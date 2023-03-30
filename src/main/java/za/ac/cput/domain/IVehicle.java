@@ -7,10 +7,12 @@ package za.ac.cput.domain;
  */
 
 public interface IVehicle {
-    String getId();
+    int getId();
     String getMake();
     String getModel();
     int getYear();
     String getCategory();
     String getLicensePlate();
+    boolean equals(Object o) ;
+    public int hashCode() ;
 }

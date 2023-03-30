@@ -1,13 +1,16 @@
 package za.ac.cput.domain;
+
+import java.util.Objects;
+
 /**
  * Car.java
  * Entity for the Car
  * Author: Peter Buckingham (220165289)
- *  Date: 29 March 2021
+ * Date: 29 March 2021
  */
 
-public class Car implements IVehicle{
-    private final String id;
+public class Car implements IVehicle {
+    private final int id;
     private final String make;
     private final String model;
     private final int year;
@@ -23,7 +26,7 @@ public class Car implements IVehicle{
         this.licensePlate = builder.licensePlate;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
@@ -51,15 +54,28 @@ public class Car implements IVehicle{
         return new Builder();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Car)) return false;
+        Car car = (Car) o;
+        return getId() == car.getId() && getYear() == car.getYear() && Objects.equals(getMake(), car.getMake()) && Objects.equals(getModel(), car.getModel()) && Objects.equals(getCategory(), car.getCategory()) && Objects.equals(getLicensePlate(), car.getLicensePlate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getMake(), getModel(), getYear(), getCategory(), getLicensePlate());
+    }
+
     public static class Builder {
-        private String id;
+        private int id;
         private String make;
         private String model;
         private int year;
         private String category;
         private String licensePlate;
 
-        public Builder id(String id) {
+        public Builder id(int id) {
             this.id = id;
             return this;
         }
@@ -94,4 +110,3 @@ public class Car implements IVehicle{
         }
     }
 }
-

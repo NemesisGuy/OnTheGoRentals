@@ -27,12 +27,13 @@ public class ICarRepositoryImpl implements ICarRepository {
     }
 
     @Override
-    public Car read(String id) {
+    public Car read(Integer id) {
         return cars.stream()
-                .filter(car -> car.getId().equals(id))
+                .filter(car -> car.getId()==id)
                 .findFirst()
                 .orElse(null);
     }
+
 
     @Override
     public Car update(Car entity) {
@@ -48,7 +49,7 @@ public class ICarRepositoryImpl implements ICarRepository {
     }
 
     @Override
-    public boolean delete(String id) {
+    public boolean delete(Integer id) {
         Car carToDelete = read(id);
 
         if (carToDelete != null) {
@@ -61,6 +62,7 @@ public class ICarRepositoryImpl implements ICarRepository {
 
     @Override
     public List<Car> getAllCars() {
+
         return Collections.unmodifiableList(cars);
     }
 
@@ -72,7 +74,8 @@ public class ICarRepositoryImpl implements ICarRepository {
     }
 
     @Override
-    public Car getCarById(String id) {
+    public Car getCarById(Integer id) {
+
         return read(id);
     }
 }

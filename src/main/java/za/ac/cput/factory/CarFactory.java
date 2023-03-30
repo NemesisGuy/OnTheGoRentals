@@ -3,7 +3,8 @@ package za.ac.cput.factory;
 import za.ac.cput.domain.Car;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
+
 
 public class CarFactory implements IFactory<Car> {
 
@@ -11,7 +12,8 @@ public class CarFactory implements IFactory<Car> {
     public Car create() {
         // implement logic to create a new Car object
         return Car.builder()
-                .id(UUID.randomUUID().toString())
+                //generate random number placeholder for id, will probably be replaced by database auto-increment value later
+                .id(new Random().nextInt(1000000))
                 .build();
 
     }
