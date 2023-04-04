@@ -9,28 +9,6 @@ import java.util.UUID;
 
 public class PaymentFactory implements IFactory<Payment>{
 
-/*
---> Commented out sirs method
-
-    public static Payment createPayment(double paymentAmount, String paymentMethod, LocalDate paymentDate, Rental rentalId) {
-
-        int id = generateId();
-
-        return new Payment.Builder()
-                .setPaymentId(id)
-                .setPaymentAmount(paymentAmount)
-                .setPaymentMethod(paymentMethod)
-                .setPaymentDate(paymentDate)
-                .setRentalId(rentalId)
-                .build();
-    }
-
-    public static int generateId() {
-        return new Random().nextInt(1000000);
-    }
-*/
-
-    // Implementing iFactory methods
     @Override
     public Payment create() {
         return new Payment.Builder()
