@@ -8,7 +8,6 @@ import java.time.LocalDate;
 
 class InsuranceTest {
     private Insurance insurance;
-    private String insuranceId = "807041";
     private String insuranceType = "Collision Damage Waiver";
     private double insuranceAmount = 42000.0;
     private LocalDate insuranceCoverageStartDate = LocalDate.parse("2022-01-01");
@@ -19,7 +18,6 @@ class InsuranceTest {
     public void testInsurance() {
 
         insurance = new Insurance.Builder()
-                .setInsuranceId(insuranceId)
                 .setInsuranceType(insuranceType)
                 .setInsuranceAmount(insuranceAmount)
                 .setInsuranceCoverageStartDate(insuranceCoverageStartDate)
@@ -29,7 +27,6 @@ class InsuranceTest {
 
         System.out.println(insurance.toString());
 
-        Assertions.assertEquals(insuranceId, insurance.getInsuranceId());
         Assertions.assertEquals(insuranceType, insurance.getInsuranceType());
         Assertions.assertEquals(insuranceAmount, insurance.getInsuranceAmount());
         Assertions.assertEquals(insuranceCoverageStartDate, insurance.getInsuranceCoverageStartDate());

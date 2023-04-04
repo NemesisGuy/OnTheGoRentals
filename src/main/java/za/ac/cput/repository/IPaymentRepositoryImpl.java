@@ -22,6 +22,7 @@ public class IPaymentRepositoryImpl implements IPaymentRepository {
         }
         return repository;
     }
+
     @Override
     public Payment create(Payment payment) {
         paymentDB.add(payment);
@@ -29,13 +30,12 @@ public class IPaymentRepositoryImpl implements IPaymentRepository {
     }
 
     @Override
-    public Payment read(String id) {
+    public Payment read(Integer id) {
         Payment payment = paymentDB.stream()
-                .filter(p -> p.getPaymentId().equals(id))
+                .filter(p -> p.getPaymentId()==id)
                 .findAny()
                 .orElse(null);
         return payment;
-
     }
 
     @Override
@@ -50,7 +50,7 @@ public class IPaymentRepositoryImpl implements IPaymentRepository {
     }
 
     @Override
-    public boolean delete(String id) {
+    public boolean delete(Integer id) {
         Payment paymentToDelete = read(id);
         if (paymentToDelete == null)
             return false;
@@ -64,8 +64,7 @@ public class IPaymentRepositoryImpl implements IPaymentRepository {
     }
 
     @Override
-    public Payment getPaymentById(String id) {
+    public Payment getPaymentById(Integer id) {
         return read(id);
     }
-
 }

@@ -1,12 +1,11 @@
 package za.ac.cput.repository;
 
-
 import za.ac.cput.domain.Insurance;
 
 import java.util.List;
 
-public interface IInsuranceRepository extends IRepository <Insurance, String>{
+public interface IInsuranceRepository extends IRepository <Insurance, Integer>{
     List<Insurance> getAllInsurancePolicies();
-    Insurance getInsuranceById(String id);
+    Insurance getInsuranceById(Integer id);
 
 }

@@ -5,8 +5,8 @@ import za.ac.cput.domain.Payment;
 
 import java.util.List;
 
-public interface IPaymentRepository extends IRepository<Payment, String>{
+public interface IPaymentRepository extends IRepository<Payment, Integer>{
     List<Payment> getAllPayments();
-    Payment getPaymentById(String id);
+    Payment getPaymentById(Integer id);
 
 }

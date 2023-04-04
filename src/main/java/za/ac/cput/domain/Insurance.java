@@ -10,8 +10,8 @@ import za.ac.cput.scratch.Rental;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Insurance {
-    private String insuranceId;
+public class Insurance implements IInsurance {
+    private int insuranceId;
     private String insuranceType;
     private double insuranceAmount;
     private LocalDate insuranceCoverageStartDate;
@@ -27,7 +27,7 @@ public class Insurance {
         this.rentalId = builder.rentalId;
     }
 
-    public String getInsuranceId() {
+    public int getInsuranceId() {
         return insuranceId;
     }
 
@@ -76,15 +76,15 @@ public class Insurance {
         return Objects.hash(insuranceId, insuranceType, insuranceAmount, insuranceCoverageStartDate, insuranceCoverageEndDate, rentalId);
     }
 
-    public static class Builder{
-        private String insuranceId;
+    public static class Builder {
+        private int insuranceId;
         private String insuranceType;
         private double insuranceAmount;
         private LocalDate insuranceCoverageStartDate;
         private LocalDate insuranceCoverageEndDate;
         private Rental rentalId;
 
-        public Builder setInsuranceId(String insuranceId) {
+        public Builder setInsuranceId(int insuranceId) {
             this.insuranceId = insuranceId;
             return this;
         }

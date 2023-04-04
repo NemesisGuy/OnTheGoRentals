@@ -13,31 +13,19 @@ class InsuranceFactoryTest {
 
     @Test
     void testInsuranceFactory_pass() {
-        Insurance insurance = InsuranceFactory.createInsurance
-                (
-                        "Collision Damage Waiver",
-                        42000.0,
-                        LocalDate.parse("2022-01-01"),
-                        LocalDate.parse("2023-12-31"),
-                        null
-                );
+        InsuranceFactory insuranceFactory = new InsuranceFactory();
+        Insurance insurance = insuranceFactory.create();
 
-        System.out.println(insurance.toString());
         Assertions.assertNotNull(insurance);
+        Assertions.assertNotNull(insurance.getInsuranceId());
     }
 
     @Test
     void testInsuranceFactory_fail() {
-        Insurance insurance = InsuranceFactory.createInsurance
-                (
-                        "Collision Damage Waiver",
-                        42000.0,
-                        LocalDate.parse("2022-01-01"),
-                        LocalDate.parse("12-31-2023"),
-                        null
-                );
+        InsuranceFactory insuranceFactory = new InsuranceFactory();
+        Insurance insurance = insuranceFactory.create();
 
-        System.out.println(insurance.toString());
-        Assertions.assertNotNull(insurance);
+        Assertions.assertNull(insurance);
+        Assertions.assertNull(insurance.getInsuranceId());
     }
 }

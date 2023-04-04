@@ -4,20 +4,17 @@ import za.ac.cput.domain.Payment;
 import za.ac.cput.scratch.Rental;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
-
-/**
- * PaymentFactory.java
- * Class for the PaymentFactory
- * Author: Aqeel Hanslo (219374422)
- * Date: 30 March 2023
- */
 
 public class PaymentFactory implements IFactory<Payment>{
 
+/*
+--> Commented out sirs method
+
     public static Payment createPayment(double paymentAmount, String paymentMethod, LocalDate paymentDate, Rental rentalId) {
 
-        String id = generateId();
+        int id = generateId();
 
         return new Payment.Builder()
                 .setPaymentId(id)
@@ -28,14 +25,17 @@ public class PaymentFactory implements IFactory<Payment>{
                 .build();
     }
 
-    public static String generateId() {
-        return UUID.randomUUID().toString();
+    public static int generateId() {
+        return new Random().nextInt(1000000);
     }
+*/
 
     // Implementing iFactory methods
     @Override
     public Payment create() {
-        return null;
+        return new Payment.Builder()
+                .setPaymentId(new Random().nextInt(1000000))
+                .build();
     }
 
     @Override
