@@ -28,8 +28,8 @@ public class IInsuranceRepositoryImpl implements IInsuranceRepository {
     }
 
     @Override
-    public Insurance read(String id) {
-        Insurance insurance = insuranceDB.stream().filter(e -> e.getInsuranceId().equals(id))
+    public Insurance read(Integer id) {
+        Insurance insurance = insuranceDB.stream().filter(e -> e.getInsuranceId()==id)
                 .findAny().orElse(null);
         return insurance;
     }
@@ -46,7 +46,7 @@ public class IInsuranceRepositoryImpl implements IInsuranceRepository {
     }
 
     @Override
-    public boolean delete(String id) {
+    public boolean delete(Integer id) {
         Insurance insuranceToDelete = read(id);
         if (insuranceToDelete != null) {
             insuranceDB.remove(insuranceToDelete);
@@ -61,7 +61,7 @@ public class IInsuranceRepositoryImpl implements IInsuranceRepository {
     }
 
     @Override
-    public Insurance getInsuranceById(String id) {
+    public Insurance getInsuranceById(Integer id) {
         return read(id);
     }
 }

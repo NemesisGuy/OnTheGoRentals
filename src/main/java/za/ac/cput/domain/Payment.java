@@ -11,8 +11,8 @@ import za.ac.cput.scratch.Rental;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Payment {
-    private String paymentId;
+public class Payment implements IPayment{
+    private int paymentId;
     private double paymentAmount;
     private String paymentMethod;
     private LocalDate paymentDate;
@@ -26,7 +26,7 @@ public class Payment {
         this.rentalId = builder.rentalId;
     }
 
-    public String getPaymentId() {
+    public int getPaymentId() {
         return paymentId;
     }
 
@@ -72,13 +72,13 @@ public class Payment {
 
     // Inner Builder Class
     public static class Builder {
-        private String paymentId;
+        private int paymentId;
         private double paymentAmount;
         private String paymentMethod;
         private LocalDate paymentDate;
         private Rental rentalId;
 
-        public Builder setPaymentId(String paymentId) {
+        public Builder setPaymentId(int paymentId) {
             this.paymentId = paymentId;
             return this;
         }

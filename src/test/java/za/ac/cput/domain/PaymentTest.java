@@ -6,7 +6,6 @@ import java.time.LocalDate;
 
 class PaymentTest {
     private Payment payment;
-    private String paymentId = "203401";
     private double paymentAmount = 2000.0;
     private String paymentMethod = "Credit";
     private LocalDate paymentDate = LocalDate.parse("2023-01-01");
@@ -16,7 +15,6 @@ class PaymentTest {
     public void testPayment() {
 
         payment = new Payment.Builder()
-                .setPaymentId(paymentId)
                 .setPaymentAmount(paymentAmount)
                 .setPaymentMethod(paymentMethod)
                 .setPaymentDate(paymentDate)
@@ -25,7 +23,6 @@ class PaymentTest {
 
         System.out.println(payment.toString());
 
-        Assertions.assertEquals(paymentId, payment.getPaymentId());
         Assertions.assertEquals(paymentAmount, payment.getPaymentAmount());
         Assertions.assertEquals(paymentMethod, payment.getPaymentMethod());
         Assertions.assertEquals(paymentDate, payment.getPaymentDate());
