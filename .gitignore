@@ -48,3 +48,14 @@ build/
 ### Database credentials ###
 ### Ignore database configuration file ###
 mysql-db.properties
+/spring/.mvn/
+*.log
+.mvn/
+application.properties
+
+HELP.md
+
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+!src/main/resources/application.properties

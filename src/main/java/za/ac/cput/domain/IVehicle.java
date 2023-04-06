@@ -6,7 +6,7 @@ package za.ac.cput.domain;
  * Date: 29 March 2021
  */
 
-public interface IVehicle {
+public interface IVehicle extends IDomain{
     int getId();
     String getMake();
     String getModel();
