@@ -9,9 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import za.ac.cput.scratch.Customer;
 import za.ac.cput.scratch.Rental;
-import za.ac.cput.domain.DamageReport;
-import za.ac.cput.domain.Car;
-
 import java.time.LocalDate;
 
 class DamageReportTest {
