@@ -1,4 +1,4 @@
-package az.ac.cput.domain;
+package za.ac.cput.domain;
 
 import java.time.LocalDate;
 import az.ac.cput.scratch.Customer;

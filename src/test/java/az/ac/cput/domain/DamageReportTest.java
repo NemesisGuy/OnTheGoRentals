@@ -9,10 +9,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import az.ac.cput.scratch.Customer;
 import az.ac.cput.scratch.Rental;
+import za.ac.cput.domain.DamageReport;
 
 import java.time.LocalDate;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DamageReportTest {
 

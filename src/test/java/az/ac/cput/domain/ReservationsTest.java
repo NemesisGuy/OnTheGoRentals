@@ -6,13 +6,11 @@ package az.ac.cput.domain;
  * Author: Cwenga Dlova (214310671)
  * Date:  01 April 2023
  */
-import com.mysql.cj.protocol.a.LocalDateTimeValueEncoder;
-import com.mysql.cj.protocol.a.LocalTimeValueEncoder;
 import org.junit.jupiter.api.Test;
+import za.ac.cput.domain.Reservations;
 
 import java.sql.Time;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.*;

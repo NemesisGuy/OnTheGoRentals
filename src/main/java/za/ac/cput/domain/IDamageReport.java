@@ -1,4 +1,4 @@
-package az.ac.cput.domain;
+package za.ac.cput.domain;
 
 import az.ac.cput.scratch.Customer;
 import az.ac.cput.scratch.Rental;
