@@ -1,4 +1,4 @@
-package az.ac.cput.domain;
+package za.ac.cput.domain;
 
 /**
  * ReservationsTest.java

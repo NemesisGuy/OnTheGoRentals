@@ -1,7 +1,7 @@
 package za.ac.cput.domain;
 
-import az.ac.cput.scratch.Customer;
-import az.ac.cput.scratch.Rental;
+import za.ac.cput.scratch.Customer;
+import za.ac.cput.scratch.Rental;
 
 import java.time.LocalDate;
 
