@@ -9,7 +9,7 @@ import java.sql.Time;
 import java.time.LocalDate;
 
 
-public class Reservations {
+public class Reservations implements IDomain{
     private int id;
     private String pickUpLocation;
     private LocalDate pickUpDate;
