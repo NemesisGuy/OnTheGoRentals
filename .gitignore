@@ -53,15 +53,9 @@ mysql-db.properties
 .mvn/
 application.properties
 
-
-
-
-
 HELP.md
 
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 !src/main/resources/application.properties
-
-

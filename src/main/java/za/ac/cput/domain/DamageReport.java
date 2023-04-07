@@ -10,8 +10,8 @@ import java.time.LocalDate;
  * Author: Cwenga Dlova (214310671)
  * Date:  01 April 2023
  */
-public class DamageReport implements IDamageReport{
-    private String id;
+public class DamageReport implements IDomain{
+    private int id;
     private Rental rentalId;
     private Customer customerId;
     private Car carId;
@@ -29,7 +29,7 @@ public class DamageReport implements IDamageReport{
         this.description = builder.description;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
@@ -61,7 +61,7 @@ public class DamageReport implements IDamageReport{
     @Override
     public String toString() {
         return "DamageReport{" +
-                "id='" + id + '\'' +
+                "id=" + id + '\'' +
                 ", rentalId=" + rentalId +
                 ", customerId=" + customerId +
                 ", carId=" + carId +
@@ -71,7 +71,7 @@ public class DamageReport implements IDamageReport{
                 '}';
     }
     public static class Builder {
-        private String id;
+        private int id;
         private Rental rentalId;
         private Customer customerId;
         private Car carId;
@@ -79,7 +79,7 @@ public class DamageReport implements IDamageReport{
         private String damageLocation;
         private String description;
 
-        public Builder setId(String id) {
+        public Builder setId(int id) {
             this.id = id;
             return this;
         }
