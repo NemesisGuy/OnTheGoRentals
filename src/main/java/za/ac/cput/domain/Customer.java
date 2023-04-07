@@ -1,107 +1,102 @@
 package za.ac.cput.domain;
 
-import java.util.Objects;
-
-    /**
+     /**
      * Lonwabo Magazi-218331851
      * Date: March 2023
+      * Customer.java
      */
 
     public class Customer {
-        private int Customer_Id;
+        private int CustomerId;
         private String Name;
         private String ContactInfo;
-        private String BorrowingHistory;
+        private String HiringHistory;
 
-        public Customer() {
-        }
 
-        public Customer(String Name,
-                        String ContactInfo,
-                        String BorrowingHistory,
-                        String referenceNumber) {
-            this.Name = Name;
-            this.ContactInfo = ContactInfo;
-            this.BorrowingHistory = BorrowingHistory;
-        }
+        //Builder Class
+        private Customer(CustomerBuilder builder) {
 
-        private Customer(Builder builder) {
-            this.Customer_Id = Customer_Id;
-            this.Name = Name;
-            this.ContactInfo = ContactInfo;
-            this.BorrowingHistory = BorrowingHistory;
+            this.CustomerId = builder.CustomerId;
+            this.Name = builder.Name;
+            this.ContactInfo = builder.ContactInfo;
+            this.HiringHistory = builder.HiringHistory;
 
         }
 
-        public Customer(String borrowingHistory) {
-            BorrowingHistory = borrowingHistory;
-        }
+        //Getters
 
-        public Customer(String Name, String contactInfo) {
-            this.Name = Name;
-            ContactInfo = contactInfo;
-
-        }
-        public int getCustomer_Id() {
-            return Customer_Id;
-        }
-        public String getBorrowingHistory() {
-            return BorrowingHistory;
-        }
-
-        public void setBorrowingHistory(String borrowingHistory) {
-            BorrowingHistory = borrowingHistory;
+        public int getCustomerId() {
+            return CustomerId;
         }
 
         public String getName() {
             return Name;
         }
-
-        public void setName(String name) {
-            this.Name = Name;
-        }
-
         public String getContactInfo() {
             return ContactInfo;
         }
+        public String getHiringHistory() {
+            return HiringHistory;
+        }
 
+
+        //Setters
+        public void setCustomerId(int customerId)  {
+            this.CustomerId = CustomerId;
+        }
+        public void setName(String name) {
+            this.Name = name;
+        }
         public void setContactInfo(String contactInfo) {
-            ContactInfo = contactInfo;
+            this.ContactInfo = contactInfo;
         }
+        public void setHiringHistory(String hiringHistory) {
+            this.HiringHistory = hiringHistory;
+        }
+
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Customer customer)) return false;
-            return Name.equals(customer.Name) && ContactInfo.equals(customer.ContactInfo) && BorrowingHistory.equals(customer.BorrowingHistory);
+        public String toString() {
+            return "Customer{" +
+                    "CustomerId=" + CustomerId +
+                    "Name='" + Name + '\'' +
+                    ", ContactInfo=" + ContactInfo + '\'' +
+                    ", HiringHistory=" + HiringHistory + '\'' +
+                    '}';
         }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(Name, ContactInfo, BorrowingHistory);
-        }
 
-        public static class Builder {
-            private String Name, ContactInfo, BorrowingHistory;
-            private int Customer_Id;
+         //Builder ClassS
+        public static class CustomerBuilder {
+            private int CustomerId;
+            private String Name;
+            private String ContactInfo;
+            private String HiringHistory;
 
-            public Builder setName(String Name) {
+            public CustomerBuilder setCustomerId(int CustomerId) {
+                this.CustomerId = this.CustomerId;
+                return this;
+            }
+            public CustomerBuilder setName(String Name) {
                 this.Name = Name;
                 return this;
             }
-            public Builder setCustomer_Id(int customer_Id) {
-                this.Customer_Id = customer_Id;
-                return this;
-            }
 
-            public Builder setContactInfo(String ContactInfo) {
+            public Customer.CustomerBuilder setContactInfo(String ContactInfo) {
                 this.ContactInfo = ContactInfo;
                 return this;
             }
 
-            public Builder setBorrowingHistory(String BorrowingHistory) {
-                this.BorrowingHistory = BorrowingHistory;
+            public Customer.CustomerBuilder setBorrowingHistory(String BorrowingHistory) {
+                this.HiringHistory = HiringHistory;
                 return this;
             }
-        }
-    }
+
+            public Customer build(){
+                return new Customer(this);
+
+            }
+
+         }
+
+     }
