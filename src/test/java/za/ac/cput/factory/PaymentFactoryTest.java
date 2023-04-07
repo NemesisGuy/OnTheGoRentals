@@ -13,7 +13,7 @@ class PaymentFactoryTest {
         Payment payment = paymentFactory.create();
 
         Assertions.assertNotNull(payment);
-        Assertions.assertNotNull(payment.getPaymentId());
+        Assertions.assertNotNull(payment.getId());
     }
 
     @Test
@@ -22,7 +22,7 @@ class PaymentFactoryTest {
         Payment payment = paymentFactory.create();
 
         Assertions.assertNull(payment);
-        Assertions.assertNull(payment.getPaymentId());
+        Assertions.assertNull(payment.getId());
     }
 
 }

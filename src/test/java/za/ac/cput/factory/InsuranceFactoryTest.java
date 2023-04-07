@@ -17,7 +17,7 @@ class InsuranceFactoryTest {
         Insurance insurance = insuranceFactory.create();
 
         Assertions.assertNotNull(insurance);
-        Assertions.assertNotNull(insurance.getInsuranceId());
+        Assertions.assertNotNull(insurance.getId());
     }
 
     @Test
@@ -26,6 +26,6 @@ class InsuranceFactoryTest {
         Insurance insurance = insuranceFactory.create();
 
         Assertions.assertNull(insurance);
-        Assertions.assertNull(insurance.getInsuranceId());
+        Assertions.assertNull(insurance.getId());
     }
 }
