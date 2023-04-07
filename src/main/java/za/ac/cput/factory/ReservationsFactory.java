@@ -7,6 +7,9 @@ package za.ac.cput.factory;
  */
 
 import za.ac.cput.domain.Reservations;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -17,6 +20,12 @@ public class ReservationsFactory implements IFactory<Reservations>{
     public Reservations create(){
         return new Reservations.Builder()
         .setId(new Random().nextInt(1000000))
+                .setPickUpLocation("Cape Town")
+                .setPickUpDate(LocalDate.parse("2023-02-25"))
+                .setPickUpTime(Time.valueOf(LocalTime.of(10,00)))
+                .setReturnLocation("Cape Town")
+                .setReturnDate(LocalDate.parse("2023-02-28"))
+                .setReturnTme(Time.valueOf(LocalTime.of(14,00)))
                 .build();
     }
 
