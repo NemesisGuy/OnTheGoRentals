@@ -1,6 +1,10 @@
+/* MaintenanceFactory.java
+ Entity for the Maintenance
+ Author: Asiphe Funda (215092317)
+ Date: 06 April 2023
+*/
 package za.ac.cput.factory;
 
-import za.ac.cput.domain.Car;
 import za.ac.cput.domain.Maintenance;
 
 import java.util.List;
@@ -9,9 +13,7 @@ import java.util.Random;
 public class MaintenanceFactory implements IFactory<Maintenance>{
     @Override
     public Maintenance create() {
-        // implement logic to create a new Car object
         return Maintenance.builder()
-                //generate random number placeholder for id, will probably be replaced by database auto-increment value later
                 .id(new Random().nextInt(1000000))
                 .build();
     }

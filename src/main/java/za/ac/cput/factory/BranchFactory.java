@@ -1,3 +1,8 @@
+/* BranchFactory.java
+ Entity for the Branch
+ Author: Asiphe Funda (215092317)
+ Date: 06 April 2023
+*/
 package za.ac.cput.factory;
 
 import za.ac.cput.domain.Address;
@@ -6,7 +11,6 @@ import za.ac.cput.domain.Branch;
 import java.util.List;
 import java.util.Random;
 
-import static za.ac.cput.domain.Car.builder;
 
 public class BranchFactory implements IFactory<Branch> {
     @Override

@@ -1,3 +1,8 @@
+/* Branch.java
+ Entity for the Branch
+ Author: Asiphe Funda (215092317)
+ Date: 19 March 2023
+*/
 package za.ac.cput.domain;
 
 public class Branch implements IDomain{
