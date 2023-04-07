@@ -30,7 +30,7 @@ public class IPaymentRepositoryImpl implements IPaymentRepository {
     @Override
     public Payment read(Integer id) {
         Payment payment = paymentDB.stream()
-                .filter(p -> p.getPaymentId()==id)
+                .filter(p -> p.getId()==id)
                 .findAny()
                 .orElse(null);
         return payment;
@@ -38,7 +38,7 @@ public class IPaymentRepositoryImpl implements IPaymentRepository {
 
     @Override
     public Payment update(Payment payment) {
-        Payment old = read(payment.getPaymentId());
+        Payment old = read(payment.getId());
         if (old != null) {
             paymentDB.remove(old);
             paymentDB.add(payment);

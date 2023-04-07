@@ -23,13 +23,13 @@ class IInsuranceRepositoryImplTest {
     @Test
     void a_create() {
         Insurance created = repository.create(insurance);
-        assertEquals(created.getInsuranceId(), insurance.getInsuranceId());
+        assertEquals(created.getId(), insurance.getId());
         System.out.println("Created: " + created);
     }
 
     @Test
     void b_read() {
-        Insurance read = repository.read(insurance.getInsuranceId());
+        Insurance read = repository.read(insurance.getId());
         assertNotNull(read);
         System.out.println("Read: " + read);
     }
@@ -61,14 +61,14 @@ class IInsuranceRepositoryImplTest {
 
     @Test
     void e_getInsuranceById() {
-        Insurance id = repository.getInsuranceById(insurance.getInsuranceId());
+        Insurance id = repository.getInsuranceById(insurance.getId());
         System.out.println("\nSearch by Id: " + id);
         assertNotNull(id);
     }
 
     @Test
     void f_delete() {
-        boolean success = repository.delete(insurance.getInsuranceId());
+        boolean success = repository.delete(insurance.getId());
         assertTrue(success);
         System.out.println("Deleted: " + success);
     }

@@ -10,9 +10,9 @@ import za.ac.cput.scratch.Rental;
 
 import java.time.LocalDate;
 
-public interface IInsurance {
+public interface IInsurance extends IDomain {
 
-    int getInsuranceId();
+    int getId();
 
     String getInsuranceType();
 
