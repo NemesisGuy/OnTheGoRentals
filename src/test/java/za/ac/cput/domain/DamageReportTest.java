@@ -24,7 +24,7 @@ class DamageReportTest {
     @Test
     public void testDamageReport(){
         DamageReport report = new DamageReport.Builder()
-                .setId(String.valueOf(id))
+
                 .setRentalId(rentalId)
                 .setCustomerId(customerId)
                 .setCarId(carId)
@@ -38,7 +38,7 @@ class DamageReportTest {
     @Test
     public void testEquality() {
         DamageReport report2 = new DamageReport.Builder()
-                .setId(String.valueOf(4565232))
+                .setId(4565232)
                 .setRentalId(rentalId)
                 .setCustomerId(customerId)
                 .setCarId(carId)
@@ -48,7 +48,7 @@ class DamageReportTest {
                 .build();
 
         DamageReport report3 = new DamageReport.Builder()
-                .setId(String.valueOf(5556231))
+                .setId(5556231)
                 .setRentalId(rentalId)
                 .setCustomerId(customerId)
                 .setCarId(carId)
