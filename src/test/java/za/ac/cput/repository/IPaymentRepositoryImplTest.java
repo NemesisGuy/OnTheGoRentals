@@ -25,13 +25,13 @@ class IPaymentRepositoryImplTest {
     @Test
     void a_create() {
         Payment created = repository.create(payment);
-        assertEquals(payment.getPaymentId(), created.getPaymentId());
+        assertEquals(payment.getId(), created.getId());
         System.out.println("Created: " + created);
     }
 
     @Test
     void b_read() {
-        Payment read = repository.read(payment.getPaymentId());
+        Payment read = repository.read(payment.getId());
         Assertions.assertNotNull(read);
         System.out.println("Read: " + read);
     }
@@ -63,14 +63,14 @@ class IPaymentRepositoryImplTest {
 
     @Test
     void e_getPaymentById() {
-        Payment id = repository.getPaymentById(payment.getPaymentId());
+        Payment id = repository.getPaymentById(payment.getId());
         System.out.println("\nSearch by Id: " + id);
         assertNotNull(id);
     }
 
     @Test
     void f_delete() {
-        boolean deleted = repository.delete(payment.getPaymentId());
+        boolean deleted = repository.delete(payment.getId());
         Assertions.assertTrue(deleted);
         System.out.println("Deleted: " + deleted);
     }

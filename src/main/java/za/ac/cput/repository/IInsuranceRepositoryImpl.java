@@ -28,14 +28,14 @@ public class IInsuranceRepositoryImpl implements IInsuranceRepository {
 
     @Override
     public Insurance read(Integer id) {
-        Insurance insurance = insuranceDB.stream().filter(e -> e.getInsuranceId()==id)
+        Insurance insurance = insuranceDB.stream().filter(e -> e.getId()==id)
                 .findAny().orElse(null);
         return insurance;
     }
 
     @Override
     public Insurance update(Insurance insurance) {
-        Insurance old = read(insurance.getInsuranceId());
+        Insurance old = read(insurance.getId());
         if (old != null) {
             insuranceDB.remove(old);
             insuranceDB.add(insurance);
