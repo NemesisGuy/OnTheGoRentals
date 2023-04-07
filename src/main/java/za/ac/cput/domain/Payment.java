@@ -26,7 +26,7 @@ public class Payment implements IPayment{
         this.rentalId = builder.rentalId;
     }
 
-    public int getPaymentId() {
+    public int getId() {
         return paymentId;
     }
 

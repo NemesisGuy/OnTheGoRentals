@@ -29,7 +29,7 @@ public class Insurance implements IInsurance {
         this.rentalId = builder.rentalId;
     }
 
-    public int getInsuranceId() {
+    public int getId() {
         return insuranceId;
     }
 

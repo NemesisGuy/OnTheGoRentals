@@ -10,15 +10,11 @@ import za.ac.cput.scratch.Rental;
 
 import java.time.LocalDate;
 
-public interface IPayment {
+public interface IPayment extends IDomain {
 
-    int getPaymentId();
-
+    int getId();
     double getPaymentAmount();
-
     String getPaymentMethod();
-
     LocalDate getPaymentDate();
-
     Rental getRentalId();
 }
