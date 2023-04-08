@@ -10,6 +10,8 @@ import za.ac.cput.domain.Maintenance;
 import java.util.List;
 
 public interface IMaintenanceRepository extends IRepository <Maintenance, Integer>{
-    public List<Maintenance> getAll();
+    List<Maintenance> getAll();
+
+    public List<Maintenance> getAllMaintenance();
     Maintenance getMaintenanceById(Integer id);
 }

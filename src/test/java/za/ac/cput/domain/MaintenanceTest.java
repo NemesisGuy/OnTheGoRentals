@@ -16,7 +16,7 @@ class MaintenanceTest {
     @Test
     public void testMaintenance(){
         Maintenance maintenance= new Maintenance.Builder()
-                .setId(maintenanceId)
+                .setMaintenanceId(maintenanceId)
                 .setMaintenanceType(maintenanceType)
                 .setServiceProvider(serviceProvider)
                 .setServiceDate(serviceDate)
@@ -27,14 +27,14 @@ class MaintenanceTest {
     @Test
     public void testObjectIdentity(){
         Maintenance maintenance= new Maintenance.Builder()
-                .setId(102030)
+                .setMaintenanceId(102030)
                 .setMaintenanceType("Brake Repair")
                 .setServiceProvider(serviceProvider)
                 .setServiceDate( LocalDate.parse("2023-04-07"))
                 .build();
 
         Maintenance maintenance1= new Maintenance.Builder()
-                .setId(102030)
+                .setMaintenanceId(102030)
                 .setMaintenanceType("Brake Repair")
                 .setServiceProvider(serviceProvider)
                 .setServiceDate( LocalDate.parse("2023-04-07"))
@@ -45,14 +45,14 @@ class MaintenanceTest {
 @Test
     public void testInequality(){
     Maintenance maintenance= new Maintenance.Builder()
-            .setId(123450)
+            .setMaintenanceId(123450)
             .setMaintenanceType("Brake Repair")
             .setServiceProvider(serviceProvider)
             .setServiceDate( LocalDate.parse("2023-04-08"))
             .build();
 
     Maintenance maintenance1= new Maintenance.Builder()
-            .setId(102030)
+            .setMaintenanceId(102030)
             .setMaintenanceType("Tire Replacement")
             .setServiceProvider(serviceProvider)
             .setServiceDate( LocalDate.parse("2023-04-07"))
