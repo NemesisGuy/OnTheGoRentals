@@ -4,7 +4,7 @@ import za.ac.cput.domain.Rental;
 
 import java.util.List;
 
-public interface IFactoryRental<R> {
+public interface IFactoryRental<R> extends IFactory<Rental> {
     abstract Rental create();
 
     Rental getById(long id);

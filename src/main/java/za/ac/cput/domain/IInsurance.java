@@ -6,7 +6,7 @@ package za.ac.cput.domain;
  * Date: 04 April 2023
  */
 
-import za.ac.cput.scratch.Rental;
+
 
 import java.time.LocalDate;
 

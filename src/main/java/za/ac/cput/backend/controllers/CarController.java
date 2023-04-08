@@ -16,7 +16,7 @@ import java.util.List;
 public class CarController {
 
     @GetMapping("/cars")
-    public String cars() {
+    public List cars() {
         List<Car> cars = new ArrayList<>();
 
         Car car1 = Car.builder()
@@ -70,20 +70,7 @@ public class CarController {
         cars.add(car4);
         cars.add(car5);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("<table>")
-                .append("<tr><th>ID</th><th>Make</th><th>Model</th><th>Year</th><th>Category</th><th>License Plate</th></tr>");
-        for (Car car : cars) {
-            sb.append("<tr>")
-                    .append("<td>").append(car.getId()).append("</td>")
-                    .append("<td>").append(car.getMake()).append("</td>")
-                    .append("<td>").append(car.getModel()).append("</td>")
-                    .append("<td>").append(car.getYear()).append("</td>")
-                    .append("<td>").append(car.getCategory()).append("</td>")
-                    .append("<td>").append(car.getLicensePlate()).append("</td>")
-                    .append("</tr>");
-        }
-        sb.append("</table>");
-        return sb.toString();
+
+        return cars ;
     }
 }

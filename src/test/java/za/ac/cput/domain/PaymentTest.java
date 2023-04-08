@@ -1,7 +1,7 @@
 package za.ac.cput.domain;
 
 import org.junit.jupiter.api.*;
-import za.ac.cput.scratch.Rental;
+
 import java.time.LocalDate;
 
 class PaymentTest {

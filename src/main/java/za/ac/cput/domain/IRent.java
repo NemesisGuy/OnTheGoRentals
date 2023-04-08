@@ -6,7 +6,9 @@ package za.ac.cput.domain;
  * IRent.java
  */
 
+
 public interface IRent extends IDomain {
+
 
     int getId();
     String getBorrower();

@@ -9,7 +9,7 @@ import java.util.List;
  * Date: March 2023
  */
 
-public interface IFactoryCustomer<T> {
+public interface IFactoryCustomer<T> extends IFactory<Customer>{
     abstract Customer create();
 
     Customer getById(long id);
