@@ -7,8 +7,6 @@ package za.ac.cput.domain;
  */
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import za.ac.cput.scratch.Customer;
-import za.ac.cput.scratch.Rental;
 import java.time.LocalDate;
 
 class DamageReportTest {

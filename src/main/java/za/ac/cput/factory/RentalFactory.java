@@ -11,41 +11,42 @@ import java.util.Random;
  * RentalFactory Class.java
  */
 
-public class RentalFactory implements IFactoryRental {
-        @Override
+public class RentalFactory {
+
         public Rental create() {
             return new Rental.RentalBuilder()
                     .setRentalId(new Random().nextInt(1000000))
                     .build();
         }
-    @Override
+
     public Rental getById(long id) {
         return null;
     }
 
-    @Override
+
     public Rental update(Rental entity) {
         return null;
     }
 
-    @Override
+
     public boolean delete(Rental entity) {
         return false;
     }
 
-    @Override
+
     public List<Rental> getAll() {
         return null;
     }
 
-    @Override
+
     public long count() {
         return 0;
     }
 
-    @Override
+
     public Class<Rental> getType() {
         return null;
     }
+
 }
 

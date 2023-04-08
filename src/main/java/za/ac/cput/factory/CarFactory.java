@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 
-public class CarFactory implements IFactory<Car> {
+public class CarFactory implements IFactoryCar {
 
     @Override
     public Car create() {
@@ -51,6 +51,18 @@ public class CarFactory implements IFactory<Car> {
     @Override
     public Class<Car> getType() {
         return Car.class;
+    }
+
+    @Override
+    public Car createCar(int id, String make, String model, int year, String category, String licensePlate) {
+        return Car.builder()
+                .id(id)
+                .make(make)
+                .model(model)
+                .year(year)
+                .category(category)
+                .licensePlate(licensePlate)
+                .build();
     }
 }
 

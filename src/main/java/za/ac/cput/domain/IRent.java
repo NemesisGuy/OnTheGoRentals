@@ -5,7 +5,7 @@ package za.ac.cput.domain;
  * Date: March 2023
  */
 
-public interface IRent {
+public interface IRent extends IDomain{
 
     int getId();
     String getBorrower();
