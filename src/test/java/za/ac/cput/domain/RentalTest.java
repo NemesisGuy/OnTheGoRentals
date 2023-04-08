@@ -4,33 +4,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RentalTest {
 
+
+    private int rentalId;
+    private String rentalBorrower;
+    private String rentalCar;
+    private String rentalIssuer;
+    private String rentalIssuedDate;
+    private String rentalDateReturned;
+    private String rentalReceiver;
+
     public void testRental ()  {
 
         Rental rental = new Rental.RentalBuilder()
+                .setRentalId(rentalId)
+                .setBorrower(rentalBorrower)
+                .setCar(rentalCar)
+                .setIssuer(rentalIssuer)
+                .setIssuedDate(rentalIssuedDate)
+                .setDateReturned(rentalDateReturned)
+                .setReceiver(rentalReceiver)
                 .build();
-
-        rental.setRentalId(Integer.parseInt("218331851"));
-        rental.setBorrower(" ");
-        rental.setCar("Range Rover");
-        rental.setIssuer("Land Rover ");
-        rental.setIssuedDate("23/03/2023");
-        rental.setDateReturned("23/04/2023 ");
-        rental.setReceiver("Asiphe ");
 
         System.out.println(rental.toString());
 
-
-        assertEquals("218331851",rental.getRentalId());
-
-        assertEquals("Lonwabo Magazi",rental.getBorrower());
-
-        assertEquals("218331851@mycput.ac.za",rental.getCar());
-
-        assertEquals(" ",rental.getIssuer());
-        assertEquals("218331851@mycput.ac.za",rental.getIssuedDate());
-        assertEquals("218331851@mycput.ac.za",rental.getDateReturned());
-        assertEquals("218331851@mycput.ac.za",rental.getReceiver());
+        assertEquals(rentalId,rental.getRentalId());
+        assertEquals(rentalBorrower,rental.getBorrower());
+        assertEquals(rentalCar,rental.getCar());
+        assertEquals(rentalIssuer,rental.getIssuer());
+        assertEquals(rentalIssuedDate,rental.getIssuedDate());
+        assertEquals(rentalDateReturned,rental.getDateReturned());
+        assertEquals(rentalReceiver,rental.getReceiver());
     }
-
-
 }

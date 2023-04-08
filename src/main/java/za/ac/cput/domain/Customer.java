@@ -6,7 +6,7 @@ package za.ac.cput.domain;
       * Customer.java
      */
 
-    public class Customer {
+    public class Customer implements IDomain {
         private int CustomerId;
         private String Name;
         private String ContactInfo;
@@ -64,6 +64,11 @@ package za.ac.cput.domain;
                     ", HiringHistory=" + HiringHistory + '\'' +
                     '}';
         }
+
+         @Override
+         public int getId() {
+             return 0;
+         }
 
 
          //Builder ClassS
