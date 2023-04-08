@@ -3,9 +3,12 @@ package za.ac.cput.domain;
 /**
  * Lonwabo Magazi-218331851
  * Date: March 2023
+ * IRent.java
  */
 
-public interface IRent extends IDomain{
+
+public interface IRent extends IDomain {
+
 
     int getId();
     String getBorrower();

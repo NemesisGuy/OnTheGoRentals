@@ -42,15 +42,8 @@ public class Rental implements IRent{
         return this.rentalId;
     }
 
-    public void setRentalId(int rentalId) {
-        this.rentalId = rentalId;
-    }
     public String getBorrower(String borrower) {
         return this.borrower;
-    }
-
-    public void setBorrower(String borrower) {
-        this.borrower = borrower;
     }
 
     @Override
@@ -67,17 +60,11 @@ public class Rental implements IRent{
         return car;
     }
 
-    public void setCar(String car) {
-        this.car = car;
-    }
 
     public String getIssuer() {
         return issuer;
     }
 
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
-    }
 
     public String getIssuedDate() {
         return issuedDate;
@@ -88,17 +75,11 @@ public class Rental implements IRent{
         return null;
     }
 
-    public void setIssuedDate(String issuedDate) {
-        this.issuedDate = issuedDate;
-    }
 
     public String getDateReturned() {
         return dateReturned;
     }
 
-    public void setDateReturned(String dateReturned) {
-        this.dateReturned = dateReturned;
-    }
 
     public String getReceiver() {
         return receiver;
@@ -109,20 +90,14 @@ public class Rental implements IRent{
         return false;
     }
 
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
-    }
-
     public boolean isFinePaid() {
         return finePaid;
     }
 
-    public void setFinePaid(boolean finePaid) {
-        this.finePaid = finePaid;
-    }
 
 
-    //Builder ClassS
+
+    //Builder Class
     public static class RentalBuilder {
 
         private int rentalId;
