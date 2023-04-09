@@ -1,4 +1,10 @@
 package za.ac.cput.factory;
+/**
+ * InsuranceFactory.java
+ * Class for the Insurance Factory
+ * Author: Aqeel Hanslo (219374422)
+ * Date:  06 April 2023
+ */
 
 import za.ac.cput.domain.Insurance;
 
