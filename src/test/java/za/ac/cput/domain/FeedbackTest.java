@@ -13,13 +13,13 @@ public class FeedbackTest {
         Feedback feedback1 = new Feedback.FeedbackBuilder()
                 .setName("Shamiso")
                 .setComment("This is a test!")
-                .setId("2345")
+                .setId(2345)
                 .build();
 
         Feedback feedback2 = new Feedback.FeedbackBuilder()
                 .setName("Moyo")
                 .setComment("Needs improvement.")
-                .setId("2345")
+                .setId(2345)
                 .build();
 
         System.out.println(feedback1.getComment());

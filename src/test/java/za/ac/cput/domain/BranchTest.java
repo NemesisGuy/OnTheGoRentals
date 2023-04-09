@@ -56,6 +56,6 @@ class BranchTest {
                 .setEmail(email)
                 .build();
 
-        assertNotEquals(branch,branch);
+        assertNotEquals(branch,branch1);
     }
 }

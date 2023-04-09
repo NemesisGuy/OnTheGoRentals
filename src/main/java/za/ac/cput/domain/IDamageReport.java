@@ -3,8 +3,9 @@ package za.ac.cput.domain;
 
 import java.time.LocalDate;
 
-public interface IDamageReport {
-    String getId();
+public interface IDamageReport extends IDomain{
+    int getId();
+
     Rental getRentalId();
     Customer getCustomerId();
     Car getCarId();

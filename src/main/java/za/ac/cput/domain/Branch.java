@@ -1,7 +1,9 @@
 package za.ac.cput.domain;
 
-public class Branch implements IDomain{
+public class Branch implements IBranch{
+
     private int branchId;
+
     private String branchName;
     private Address address;
     private String email;

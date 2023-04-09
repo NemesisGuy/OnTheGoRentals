@@ -7,7 +7,7 @@
 
 package za.ac.cput.domain;
 
-public class Employee {
+public class Employee  implements IEmployee{
     private final int id;
     private final String firstName;
     private final String lastName;

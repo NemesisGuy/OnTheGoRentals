@@ -10,8 +10,9 @@ package za.ac.cput.domain;
 public class Feedback {
     private String name;
     private String comment;
-    private String id;
-    private Feedback(String name, String comment, String id) {
+    private int id;
+
+    private Feedback(String name, String comment, int id) {
         this.name = name;
         this.comment = comment;
         this.id = id;
@@ -25,7 +26,7 @@ public class Feedback {
         return comment;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
@@ -36,8 +37,7 @@ public class Feedback {
     public static class FeedbackBuilder {
         private String name;
         private String comment;
-
-        private String id;
+        private int id;
 
         public FeedbackBuilder setName(String name) {
             this.name = name;
@@ -48,13 +48,14 @@ public class Feedback {
             this.comment = comment;
             return this;
         }
-        public FeedbackBuilder setId(String id) {
+
+        public FeedbackBuilder setId(int id) {
             this.id = id;
             return this;
         }
 
         public Feedback build() {
-            return new Feedback(name, comment,id);
+            return new Feedback(name, comment, id);
         }
 
         @Override
@@ -62,7 +63,7 @@ public class Feedback {
             return "FeedbackBuilder{" +
                     "name='" + name + '\'' +
                     ", comment='" + comment + '\'' +
-                    ", id='" + id + '\'' +
+                    ", id=" + id +
                     '}';
         }
 

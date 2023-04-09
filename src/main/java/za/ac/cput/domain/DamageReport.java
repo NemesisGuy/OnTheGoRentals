@@ -9,7 +9,7 @@ import java.time.LocalDate;
  * Author: Cwenga Dlova (214310671)
  * Date:  01 April 2023
  */
-public class DamageReport implements IDomain{
+public class DamageReport implements IDamageReport{
     private int id;
     private Rental rentalId;
     private Customer customerId;
