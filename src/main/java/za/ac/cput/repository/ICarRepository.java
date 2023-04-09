@@ -1,7 +1,7 @@
 package za.ac.cput.repository;
 /**
- * IRepository.java
- * Interface for the IRepository
+ * ICarRepository.java
+ * Interface for the ICarRepository
  * Author: Peter Buckingham (220165289)
  * Date: 29 March 2021
  */
