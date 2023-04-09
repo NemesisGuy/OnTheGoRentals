@@ -1,4 +1,10 @@
 package za.ac.cput.repository;
+/**
+ * IPaymentRepositoryImpl.java
+ * Class implementation for the Payment Repository
+ * Author: Aqeel Hanslo (219374422)
+ * Date:  06 April 2023
+ */
 
 import za.ac.cput.domain.Payment;
 
