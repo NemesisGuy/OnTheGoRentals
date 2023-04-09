@@ -1,25 +1,20 @@
-/* Branch.java
- Entity for the Branch
- Author: Asiphe Funda (215092317)
- Date: 19 March 2023
-*/
 package za.ac.cput.domain;
 
 public class Branch implements IDomain{
-    private int id;
+    private int branchId;
     private String branchName;
     private Address address;
     private String email;
 
     private Branch(Builder builder) {
-        this.id = builder.id;
+        this.branchId = builder.branchId;
         this.branchName = builder.branchName;
         this.address = builder.address;
         this.email = builder.email;
     }
 
-    public int getId() {
-        return id;
+    public int getBranchId() {
+        return branchId;
     }
 
     public String getBranchName() {
@@ -40,21 +35,26 @@ public class Branch implements IDomain{
     @Override
     public String toString() {
         return "Branch{" +
-                "id=" + id +
+                "branchId=" + branchId +
                 ", branchName='" + branchName + '\'' +
                 ", address=" + address +
                 ", email=" + email +
                 '}';
     }
 
+    @Override
+    public int getId() {
+        return 0;
+    }
+
     public static class Builder {
-        private int id;
+        private int branchId;
         private String branchName;
         private Address address;
         private String email;
 
-        public Builder setId(int id) {
-            this.id = id;
+        public Builder setBranchId(int branchId) {
+            this.branchId = branchId;
             return this;
         }
 
@@ -74,7 +74,7 @@ public class Branch implements IDomain{
         }
 
         public Builder copy(Branch branch) {
-            this.id = branch.id;
+            this.branchId = branch.branchId;
             this.branchName = branch.branchName;
             this.address = branch.address;
             this.email = branch.email;
@@ -85,10 +85,12 @@ public class Branch implements IDomain{
             return new Branch(this);
         }
 
-        public Builder id(int nextInt) {
+        public Builder branchId(int nextInt) {
             return null;
         }
     }
 }
+
+
 
 

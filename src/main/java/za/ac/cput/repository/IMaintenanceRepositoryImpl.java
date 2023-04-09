@@ -9,26 +9,35 @@ package za.ac.cput.repository;
 import za.ac.cput.domain.Maintenance;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class IMaintenanceRepositoryImpl implements IMaintenanceRepository{
-    private  List<Maintenance> maintenance;
+public class IMaintenanceRepositoryImpl implements IMaintenanceRepository {
+    private List<Maintenance> maintenanceDB;
+    private static IMaintenanceRepositoryImpl repository = null;
 
-    public IMaintenanceRepositoryImpl(){
-        maintenance = new ArrayList<>();
-
+    private IMaintenanceRepositoryImpl() {
+        maintenanceDB = new ArrayList<>();
     }
+
+    public static IMaintenanceRepositoryImpl getRepository() {
+        if (repository == null) {
+            repository = new IMaintenanceRepositoryImpl();
+
+        }
+        return IMaintenanceRepositoryImpl.getRepository();
+    }
+
+
     @Override
     public Maintenance create(Maintenance entity) {
-        maintenance.add(entity);
+        maintenanceDB.add(entity);
         return entity;
     }
 
     @Override
     public Maintenance read(Integer id) {
-        return maintenance.stream()
-                .filter(maintenance -> maintenance.getId()==id)
+        return maintenanceDB.stream()
+                .filter(maintenance -> maintenance.getId() == id)
                 .findFirst()
                 .orElse(null);
     }
@@ -38,8 +47,8 @@ public class IMaintenanceRepositoryImpl implements IMaintenanceRepository{
         Maintenance maintenanceToUpdate = read(entity.getId());
 
         if (maintenanceToUpdate != null) {
-            maintenance.remove(maintenanceToUpdate);
-            maintenance.add(entity);
+            maintenanceDB.remove(maintenanceToUpdate);
+            maintenanceDB.add(entity);
             return entity;
         }
         return null;
@@ -51,21 +60,26 @@ public class IMaintenanceRepositoryImpl implements IMaintenanceRepository{
         Maintenance maintenanceToDelete = read(id);
 
         if (maintenanceToDelete != null) {
-            maintenance.remove(maintenanceToDelete);
+            maintenanceDB.remove(maintenanceToDelete);
             return true;
         }
 
         return false;
     }
+
     @Override
     public List<Maintenance> getAll() {
-        return Collections.unmodifiableList(maintenance);
+        return null;
+    }
+
+    @Override
+    public List<Maintenance> getAllMaintenance() {
+        return null;
     }
 
     @Override
     public Maintenance getMaintenanceById(Integer id) {
-
-        return read(id);
+        return null;
     }
 }
 

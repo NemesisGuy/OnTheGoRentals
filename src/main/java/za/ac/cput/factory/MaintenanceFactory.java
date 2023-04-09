@@ -14,7 +14,7 @@ public class MaintenanceFactory implements IFactory<Maintenance>{
     @Override
     public Maintenance create() {
         return Maintenance.builder()
-                .id(new Random().nextInt(1000000))
+                .maintenanceId(new Random().nextInt(1000000))
                 .build();
     }
 

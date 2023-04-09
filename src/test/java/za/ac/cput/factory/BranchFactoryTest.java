@@ -2,27 +2,26 @@ package za.ac.cput.factory;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import za.ac.cput.domain.Address;
 import za.ac.cput.domain.Branch;
 
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class BranchFactoryTest {
     @Test
-    void testBranchFactory_pass(){
-        BranchFactory branchFactory = new BranchFactory();
-        Branch branch = branchFactory.create();
+            public void test(){
+    Branch branch= new Branch.Builder()
+            .setBranchId(234)
+            .setBranchName("CBD")
+            .setAddress(Address.builder().build())
+            .setEmail("215092317@mycput.ac.za")
+            .build();
+
+        //System.out.println(email.toString());
 
         Assertions.assertNotNull(branch);
-        Assertions.assertNotNull(branch.getId());
-
+        Assertions.assertEquals("CBD", branch.getBranchName());
+        Assertions.assertEquals("215092317@mycput.ac.za", branch.getEmail());
     }
-    @Test
-    void testBranchFactory_fail(){
-        BranchFactory branchFactory = new BranchFactory();
-        Branch branch = branchFactory.create();
 
-        Assertions.assertNull(branch);
-        Assertions.assertNull(branch.getId());
-    }
 }

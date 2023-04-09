@@ -1,22 +1,22 @@
-/* BranchFactory.java
- Entity for the Branch
+/* MaintenanceFactory.java
+ Entity for the Maintenance
  Author: Asiphe Funda (215092317)
  Date: 06 April 2023
 */
+
 package za.ac.cput.factory;
 
-import za.ac.cput.domain.Address;
+
 import za.ac.cput.domain.Branch;
 
 import java.util.List;
 import java.util.Random;
 
-
 public class BranchFactory implements IFactory<Branch> {
     @Override
     public Branch create() {
         return Branch.builder()
-                .id(new Random().nextInt(1000))
+                .branchId(new Random().nextInt(1000))
                 .build();
     }
 
@@ -47,8 +47,9 @@ public class BranchFactory implements IFactory<Branch> {
 
     @Override
     public Class<Branch> getType() {
-        return Branch.class;
+        return null;
     }
-}
 
+
+}
 
