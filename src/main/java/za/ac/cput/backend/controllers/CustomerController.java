@@ -32,8 +32,72 @@ public class CustomerController {
                 .setBorrowingHistory("History2")
                 .build();
 
+        Customer customer3 = new Customer.CustomerBuilder()
+                .setCustomerId(3)
+                .setName("Bob Johnson")
+                .setContactInfo("bobjohnson@gmail.com")
+                .setBorrowingHistory("History3")
+                .build();
+
+        Customer customer4 = new Customer.CustomerBuilder()
+                .setCustomerId(4)
+                .setName("Mary Williams")
+                .setContactInfo("marywilliams@gmail.com")
+                .setBorrowingHistory("History4")
+                .build();
+
+        Customer customer5 = new Customer.CustomerBuilder()
+                .setCustomerId(5)
+                .setName("Tom Davis")
+                .setContactInfo("tomdavis@gmail.com")
+                .setBorrowingHistory("History5")
+                .build();
+
+        Customer customer6 = new Customer.CustomerBuilder()
+                .setCustomerId(6)
+                .setName("Samantha Taylor")
+                .setContactInfo("samanthataylor@gmail.com")
+                .setBorrowingHistory("History6")
+                .build();
+
+        Customer customer7 = new Customer.CustomerBuilder()
+                .setCustomerId(7)
+                .setName("Harry Thompson")
+                .setContactInfo("harrythompson@gmail.com")
+                .setBorrowingHistory("History7")
+                .build();
+
+        Customer customer8 = new Customer.CustomerBuilder()
+                .setCustomerId(8)
+                .setName("Lucy Green")
+                .setContactInfo("lucygreen@gmail.com")
+                .setBorrowingHistory("History8")
+                .build();
+
+        Customer customer9 = new Customer.CustomerBuilder()
+                .setCustomerId(9)
+                .setName("David Brown")
+                .setContactInfo("davidbrown@gmail.com")
+                .setBorrowingHistory("History9")
+                .build();
+
+        Customer customer10 = new Customer.CustomerBuilder()
+                .setCustomerId(10)
+                .setName("Amy Lee")
+                .setContactInfo("amylee@gmail.com")
+                .setBorrowingHistory("History10")
+                .build();
+
         customers.add(customer1);
         customers.add(customer2);
+        customers.add(customer3);
+        customers.add(customer4);
+        customers.add(customer5);
+        customers.add(customer6);
+        customers.add(customer7);
+        customers.add(customer8);
+        customers.add(customer9);
+        customers.add(customer10);
 
         return customers;
     }
