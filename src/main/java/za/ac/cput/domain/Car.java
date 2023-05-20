@@ -1,7 +1,12 @@
 package za.ac.cput.domain;
 
-import java.util.Objects;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+import java.util.Objects;
 /**
  * Car.java
  * Entity for the Car
@@ -10,7 +15,11 @@ import java.util.Objects;
  */
 
 public class Car implements IVehicle {
+  //  @Id
+  //  @GeneratedValue(strategy = GenerationType.IDENTITY)
+   // @Column(name = "car_id")
     private final int id;
+
     private final String make;
     private final String model;
     private final int year;

@@ -5,6 +5,7 @@ package za.ac.cput.backend.controllers;
  * Author: Peter Buckingham (220165289)
  * Date: 05 April 2023
  */
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import za.ac.cput.domain.Customer;
@@ -12,9 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+
 public class CustomerController {
 
-    @GetMapping("/customers")
+    @GetMapping("/api/customers")
     public List<Customer> customers() {
         List<Customer> customers = new ArrayList<>();
 

@@ -8,4 +8,7 @@ package za.ac.cput.domain;
 
 public interface IDomain {
     int getId();
+    boolean equals(Object o) ;
+    public int hashCode();
+    String toString();
 }
