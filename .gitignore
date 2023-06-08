@@ -60,3 +60,4 @@ HELP.md
 !**/src/test/**/target/
 !src/main/resources/application.properties
 /OnTheGoRentals.drawio
+/src/main/resources/application.properties

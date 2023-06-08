@@ -7,7 +7,7 @@ package za.ac.cput.domain;
  * Date: 01 April 2023
  */
 
-public class Feedback {
+public class Feedback implements IFeedback{
     private String name;
     private String comment;
     private int id;

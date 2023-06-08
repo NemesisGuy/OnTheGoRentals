@@ -1,7 +1,12 @@
 package za.ac.cput.domain;
 
-import java.util.Objects;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+import java.util.Objects;
 /**
  * Car.java
  * Entity for the Car
@@ -10,11 +15,16 @@ import java.util.Objects;
  */
 
 public class Car implements IVehicle {
+  //  @Id
+  //  @GeneratedValue(strategy = GenerationType.IDENTITY)
+   // @Column(name = "car_id")
     private final int id;
+
     private final String make;
     private final String model;
     private final int year;
     private final String category;
+    private final PriceGroup priceGroup;
     private final String licensePlate;
 
     private Car(Builder builder) {
@@ -23,6 +33,7 @@ public class Car implements IVehicle {
         this.model = builder.model;
         this.year = builder.year;
         this.category = builder.category;
+        this.priceGroup = builder.priceGroup;
         this.licensePlate = builder.licensePlate;
     }
 
@@ -45,10 +56,14 @@ public class Car implements IVehicle {
     public String getCategory() {
         return category;
     }
+    public PriceGroup getPriceGroup() {
+        return priceGroup;
+    }
 
     public String getLicensePlate() {
         return licensePlate;
     }
+
 
     public static Builder builder() {
         return new Builder();
@@ -73,6 +88,9 @@ public class Car implements IVehicle {
         private String model;
         private int year;
         private String category;
+
+        private PriceGroup priceGroup;
+
         private String licensePlate;
 
         public Builder id(int id) {
@@ -99,10 +117,15 @@ public class Car implements IVehicle {
             this.category = category;
             return this;
         }
+        public Builder priceGroup(PriceGroup priceGroup) {
+            this.priceGroup = priceGroup;
+            return this;
+        }
 
         public Builder licensePlate(String licensePlate) {
             this.licensePlate = licensePlate;
             return this;
+
         }
 
         public Car build() {
