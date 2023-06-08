@@ -15,4 +15,5 @@ public class BackendApplication {
         SpringApplication.run(BackendApplication.class, args);
     }
 
+    //factory,repos,  domain, controllers and services
 }
