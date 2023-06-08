@@ -22,12 +22,12 @@ public class CarController {
 
         cars.add(Car.builder()
                 .id(1233)
-                .make("Toyota")
-                .model("Corolla")
+                .make("Nissan")
+                .model("350Z")
                 .year(2022)
                 .category("Sedan")
-                .licensePlate("ABC1233")
-                .priceGroup(PriceGroup.ECONOMY)
+                .licensePlate("ABC123456")
+                .priceGroup(PriceGroup.SPECIAL)
                 .build());
 
         Car car1 = Car.builder()
@@ -76,7 +76,7 @@ public class CarController {
                 .model("Camaro")
                 .year(2023)
                 .category("Sports")
-                .priceGroup(PriceGroup.PREMIUM)
+                .priceGroup(PriceGroup.SPECIAL)
                 .licensePlate("MNO345")
                 .build();
 
@@ -126,6 +126,16 @@ public class CarController {
                 .priceGroup(PriceGroup.ECONOMY)
                 .licensePlate("SAMK021")
                 .build();
+        Car car11 = Car.builder()
+                .id(4523)
+                .make("Mercedes")
+                .model("AMG GT")
+                .year(2023)
+                .category("Sports")
+                .priceGroup(PriceGroup.SPECIAL)
+                .licensePlate("SAMK021")
+                .build();
+
 
         cars.add(car1);
         cars.add(car2);

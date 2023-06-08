@@ -15,9 +15,9 @@ import java.util.Objects;
  */
 
 public class Car implements IVehicle {
-  //  @Id
-  //  @GeneratedValue(strategy = GenerationType.IDENTITY)
-   // @Column(name = "car_id")
+    //  @Id
+    //  @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // @Column(name = "car_id")
     private final int id;
 
     private final String make;
