@@ -5,15 +5,17 @@ package za.ac.cput.backend.controllers;
  * Author: Peter Buckingham (220165289)
  * Date: 05 April 2023
  */
-
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class HelloWorldController {
+@RequestMapping(value = "/hello", produces = MediaType.APPLICATION_JSON_VALUE)
 
-    @GetMapping("/api/hello")
+public class HelloWorldController {
+  //  @GetMapping({ "/", "/home", "/index", "/api/home", "/api/hello", "/api/index" })
     public String hello() {
-        return "<h1>Hello, world!</h1> </br> <h3>Im a test controller!!</h3>";
+        return "{\"message\": \"Hello, world!\", \"description\": \"I'm a test controller!\"}";
     }
 }

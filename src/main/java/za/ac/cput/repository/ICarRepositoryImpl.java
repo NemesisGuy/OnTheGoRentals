@@ -55,6 +55,8 @@ public class ICarRepositoryImpl implements ICarRepository {
     @Override
     public Car update(Car entity) {
         Car carToUpdate = read(entity.getId());
+        System.out.println("car to update: " + carToUpdate.toString());
+
 
         if (carToUpdate != null) {
             cars.remove(carToUpdate);
@@ -64,6 +66,8 @@ public class ICarRepositoryImpl implements ICarRepository {
 
         return null;
     }
+
+
 
     @Override
     public boolean delete(Integer id) {

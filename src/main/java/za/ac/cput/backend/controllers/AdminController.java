@@ -1,10 +1,7 @@
 package za.ac.cput.backend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.PriceGroup;
 import za.ac.cput.service.impl.ICarServiceImpl;
@@ -32,4 +29,22 @@ public class AdminController {
             return PriceGroup.NONE;
         }
     }
+
+    @DeleteMapping("/cars/delete/{carId}")
+    public boolean deleteCar(@PathVariable Integer carId) {
+        System.out.println("/api/admin/cars/delete was triggered");
+        System.out.println("CarService was created...attempting to delete car...");
+        return carService.delete(carId);
+    }
+
+   @PutMapping("/cars/update/{carId}")
+   public Car updateCar(@PathVariable int carId, @RequestBody Car updatedCar) {
+       Car updated = carService.update(updatedCar);
+       return updated;
+   }
+
+
+
+
 }
+ //.delete(`http://localhost:8080/api/admin/cars/delete/${carId}`)

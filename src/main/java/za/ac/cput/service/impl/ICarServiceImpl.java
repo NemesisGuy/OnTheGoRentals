@@ -1,12 +1,6 @@
 package za.ac.cput.service.impl;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-
-import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Car;
-import za.ac.cput.domain.PriceGroup;
-import za.ac.cput.repository.ICarRepository;
 import za.ac.cput.repository.ICarRepositoryImpl;
 import za.ac.cput.service.ICarService;
 
@@ -57,16 +51,20 @@ public class ICarServiceImpl implements ICarService {
 
     @Override
     public Car update(Car car) {
-        return null;
+
+        return repository.update(car);
     }
 
     @Override
     public boolean delete(Integer integer) {
-        return false;
+        return repository.delete(integer);
     }
 
+
     @Override
-    public void delete(int id) {
+    public boolean delete(int id) {
+
+        return repository.delete(id);
 
     }
 
