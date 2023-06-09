@@ -20,32 +20,31 @@ public class BranchFactory implements IFactory<Branch> {
                 .build();
     }
 
-    @Override
+
     public Branch getById(long id) {
         return null;
     }
 
-    @Override
+
     public Branch update(Branch entity) {
         return null;
     }
 
-    @Override
+
     public boolean delete(Branch entity) {
         return false;
     }
 
-    @Override
     public List<Branch> getAll() {
         return null;
     }
 
-    @Override
+
     public long count() {
         return 0;
     }
 
-    @Override
+
     public Class<Branch> getType() {
         return null;
     }

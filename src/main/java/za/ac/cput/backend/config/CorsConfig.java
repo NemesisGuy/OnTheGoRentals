@@ -9,6 +9,7 @@ public class CorsConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
+
         return new WebMvcConfigurer() {
             @SuppressWarnings("NullableProblems")
             @Override
@@ -16,8 +17,13 @@ public class CorsConfig {
                 registry.addMapping("/api/**")
                         .allowedOrigins("http://localhost:5173")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .allowedHeaders("*")
                         .allowCredentials(true)
+                        .exposedHeaders("Access-Control-Allow-Origin")
                         .maxAge(3600);
+
+                System.out.println("CorsConfig was triggered");
+
             }
         };
     }

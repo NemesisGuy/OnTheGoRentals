@@ -20,32 +20,32 @@ public class PaymentFactory implements IFactory<Payment>{
                 .build();
     }
 
-    @Override
+
     public Payment getById(long id) {
         return null;
     }
 
-    @Override
+
     public Payment update(Payment entity) {
         return null;
     }
 
-    @Override
+
     public boolean delete(Payment entity) {
         return false;
     }
 
-    @Override
+
     public List<Payment> getAll() {
         return null;
     }
 
-    @Override
+
     public long count() {
         return 0;
     }
 
-    @Override
+
     public Class<Payment> getType() {
         return null;
     }

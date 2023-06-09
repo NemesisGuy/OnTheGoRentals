@@ -18,39 +18,10 @@ public class CarFactory implements IFactoryCar {
 
     }
 
-    @Override
-    public Car getById(long id) {
-        // implement logic to retrieve a Car object by ID
-        return null;
-    }
 
     @Override
-    public Car update(Car entity) {
-        // implement logic to update a Car object
-        return null;
-    }
-
-    @Override
-    public boolean delete(Car entity) {
-        // implement logic to delete a Car object
-        return false;
-    }
-
-    @Override
-    public List<Car> getAll() {
-        // implement logic to retrieve all Car objects
-        return null;
-    }
-
-    @Override
-    public long count() {
-        // implement logic to count the number of Car objects
-        return 0;
-    }
-
-    @Override
-    public Class<Car> getType() {
-        return Car.class;
+    public Car createCar() {
+        return Car.builder().build();
     }
 
     @Override

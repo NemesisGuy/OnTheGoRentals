@@ -7,6 +7,7 @@ package za.ac.cput.repository;
  */
 
 import za.ac.cput.domain.Car;
+import za.ac.cput.domain.PriceGroup;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public interface ICarRepository extends IRepository<Car, Integer> {
     List<Car> getAllCars();
 
     List<Car> getCarsByCategory(String category);
+    List<Car> getCarsByPriceGroup(PriceGroup priceGroup);
 
     Car getCarById(Integer id);
 }

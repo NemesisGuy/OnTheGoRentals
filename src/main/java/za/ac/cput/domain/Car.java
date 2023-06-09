@@ -15,17 +15,19 @@ import java.util.Objects;
  */
 
 public class Car implements IVehicle {
-    //  @Id
-    //  @GeneratedValue(strategy = GenerationType.IDENTITY)
-    // @Column(name = "car_id")
-    private final int id;
 
-    private final String make;
-    private final String model;
-    private final int year;
-    private final String category;
-    private final PriceGroup priceGroup;
-    private final String licensePlate;
+    private int id;
+
+    private  String make;
+    private  String model;
+    private  int year;
+    private  String category;
+    private  PriceGroup priceGroup;
+    private  String licensePlate;
+    public Car() {
+        // Default constructor
+    }
+
 
     private Car(Builder builder) {
         this.id = builder.id;
@@ -80,6 +82,14 @@ public class Car implements IVehicle {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getMake(), getModel(), getYear(), getCategory(), getLicensePlate());
+    }
+
+    public void setPriceGroup(PriceGroup priceGroupEnum) {
+                   this.priceGroup = priceGroupEnum;
+    }
+
+    public String getPriceGroupString() {
+        return priceGroup.toString();
     }
 
     public static class Builder {

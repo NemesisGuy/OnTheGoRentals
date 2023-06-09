@@ -7,9 +7,17 @@ package za.ac.cput.backend;
  */
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import za.ac.cput.service.impl.ICarServiceImpl;
 
 @SpringBootApplication
 public class BackendApplication {
+
+    @Bean
+    public ICarServiceImpl carService() {
+        return new ICarServiceImpl();
+    }
+
 
     public static void main(String[] args) {
         SpringApplication.run(BackendApplication.class, args);

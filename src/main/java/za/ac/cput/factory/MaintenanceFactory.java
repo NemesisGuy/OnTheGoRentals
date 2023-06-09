@@ -11,39 +11,39 @@ import java.util.List;
 import java.util.Random;
 
 public class MaintenanceFactory implements IFactory<Maintenance>{
-    @Override
+
     public Maintenance create() {
         return Maintenance.builder()
                 .maintenanceId(new Random().nextInt(1000000))
                 .build();
     }
 
-    @Override
+
     public Maintenance getById(long id) {
         return null;
     }
 
-    @Override
+
     public Maintenance update(Maintenance entity) {
         return null;
     }
 
-    @Override
+
     public boolean delete(Maintenance entity) {
         return false;
     }
 
-    @Override
+
     public List<Maintenance> getAll() {
         return null;
     }
 
-    @Override
+
     public long count() {
         return 0;
     }
 
-    @Override
+
     public Class<Maintenance> getType() {
         return Maintenance.class;
     }

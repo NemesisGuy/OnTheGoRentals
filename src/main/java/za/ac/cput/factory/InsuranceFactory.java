@@ -20,32 +20,32 @@ public class InsuranceFactory implements IFactory<Insurance>{
                 .build();
     }
 
-    @Override
+
     public Insurance getById(long id) {
         return null;
     }
 
-    @Override
+
     public Insurance update(Insurance entity) {
         return null;
     }
 
-    @Override
+
     public boolean delete(Insurance entity) {
         return false;
     }
 
-    @Override
+
     public List<Insurance> getAll() {
         return null;
     }
 
-    @Override
+
     public long count() {
         return 0;
     }
 
-    @Override
+
     public Class<Insurance> getType() {
         return null;
     }

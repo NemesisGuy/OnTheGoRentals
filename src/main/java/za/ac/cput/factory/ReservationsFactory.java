@@ -29,32 +29,32 @@ public class ReservationsFactory implements IFactory<Reservations>{
                 .build();
     }
 
-    @Override
+
     public Reservations getById(long id) {
         return null;
     }
 
-    @Override
+
     public Reservations update(Reservations entity) {
         return null;
     }
 
-    @Override
+
     public boolean delete(Reservations entity) {
         return false;
     }
 
-    @Override
+
     public List<Reservations> getAll() {
         return null;
     }
 
-    @Override
+
     public long count() {
         return 0;
     }
 
-    @Override
+
     public Class<Reservations> getType() {
         return null;
     }
