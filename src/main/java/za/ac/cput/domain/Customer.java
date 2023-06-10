@@ -1,107 +1,73 @@
 package za.ac.cput.domain;
 
-     /**
-     * Lonwabo Magazi-218331851
-     * Date: March 2023
-      * Customer.java
-     */
+/**
+ * Lonwabo Magazi-218331851
+ * Date: March 2023
+ * Customer.java
+ */
 
-    public class Customer implements IDomain {
-        private int CustomerId;
-        private String Name;
-        private String ContactInfo;
-        private String HiringHistory;
+public class Customer {
 
+    private int customerId;
+    private String name;
+    private String contactInfo;
+    private String hiringHistory;
 
-        //Builder Class
-        private Customer(CustomerBuilder builder) {
+    // constructor
+    public Customer() {
+    }
 
-            this.CustomerId = builder.CustomerId;
-            this.Name = builder.Name;
-            this.ContactInfo = builder.ContactInfo;
-            this.HiringHistory = builder.HiringHistory;
+    // Parameterized constructor
+    public Customer(int customerId, String name, String contactInfo, String hiringHistory) {
+        this.customerId = customerId;
+        this.name = name;
+        this.contactInfo = contactInfo;
+        this.hiringHistory = hiringHistory;
+    }
 
-        }
+    // Getters and setters
 
-        //Getters
+    public int getCustomerId() {
+        return customerId;
+    }
 
-        public int getCustomerId() {
-            return CustomerId;
-        }
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
 
-        public String getName() {
-            return Name;
-        }
-        public String getContactInfo() {
-            return ContactInfo;
-        }
-        public String getHiringHistory() {
-            return HiringHistory;
-        }
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 
-        //Setters
-        public void setCustomerId(int customerId)  {
-            this.CustomerId = CustomerId;
-        }
-        public void setName(String name) {
-            this.Name = name;
-        }
-        public void setContactInfo(String contactInfo) {
-            this.ContactInfo = contactInfo;
-        }
-        public void setHiringHistory(String hiringHistory) {
-            this.HiringHistory = hiringHistory;
-        }
+    public String getContactInfo() {
+        return contactInfo;
+    }
 
+    public void setContactInfo(String contactInfo) {
+        this.contactInfo = contactInfo;
+    }
 
-        @Override
-        public String toString() {
-            return "Customer{" +
-                    "CustomerId=" + CustomerId +
-                    "Name='" + Name + '\'' +
-                    ", ContactInfo=" + ContactInfo + '\'' +
-                    ", HiringHistory=" + HiringHistory + '\'' +
-                    '}';
-        }
+    public String getHiringHistory() {
+        return hiringHistory;
+    }
 
-         @Override
-         public int getId() {
-             return 0;
-         }
+    public void setHiringHistory(String hiringHistory) {
+        this.hiringHistory = hiringHistory;
+    }
 
+    // toString method
 
-         //Builder ClassS
-        public static class CustomerBuilder {
-            private int CustomerId;
-            private String Name;
-            private String ContactInfo;
-            private String HiringHistory;
-
-            public CustomerBuilder setCustomerId(int CustomerId) {
-                this.CustomerId = this.CustomerId;
-                return this;
-            }
-            public CustomerBuilder setName(String Name) {
-                this.Name = Name;
-                return this;
-            }
-
-            public Customer.CustomerBuilder setContactInfo(String ContactInfo) {
-                this.ContactInfo = ContactInfo;
-                return this;
-            }
-
-            public Customer.CustomerBuilder setBorrowingHistory(String BorrowingHistory) {
-                this.HiringHistory = HiringHistory;
-                return this;
-            }
-
-            public Customer build(){
-                return new Customer(this);
-
-            }
-
-         }
-
-     }
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "customerId=" + customerId +
+                ", name='" + name + '\'' +
+                ", contactInfo='" + contactInfo + '\'' +
+                ", hiringHistory='" + hiringHistory + '\'' +
+                '}';
+    }
+}
