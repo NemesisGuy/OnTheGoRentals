@@ -3,8 +3,7 @@ package za.ac.cput.domain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RentalTest {
-
-
+    
     private int rentalId;
     private String rentalBorrower;
     private String rentalCar;

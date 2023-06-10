@@ -6,182 +6,136 @@ package za.ac.cput.domain;
  * Rental Class.java
  */
 
-
-public class Rental implements IRent{
-
-    //Declare the private variables
+public class Rental {
 
     private int rentalId;
     private String borrower;
     private String car;
     private String issuer;
     private String issuedDate;
-
-    private String Date;
+    private String date;
     private String dateReturned;
     private String receiver;
     private boolean finePaid;
 
-
-    //Initializing a parameterized constructor
-    public Rental (int rentalId, String borrower, String car, String issuer, String issuedDate, String Date, String DateReturned, String receiver, boolean fine){
-
+    public Rental(int rentalId, String borrower, String car, String issuer, String issuedDate, String date, String dateReturned, String receiver, boolean finePaid) {
         this.rentalId = rentalId;
         this.borrower = borrower;
         this.car = car;
         this.issuer = issuer;
         this.issuedDate = issuedDate;
-        this.Date = Date;
-        this.dateReturned = DateReturned;
+        this.date = date;
+        this.dateReturned = dateReturned;
         this.receiver = receiver;
-        this.finePaid = fine;
+        this.finePaid = finePaid;
     }
 
-
-    public int getRentalId()  {
-        return this.rentalId;
+    public int getRentalId() {
+        return rentalId;
     }
 
-    public String getBorrower(String borrower) {
-        return this.borrower;
-    }
-
-    @Override
-    public int getId() {
-        return 0;
-    }
-
-    @Override
     public String getBorrower() {
-        return null;
+        return borrower;
     }
 
     public String getCar() {
         return car;
     }
 
-
     public String getIssuer() {
         return issuer;
     }
-
 
     public String getIssuedDate() {
         return issuedDate;
     }
 
-    @Override
     public String getDate() {
-        return null;
+        return date;
     }
-
 
     public String getDateReturned() {
         return dateReturned;
     }
 
-
     public String getReceiver() {
         return receiver;
-    }
-
-    @Override
-    public boolean finePaid() {
-        return false;
     }
 
     public boolean isFinePaid() {
         return finePaid;
     }
 
-
-
-
-    //Builder Class
     public static class RentalBuilder {
-
         private int rentalId;
         private String borrower;
         private String car;
         private String issuer;
-
-        private  String Date;
         private String issuedDate;
+        private String date;
         private String dateReturned;
         private String receiver;
         private boolean finePaid;
 
-
-        public Rental.RentalBuilder setRentalId(int rentalId) {
+        public RentalBuilder setRentalId(int rentalId) {
             this.rentalId = rentalId;
             return this;
         }
-        public Rental.RentalBuilder setBorrower(String borrower) {
+
+        public RentalBuilder setBorrower(String borrower) {
             this.borrower = borrower;
             return this;
         }
 
-        public Rental.RentalBuilder setCar(String car) {
+        public RentalBuilder setCar(String car) {
             this.car = car;
             return this;
         }
 
-        public Rental.RentalBuilder setIssuer(String issuer) {
+        public RentalBuilder setIssuer(String issuer) {
             this.issuer = issuer;
             return this;
         }
 
-        public Rental.RentalBuilder setDate(String Date) {
-            this.Date = Date;
-            return this;
-        }
-
-        public Rental.RentalBuilder setIssuedDate(String issuedDate) {
+        public RentalBuilder setIssuedDate(String issuedDate) {
             this.issuedDate = issuedDate;
             return this;
         }
 
-        public Rental.RentalBuilder setDateReturned(String dateReturned) {
+        public RentalBuilder setDate(String date) {
+            this.date = date;
+            return this;
+        }
+
+        public RentalBuilder setDateReturned(String dateReturned) {
             this.dateReturned = dateReturned;
             return this;
         }
 
-        public Rental.RentalBuilder setReceiver(String receiver) {
+        public RentalBuilder setReceiver(String receiver) {
             this.receiver = receiver;
             return this;
         }
 
-        public Rental.RentalBuilder setFinePaid(Boolean finePaid) {
+        public RentalBuilder setFinePaid(boolean finePaid) {
             this.finePaid = finePaid;
             return this;
         }
 
-        public Rental build(){
-                return new Rental(this);
-            }
+        public Rental build() {
+            return new Rental(rentalId, borrower, car, issuer, issuedDate, date, dateReturned, receiver, finePaid);
         }
-
-        private Rental(RentalBuilder builder) {
-
-        this.rentalId = builder.rentalId;
-        this.borrower = builder.borrower;
-        this.car = builder.car;
-        this.issuer =builder.issuer;
-        this.Date = builder.Date;
-        this.issuedDate = builder.dateReturned;
-        this.dateReturned = builder.receiver;
-        this.finePaid = builder.finePaid;
-
     }
 
     @Override
     public String toString() {
         return "Rental{" +
                 "rentalId=" + rentalId +
-                "borrower='" + borrower + '\'' +
-                ", car ='" + car + '\'' +
+                ", borrower='" + borrower + '\'' +
+                ", car='" + car + '\'' +
                 ", issuer='" + issuer + '\'' +
                 ", issuedDate='" + issuedDate + '\'' +
+                ", date='" + date + '\'' +
                 ", dateReturned='" + dateReturned + '\'' +
                 ", receiver='" + receiver + '\'' +
                 ", finePaid=" + finePaid +

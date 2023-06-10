@@ -14,7 +14,9 @@ public class ICustomerRepositorylmpl implements IRepository<Customer, String> {
         Customers = new ArrayList<>();
     }
 
-
+    public static ICustomerRepositorylmpl getRepository() {
+        return null;
+    }
 
 
     @Override
