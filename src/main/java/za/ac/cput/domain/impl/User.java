@@ -1,6 +1,5 @@
 package za.ac.cput.domain.impl;
 
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import za.ac.cput.domain.IDomain;
 
 import java.util.Objects;

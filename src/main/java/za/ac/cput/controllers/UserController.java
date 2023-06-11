@@ -1,15 +1,12 @@
 package za.ac.cput.controllers;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import za.ac.cput.domain.impl.User;
-import za.ac.cput.service.impl.ICarServiceImpl;
 import za.ac.cput.service.impl.IUserServiceImpl;
-
 
 import java.util.ArrayList;
 
@@ -40,6 +37,7 @@ public class UserController {
         // Return an appropriate response, such as a success message or error message
         return "User logged in successfully";
     }
+
     @RequestMapping("/getall")
     public ArrayList<User> getAll() {
         ArrayList<User> users = new ArrayList<>(userService.getAll());
