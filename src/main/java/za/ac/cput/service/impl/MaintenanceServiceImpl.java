@@ -31,6 +31,16 @@ public class MaintenanceServiceImpl implements IMaintenanceService {
     }
 
     @Override
+    public Maintenance read(Integer id) {
+        return null;
+    }
+
+    @Override
+    public Maintenance update(Maintenance maintenance) {
+        return null;
+    }
+
+    @Override
     public boolean delete(Integer id) {
         boolean success = repository.delete(id);
         return success;

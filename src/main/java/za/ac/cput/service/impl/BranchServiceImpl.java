@@ -7,7 +7,6 @@
 package za.ac.cput.service.impl;
 
 import za.ac.cput.domain.impl.Branch;
-import za.ac.cput.repository.IBranchRepository;
 import za.ac.cput.repository.impl.BranchRepositoryImpl;
 import za.ac.cput.service.IBranchService;
 
@@ -15,21 +14,35 @@ import java.util.Set;
 
 
 public class BranchServiceImpl implements IBranchService {
-private static IBranchService service = null;
-private IBranchRepository repository =  null;
-private BranchServiceImpl(){
-    repository = BranchRepositoryImpl.getRepository();
-}
-public static IBranchService getService(){
-    if(service == null){
-        service= new BranchServiceImpl();
+    private static BranchServiceImpl service;
+    private static BranchRepositoryImpl repository;
+
+    private BranchServiceImpl(){
+        repository = BranchRepositoryImpl.getRepository();
     }
-    return service;
-}
+
+    public static BranchServiceImpl getService(){
+        if (service == null){
+            service = new BranchServiceImpl();
+        }
+        return service;
+    }
     @Override
     public Branch create(Branch branch) {
         Branch created = repository.create(branch);
         return created;
+    }
+
+    @Override
+    public Branch read(Integer id) {
+        Branch read = repository.read(id);
+        return read;
+    }
+
+    @Override
+    public Branch update(Branch branch) {
+        Branch updated = repository.update(branch);
+        return updated;
     }
 
     @Override
