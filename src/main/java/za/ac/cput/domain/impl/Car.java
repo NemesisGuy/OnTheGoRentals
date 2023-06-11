@@ -1,7 +1,7 @@
 package za.ac.cput.domain.impl;
 
 
-import za.ac.cput.domain.IVehicle;
+import za.ac.cput.domain.IDomain;
 
 import java.util.Objects;
 /**
@@ -11,7 +11,7 @@ import java.util.Objects;
  * Date: 29 March 2021
  */
 
-public class Car implements IVehicle {
+public class Car implements IDomain {
 
     private int id;
 
@@ -88,7 +88,18 @@ public class Car implements IVehicle {
     public String getPriceGroupString() {
         return priceGroup.toString();
     }
-
+    @Override
+    public String toString() {
+        return "Car{" +
+                "id=" + id +
+                ", make='" + make + '\'' +
+                ", model='" + model + '\'' +
+                ", year=" + year +
+                ", category='" + category + '\'' +
+                ", priceGroup=" + priceGroup +
+                ", licensePlate='" + licensePlate + '\'' +
+                '}';
+    }
 
 
     public static class Builder {
@@ -135,6 +146,16 @@ public class Car implements IVehicle {
             this.licensePlate = licensePlate;
             return this;
 
+        }
+        public Builder copy(Car car) {
+            this.id = car.id;
+            this.make = car.make;
+            this.model = car.model;
+            this.year = car.year;
+            this.category = car.category;
+            this.priceGroup = car.priceGroup;
+            this.licensePlate = car.licensePlate;
+            return this;
         }
 
         public Car build() {

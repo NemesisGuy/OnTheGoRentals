@@ -22,7 +22,7 @@ public class ICarRepositoryImpl implements ICarRepository {
         cars = createCarList();
 
     }
-
+    // Singleton
     public static ICarRepositoryImpl getRepository() {
         if (repository == null)
             repository = new ICarRepositoryImpl();
