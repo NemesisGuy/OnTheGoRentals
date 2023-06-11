@@ -1,25 +1,20 @@
 package za.ac.cput.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.Maintenance;
-
-import java.time.LocalDate;
+import za.ac.cput.factory.impl.MaintenanceFactory;
 
 class MaintenanceFactoryTest {
-    private int maintenanceId = 55236;
-    private String maintenanceType = "Brake repair";
-    private String serviceProvider = null;
-    private LocalDate serviceDate = LocalDate.parse("2023-04-06");
 @Test
     void testMaintenance(){
-    Maintenance maintenance= new Maintenance.Builder()
-            .setMaintenanceId(maintenanceId)
-            .setMaintenanceType(maintenanceType)
-            .setServiceProvider(serviceProvider)
-            .setServiceDate(serviceDate)
-            .build();
 
-    System.out.println(maintenance.toString());
+    MaintenanceFactory maintenanceFactory = new MaintenanceFactory();
+    Maintenance maintenance = maintenanceFactory.create();
+
+    Assertions.assertNotNull(maintenance);
+    Assertions.assertNotNull(maintenance.getId());
+
 }
 
 }

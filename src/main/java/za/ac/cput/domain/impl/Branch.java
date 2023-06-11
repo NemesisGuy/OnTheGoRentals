@@ -1,24 +1,22 @@
 package za.ac.cput.domain.impl;
 
-import za.ac.cput.domain.IBranch;
+public class Branch {
 
-public class Branch implements IBranch {
-
-    private int branchId;
+    private int id;
 
     private String branchName;
     private Address address;
     private String email;
 
     private Branch(Builder builder) {
-        this.branchId = builder.branchId;
+        this.id = builder.id;
         this.branchName = builder.branchName;
         this.address = builder.address;
         this.email = builder.email;
     }
 
-    public int getBranchId() {
-        return branchId;
+    public int getId() {
+        return id;
     }
 
     public String getBranchName() {
@@ -39,26 +37,21 @@ public class Branch implements IBranch {
     @Override
     public String toString() {
         return "Branch{" +
-                "branchId=" + branchId +
+                "id=" + id +
                 ", branchName='" + branchName + '\'' +
                 ", address=" + address +
                 ", email=" + email +
                 '}';
     }
 
-    @Override
-    public int getId() {
-        return 0;
-    }
-
     public static class Builder {
-        private int branchId;
+        private int id;
         private String branchName;
         private Address address;
         private String email;
 
-        public Builder setBranchId(int branchId) {
-            this.branchId = branchId;
+        public Builder setId(int id) {
+            this.id = id;
             return this;
         }
 
@@ -78,7 +71,7 @@ public class Branch implements IBranch {
         }
 
         public Builder copy(Branch branch) {
-            this.branchId = branch.branchId;
+            this.id = branch.id;
             this.branchName = branch.branchName;
             this.address = branch.address;
             this.email = branch.email;
@@ -89,7 +82,7 @@ public class Branch implements IBranch {
             return new Branch(this);
         }
 
-        public Builder branchId(int nextInt) {
+        public Builder id(int nextInt) {
             return null;
         }
     }

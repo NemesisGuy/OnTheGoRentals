@@ -8,45 +8,18 @@ package za.ac.cput.factory.impl;
 import za.ac.cput.domain.impl.Maintenance;
 import za.ac.cput.factory.IFactory;
 
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Random;
 
 public class MaintenanceFactory implements IFactory<Maintenance> {
 
     public Maintenance create() {
-        return Maintenance.builder()
-                .maintenanceId(new Random().nextInt(1000000))
+        return new Maintenance.Builder()
+                .setId(new Random().nextInt(1000000))
+                .setMaintenanceType("Oil filter")
+                .setServiceProvider("hippo")
+                .setServiceDate(LocalDate.parse("2023-06-11"))
                 .build();
-    }
-
-
-    public Maintenance getById(long id) {
-        return null;
-    }
-
-
-    public Maintenance update(Maintenance entity) {
-        return null;
-    }
-
-
-    public boolean delete(Maintenance entity) {
-        return false;
-    }
-
-
-    public List<Maintenance> getAll() {
-        return null;
-    }
-
-
-    public long count() {
-        return 0;
-    }
-
-
-    public Class<Maintenance> getType() {
-        return Maintenance.class;
     }
 }
 

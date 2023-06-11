@@ -10,21 +10,21 @@ import za.ac.cput.domain.IDomain;
 import java.time.LocalDate;
 
 public class Maintenance implements IDomain {
-    private int maintenanceId;
+    private int id;
     private String maintenanceType;
     private String serviceProvider;
     private LocalDate serviceDate;
 
 
     private Maintenance(Builder builder) {
-        this.maintenanceId = builder.maintenanceId;
+        this.id = builder.id;
         this.maintenanceType = builder.maintenanceType;
         this.serviceProvider = builder.serviceProvider;
         this.serviceDate = builder.serviceDate;
     }
 
-    public int getMaintenanceId() {
-        return maintenanceId;
+    public int getId() {
+        return id;
     }
 
     public String getMaintenanceType() {
@@ -45,26 +45,21 @@ public class Maintenance implements IDomain {
     @Override
     public String toString() {
         return "Maintenance{" +
-                "maintenanceId=" + maintenanceId +
+                "id=" + id +
                 ", maintenanceType='" + maintenanceType + '\'' +
                 ", serviceProvider='" + serviceProvider + '\'' +
                 ", serviceDate=" + serviceDate +'\''+
                 '}';
     }
 
-    @Override
-    public int getId() {
-        return 0;
-    }
-
     public static class Builder {
-        private int maintenanceId;
+        private int id;
         private String maintenanceType;
         private String serviceProvider;
         private LocalDate serviceDate;
 
-        public Builder setMaintenanceId(int maintenanceId) {
-            this.maintenanceId = maintenanceId;
+        public Builder setId(int id) {
+            this.id = id;
             return this;
         }
 
@@ -84,7 +79,7 @@ public class Maintenance implements IDomain {
         }
 
         public Builder copy(Maintenance maintenance) {
-            this.maintenanceId = maintenance.maintenanceId;
+            this.id = maintenance.id;
             this.maintenanceType = maintenance.maintenanceType;
             this.serviceProvider = maintenance.serviceProvider;
             this.serviceDate = maintenance.serviceDate;
@@ -95,7 +90,7 @@ public class Maintenance implements IDomain {
             return new Maintenance(this);
         }
 
-        public Builder maintenanceId(int nextInt) {
+        public Builder id(int nextInt) {
             return null;
         }
     }

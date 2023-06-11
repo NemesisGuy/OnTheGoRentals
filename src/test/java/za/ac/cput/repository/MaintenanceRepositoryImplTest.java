@@ -2,20 +2,19 @@ package za.ac.cput.repository;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class IBranchRepositoryImplTest {
-
+class MaintenanceRepositoryImplTest {
     @Test
-    void create() {
+    void test_create() {
+
     }
 
     @Test
-    void read() {
+    void test_read() {
+
     }
 
     @Test
-    void update() {
+    void test_update() {
     }
 
     @Test
@@ -24,5 +23,6 @@ class IBranchRepositoryImplTest {
 
     @Test
     void getAll() {
+
     }
 }
