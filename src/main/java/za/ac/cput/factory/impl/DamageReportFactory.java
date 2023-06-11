@@ -5,6 +5,7 @@ package za.ac.cput.factory.impl;
  * Author: Cwenga Dlova (214310671)
  * Date:  06 April 2023
  */
+import za.ac.cput.domain.impl.Car;
 import za.ac.cput.domain.impl.DamageReport;
 import za.ac.cput.factory.IFactory;
 
@@ -18,39 +19,13 @@ public class DamageReportFactory implements IFactory<DamageReport> {
     public DamageReport create() {
         return new DamageReport.Builder()
                 .setId(new Random().nextInt(1000000))
+                .setCarId(Car.builder().build())
+                .setRentalId(null)
+                .setCustomerId(null)
                 .setReportDate(LocalDate.parse("2023-01-05"))
                 .setDamageLocation("Cape Town")
                 .setDescription("Drunk driving recklessness.")
                 .build();
     }
 
-
-    public DamageReport getById(long id) {
-        return null;
-    }
-
-
-    public DamageReport update(DamageReport entity) {
-        return null;
-    }
-
-
-    public boolean delete(DamageReport entity) {
-        return false;
-    }
-
-
-    public List<DamageReport> getAll() {
-        return null;
-    }
-
-
-    public long count() {
-        return 0;
-    }
-
-
-    public Class<DamageReport> getType() {
-        return null;
-    }
 }

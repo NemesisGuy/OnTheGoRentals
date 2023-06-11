@@ -8,7 +8,7 @@ package za.ac.cput.repository;
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.DamageReport;
 import za.ac.cput.factory.impl.DamageReportFactory;
-import za.ac.cput.repository.impl.IDamageReportRepositoryImp;
+import za.ac.cput.repository.impl.DamageReportRepositoryImpl;
 
 import java.time.LocalDate;
 
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class IDamageReportRepositoryImpTest {
 
-    private static IDamageReportRepositoryImp repository = IDamageReportRepositoryImp.getRepository();
+    private static DamageReportRepositoryImpl repository = DamageReportRepositoryImpl.getRepository();
 
     private static DamageReportFactory repositoryFactory = new DamageReportFactory();
     private static DamageReport report1 = repositoryFactory.create();

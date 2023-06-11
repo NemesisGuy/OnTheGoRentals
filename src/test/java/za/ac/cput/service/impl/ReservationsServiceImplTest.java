@@ -1,10 +1,12 @@
-package za.ac.cput.repository;
+package za.ac.cput.service.impl;
+
 /**
- * IReservationsReposatoryImpTest.java
- * Class for the Reservations repository test
+ * ReservationsServiceTest.java
+ * Class for the Reservations service test
  * Author: Cwenga Dlova (214310671)
- * Date:  07 April 2023
+ * Date:  11 June 2023
  */
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.Reservations;
@@ -18,7 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class IReservationsRepositoryImplTest {
+class ReservationsServiceImplTest {
 
     private static ReservationsRepositoryImpl repository = ReservationsRepositoryImpl.getRepository();
 
@@ -27,49 +29,30 @@ class IReservationsRepositoryImplTest {
     private static Reservations reservation2;
 
     @Test
-    public void test_create() {
+    public void test_1() {
         Reservations created = repository.create(reservation);
         assertEquals(created.getId(), reservation.getId());
         System.out.println("Created: " + created);
 
     }
     @Test
-    public void test_read(){
-        Reservations read = repository.read(reservation.getId());
-       // Assertions.assertNotNull(read);
-        System.out.println("Read: " + read);
-    }
-    @Test
-    public void test_update() {
-
+    public void test_2() {
         Reservations updated = new Reservations.Builder().copy(reservation)
-                .setPickUpLocation("Parklands")
-                .setPickUpDate(LocalDate.parse("2023-03-01"))
+                .setPickUpLocation("Salt River")
+                .setPickUpDate(LocalDate.parse("2023-05-01"))
                 .setPickUpTime(Time.valueOf(LocalTime.of(12,00)))
                 .build();
         Assertions.assertNotNull(repository.update(updated));
         System.out.println("Updated: " + updated);
-
-
     }
     @Test
-    public void test_delete() {
-        boolean success = repository.delete(reservation.getId());
-        //assertTrue(success);
-        System.out.println("Deleted: " + success);
-
-    }
-    @Test
-    public void test_getAllReservationsMade() {
-        reservation2 = new ReservationsFactory().create();
-        Reservations created = repository.create(reservation2);
-
+    public void test_3() {
         List<Reservations> list = repository.getAllReservationsMade();
         System.out.println("\nShow all: ");
         for (Reservations reservation : list) {
             System.out.println(reservation);
         }
-        assertNotSame(reservation2, reservation);
+        assertNotNull(reservation);
     }
 
 

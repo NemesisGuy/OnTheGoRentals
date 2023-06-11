@@ -11,19 +11,19 @@ import za.ac.cput.repository.IDamageReportRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IDamageReportRepositoryImp implements IDamageReportRepository {
+public class DamageReportRepositoryImpl implements IDamageReportRepository {
 
     private List<DamageReport> reportDB;
 
-    private static IDamageReportRepositoryImp repository = null;
+    private static DamageReportRepositoryImpl repository = null;
 
-    private IDamageReportRepositoryImp(){
+    private DamageReportRepositoryImpl(){
         reportDB = new ArrayList<>();
     }
 
-    public static IDamageReportRepositoryImp getRepository() {
+    public static DamageReportRepositoryImpl getRepository() {
         if (repository == null) {
-            repository = new IDamageReportRepositoryImp();
+            repository = new DamageReportRepositoryImpl();
         }
         return repository;
     }

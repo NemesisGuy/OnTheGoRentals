@@ -11,7 +11,7 @@ import java.sql.Time;
 import java.time.LocalDate;
 
 
-public class Reservations implements IDomain {
+public class Reservations {
     private int id;
     private String pickUpLocation;
     private LocalDate pickUpDate;
@@ -19,6 +19,9 @@ public class Reservations implements IDomain {
     private String returnLocation;
     private LocalDate returnDate;
     private Time returnTme;
+
+    public Reservations() {
+    }
 
     public Reservations(Builder builder) {
         this.id = builder.id;

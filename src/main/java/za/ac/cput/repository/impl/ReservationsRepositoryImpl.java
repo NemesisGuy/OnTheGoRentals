@@ -11,19 +11,19 @@ import za.ac.cput.repository.IReservationsReposatory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IReservationsRepositoryImpl implements IReservationsReposatory {
+public class ReservationsRepositoryImpl implements IReservationsReposatory {
 
     private List<Reservations> reservationsDB;
 
-    private static IReservationsRepositoryImpl repository = null;
+    private static ReservationsRepositoryImpl repository = null;
 
-    private IReservationsRepositoryImpl(){
+    private ReservationsRepositoryImpl(){
         reservationsDB = new ArrayList<>();
     }
 
-    public static IReservationsRepositoryImpl getRepository() {
+    public static ReservationsRepositoryImpl getRepository() {
         if (repository == null) {
-            repository = new IReservationsRepositoryImpl();
+            repository = new ReservationsRepositoryImpl();
         }
         return repository;
     }
