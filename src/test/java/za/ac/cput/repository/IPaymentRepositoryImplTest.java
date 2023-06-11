@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import za.ac.cput.domain.Insurance;
-import za.ac.cput.domain.Payment;
-import za.ac.cput.factory.PaymentFactory;
+import za.ac.cput.domain.impl.Payment;
+import za.ac.cput.factory.impl.PaymentFactory;
+import za.ac.cput.repository.impl.IPaymentRepositoryImpl;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

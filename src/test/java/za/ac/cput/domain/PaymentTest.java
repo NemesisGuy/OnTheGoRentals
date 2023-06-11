@@ -1,6 +1,8 @@
 package za.ac.cput.domain;
 
 import org.junit.jupiter.api.*;
+import za.ac.cput.domain.impl.Payment;
+import za.ac.cput.domain.impl.Rental;
 
 import java.time.LocalDate;
 

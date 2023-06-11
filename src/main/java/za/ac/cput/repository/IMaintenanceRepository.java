@@ -5,7 +5,7 @@
 */
 package za.ac.cput.repository;
 
-import za.ac.cput.domain.Maintenance;
+import za.ac.cput.domain.impl.Maintenance;
 
 import java.util.List;
 

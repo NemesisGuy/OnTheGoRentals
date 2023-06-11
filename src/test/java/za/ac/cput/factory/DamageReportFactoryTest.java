@@ -8,9 +8,8 @@ package za.ac.cput.factory;
  */
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
-import za.ac.cput.domain.DamageReport;
-
-import static org.junit.jupiter.api.Assertions.*;
+import za.ac.cput.domain.impl.DamageReport;
+import za.ac.cput.factory.impl.DamageReportFactory;
 
 class DamageReportFactoryTest {
     @Test

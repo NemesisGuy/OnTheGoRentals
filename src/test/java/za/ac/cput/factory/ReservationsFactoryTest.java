@@ -6,11 +6,10 @@ package za.ac.cput.factory;
  * Date:  05 April 2023
  */
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Assertions;
-import za.ac.cput.domain.Reservations;
+import za.ac.cput.domain.impl.Reservations;
 import org.junit.jupiter.api.Test;
+import za.ac.cput.factory.impl.ReservationsFactory;
 
 class ReservationsFactoryTest {
 

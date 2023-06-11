@@ -3,11 +3,12 @@ package za.ac.cput.repository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import za.ac.cput.domain.Insurance;
-import za.ac.cput.factory.InsuranceFactory;
+import za.ac.cput.domain.impl.Insurance;
+import za.ac.cput.factory.impl.InsuranceFactory;
+import za.ac.cput.repository.impl.IInsuranceRepositoryImpl;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

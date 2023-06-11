@@ -5,8 +5,7 @@ package za.ac.cput.repository;
  * Author: Cwenga Dlova (214310671)
  * Date:  07 April 2023
  */
-import za.ac.cput.domain.DamageReport;
-import za.ac.cput.domain.Payment;
+import za.ac.cput.domain.impl.DamageReport;
 
 public interface IDamageReportRepository extends IRepository <DamageReport, Integer>{
 

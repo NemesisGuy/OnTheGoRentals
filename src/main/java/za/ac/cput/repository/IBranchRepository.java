@@ -5,7 +5,7 @@
 */
 package za.ac.cput.repository;
 
-import za.ac.cput.domain.Branch;
+import za.ac.cput.domain.impl.Branch;
 
 import java.util.List;
 

@@ -1,5 +1,7 @@
 package za.ac.cput.domain;
 
+import za.ac.cput.domain.impl.User;
+
 public interface IUser  extends IDomain{
     int getId();
     User getUser();

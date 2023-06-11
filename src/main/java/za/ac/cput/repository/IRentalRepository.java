@@ -1,6 +1,6 @@
 package za.ac.cput.repository;
 
-import za.ac.cput.domain.Rental;
+import za.ac.cput.domain.impl.Rental;
 
 import java.util.List;
 

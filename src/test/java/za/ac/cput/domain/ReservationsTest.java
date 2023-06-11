@@ -7,7 +7,7 @@ package za.ac.cput.domain;
  * Date:  01 April 2023
  */
 import org.junit.jupiter.api.Test;
-import za.ac.cput.domain.Reservations;
+import za.ac.cput.domain.impl.Reservations;
 
 import java.sql.Time;
 import java.time.LocalDate;

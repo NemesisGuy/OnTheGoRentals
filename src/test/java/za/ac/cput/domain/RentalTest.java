@@ -1,5 +1,7 @@
 package za.ac.cput.domain;
 
+import za.ac.cput.domain.impl.Rental;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RentalTest {

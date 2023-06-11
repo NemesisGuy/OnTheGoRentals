@@ -1,7 +1,8 @@
 package za.ac.cput.service.impl;
 
-import za.ac.cput.domain.Car;
-import za.ac.cput.repository.ICarRepositoryImpl;
+import za.ac.cput.domain.impl.Car;
+import za.ac.cput.repository.ICarRepository;
+import za.ac.cput.repository.impl.ICarRepositoryImpl;
 import za.ac.cput.service.ICarService;
 
 import java.util.ArrayList;
@@ -9,15 +10,26 @@ import java.util.ArrayList;
 public class ICarServiceImpl implements ICarService {
     private  ICarServiceImpl service = null;
     private static ICarRepositoryImpl repository = null;
-
-
     private ArrayList<Car> cars;
 
     public ICarServiceImpl() {
         repository = ICarRepositoryImpl.getRepository();
-       // this.cars = createCarList();
     }
 
+    public ICarServiceImpl(ICarRepositoryImpl repository) {
+        this.repository = repository;
+    }
+
+    public ICarServiceImpl(ICarRepository carRepository) {
+        this.repository = repository;
+    }
+
+    public ICarRepositoryImpl getRepository() {
+        if (repository == null) {
+            repository = ICarRepositoryImpl.getRepository();
+        }
+        return repository;
+    }
 
     public ICarServiceImpl getService() {
         if (service == null) {
@@ -26,27 +38,22 @@ public class ICarServiceImpl implements ICarService {
         return service;
     }
 
-
-    /* @Override ///this was recursive lol
-    public  Car create(Car car) {
-        ICarServiceImpl service = new ICarServiceImpl();
-        Car car1 = service.create(car);
-        return car1;
-    }*/
    @Override
-
    public Car create(Car car) {
+
        return repository.create(car);
    }
 
     @Override
     public Car read(Integer integer) {
-        return null;
+
+        return repository.read(integer);
     }
 
     @Override
     public Car read(int id) {
-        return null;
+
+        return repository.read(id);
     }
 
     @Override
@@ -57,7 +64,8 @@ public class ICarServiceImpl implements ICarService {
 
     @Override
     public boolean delete(Integer integer) {
-        return repository.delete(integer);
+
+       return repository.delete(integer);
     }
 
 
@@ -72,7 +80,7 @@ public class ICarServiceImpl implements ICarService {
     public ArrayList<Car> getAll() {
 
         return (ArrayList<Car>) repository.getAllCars();
-      // return null;
+
     }
 
 

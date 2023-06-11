@@ -5,10 +5,9 @@ package za.ac.cput.repository;
  * Author: Cwenga Dlova (214310671)
  * Date:  07 April 2023
  */
-import za.ac.cput.domain.Reservations;
+import za.ac.cput.domain.impl.Reservations;
 
 import java.util.List;
-import java.util.Set;
 
 public interface IReservationsReposatory extends IRepository <Reservations, Integer>{
     List<Reservations> getAllReservationsMade();

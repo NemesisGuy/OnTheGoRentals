@@ -1,7 +1,7 @@
 package za.ac.cput.factory;
 
 import org.junit.jupiter.api.Test;
-import za.ac.cput.domain.Maintenance;
+import za.ac.cput.domain.impl.Maintenance;
 
 import java.time.LocalDate;
 

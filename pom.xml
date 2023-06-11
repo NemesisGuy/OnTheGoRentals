@@ -11,7 +11,7 @@
     <groupId>az.ac.cput</groupId>
     <artifactId>OnTheGoRentals</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>OnTheGoRentals</name>
+    <userName>OnTheGoRentals</userName>
     <description>OnTheGoRentals</description>
     <properties>
         <java.version>17</java.version>

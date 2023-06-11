@@ -5,10 +5,10 @@ package za.ac.cput.repository;
  * Author: Cwenga Dlova (214310671)
  * Date:  07 April 2023
  */
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import za.ac.cput.domain.DamageReport;
-import za.ac.cput.factory.DamageReportFactory;
+import za.ac.cput.domain.impl.DamageReport;
+import za.ac.cput.factory.impl.DamageReportFactory;
+import za.ac.cput.repository.impl.IDamageReportRepositoryImp;
 
 import java.time.LocalDate;
 

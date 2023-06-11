@@ -6,7 +6,7 @@ package za.ac.cput.factory;
  * Date: 20 March 2023
  */
 
-import za.ac.cput.domain.Feedback;
+import za.ac.cput.domain.impl.Feedback;
 
 import java.util.List;
 

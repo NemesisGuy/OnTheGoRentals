@@ -6,11 +6,10 @@ package za.ac.cput.repository;
  * Date:  07 April 2023
  */
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.Rollback;
-import za.ac.cput.domain.Reservations;
-import za.ac.cput.factory.ReservationsFactory;
+import za.ac.cput.domain.impl.Reservations;
+import za.ac.cput.factory.impl.ReservationsFactory;
+import za.ac.cput.repository.impl.IReservationsRepositoryImpl;
 
 import java.sql.Time;
 import java.time.LocalDate;

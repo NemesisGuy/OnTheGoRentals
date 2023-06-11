@@ -5,7 +5,7 @@ package za.ac.cput.factory; /**
  * Date: 20 March 2023
  */
 
-import za.ac.cput.domain.Employee;
+import za.ac.cput.domain.impl.Employee;
 
 import java.util.List;
 

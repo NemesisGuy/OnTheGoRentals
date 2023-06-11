@@ -6,6 +6,7 @@ package za.ac.cput.domain;
  *    Date: 1 April 2021
  */
 import org.junit.jupiter.api.Test;
+import za.ac.cput.domain.impl.Feedback;
 
 public class FeedbackTest {
     @Test

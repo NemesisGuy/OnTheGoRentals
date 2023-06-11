@@ -6,8 +6,8 @@ package za.ac.cput.repository;
  * Date: 29 March 2021
  */
 
-import za.ac.cput.domain.Car;
-import za.ac.cput.domain.PriceGroup;
+import za.ac.cput.domain.impl.Car;
+import za.ac.cput.domain.impl.PriceGroup;
 
 import java.util.List;
 

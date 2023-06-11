@@ -1,6 +1,8 @@
 package za.ac.cput.domain;
 
 import org.junit.jupiter.api.Test;
+import za.ac.cput.domain.impl.Address;
+import za.ac.cput.domain.impl.Branch;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
