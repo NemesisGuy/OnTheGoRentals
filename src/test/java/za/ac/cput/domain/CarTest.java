@@ -34,90 +34,92 @@ class CarTest {
         Assertions.assertEquals(category, car.getCategory());
         Assertions.assertEquals(year, car.getYear());
     }
-        @Test
-        public void testBuilder() {
-            Car car = Car.builder()
-                    .id(123)
-                    .make("Toyota")
-                    .model("Corolla")
-                    .year(2021)
-                    .category("Sedan")
-                    .licensePlate("ABC123")
-                    .build();
 
-            Assertions.assertEquals(123, car.getId());
-            Assertions.assertEquals("Toyota", car.getMake());
-            Assertions.assertEquals("Corolla", car.getModel());
-            Assertions.assertEquals(2021, car.getYear());
-            Assertions.assertEquals("Sedan", car.getCategory());
-            Assertions.assertEquals("ABC123", car.getLicensePlate());
-        }
+    @Test
+    public void testBuilder() {
+        Car car = Car.builder()
+                .id(123)
+                .make("Toyota")
+                .model("Corolla")
+                .year(2021)
+                .category("Sedan")
+                .licensePlate("ABC123")
+                .build();
 
-        @Test
-        public void testEquals() {
-            Car car1 = Car.builder()
-                    .id(123)
-                    .make("Toyota")
-                    .model("Corolla")
-                    .year(2021)
-                    .category("Sedan")
-                    .licensePlate("ABC123")
-                    .build();
+        Assertions.assertEquals(123, car.getId());
+        Assertions.assertEquals("Toyota", car.getMake());
+        Assertions.assertEquals("Corolla", car.getModel());
+        Assertions.assertEquals(2021, car.getYear());
+        Assertions.assertEquals("Sedan", car.getCategory());
+        Assertions.assertEquals("ABC123", car.getLicensePlate());
+    }
 
-            Car car2 = Car.builder()
-                    .id(123)
-                    .make("Toyota")
-                    .model("Corolla")
-                    .year(2021)
-                    .category("Sedan")
-                    .licensePlate("ABC123")
-                    .build();
+    @Test
+    public void testEquals() {
+        Car car1 = Car.builder()
+                .id(123)
+                .make("Toyota")
+                .model("Corolla")
+                .year(2021)
+                .category("Sedan")
+                .licensePlate("ABC123")
+                .build();
 
-            Car car3 = Car.builder()
-                    .id(456)
-                    .make("Honda")
-                    .model("Civic")
-                    .year(2022)
-                    .category("Sedan")
-                    .licensePlate("DEF456")
-                    .build();
+        Car car2 = Car.builder()
+                .id(123)
+                .make("Toyota")
+                .model("Corolla")
+                .year(2021)
+                .category("Sedan")
+                .licensePlate("ABC123")
+                .build();
 
-            Assertions.assertEquals(car1, car2);
-            Assertions.assertNotEquals(car1, car3);
-        }
+        Car car3 = Car.builder()
+                .id(456)
+                .make("Honda")
+                .model("Civic")
+                .year(2022)
+                .category("Sedan")
+                .licensePlate("DEF456")
+                .build();
 
-        @Test
-        public void testHashCode() {
-            Car car1 = Car.builder()
-                    .id(123)
-                    .make("Toyota")
-                    .model("Corolla")
-                    .year(2021)
-                    .category("Sedan")
-                    .licensePlate("ABC123")
-                    .build();
+        Assertions.assertEquals(car1, car2);
+        Assertions.assertNotEquals(car1, car3);
+    }
 
-            Car car2 = Car.builder()
-                    .id(123)
-                    .make("Toyota")
-                    .model("Corolla")
-                    .year(2021)
-                    .category("Sedan")
-                    .licensePlate("ABC123")
-                    .build();
+    @Test
+    public void testHashCode() {
+        Car car1 = Car.builder()
+                .id(123)
+                .make("Toyota")
+                .model("Corolla")
+                .year(2021)
+                .category("Sedan")
+                .licensePlate("ABC123")
+                .build();
 
-            Car car3 = Car.builder()
-                    .id(456)
-                    .make("Honda")
-                    .model("Civic")
-                    .year(2022)
-                    .category("Sedan")
-                    .licensePlate("DEF456")
-                    .build();
+        Car car2 = Car.builder()
+                .id(123)
+                .make("Toyota")
+                .model("Corolla")
+                .year(2021)
+                .category("Sedan")
+                .licensePlate("ABC123")
+                .build();
 
-            Assertions.assertEquals(car1.hashCode(), car2.hashCode());
-            Assertions.assertNotEquals(car1.hashCode(), car3.hashCode());
-        }
+        Car car3 = Car.builder()
+                .id(456)
+                .make("Honda")
+                .model("Civic")
+                .year(2022)
+                .category("Sedan")
+                .licensePlate("DEF456")
+                .build();
+
+        Assertions.assertEquals(car1.hashCode(), car2.hashCode());
+        Assertions.assertNotEquals(car1.hashCode(), car3.hashCode());
+    }
+
     @Test
     void testGetAllCarsExecutionTime() {
         assertTimeoutPreemptively(Duration.ofMillis(100), () -> {
@@ -131,4 +133,4 @@ class CarTest {
             assertTrue(cars.size() > 0);
         });
     }
-    }
+}

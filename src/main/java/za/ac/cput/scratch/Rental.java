@@ -7,6 +7,7 @@ package za.ac.cput.scratch;
  * Author: Peter Buckingham (220165289)
  * Date: 29 March 2023
  */
+
 import java.util.Date;
 
 public class Rental {

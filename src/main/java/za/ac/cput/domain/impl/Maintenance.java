@@ -23,6 +23,10 @@ public class Maintenance implements IDomain {
         this.serviceDate = builder.serviceDate;
     }
 
+    public static Maintenance.Builder builder() {
+        return new Maintenance.Builder();
+    }
+
     public int getMaintenanceId() {
         return maintenanceId;
     }
@@ -38,9 +42,6 @@ public class Maintenance implements IDomain {
     public LocalDate getServiceDate() {
         return serviceDate;
     }
-    public static Maintenance.Builder builder() {
-        return new Maintenance.Builder();
-    }
 
     @Override
     public String toString() {
@@ -48,7 +49,7 @@ public class Maintenance implements IDomain {
                 "maintenanceId=" + maintenanceId +
                 ", maintenanceType='" + maintenanceType + '\'' +
                 ", serviceProvider='" + serviceProvider + '\'' +
-                ", serviceDate=" + serviceDate +'\''+
+                ", serviceDate=" + serviceDate + '\'' +
                 '}';
     }
 

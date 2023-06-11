@@ -17,9 +17,7 @@ public interface IBranch extends IDomain {
     String getBranchName();
 
 
-
     Address getAddress();
-
 
 
     String getEmail();

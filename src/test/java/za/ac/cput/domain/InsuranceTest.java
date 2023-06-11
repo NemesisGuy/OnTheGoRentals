@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.Insurance;
 import za.ac.cput.domain.impl.Rental;
 
-
 import java.time.LocalDate;
 
 class InsuranceTest {

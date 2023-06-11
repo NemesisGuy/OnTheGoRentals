@@ -7,8 +7,6 @@ package za.ac.cput.domain.impl;
  */
 
 
-
-
 import za.ac.cput.domain.IInsurance;
 
 import java.time.LocalDate;

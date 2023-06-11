@@ -1,7 +1,6 @@
 package za.ac.cput.service.impl;
 
 import za.ac.cput.domain.impl.User;
-
 import za.ac.cput.repository.IRepository;
 import za.ac.cput.repository.impl.IUserRepositoryImpl;
 import za.ac.cput.service.IUserService;
@@ -39,10 +38,14 @@ public class IUserServiceImpl implements IUserService {
         return service;
     }
 
-
     @Override
     public User create(User user) {
         return repository.create(user);
+    }
+
+    @Override
+    public User read(Integer integer) {
+        return repository.read(integer);
     }
 
     @Override
@@ -57,7 +60,7 @@ public class IUserServiceImpl implements IUserService {
 
     @Override
     public boolean delete(int id) {
-        return false;
+        return repository.delete(id);
     }
 
     public boolean delete(Integer id) {
@@ -69,30 +72,8 @@ public class IUserServiceImpl implements IUserService {
         return (ArrayList<User>) repository.getAllUsers();
     }
 
-    @Override
-    public Object create(Object entity) {
-        return repository.create((User) entity);
-    }
-
-    @Override
-    public Object read(Object o) {
-        return repository.read((Integer) o);
-    }
-
-    @Override
-    public Object update(Object entity) {
-        return repository.update((User) entity);
-
-    }
-
-    @Override
-    public boolean delete(Object o) {
-        return true;
-    }
-
 
     ///////////
-
 
 
 }

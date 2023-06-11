@@ -10,8 +10,9 @@ import za.ac.cput.domain.impl.Insurance;
 
 import java.util.List;
 
-public interface IInsuranceRepository extends IRepository <Insurance, Integer>{
+public interface IInsuranceRepository extends IRepository<Insurance, Integer> {
     List<Insurance> getAllInsurancePolicies();
+
     Insurance getInsuranceById(Integer id);
 
 }

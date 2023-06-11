@@ -26,7 +26,7 @@ public class Rental implements IRent {
 
 
     //Initializing a parameterized constructor
-    public Rental (int rentalId, String borrower, String car, String issuer, String issuedDate, String Date, String DateReturned, String receiver, boolean fine){
+    public Rental(int rentalId, String borrower, String car, String issuer, String issuedDate, String Date, String DateReturned, String receiver, boolean fine) {
 
         this.rentalId = rentalId;
         this.borrower = borrower;
@@ -40,7 +40,20 @@ public class Rental implements IRent {
     }
 
 
-    public int getRentalId()  {
+    private Rental(RentalBuilder builder) {
+
+        this.rentalId = builder.rentalId;
+        this.borrower = builder.borrower;
+        this.car = builder.car;
+        this.issuer = builder.issuer;
+        this.Date = builder.Date;
+        this.issuedDate = builder.dateReturned;
+        this.dateReturned = builder.receiver;
+        this.finePaid = builder.finePaid;
+
+    }
+
+    public int getRentalId() {
         return this.rentalId;
     }
 
@@ -62,11 +75,9 @@ public class Rental implements IRent {
         return car;
     }
 
-
     public String getIssuer() {
         return issuer;
     }
-
 
     public String getIssuedDate() {
         return issuedDate;
@@ -77,11 +88,9 @@ public class Rental implements IRent {
         return null;
     }
 
-
     public String getDateReturned() {
         return dateReturned;
     }
-
 
     public String getReceiver() {
         return receiver;
@@ -96,8 +105,19 @@ public class Rental implements IRent {
         return finePaid;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "Rental{" +
+                "rentalId=" + rentalId +
+                "borrower='" + borrower + '\'' +
+                ", car ='" + car + '\'' +
+                ", issuer='" + issuer + '\'' +
+                ", issuedDate='" + issuedDate + '\'' +
+                ", dateReturned='" + dateReturned + '\'' +
+                ", receiver='" + receiver + '\'' +
+                ", finePaid=" + finePaid +
+                '}';
+    }
 
     //Builder Class
     public static class RentalBuilder {
@@ -107,7 +127,7 @@ public class Rental implements IRent {
         private String car;
         private String issuer;
 
-        private  String Date;
+        private String Date;
         private String issuedDate;
         private String dateReturned;
         private String receiver;
@@ -118,6 +138,7 @@ public class Rental implements IRent {
             this.rentalId = rentalId;
             return this;
         }
+
         public Rental.RentalBuilder setBorrower(String borrower) {
             this.borrower = borrower;
             return this;
@@ -158,35 +179,8 @@ public class Rental implements IRent {
             return this;
         }
 
-        public Rental build(){
-                return new Rental(this);
-            }
+        public Rental build() {
+            return new Rental(this);
         }
-
-        private Rental(RentalBuilder builder) {
-
-        this.rentalId = builder.rentalId;
-        this.borrower = builder.borrower;
-        this.car = builder.car;
-        this.issuer =builder.issuer;
-        this.Date = builder.Date;
-        this.issuedDate = builder.dateReturned;
-        this.dateReturned = builder.receiver;
-        this.finePaid = builder.finePaid;
-
-    }
-
-    @Override
-    public String toString() {
-        return "Rental{" +
-                "rentalId=" + rentalId +
-                "borrower='" + borrower + '\'' +
-                ", car ='" + car + '\'' +
-                ", issuer='" + issuer + '\'' +
-                ", issuedDate='" + issuedDate + '\'' +
-                ", dateReturned='" + dateReturned + '\'' +
-                ", receiver='" + receiver + '\'' +
-                ", finePaid=" + finePaid +
-                '}';
     }
 }

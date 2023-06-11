@@ -3,10 +3,10 @@ package za.ac.cput.domain;
 import za.ac.cput.domain.impl.Employee;
 
 /**
- *    EmployeeTest.java
- *    Test for employee
- *    Author: Shamiso Moyo Chaka (220365393)
- *    Date: 1 April 2021
+ * EmployeeTest.java
+ * Test for employee
+ * Author: Shamiso Moyo Chaka (220365393)
+ * Date: 1 April 2021
  */
 public class EmployeeTest {
     public static void main(String[] args) {

@@ -5,6 +5,7 @@ package za.ac.cput.repository;
  * Author: Cwenga Dlova (214310671)
  * Date:  07 April 2023
  */
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.Reservations;
@@ -16,7 +17,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 class IReservationsRepositoryImplTest {
 
@@ -33,25 +35,28 @@ class IReservationsRepositoryImplTest {
         System.out.println("Created: " + created);
 
     }
+
     @Test
-    public void test_read(){
+    public void test_read() {
         Reservations read = repository.read(reservation.getId());
-       // Assertions.assertNotNull(read);
+        // Assertions.assertNotNull(read);
         System.out.println("Read: " + read);
     }
+
     @Test
     public void test_update() {
 
         Reservations updated = new Reservations.Builder().copy(reservation)
                 .setPickUpLocation("Parklands")
                 .setPickUpDate(LocalDate.parse("2023-03-01"))
-                .setPickUpTime(Time.valueOf(LocalTime.of(12,00)))
+                .setPickUpTime(Time.valueOf(LocalTime.of(12, 00)))
                 .build();
         Assertions.assertNotNull(repository.update(updated));
         System.out.println("Updated: " + updated);
 
 
     }
+
     @Test
     public void test_delete() {
         boolean success = repository.delete(reservation.getId());
@@ -59,6 +64,7 @@ class IReservationsRepositoryImplTest {
         System.out.println("Deleted: " + success);
 
     }
+
     @Test
     public void test_getAllReservationsMade() {
         reservation2 = new ReservationsFactory().create();

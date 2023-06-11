@@ -5,6 +5,7 @@ package za.ac.cput.domain;
  * Author: Cwenga Dlova (214310671)
  * Date:  01 April 2023
  */
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.Car;
@@ -16,7 +17,7 @@ import java.time.LocalDate;
 
 class DamageReportTest {
 
-    private int id= 7512344;
+    private int id = 7512344;
     private Rental rentalId = null;
     private Customer customerId = null;
     private Car carId = null;
@@ -25,7 +26,7 @@ class DamageReportTest {
     private String description = "Accidentally pumbed into another car and smashed the windscreen.";
 
     @Test
-    public void testDamageReport(){
+    public void testDamageReport() {
         DamageReport report = new DamageReport.Builder()
 
                 .setRentalId(rentalId)
@@ -38,6 +39,7 @@ class DamageReportTest {
 
         System.out.println(report.toString());
     }
+
     @Test
     public void testEquality() {
         DamageReport report2 = new DamageReport.Builder()

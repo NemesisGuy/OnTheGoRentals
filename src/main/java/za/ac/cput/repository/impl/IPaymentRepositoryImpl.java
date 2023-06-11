@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IPaymentRepositoryImpl implements IPaymentRepository {
-    private List<Payment> paymentDB;
     private static IPaymentRepositoryImpl repository = null;
+    private List<Payment> paymentDB;
 
     private IPaymentRepositoryImpl() {
         paymentDB = new ArrayList<>();
@@ -37,7 +37,7 @@ public class IPaymentRepositoryImpl implements IPaymentRepository {
     @Override
     public Payment read(Integer id) {
         Payment payment = paymentDB.stream()
-                .filter(p -> p.getId()==id)
+                .filter(p -> p.getId() == id)
                 .findAny()
                 .orElse(null);
         return payment;

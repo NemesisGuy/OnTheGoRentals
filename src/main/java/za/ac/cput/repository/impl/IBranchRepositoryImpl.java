@@ -1,4 +1,3 @@
-
 /* BranchRepositoryImpl.java
  Entity for the Branch
  Author: Asiphe Funda (215092317)
@@ -19,6 +18,7 @@ public class IBranchRepositoryImpl implements IBranchRepository {
     public IBranchRepositoryImpl() {
         branch = new ArrayList<>();
     }
+
     @Override
     public Branch create(Branch entity) {
         branch.add(entity);
@@ -28,7 +28,7 @@ public class IBranchRepositoryImpl implements IBranchRepository {
     @Override
     public Branch read(Integer id) {
         return branch.stream()
-                .filter(branch -> branch.getId()==id)
+                .filter(branch -> branch.getId() == id)
                 .findFirst()
                 .orElse(null);
     }
@@ -57,10 +57,12 @@ public class IBranchRepositoryImpl implements IBranchRepository {
 
         return false;
     }
+
     @Override
     public List<Branch> getAll() {
         return Collections.unmodifiableList(branch);
     }
+
     @Override
     public Branch getBranchById(Integer id) {
 

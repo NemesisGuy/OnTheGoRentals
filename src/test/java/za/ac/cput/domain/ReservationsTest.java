@@ -6,6 +6,7 @@ package za.ac.cput.domain;
  * Author: Cwenga Dlova (214310671)
  * Date:  01 April 2023
  */
+
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.Reservations;
 
@@ -13,12 +14,12 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 class ReservationsTest {
 
     @Test
-    public void testReservations(){
+    public void testReservations() {
         Reservations reservation = new Reservations.Builder()
                 .setId(7896)
                 .setPickUpLocation("Cape Town Airport")
@@ -32,10 +33,11 @@ class ReservationsTest {
         System.out.println(reservation.toString());
 
     }
+
     @Test
     public void identityTest() {
 
-        Reservations reservation1= new Reservations.Builder()
+        Reservations reservation1 = new Reservations.Builder()
                 .setId(7896)
                 .setPickUpLocation("Cape Town Airport")
                 .setPickUpDate(LocalDate.parse("2023-04-06"))

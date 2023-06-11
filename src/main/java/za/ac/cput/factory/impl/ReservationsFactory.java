@@ -18,15 +18,15 @@ import java.util.Random;
 public class ReservationsFactory implements IFactory<Reservations> {
 
     @Override
-    public Reservations create(){
+    public Reservations create() {
         return new Reservations.Builder()
-        .setId(new Random().nextInt(1000000))
+                .setId(new Random().nextInt(1000000))
                 .setPickUpLocation("Cape Town")
                 .setPickUpDate(LocalDate.parse("2023-02-25"))
-                .setPickUpTime(Time.valueOf(LocalTime.of(10,00)))
+                .setPickUpTime(Time.valueOf(LocalTime.of(10, 00)))
                 .setReturnLocation("Cape Town")
                 .setReturnDate(LocalDate.parse("2023-02-28"))
-                .setReturnTme(Time.valueOf(LocalTime.of(14,00)))
+                .setReturnTme(Time.valueOf(LocalTime.of(14, 00)))
                 .build();
     }
 

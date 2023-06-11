@@ -37,14 +37,12 @@ public class AdminController {
         return carService.delete(carId);
     }
 
-   @PutMapping("/cars/update/{carId}")
-   public Car updateCar(@PathVariable int carId, @RequestBody Car updatedCar) {
-       Car updated = carService.update(updatedCar);
-       return updated;
-   }
-
-
+    @PutMapping("/cars/update/{carId}")
+    public Car updateCar(@PathVariable int carId, @RequestBody Car updatedCar) {
+        Car updated = carService.update(updatedCar);
+        return updated;
+    }
 
 
 }
- //.delete(`http://localhost:8080/api/admin/cars/delete/${carId}`)
+//.delete(`http://localhost:8080/api/admin/cars/delete/${carId}`)

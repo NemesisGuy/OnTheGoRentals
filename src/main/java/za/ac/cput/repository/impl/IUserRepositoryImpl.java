@@ -1,17 +1,15 @@
 package za.ac.cput.repository.impl;
 
 
-
 import za.ac.cput.domain.impl.User;
 import za.ac.cput.repository.IRepository;
-
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class IUserRepositoryImpl implements IRepository <User, Integer> {
-    private List<User> users;
+public class IUserRepositoryImpl implements IRepository<User, Integer> {
     private static IUserRepositoryImpl repository = null;
+    private List<User> users;
 
     private IUserRepositoryImpl() {
         users = createUserList();

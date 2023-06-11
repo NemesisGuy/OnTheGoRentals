@@ -17,6 +17,10 @@ public class Branch implements IBranch {
         this.email = builder.email;
     }
 
+    public static Branch.Builder builder() {
+        return new Branch.Builder();
+    }
+
     public int getBranchId() {
         return branchId;
     }
@@ -33,9 +37,6 @@ public class Branch implements IBranch {
         return email;
     }
 
-    public static Branch.Builder builder() {
-        return new Branch.Builder();
-    }
     @Override
     public String toString() {
         return "Branch{" +

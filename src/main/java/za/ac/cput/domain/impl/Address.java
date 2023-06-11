@@ -10,14 +10,13 @@ import za.ac.cput.domain.IAddress;
 
 public class Address implements IAddress {
 
-    private final int id;
-
     private static String streetNumber;
     private static String streetName;
     private static String suburb;
     private static String city;
     private static String state;
     private static int postcode;
+    private final int id;
 
     private Address(Builder builder) {
         this.id = builder.id;
@@ -27,6 +26,10 @@ public class Address implements IAddress {
         this.city = builder.city;
         this.state = builder.state;
         this.postcode = builder.postcode;
+    }
+
+    public static Address.Builder builder() {
+        return new Address.Builder();
     }
 
     public String getStreetNumber() {
@@ -52,9 +55,6 @@ public class Address implements IAddress {
     public int getPostcode() {
         return postcode;
     }
-    public static Address.Builder builder() {
-        return new Address.Builder();
-    }
 
     @Override
     public String toString() {
@@ -73,7 +73,7 @@ public class Address implements IAddress {
         return this.id;
     }
 
-    public static class Builder{
+    public static class Builder {
         private int id;
         private String streetNumber;
         private String streetName;
@@ -81,6 +81,7 @@ public class Address implements IAddress {
         private String city;
         private String state;
         private int postcode;
+
         public Builder setId(int id) {
             this.id = id;
             return this;
@@ -116,7 +117,8 @@ public class Address implements IAddress {
             this.postcode = postcode;
             return this;
         }
-        public Builder copy (Address address){
+
+        public Builder copy(Address address) {
             this.streetNumber = Address.streetNumber;
             this.streetName = Address.streetName;
             this.suburb = Address.suburb;
@@ -125,6 +127,7 @@ public class Address implements IAddress {
             this.postcode = Address.postcode;
             return this;
         }
+
         public Address build() {
             return new Address(this);
         }

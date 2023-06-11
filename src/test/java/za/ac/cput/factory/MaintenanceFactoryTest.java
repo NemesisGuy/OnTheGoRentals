@@ -10,16 +10,17 @@ class MaintenanceFactoryTest {
     private String maintenanceType = "Brake repair";
     private String serviceProvider = null;
     private LocalDate serviceDate = LocalDate.parse("2023-04-06");
-@Test
-    void testMaintenance(){
-    Maintenance maintenance= new Maintenance.Builder()
-            .setMaintenanceId(maintenanceId)
-            .setMaintenanceType(maintenanceType)
-            .setServiceProvider(serviceProvider)
-            .setServiceDate(serviceDate)
-            .build();
 
-    System.out.println(maintenance.toString());
-}
+    @Test
+    void testMaintenance() {
+        Maintenance maintenance = new Maintenance.Builder()
+                .setMaintenanceId(maintenanceId)
+                .setMaintenanceType(maintenanceType)
+                .setServiceProvider(serviceProvider)
+                .setServiceDate(serviceDate)
+                .build();
+
+        System.out.println(maintenance.toString());
+    }
 
 }

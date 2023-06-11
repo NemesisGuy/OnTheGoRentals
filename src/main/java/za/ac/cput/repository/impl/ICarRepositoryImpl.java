@@ -9,19 +9,21 @@ package za.ac.cput.repository.impl;
 import za.ac.cput.domain.impl.Car;
 import za.ac.cput.domain.impl.PriceGroup;
 import za.ac.cput.repository.ICarRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ICarRepositoryImpl implements ICarRepository {
-    private List<Car> cars;
     private static ICarRepositoryImpl repository = null;
+    private List<Car> cars;
 
     public ICarRepositoryImpl() {
 
         cars = createCarList();
 
     }
+
     // Singleton
     public static ICarRepositoryImpl getRepository() {
         if (repository == null)

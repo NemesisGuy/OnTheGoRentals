@@ -15,7 +15,7 @@ public class RentalTest {
     private String rentalDateReturned;
     private String rentalReceiver;
 
-    public void testRental ()  {
+    public void testRental() {
 
         Rental rental = new Rental.RentalBuilder()
                 .setRentalId(rentalId)
@@ -29,12 +29,12 @@ public class RentalTest {
 
         System.out.println(rental.toString());
 
-        assertEquals(rentalId,rental.getRentalId());
-        assertEquals(rentalBorrower,rental.getBorrower());
-        assertEquals(rentalCar,rental.getCar());
-        assertEquals(rentalIssuer,rental.getIssuer());
-        assertEquals(rentalIssuedDate,rental.getIssuedDate());
-        assertEquals(rentalDateReturned,rental.getDateReturned());
-        assertEquals(rentalReceiver,rental.getReceiver());
+        assertEquals(rentalId, rental.getRentalId());
+        assertEquals(rentalBorrower, rental.getBorrower());
+        assertEquals(rentalCar, rental.getCar());
+        assertEquals(rentalIssuer, rental.getIssuer());
+        assertEquals(rentalIssuedDate, rental.getIssuedDate());
+        assertEquals(rentalDateReturned, rental.getDateReturned());
+        assertEquals(rentalReceiver, rental.getReceiver());
     }
 }

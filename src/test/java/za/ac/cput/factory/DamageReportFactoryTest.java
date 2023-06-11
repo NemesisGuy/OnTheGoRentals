@@ -6,8 +6,9 @@ package za.ac.cput.factory;
  * Author: Cwenga Dlova (214310671)
  * Date:  06 April 2023
  */
-import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.DamageReport;
 import za.ac.cput.factory.impl.DamageReportFactory;
 

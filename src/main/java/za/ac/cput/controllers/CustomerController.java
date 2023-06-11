@@ -1,14 +1,16 @@
 package za.ac.cput.controllers;
 /**
- *  CustomerController.java
- *  This is the controller for the Customer class
+ * CustomerController.java
+ * This is the controller for the Customer class
  * Author: Peter Buckingham (220165289)
  * Date: 05 April 2023
  */
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import za.ac.cput.domain.impl.Customer;
+
 import java.util.ArrayList;
 import java.util.List;
 

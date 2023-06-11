@@ -5,6 +5,7 @@ package za.ac.cput.repository;
  * Author: Cwenga Dlova (214310671)
  * Date:  07 April 2023
  */
+
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.DamageReport;
 import za.ac.cput.factory.impl.DamageReportFactory;
@@ -12,7 +13,8 @@ import za.ac.cput.repository.impl.IDamageReportRepositoryImp;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class IDamageReportRepositoryImpTest {
 
@@ -36,6 +38,7 @@ class IDamageReportRepositoryImpTest {
         System.out.println("Read: " + read);
 
     }
+
     @Test
     public void test_update() {
         DamageReport updated = new DamageReport.Builder().copy(report1)
@@ -46,8 +49,9 @@ class IDamageReportRepositoryImpTest {
         assertNotNull(repository.update(updated));
         System.out.println("Updated: " + updated);
     }
+
     @Test
-    public void test_delete(){
+    public void test_delete() {
         boolean success = repository.delete(report1.getId());
         //assertTrue(success);
         System.out.println("Deleted: " + success);

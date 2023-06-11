@@ -5,6 +5,7 @@ package za.ac.cput.repository.impl;
  * Author: Shamiso Moyo Chaka (220365393)
  * Date: 1 April 2023
  */
+
 import za.ac.cput.domain.impl.Feedback;
 import za.ac.cput.repository.IFactoryRepository;
 
@@ -15,9 +16,11 @@ import java.util.stream.Collectors;
 
 public class IFactoryImpl implements IFactoryRepository {
 
-    private List <Feedback> feedbacks;
+    private List<Feedback> feedbacks;
 
-    public IFactoryImpl() {feedbacks = new ArrayList<>();}
+    public IFactoryImpl() {
+        feedbacks = new ArrayList<>();
+    }
 
 
     @Override
@@ -52,7 +55,7 @@ public class IFactoryImpl implements IFactoryRepository {
     public boolean delete(String comment) {
         Feedback feedbackToDelete = read(comment);
 
-        if(feedbackToDelete != null) {
+        if (feedbackToDelete != null) {
             feedbacks.remove(feedbackToDelete);
             return true;
         }

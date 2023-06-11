@@ -14,8 +14,8 @@ import java.util.List;
 
 public class IIRentRepoImpl implements IRentalRepository {
 
-    private List<Rental> rentals;
     private static IIRentRepoImpl repository = null;
+    private List<Rental> rentals;
 
     private IIRentRepoImpl() {
         rentals = new ArrayList<>();

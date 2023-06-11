@@ -1,4 +1,5 @@
 package za.ac.cput.scratch;
+
 /**
  * scratch concepts
  * Reservation.java

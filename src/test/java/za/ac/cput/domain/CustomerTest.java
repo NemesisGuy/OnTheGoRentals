@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CustomerTest {
 
-    public void testCustomer ()  {
+    public void testCustomer() {
 
         Customer customer = new Customer.CustomerBuilder()
                 .build();
@@ -19,15 +19,15 @@ public class CustomerTest {
         System.out.println(customer.toString());
 
 
-            assertEquals("218331851",customer.getCustomerId());
+        assertEquals("218331851", customer.getCustomerId());
 
-            assertEquals("Lonwabo Magazi",customer.getName());
+        assertEquals("Lonwabo Magazi", customer.getName());
 
-            assertEquals("218331851@mycput.ac.za",customer.getContactInfo());
+        assertEquals("218331851@mycput.ac.za", customer.getContactInfo());
 
-            assertEquals(" ",customer.getHiringHistory());
-        }
-
-
+        assertEquals(" ", customer.getHiringHistory());
     }
+
+
+}
 

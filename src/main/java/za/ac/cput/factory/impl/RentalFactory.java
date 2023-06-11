@@ -13,11 +13,11 @@ import java.util.Random;
 
 public class RentalFactory {
 
-        public Rental create() {
-            return new Rental.RentalBuilder()
-                    .setRentalId(new Random().nextInt(1000000))
-                    .build();
-        }
+    public Rental create() {
+        return new Rental.RentalBuilder()
+                .setRentalId(new Random().nextInt(1000000))
+                .build();
+    }
 
     public Rental getById(long id) {
         return null;

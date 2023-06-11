@@ -1,16 +1,17 @@
 package za.ac.cput.domain;
 /**
- *    FeedbackTest.java
- *    Test for Feedback
- *    Author: Shamiso Moyo Chaka (220365393)
- *    Date: 1 April 2021
+ * FeedbackTest.java
+ * Test for Feedback
+ * Author: Shamiso Moyo Chaka (220365393)
+ * Date: 1 April 2021
  */
+
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.Feedback;
 
 public class FeedbackTest {
     @Test
-    void testFeedbackConstructor () {
+    void testFeedbackConstructor() {
         Feedback feedback1 = new Feedback.FeedbackBuilder()
                 .setName("Shamiso")
                 .setComment("This is a test!")

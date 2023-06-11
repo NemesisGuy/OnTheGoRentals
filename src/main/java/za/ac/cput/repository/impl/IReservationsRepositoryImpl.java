@@ -5,6 +5,7 @@ package za.ac.cput.repository.impl;
  * Author: Cwenga Dlova (214310671)
  * Date:  07 April 2023
  */
+
 import za.ac.cput.domain.impl.Reservations;
 import za.ac.cput.repository.IReservationsReposatory;
 
@@ -13,11 +14,10 @@ import java.util.List;
 
 public class IReservationsRepositoryImpl implements IReservationsReposatory {
 
+    private static IReservationsRepositoryImpl repository = null;
     private List<Reservations> reservationsDB;
 
-    private static IReservationsRepositoryImpl repository = null;
-
-    private IReservationsRepositoryImpl(){
+    private IReservationsRepositoryImpl() {
         reservationsDB = new ArrayList<>();
     }
 
@@ -37,7 +37,7 @@ public class IReservationsRepositoryImpl implements IReservationsReposatory {
     @Override
     public Reservations read(Integer id) {
 
-        Reservations reservations = reservationsDB.stream().filter(r -> r.getId() == id).findAny().orElse(null) ;
+        Reservations reservations = reservationsDB.stream().filter(r -> r.getId() == id).findAny().orElse(null);
         return reservations;
     }
 

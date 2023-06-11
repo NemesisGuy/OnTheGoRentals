@@ -9,7 +9,7 @@ import za.ac.cput.domain.impl.Employee;
 
 import java.util.List;
 
-public interface IFactoryEmployee <T> {
+public interface IFactoryEmployee<T> {
     T create();
 
     T getById(long id);

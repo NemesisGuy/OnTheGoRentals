@@ -1,4 +1,3 @@
-
 /* IMantenanceImpl.java
  Entity for the Maintenance
  Author: Asiphe Funda (215092317)
@@ -13,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IMaintenanceRepositoryImpl implements IMaintenanceRepository {
-    private List<Maintenance> maintenanceDB;
     private static IMaintenanceRepositoryImpl repository = null;
+    private List<Maintenance> maintenanceDB;
 
     private IMaintenanceRepositoryImpl() {
         maintenanceDB = new ArrayList<>();

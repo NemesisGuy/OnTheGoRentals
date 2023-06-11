@@ -10,7 +10,7 @@ import java.util.List;
  * IRentalRepository.java
  */
 
-public interface IRentalRepository extends IRepository <Rental, Integer> {
+public interface IRentalRepository extends IRepository<Rental, Integer> {
 
     Rental getRentalById(Integer id);
 

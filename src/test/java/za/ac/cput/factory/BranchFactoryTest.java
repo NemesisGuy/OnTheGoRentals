@@ -6,16 +6,15 @@ import za.ac.cput.domain.impl.Address;
 import za.ac.cput.domain.impl.Branch;
 
 
-
 class BranchFactoryTest {
     @Test
-            public void test(){
-    Branch branch= new Branch.Builder()
-            .setBranchId(234)
-            .setBranchName("CBD")
-            .setAddress(Address.builder().build())
-            .setEmail("215092317@mycput.ac.za")
-            .build();
+    public void test() {
+        Branch branch = new Branch.Builder()
+                .setBranchId(234)
+                .setBranchName("CBD")
+                .setAddress(Address.builder().build())
+                .setEmail("215092317@mycput.ac.za")
+                .build();
 
         //System.out.println(email.toString());
 

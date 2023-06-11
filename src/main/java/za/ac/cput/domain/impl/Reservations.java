@@ -5,6 +5,7 @@ package za.ac.cput.domain.impl;
  * Author: Cwenga Dlova (214310671)
  * Date:  01 April 2023
  */
+
 import za.ac.cput.domain.IDomain;
 
 import java.sql.Time;
@@ -70,7 +71,8 @@ public class Reservations implements IDomain {
                 ", returnTme=" + returnTme +
                 '}';
     }
-    public static class Builder{
+
+    public static class Builder {
         private int id;
         private String pickUpLocation;
         private LocalDate pickUpDate;
@@ -114,6 +116,7 @@ public class Reservations implements IDomain {
             this.returnTme = returnTme;
             return this;
         }
+
         public Builder copy(Reservations reservations) {
             this.id = reservations.id;
             this.pickUpLocation = reservations.pickUpLocation;
@@ -124,6 +127,7 @@ public class Reservations implements IDomain {
             this.returnTme = reservations.returnTme;
             return this;
         }
+
         public Reservations build() {
             return new Reservations(this);
         }

@@ -2,12 +2,7 @@ package za.ac.cput.factory.impl;
 
 import za.ac.cput.domain.impl.Feedback;
 import za.ac.cput.factory.IFactoryFeedback;
-/**
- * FeedbackFactory.java
- * Class for FeedbackFactory
- * Author: Shamiso Moyo Chaka (220365393)
- * Date: 1 April March 2023
- */
+
 import java.util.List;
 
 public class FeedbackFactory implements IFactoryFeedback {
