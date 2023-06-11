@@ -12,7 +12,7 @@ public interface CustomerRepository {
 
     Customer update(Customer customer);
 
-    void delete(int customerId);
+    boolean delete(int customerId);
 
     List<Customer> getAllCustomers();
 }
