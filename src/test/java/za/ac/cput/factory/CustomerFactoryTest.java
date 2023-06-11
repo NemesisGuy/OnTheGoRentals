@@ -6,7 +6,6 @@ import za.ac.cput.domain.impl.Customer;
 import za.ac.cput.factory.impl.CustomerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Lonwabo Magazi-218331851

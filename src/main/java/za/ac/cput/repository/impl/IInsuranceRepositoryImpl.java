@@ -9,11 +9,12 @@ package za.ac.cput.repository.impl;
 import za.ac.cput.domain.impl.Insurance;
 import za.ac.cput.repository.IInsuranceRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IInsuranceRepositoryImpl implements IInsuranceRepository {
-    private List<Insurance> insuranceDB;
     private static IInsuranceRepositoryImpl repository = null;
+    private List<Insurance> insuranceDB;
 
     private IInsuranceRepositoryImpl() {
         insuranceDB = new ArrayList<>();
@@ -35,7 +36,7 @@ public class IInsuranceRepositoryImpl implements IInsuranceRepository {
 
     @Override
     public Insurance read(Integer id) {
-        Insurance insurance = insuranceDB.stream().filter(e -> e.getId()==id)
+        Insurance insurance = insuranceDB.stream().filter(e -> e.getId() == id)
                 .findAny().orElse(null);
         return insurance;
     }

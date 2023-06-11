@@ -10,7 +10,7 @@ class CarFactoryTest {
     @Test
     void testCreateCar() {
         CarFactory factory = new CarFactory();
-        Car car = factory.createCar(1, "Toyota", "Corolla", 2022, "Compact", PriceGroup.ECONOMY ,"ABC 123 GP");
+        Car car = factory.createCar(1, "Toyota", "Corolla", 2022, "Compact", PriceGroup.ECONOMY, "ABC 123 GP");
 
         Assertions.assertNotNull(car);
         Assertions.assertEquals(1, car.getId());

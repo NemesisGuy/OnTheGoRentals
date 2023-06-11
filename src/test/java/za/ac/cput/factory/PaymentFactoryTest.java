@@ -21,8 +21,8 @@ class PaymentFactoryTest {
         PaymentFactory paymentFactory = new PaymentFactory();
         Payment payment = paymentFactory.create();
 
-       // Assertions.assertNull(payment);
-       // Assertions.assertNull(payment.getId());
+        // Assertions.assertNull(payment);
+        // Assertions.assertNull(payment.getId());
     }
 
 }

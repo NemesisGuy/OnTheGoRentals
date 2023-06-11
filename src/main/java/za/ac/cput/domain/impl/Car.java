@@ -4,6 +4,7 @@ package za.ac.cput.domain.impl;
 import za.ac.cput.domain.IDomain;
 
 import java.util.Objects;
+
 /**
  * Car.java
  * Entity for the Car
@@ -12,19 +13,17 @@ import java.util.Objects;
  */
 
 public class Car implements IDomain {
-
     private int id;
-
-    private  String make;
-    private  String model;
-    private  int year;
-    private  String category;
+    private String make;
+    private String model;
+    private int year;
+    private String category;
     private PriceGroup priceGroup;
-    private  String licensePlate;
+    private String licensePlate;
+
     public Car() {
         // Default constructor
     }
-
 
     private Car(Builder builder) {
         this.id = builder.id;
@@ -34,6 +33,10 @@ public class Car implements IDomain {
         this.category = builder.category;
         this.priceGroup = builder.priceGroup;
         this.licensePlate = builder.licensePlate;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public int getId() {
@@ -55,17 +58,17 @@ public class Car implements IDomain {
     public String getCategory() {
         return category;
     }
+
     public PriceGroup getPriceGroup() {
         return priceGroup;
     }
 
-    public String getLicensePlate() {
-        return licensePlate;
+    public void setPriceGroup(PriceGroup priceGroupEnum) {
+        this.priceGroup = priceGroupEnum;
     }
 
-
-    public static Builder builder() {
-        return new Builder();
+    public String getLicensePlate() {
+        return licensePlate;
     }
 
     @Override
@@ -81,13 +84,10 @@ public class Car implements IDomain {
         return Objects.hash(getId(), getMake(), getModel(), getYear(), getCategory(), getLicensePlate());
     }
 
-    public void setPriceGroup(PriceGroup priceGroupEnum) {
-                   this.priceGroup = priceGroupEnum;
-    }
-
     public String getPriceGroupString() {
         return priceGroup.toString();
     }
+
     @Override
     public String toString() {
         return "Car{" +
@@ -100,7 +100,6 @@ public class Car implements IDomain {
                 ", licensePlate='" + licensePlate + '\'' +
                 '}';
     }
-
 
     public static class Builder {
         private int id;
@@ -137,6 +136,7 @@ public class Car implements IDomain {
             this.category = category;
             return this;
         }
+
         public Builder priceGroup(PriceGroup priceGroup) {
             this.priceGroup = priceGroup;
             return this;
@@ -147,6 +147,7 @@ public class Car implements IDomain {
             return this;
 
         }
+
         public Builder copy(Car car) {
             this.id = car.id;
             this.make = car.make;

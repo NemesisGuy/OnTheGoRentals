@@ -9,7 +9,7 @@ package za.ac.cput.domain.impl;
 
 import za.ac.cput.domain.IEmployee;
 
-public class Employee  implements IEmployee {
+public class Employee implements IEmployee {
     private final int id;
     private final String firstName;
     private final String lastName;
@@ -28,7 +28,6 @@ public class Employee  implements IEmployee {
         this.phoneNumber = builder.phoneNumber;
         this.salary = builder.salary;
     }
-
 
 
     // getters

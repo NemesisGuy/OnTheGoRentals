@@ -7,7 +7,6 @@ package za.ac.cput.domain;
  */
 
 
-
 import za.ac.cput.domain.impl.Rental;
 
 import java.time.LocalDate;
@@ -15,8 +14,12 @@ import java.time.LocalDate;
 public interface IPayment extends IDomain {
 
     int getId();
+
     double getPaymentAmount();
+
     String getPaymentMethod();
+
     LocalDate getPaymentDate();
+
     Rental getRentalId();
 }

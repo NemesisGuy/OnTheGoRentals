@@ -23,7 +23,6 @@ public abstract class IEmployeeImpl implements IEmployeeRepo {
     }
 
 
-
     public Employee create(Employee employee) {
         employees.add(employee);
         return employee;
@@ -43,7 +42,7 @@ public abstract class IEmployeeImpl implements IEmployeeRepo {
         Employee employeeToUpdate = read(employee.getId());
 
         if (employeeToUpdate != null) {
-            employees .remove(employeeToUpdate);
+            employees.remove(employeeToUpdate);
             employees.add(employeeToUpdate);
             return employee;
         }

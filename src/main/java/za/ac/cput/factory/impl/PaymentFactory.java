@@ -7,47 +7,28 @@ package za.ac.cput.factory.impl;
  */
 
 import za.ac.cput.domain.impl.Payment;
+import za.ac.cput.domain.impl.Rental;
 import za.ac.cput.factory.IFactory;
 
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Random;
 
 public class PaymentFactory implements IFactory<Payment> {
+
+    public static Payment createPayment(Double paymentAmount, String paymentMethod, LocalDate paymentDate, Rental rentalId) {
+        return new Payment.Builder()
+                .setPaymentId(new Random().nextInt(1000000))
+                .setPaymentAmount(paymentAmount)
+                .setPaymentMethod(paymentMethod)
+                .setPaymentDate(paymentDate)
+                .setRentalId(rentalId)
+                .build();
+    }
 
     @Override
     public Payment create() {
         return new Payment.Builder()
                 .setPaymentId(new Random().nextInt(1000000))
                 .build();
-    }
-
-
-    public Payment getById(long id) {
-        return null;
-    }
-
-
-    public Payment update(Payment entity) {
-        return null;
-    }
-
-
-    public boolean delete(Payment entity) {
-        return false;
-    }
-
-
-    public List<Payment> getAll() {
-        return null;
-    }
-
-
-    public long count() {
-        return 0;
-    }
-
-
-    public Class<Payment> getType() {
-        return null;
     }
 }

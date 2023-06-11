@@ -7,7 +7,6 @@ package za.ac.cput.domain;
  */
 
 
-
 import za.ac.cput.domain.impl.Rental;
 
 import java.time.LocalDate;

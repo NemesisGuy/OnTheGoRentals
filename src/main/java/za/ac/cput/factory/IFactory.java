@@ -6,9 +6,7 @@ package za.ac.cput.factory;
  * Date: 17 March 2021
  */
 
-import java.util.List;
-
-public interface IFactory<T>{
+public interface IFactory<T> {
     T create();
 
 

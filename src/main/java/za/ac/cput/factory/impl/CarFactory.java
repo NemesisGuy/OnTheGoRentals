@@ -25,7 +25,7 @@ public class CarFactory implements IFactory<Car> {
 
     @Override
     public Car create() {
-        return null;
+        return Car.builder().build();
     }
 }
 

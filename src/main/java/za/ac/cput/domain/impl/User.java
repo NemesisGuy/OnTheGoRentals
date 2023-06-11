@@ -1,11 +1,10 @@
 package za.ac.cput.domain.impl;
 
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import za.ac.cput.domain.IDomain;
 
 import java.util.Objects;
 
-@JsonPOJOBuilder
+
 public class User implements IDomain {
     private int id;
     private String userName;
@@ -28,13 +27,13 @@ public class User implements IDomain {
         this.pictureUrl = pictureUrl;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     @Override
     public int getId() {
         return id;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public String getUserName() {
@@ -166,6 +165,7 @@ public class User implements IDomain {
             user.role = this.role;
             return user;
         }
+
         public Builder copy(User user) {
             this.id = user.id;
             this.userName = user.userName;

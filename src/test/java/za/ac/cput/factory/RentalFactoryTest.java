@@ -28,7 +28,7 @@ class RentalFactoryTest {
         Rental rental = rentalFactory.create();
 
         //Assertions.assertNull(rental);
-      //  Assertions.assertNull(rental.getRentalId());
+        //  Assertions.assertNull(rental.getRentalId());
     }
 
 }

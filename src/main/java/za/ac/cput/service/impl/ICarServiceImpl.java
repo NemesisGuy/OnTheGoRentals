@@ -8,8 +8,8 @@ import za.ac.cput.service.ICarService;
 import java.util.ArrayList;
 
 public class ICarServiceImpl implements ICarService {
-    private  ICarServiceImpl service = null;
     private static ICarRepositoryImpl repository = null;
+    private ICarServiceImpl service = null;
     private ArrayList<Car> cars;
 
     public ICarServiceImpl() {
@@ -17,10 +17,12 @@ public class ICarServiceImpl implements ICarService {
     }
 
     public ICarServiceImpl(ICarRepositoryImpl repository) {
-        this.repository = repository;
+
+        ICarServiceImpl.repository = repository;
     }
 
     public ICarServiceImpl(ICarRepository carRepository) {
+
         this.repository = repository;
     }
 
@@ -38,11 +40,11 @@ public class ICarServiceImpl implements ICarService {
         return service;
     }
 
-   @Override
-   public Car create(Car car) {
+    @Override
+    public Car create(Car car) {
 
-       return repository.create(car);
-   }
+        return repository.create(car);
+    }
 
     @Override
     public Car read(Integer integer) {
@@ -65,9 +67,8 @@ public class ICarServiceImpl implements ICarService {
     @Override
     public boolean delete(Integer integer) {
 
-       return repository.delete(integer);
+        return repository.delete(integer);
     }
-
 
     @Override
     public boolean delete(int id) {

@@ -14,18 +14,20 @@ import java.util.List;
 public interface ICarRepository extends IRepository<Car, Integer> {
 
     Car create(Car car);
+
     Car read(Integer id);
+
     Car update(Car car);
+
     boolean delete(Integer id);
+
     List<Car> getAllCars();
+
     Car getCarById(Integer id);
+
     List<Car> getCarsByCategory(String category);
+
     List<Car> getCarsByPriceGroup(PriceGroup priceGroup);
-
-
-
-
-
 
 
 }

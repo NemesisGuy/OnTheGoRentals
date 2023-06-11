@@ -21,6 +21,7 @@ Contact
 If you have any questions or need help, you can contact us at [email address] or [link to communication channel].
 
 Contribution Agreement
-By submitting a contribution to this project, you agree to license your contribution under the project's chosen license, and that you have the right to contribute the code.
+By submitting a contribution to this project, you agree to license your contribution under the project's chosen license,
+and that you have the right to contribute the code.
 
 Thank you for contributing to OnTheGoRentals!

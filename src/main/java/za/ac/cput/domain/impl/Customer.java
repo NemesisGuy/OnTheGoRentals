@@ -31,27 +31,31 @@ public class Customer implements IDomain {
         return CustomerId;
     }
 
+    //Setters
+    public void setCustomerId(int customerId) {
+        this.CustomerId = CustomerId;
+    }
+
     public String getName() {
         return Name;
     }
+
+    public void setName(String name) {
+        this.Name = name;
+    }
+
     public String getContactInfo() {
         return ContactInfo;
     }
+
+    public void setContactInfo(String contactInfo) {
+        this.ContactInfo = contactInfo;
+    }
+
     public String getHiringHistory() {
         return HiringHistory;
     }
 
-
-    //Setters
-    public void setCustomerId(int customerId)  {
-        this.CustomerId = CustomerId;
-    }
-    public void setName(String name) {
-        this.Name = name;
-    }
-    public void setContactInfo(String contactInfo) {
-        this.ContactInfo = contactInfo;
-    }
     public void setHiringHistory(String hiringHistory) {
         this.HiringHistory = hiringHistory;
     }
@@ -84,6 +88,7 @@ public class Customer implements IDomain {
             this.CustomerId = this.CustomerId;
             return this;
         }
+
         public CustomerBuilder setName(String Name) {
             this.Name = Name;
             return this;
@@ -99,7 +104,7 @@ public class Customer implements IDomain {
             return this;
         }
 
-        public Customer build(){
+        public Customer build() {
             return new Customer(this);
 
         }

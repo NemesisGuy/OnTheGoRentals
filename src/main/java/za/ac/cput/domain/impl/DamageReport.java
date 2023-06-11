@@ -1,10 +1,10 @@
 package za.ac.cput.domain.impl;
 
 
-
 import za.ac.cput.domain.IDamageReport;
 
 import java.time.LocalDate;
+
 /**
  * DamageReport.java
  * Class for the Damage report
@@ -71,6 +71,7 @@ public class DamageReport implements IDamageReport {
                 ", description='" + description + '\'' +
                 '}';
     }
+
     public static class Builder {
         private int id;
         private Rental rentalId;
@@ -114,7 +115,8 @@ public class DamageReport implements IDamageReport {
             this.description = description;
             return this;
         }
-        public Builder copy(DamageReport report ){
+
+        public Builder copy(DamageReport report) {
             this.id = report.id;
             this.rentalId = report.rentalId;
             this.customerId = report.customerId;
@@ -125,8 +127,9 @@ public class DamageReport implements IDamageReport {
             return this;
 
         }
-        public DamageReport build(){
-            return  new DamageReport(this);
+
+        public DamageReport build() {
+            return new DamageReport(this);
         }
     }
 }
