@@ -30,33 +30,4 @@ public class ReservationsFactory implements IFactory<Reservations> {
                 .build();
     }
 
-
-    public Reservations getById(long id) {
-        return null;
-    }
-
-
-    public Reservations update(Reservations entity) {
-        return null;
-    }
-
-
-    public boolean delete(Reservations entity) {
-        return false;
-    }
-
-
-    public List<Reservations> getAll() {
-        return null;
-    }
-
-
-    public long count() {
-        return 0;
-    }
-
-
-    public Class<Reservations> getType() {
-        return null;
-    }
 }
