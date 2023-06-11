@@ -5,25 +5,25 @@ package za.ac.cput.repository.impl;
  * Author: Cwenga Dlova (214310671)
  * Date:  07 April 2023
  */
-
 import za.ac.cput.domain.impl.Reservations;
 import za.ac.cput.repository.IReservationsReposatory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class IReservationsRepositoryImpl implements IReservationsReposatory {
+public class ReservationsRepositoryImpl implements IReservationsReposatory {
 
-    private static IReservationsRepositoryImpl repository = null;
     private List<Reservations> reservationsDB;
 
-    private IReservationsRepositoryImpl() {
+    private static ReservationsRepositoryImpl repository = null;
+
+    private ReservationsRepositoryImpl(){
         reservationsDB = new ArrayList<>();
     }
 
-    public static IReservationsRepositoryImpl getRepository() {
+    public static ReservationsRepositoryImpl getRepository() {
         if (repository == null) {
-            repository = new IReservationsRepositoryImpl();
+            repository = new ReservationsRepositoryImpl();
         }
         return repository;
     }
@@ -37,7 +37,7 @@ public class IReservationsRepositoryImpl implements IReservationsReposatory {
     @Override
     public Reservations read(Integer id) {
 
-        Reservations reservations = reservationsDB.stream().filter(r -> r.getId() == id).findAny().orElse(null);
+        Reservations reservations = reservationsDB.stream().filter(r -> r.getId() == id).findAny().orElse(null) ;
         return reservations;
     }
 
