@@ -6,60 +6,42 @@ package za.ac.cput.domain;
  * Customer.java
  */
 
-public class Customer {
-
+public class Customer implements IDomain {
     private int customerId;
     private String name;
     private String contactInfo;
     private String hiringHistory;
 
-    // constructor
-    public Customer() {
+    public Customer(int i, String lonwabo, String s, String hiringHistory) {
     }
 
-    // Parameterized constructor
-    public Customer(int customerId, String name, String contactInfo, String hiringHistory) {
-        this.customerId = customerId;
-        this.name = name;
-        this.contactInfo = contactInfo;
-        this.hiringHistory = hiringHistory;
+    private Customer(CustomerBuilder builder) {
+        this.customerId = builder.customerId;
+        this.name = builder.name;
+        this.contactInfo = builder.contactInfo;
+        this.hiringHistory = builder.hiringHistory;
     }
-
-    // Getters and setters
 
     public int getCustomerId() {
         return customerId;
-    }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getContactInfo() {
         return contactInfo;
-    }
-
-    public void setContactInfo(String contactInfo) {
-        this.contactInfo = contactInfo;
     }
 
     public String getHiringHistory() {
         return hiringHistory;
     }
 
-    public void setHiringHistory(String hiringHistory) {
-        this.hiringHistory = hiringHistory;
+    @Override
+    public int getId() {
+        return customerId;
     }
-
-    // toString method
 
     @Override
     public String toString() {
@@ -69,5 +51,39 @@ public class Customer {
                 ", contactInfo='" + contactInfo + '\'' +
                 ", hiringHistory='" + hiringHistory + '\'' +
                 '}';
+    }
+
+    public void setName(String updatedName) {
+    }
+
+    public static class CustomerBuilder {
+        private int customerId;
+        private String name;
+        private String contactInfo;
+        private String hiringHistory;
+
+        public CustomerBuilder setCustomerId(int customerId) {
+            this.customerId = customerId;
+            return this;
+        }
+
+        public CustomerBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public CustomerBuilder setContactInfo(String contactInfo) {
+            this.contactInfo = contactInfo;
+            return this;
+        }
+
+        public CustomerBuilder setHiringHistory(String hiringHistory) {
+            this.hiringHistory = hiringHistory;
+            return this;
+        }
+
+        public Customer build() {
+            return new Customer(this);
+        }
     }
 }

@@ -1,31 +1,25 @@
 package za.ac.cput.domain;
 
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CustomerTest {
 
-    public void testCustomer ()  {
-
+    @Test
+    public void testCustomer() {
         Customer customer = new Customer.CustomerBuilder()
+                .setCustomerId(218331851)
+                .setName("Lonwabo Magazi")
+                .setContactInfo("218331851@mycput.ac.za")
+                .setHiringHistory("")
                 .build();
-
-        customer.setCustomerId(Integer.parseInt("218331851"));
-        customer.setName("Lonwabo Magazi");
-        customer.setContactInfo("218331851@mycput.ac.za");
-        customer.setHiringHistory("");
 
         System.out.println(customer.toString());
 
-
-            assertEquals("218331851",customer.getCustomerId());
-
-            assertEquals("Lonwabo Magazi",customer.getName());
-
-            assertEquals("218331851@mycput.ac.za",customer.getContactInfo());
-
-            assertEquals(" ",customer.getHiringHistory());
-        }
-
-
+        assertEquals(218331851, customer.getCustomerId());
+        assertEquals("Lonwabo Magazi", customer.getName());
+        assertEquals("218331851@mycput.ac.za", customer.getContactInfo());
+        assertEquals("", customer.getHiringHistory());
     }
+}
 
