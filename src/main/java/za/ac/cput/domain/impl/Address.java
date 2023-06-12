@@ -6,11 +6,8 @@
 
 package za.ac.cput.domain.impl;
 
-import za.ac.cput.domain.IAddress;
 
-public class Address implements IAddress {
-
-    private final int id;
+public class Address {
 
     private static String streetNumber;
     private static String streetName;
@@ -20,7 +17,6 @@ public class Address implements IAddress {
     private static int postcode;
 
     private Address(Builder builder) {
-        this.id = builder.id;
         this.streetNumber = builder.streetNumber;
         this.streetName = builder.streetName;
         this.suburb = builder.suburb;
@@ -68,23 +64,13 @@ public class Address implements IAddress {
                 '}';
     }
 
-    @Override
-    public int getId() {
-        return this.id;
-    }
-
     public static class Builder{
-        private int id;
         private String streetNumber;
         private String streetName;
         private String suburb;
         private String city;
         private String state;
         private int postcode;
-        public Builder setId(int id) {
-            this.id = id;
-            return this;
-        }
 
 
         public Builder setStreetNumber(String streetNumber) {

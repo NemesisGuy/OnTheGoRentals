@@ -12,13 +12,22 @@ import java.time.LocalDate;
 import java.util.Random;
 
 public class MaintenanceFactory implements IFactory<Maintenance> {
+    public Maintenance createMaintenance(String maintenanceType, String serviceProvider,LocalDate serviceDate){
+        return new Maintenance.Builder()
+                .setId(new Random().nextInt(1000000))
+                .setMaintenanceType(maintenanceType)
+                .setServiceProvider(serviceProvider)
+                .setServiceDate(serviceDate)
+                .build();
+    }
 
+    @Override
     public Maintenance create() {
         return new Maintenance.Builder()
                 .setId(new Random().nextInt(1000000))
-                .setMaintenanceType("Oil filter")
+                .setMaintenanceType("oil filter")
                 .setServiceProvider("hippo")
-                .setServiceDate(LocalDate.parse("2023-06-11"))
+                .setServiceDate(LocalDate.parse("2023-06-12"))
                 .build();
     }
 }
