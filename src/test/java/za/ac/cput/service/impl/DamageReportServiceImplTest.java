@@ -5,34 +5,45 @@ package za.ac.cput.service.impl;
  * Class for the Damage Report service test
  * Author: Cwenga Dlova (214310671)
  * Date:  11 June 2023
+ * 12 June 2023: changes made by Cwenga
  */
 
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.DamageReport;
 import za.ac.cput.factory.impl.DamageReportFactory;
-import za.ac.cput.repository.impl.DamageReportRepositoryImpl;
+
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class DamageReportServiceImplTest {
 
-    private static DamageReportRepositoryImpl repository = DamageReportRepositoryImpl.getRepository();
-    private static DamageReportFactory repositoryFactory = new DamageReportFactory();
-    private static DamageReport report1 = repositoryFactory.create();
-    private static DamageReport report2;
+    private static DamageReportServiceImpl service = DamageReportServiceImpl.getService();
+    private static DamageReportFactory damageReportFactory = new DamageReportFactory();
+
+    private static DamageReport report = damageReportFactory.createDamageReport(null, null, (LocalDate.parse("2023-05-20")), "Paarl", "Wheel puncture.");
+
+
 
     @Test
     public void test_1() {
-        DamageReport created = repository.create(report1);
-        assertEquals(created.getId(), report1.getId());
+        DamageReport created = service.create(report);
+        assertEquals(created.getId(), report.getId());
         System.out.println("Created: " + created);
     }
     @Test
     public void test_2(){
-        boolean deleted = repository.delete(report1.getId());
-        //assertTrue(deleted);
+        report = damageReportFactory.createDamageReport(null, null, (LocalDate.parse("2023-05-20")), "Paarl", "Wheel puncture.");
+        boolean deleted = service.delete(report.getId());
+        assertTrue(deleted);
         System.out.println("Deleted: " + deleted);
     }
+
+    /**@Test
+    void test_3() {
+        System.out.println("List All Reported Damages: ");
+        System.out.println(service.getAll());
+    }*/
 
 
 }
