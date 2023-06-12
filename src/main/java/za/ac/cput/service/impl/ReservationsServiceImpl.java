@@ -1,5 +1,12 @@
 package za.ac.cput.service.impl;
 
+/**
+ * ReservationsServiceImpl.java
+ * Class for the Reservations service implementation
+ * Author: Cwenga Dlova (214310671)
+ * Date:  11 June 2023
+ */
+
 import za.ac.cput.domain.impl.Reservations;
 import za.ac.cput.repository.impl.ReservationsRepositoryImpl;
 import za.ac.cput.service.IReservationsService;
@@ -15,7 +22,7 @@ public class ReservationsServiceImpl implements IReservationsService {
         repository = ReservationsRepositoryImpl.getRepository();
     }
 
-    public static IReservationsService getService(){
+    public static ReservationsServiceImpl getService(){
         if(service == null){
             service = new ReservationsServiceImpl();
         }

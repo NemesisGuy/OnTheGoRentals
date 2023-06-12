@@ -17,8 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 class IReservationsRepositoryImplTest {
 
@@ -60,7 +59,7 @@ class IReservationsRepositoryImplTest {
     @Test
     public void test_delete() {
         boolean success = repository.delete(reservation.getId());
-        //assertTrue(success);
+        assertTrue(success);
         System.out.println("Deleted: " + success);
 
     }

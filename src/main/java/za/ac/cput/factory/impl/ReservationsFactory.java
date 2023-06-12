@@ -30,4 +30,16 @@ public class ReservationsFactory implements IFactory<Reservations> {
                 .build();
     }
 
+    public Reservations createReservations(String pickUpLocation, LocalDate pickUpDate, Time pickUpTime, String returnLocation, LocalDate returnDate, Time returnTme) {
+        return new Reservations.Builder()
+                .setId(new Random().nextInt())
+                .setReturnLocation(pickUpLocation)
+                .setPickUpDate(pickUpDate)
+                .setPickUpTime(pickUpTime)
+                .setReturnLocation(returnLocation)
+                .setReturnDate(returnDate)
+                .setReturnTme(returnTme)
+                .build();
+    }
+
 }
