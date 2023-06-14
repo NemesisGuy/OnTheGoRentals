@@ -1,75 +1,69 @@
 package za.ac.cput.service.impl;
 
+import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.User;
-import za.ac.cput.repository.IRepository;
-import za.ac.cput.repository.impl.IUserRepositoryImpl;
+import za.ac.cput.repository.IUserRepository;
 import za.ac.cput.service.IUserService;
 
 import java.util.ArrayList;
-
+import java.util.Collections;
+@Service("userServiceImpl")
 public class IUserServiceImpl implements IUserService {
-    private static IUserServiceImpl service = null;
-    private static IUserRepositoryImpl repository = null;
-    private ArrayList<User> users;
+    private  IUserRepository repository = null;
 
-    public IUserServiceImpl() {
-        repository = IUserRepositoryImpl.getRepository();
-    }
 
-    public IUserServiceImpl(IUserRepositoryImpl repository) {
+    private IUserServiceImpl(IUserRepository repository) {
+
         this.repository = repository;
     }
 
-    public IUserServiceImpl(IRepository userRepository) {
-        this.repository = repository;
-    }
-
-    public static IUserRepositoryImpl getRepository() {
-        if (repository == null) {
-            repository = IUserRepositoryImpl.getRepository();
-        }
-        return repository;
-    }
-
-    public static IUserServiceImpl getService() {
-        if (service == null) {
-            service = new IUserServiceImpl();
-        }
-        return service;
-    }
 
     @Override
     public User create(User user) {
-        return repository.create(user);
+        return this.repository.save(user);
+
     }
 
     @Override
     public User read(Integer integer) {
-        return repository.read(integer);
+
+        return (User) this.repository.findAllById(Collections.singleton(integer));
+
     }
 
     @Override
     public User read(int id) {
-        return repository.read(id);
+        return (User) (User) this.repository.findAllById(Collections.singleton(id));
     }
 
     @Override
     public User update(User user) {
-        return repository.update(user);
+        if (this.repository.existsById(user.getId()))
+            return this.repository.save(user);
+
+        return null;
     }
 
     @Override
     public boolean delete(int id) {
-        return repository.delete(id);
+        if (this.repository.existsById(id)) {
+            this.repository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     public boolean delete(Integer id) {
-        return repository.delete(id);
+        if (this.repository.existsById(id)) {
+            this.repository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public ArrayList<User> getAll() {
-        return (ArrayList<User>) repository.getAllUsers();
+        return (ArrayList<User>) this.repository.findAll();
     }
 
 
