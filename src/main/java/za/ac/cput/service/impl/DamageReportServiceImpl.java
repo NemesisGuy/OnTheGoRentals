@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DamageReportServiceImpl implements IDamageReportService {
 
-    private static  DamageReportServiceImpl service = null;
+    private static DamageReportServiceImpl service = null;
     private static DamageReportRepositoryImpl repository = null;
 
     private DamageReportServiceImpl() {

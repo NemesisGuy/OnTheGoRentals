@@ -98,13 +98,19 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>5.6.1.Final</version>
+            <version>5.6.15.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>7.0.1.Final</version>
+            <version>8.0.0.Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.common</groupId>
+            <artifactId>hibernate-commons-annotations</artifactId>
+            <version>6.0.6.Final</version>
+        </dependency>
+
         <!-- Spring Boot OAuth2 Client -->
         <!--        <dependency>-->
         <!--            <groupId>org.springframework.boot</groupId>-->
