@@ -1,4 +1,4 @@
-package za.ac.cput.controllers;
+package za.ac.cput.controllers.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
