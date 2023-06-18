@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BranchServiceImplTest {
     private static BranchServiceImpl service = BranchServiceImpl.getService();
     private static BranchFactory branchFactory = new BranchFactory();
-    private static Branch branch = branchFactory.createBranch("Cape Gate", null, "215092317@mycput.ac.za");
+    private static Branch branch = branchFactory.createBranch(null);
 
     @Test
     void a_create() {

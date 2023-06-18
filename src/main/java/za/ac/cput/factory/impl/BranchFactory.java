@@ -7,7 +7,6 @@
 package za.ac.cput.factory.impl;
 
 
-import za.ac.cput.domain.impl.Address;
 import za.ac.cput.domain.impl.Branch;
 import za.ac.cput.factory.IFactory;
 
@@ -15,12 +14,12 @@ import java.util.Random;
 
 public class BranchFactory implements IFactory<Branch> {
 
-    public Branch createBranch(String branchName, Address address, String email) {
+    public static Branch createBranch(String branchName) {
         return new Branch.Builder()
                 .setId(new Random().nextInt(1000))
                 .setBranchName(branchName)
-                .setAddress(address)
-                .setEmail(email)
+                //.setAddress(address)
+                //.setEmail(email)
                 .build();
     }
 
@@ -29,8 +28,8 @@ public class BranchFactory implements IFactory<Branch> {
         return new Branch.Builder()
                 .setId(new Random().nextInt(1000))
                 .setBranchName("Cape Gate")
-                .setAddress(null)
-                .setEmail("215092317@mycput.ac.za")
+                //.setAddress(null)
+                //.setEmail("215092317@mycput.ac.za")
                 .build();
     }
 }

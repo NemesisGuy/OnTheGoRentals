@@ -6,13 +6,14 @@
  */
 package za.ac.cput.service.impl;
 
+import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.Branch;
 import za.ac.cput.repository.impl.BranchRepositoryImpl;
 import za.ac.cput.service.IBranchService;
 
 import java.util.Set;
 
-
+@Service
 public class BranchServiceImpl implements IBranchService {
     private static BranchServiceImpl service;
     private static BranchRepositoryImpl repository;
