@@ -37,4 +37,9 @@ public class CustomerServiceImpl implements CustomerService {
     public List<Customer> getAllCustomers() {
         return customerRepository.getAllCustomers();
     }
+
+    @Override
+    public Customer createCustomer(Customer customer) {
+        return null;
+    }
 }
