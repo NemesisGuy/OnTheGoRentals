@@ -23,6 +23,7 @@ public class BranchController {
                 //"CapeGate Branch",null,"215092317@mycput.ac.za");
         return branchService.create(newBranch);
         //return branchService.create(branchCreated);
+
     }
     @GetMapping("/read/{id}")
     public Branch read(@PathVariable Integer id){
