@@ -8,9 +8,10 @@ package za.ac.cput.repository;
 
 import za.ac.cput.domain.impl.Reservations;
 
+
 import java.util.List;
 
-public interface IReservationsReposatory extends IRepository<Reservations, Integer> {
+public interface IReservationsRepository extends IRepository<Reservations, Integer> {
     List<Reservations> getAllReservationsMade();
 
 

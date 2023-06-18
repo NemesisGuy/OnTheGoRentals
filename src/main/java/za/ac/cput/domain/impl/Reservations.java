@@ -6,13 +6,20 @@ package za.ac.cput.domain.impl;
  * Date:  01 April 2023
  */
 
-import za.ac.cput.domain.IDomain;
-
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.io.Serializable;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.util.Objects;
 
+@Entity
 
-public class Reservations {
+public class Reservations implements Serializable {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private int id;
     private String pickUpLocation;
     private LocalDate pickUpDate;
@@ -21,7 +28,7 @@ public class Reservations {
     private LocalDate returnDate;
     private Time returnTme;
 
-    public Reservations() {
+    private Reservations() {
     }
 
     public Reservations(Builder builder) {
@@ -60,6 +67,19 @@ public class Reservations {
 
     public Time getReturnTme() {
         return returnTme;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reservations that = (Reservations) o;
+        return id == that.id && Objects.equals(pickUpLocation, that.pickUpLocation) && Objects.equals(pickUpDate, that.pickUpDate) && Objects.equals(pickUpTime, that.pickUpTime) && Objects.equals(returnLocation, that.returnLocation) && Objects.equals(returnDate, that.returnDate) && Objects.equals(returnTme, that.returnTme);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, pickUpLocation, pickUpDate, pickUpTime, returnLocation, returnDate, returnTme);
     }
 
     @Override

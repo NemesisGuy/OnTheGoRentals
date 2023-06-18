@@ -1,3 +1,5 @@
+
+
 package za.ac.cput.repository.impl;
 /**
  * IReservstionsReposatoryImpl.java
@@ -5,13 +7,16 @@ package za.ac.cput.repository.impl;
  * Author: Cwenga Dlova (214310671)
  * Date:  07 April 2023
  */
+import org.springframework.web.bind.annotation.RestController;
 import za.ac.cput.domain.impl.Reservations;
-import za.ac.cput.repository.IReservationsReposatory;
+import za.ac.cput.repository.IReservationsRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReservationsRepositoryImpl implements IReservationsReposatory {
+@RestController
+
+public class ReservationsRepositoryImpl implements IReservationsRepository {
 
     private List<Reservations> reservationsDB;
 

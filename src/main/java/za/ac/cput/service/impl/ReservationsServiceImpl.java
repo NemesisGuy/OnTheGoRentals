@@ -7,18 +7,20 @@ package za.ac.cput.service.impl;
  * Date:  11 June 2023
  */
 
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.Reservations;
 import za.ac.cput.repository.impl.ReservationsRepositoryImpl;
 import za.ac.cput.service.IReservationsService;
 
 import java.util.List;
-
+@Service
 public class ReservationsServiceImpl implements IReservationsService {
 
     private static  ReservationsServiceImpl service = null;
     private  static  ReservationsRepositoryImpl repository= null;
 
-    private ReservationsServiceImpl() {
+    public ReservationsServiceImpl() {
         repository = ReservationsRepositoryImpl.getRepository();
     }
 

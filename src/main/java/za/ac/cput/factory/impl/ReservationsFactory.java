@@ -19,18 +19,18 @@ public class ReservationsFactory implements IFactory<Reservations> {
 
     @Override
     public Reservations create() {
-        return new Reservations.Builder()
-                .setId(new Random().nextInt(1000000))
+        return new Reservations.Builder().build();
+                /**.setId(new Random().nextInt(1000000))
                 .setPickUpLocation("Cape Town")
                 .setPickUpDate(LocalDate.parse("2023-02-25"))
                 .setPickUpTime(Time.valueOf(LocalTime.of(10, 00)))
                 .setReturnLocation("Cape Town")
                 .setReturnDate(LocalDate.parse("2023-02-28"))
                 .setReturnTme(Time.valueOf(LocalTime.of(14, 00)))
-                .build();
+                .build(); */
     }
 
-    public Reservations createReservations(String pickUpLocation, LocalDate pickUpDate, Time pickUpTime, String returnLocation, LocalDate returnDate, Time returnTme) {
+    public static Reservations createReservations( String pickUpLocation, LocalDate pickUpDate, Time pickUpTime, String returnLocation, LocalDate returnDate, Time returnTme) {
         return new Reservations.Builder()
                 .setId(new Random().nextInt())
                 .setReturnLocation(pickUpLocation)

@@ -9,13 +9,14 @@ package za.ac.cput;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 import za.ac.cput.service.impl.ICarServiceImpl;
-
+import za.ac.cput.service.impl.ReservationsServiceImpl;
+@Component
 @SpringBootApplication
 public class BackendApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(BackendApplication.class, args);
+    public static void main(String[] args) {SpringApplication.run(BackendApplication.class, args);
     }
 
     @Bean
