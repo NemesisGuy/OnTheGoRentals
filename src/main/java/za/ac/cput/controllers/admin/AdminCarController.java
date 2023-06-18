@@ -1,18 +1,27 @@
-package za.ac.cput.controllers;
+package za.ac.cput.controllers.admin;
+/**
+ * AdminCarController.java
+ * This is the controller for the Car entity
+ * Author: Peter Buckingham (220165289)
+ * Date: 05 April 2023
+ */
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.impl.Car;
 import za.ac.cput.domain.impl.PriceGroup;
+import za.ac.cput.domain.impl.User;
 import za.ac.cput.service.impl.ICarServiceImpl;
 
+import java.util.ArrayList;
+
 @RestController
-@RequestMapping("/api/admin")
-public class AdminController {
+@RequestMapping("/api/admin/cars")
+public class AdminCarController {
     @Autowired
     private ICarServiceImpl carService;
 
-    @PostMapping("/cars/create")
+    @PostMapping("/create")
     public Car createCar(@RequestBody Car car) {
         System.out.println("/api/admin/cars/create was triggered");
         car.setPriceGroup(mapPriceGroup(car.getPriceGroupString()));
@@ -22,25 +31,25 @@ public class AdminController {
         return createdCar;
     }
 
-    private PriceGroup mapPriceGroup(String priceGroupString) {
-        try {
-            return PriceGroup.valueOf(priceGroupString);
-        } catch (IllegalArgumentException e) {
-            return PriceGroup.NONE;
-        }
+    @PutMapping("/update/{carId}")
+    public Car updateCar(@PathVariable int carId, @RequestBody Car updatedCar) {
+        Car updated = carService.update(updatedCar);
+        return updated;
     }
 
-    @DeleteMapping("/cars/delete/{carId}")
+    @DeleteMapping("/delete/{carId}")
     public boolean deleteCar(@PathVariable Integer carId) {
         System.out.println("/api/admin/cars/delete was triggered");
         System.out.println("CarService was created...attempting to delete car...");
         return carService.delete(carId);
     }
 
-    @PutMapping("/cars/update/{carId}")
-    public Car updateCar(@PathVariable int carId, @RequestBody Car updatedCar) {
-        Car updated = carService.update(updatedCar);
-        return updated;
+    private PriceGroup mapPriceGroup(String priceGroupString) {
+        try {
+            return PriceGroup.valueOf(priceGroupString);
+        } catch (IllegalArgumentException e) {
+            return PriceGroup.NONE;
+        }
     }
 
 

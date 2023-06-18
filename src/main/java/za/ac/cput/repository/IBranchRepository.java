@@ -7,12 +7,11 @@ package za.ac.cput.repository;
 
 import za.ac.cput.domain.impl.Branch;
 
-import java.util.List;
+import java.util.Set;
 
-public interface IBranchRepository extends IRepository<Branch, Integer> {
+public interface IBranchRepository extends IRepository<Branch, Integer>{
 
-    public List<Branch> getAll();
-
+    public Set<Branch> getAll();
     Branch getBranchById(Integer id);
 
 }

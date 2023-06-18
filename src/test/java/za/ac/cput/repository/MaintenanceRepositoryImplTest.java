@@ -2,7 +2,7 @@ package za.ac.cput.repository;
 
 import org.junit.jupiter.api.Test;
 
-class IMaintenanceRepositoryImplTest {
+class MaintenanceRepositoryImplTest {
     @Test
     void test_create() {
 

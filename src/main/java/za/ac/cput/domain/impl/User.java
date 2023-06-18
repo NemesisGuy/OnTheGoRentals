@@ -1,11 +1,18 @@
 package za.ac.cput.domain.impl;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.IDomain;
 
 import java.util.Objects;
 
-
-public class User implements IDomain {
+@Entity
+public class User implements IDomain{
+    @jakarta.persistence.Id
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String userName;
     private String email;
@@ -19,21 +26,19 @@ public class User implements IDomain {
     public User() {
         // Default constructor
     }
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
 
     public User(int id, String userName, String email, String pictureUrl) {
         this.id = id;
         this.userName = userName;
         this.email = email;
         this.pictureUrl = pictureUrl;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    @Override
-    public int getId() {
-        return id;
     }
 
     public String getUserName() {
@@ -96,6 +101,9 @@ public class User implements IDomain {
                 '}';
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
     public static class Builder {
         private int id;
         private String userName;

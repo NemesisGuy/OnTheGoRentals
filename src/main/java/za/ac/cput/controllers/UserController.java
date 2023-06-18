@@ -1,6 +1,14 @@
 package za.ac.cput.controllers;
 
+/**
+ * UserController.java
+ * This is the controller for the user pages
+ * Author: Peter Buckingham (220165289)
+ * Date: 05 April 2023
+ */
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,26 +16,26 @@ import org.springframework.web.bind.annotation.RestController;
 import za.ac.cput.domain.impl.User;
 import za.ac.cput.service.impl.IUserServiceImpl;
 
-import java.util.ArrayList;
-
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
-
+    @Autowired
+    @Qualifier("userServiceImpl")
     private IUserServiceImpl userService;
 
     @PostMapping("/register")
-    public String register(@RequestBody User registrationRequest) {
+    public User register(@RequestBody User registrationRequest) {
         // Extract the registration details from the request object
         String username = registrationRequest.getUserName();
         String password = registrationRequest.getPassword();
         String email = registrationRequest.getEmail();
         System.out.println("Username: " + username);
         System.out.println("This user is now registered");
+        User createdUser = userService.create(registrationRequest);
         // Implement the logic to handle user registration
         // Retrieve the user details from the request and process it
         // Return an appropriate response, such as a success message or error message
-        return "User registered successfully";
+        return createdUser;
     }
 
     @PostMapping("/login")
@@ -37,13 +45,5 @@ public class UserController {
         // Return an appropriate response, such as a success message or error message
         return "User logged in successfully";
     }
-
-    @RequestMapping("/getall")
-    public ArrayList<User> getAll() {
-        ArrayList<User> users = new ArrayList<>(userService.getAll());
-
-        return users;
-    }
-
 
 }

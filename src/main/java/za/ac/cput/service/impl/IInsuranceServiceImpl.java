@@ -1,11 +1,12 @@
 package za.ac.cput.service.impl;
 
+import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.Insurance;
 import za.ac.cput.repository.impl.IInsuranceRepositoryImpl;
 import za.ac.cput.service.IInsuranceService;
 
 import java.util.List;
-
+@Service
 public class IInsuranceServiceImpl implements IInsuranceService {
     private static IInsuranceServiceImpl service;
     private static IInsuranceRepositoryImpl repository;

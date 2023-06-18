@@ -1,4 +1,10 @@
 package za.ac.cput.controllers;
+/**
+ * ErrorController.java
+ * This is the controller for the error page
+ * Author: Peter Buckingham (220165289)
+ * Date: 05 April 2023
+ */
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
