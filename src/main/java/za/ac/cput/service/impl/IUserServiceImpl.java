@@ -4,19 +4,16 @@ import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.User;
 import za.ac.cput.repository.IUserRepository;
 import za.ac.cput.service.IUserService;
-
 import java.util.ArrayList;
 import java.util.Collections;
 @Service("userServiceImpl")
 public class IUserServiceImpl implements IUserService {
     private  IUserRepository repository = null;
 
-
     private IUserServiceImpl(IUserRepository repository) {
 
         this.repository = repository;
     }
-
 
     @Override
     public User create(User user) {

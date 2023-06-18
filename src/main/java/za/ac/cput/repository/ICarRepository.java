@@ -6,28 +6,14 @@ package za.ac.cput.repository;
  * Date: 29 March 2021
  */
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import za.ac.cput.domain.impl.Car;
-import za.ac.cput.domain.impl.PriceGroup;
 
-import java.util.List;
 
-public interface ICarRepository extends IRepository<Car, Integer> {
 
-    Car create(Car car);
 
-    Car read(Integer id);
+public interface ICarRepository extends JpaRepository<Car, Integer> {
 
-    Car update(Car car);
-
-    boolean delete(Integer id);
-
-    List<Car> getAllCars();
-
-    Car getCarById(Integer id);
-
-    List<Car> getCarsByCategory(String category);
-
-    List<Car> getCarsByPriceGroup(PriceGroup priceGroup);
 
 
 }

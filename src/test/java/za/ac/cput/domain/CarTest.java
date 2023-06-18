@@ -3,7 +3,6 @@ package za.ac.cput.domain;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.impl.Car;
-import za.ac.cput.repository.impl.ICarRepositoryImpl;
 
 import java.time.Duration;
 import java.util.List;
