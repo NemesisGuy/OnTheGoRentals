@@ -6,9 +6,8 @@
 
 package za.ac.cput.domain.impl;
 
-import za.ac.cput.domain.IAddress;
 
-public class Address implements IAddress {
+public class Address {
 
     private static String streetNumber;
     private static String streetName;
@@ -16,20 +15,14 @@ public class Address implements IAddress {
     private static String city;
     private static String state;
     private static int postcode;
-    private final int id;
 
     private Address(Builder builder) {
-        this.id = builder.id;
         this.streetNumber = builder.streetNumber;
         this.streetName = builder.streetName;
         this.suburb = builder.suburb;
         this.city = builder.city;
         this.state = builder.state;
         this.postcode = builder.postcode;
-    }
-
-    public static Address.Builder builder() {
-        return new Address.Builder();
     }
 
     public String getStreetNumber() {
@@ -55,6 +48,9 @@ public class Address implements IAddress {
     public int getPostcode() {
         return postcode;
     }
+    public static Address.Builder builder() {
+        return new Address.Builder();
+    }
 
     @Override
     public String toString() {
@@ -68,24 +64,13 @@ public class Address implements IAddress {
                 '}';
     }
 
-    @Override
-    public int getId() {
-        return this.id;
-    }
-
-    public static class Builder {
-        private int id;
+    public static class Builder{
         private String streetNumber;
         private String streetName;
         private String suburb;
         private String city;
         private String state;
         private int postcode;
-
-        public Builder setId(int id) {
-            this.id = id;
-            return this;
-        }
 
 
         public Builder setStreetNumber(String streetNumber) {
@@ -117,8 +102,7 @@ public class Address implements IAddress {
             this.postcode = postcode;
             return this;
         }
-
-        public Builder copy(Address address) {
+        public Builder copy (Address address){
             this.streetNumber = Address.streetNumber;
             this.streetName = Address.streetName;
             this.suburb = Address.suburb;
@@ -127,7 +111,6 @@ public class Address implements IAddress {
             this.postcode = Address.postcode;
             return this;
         }
-
         public Address build() {
             return new Address(this);
         }

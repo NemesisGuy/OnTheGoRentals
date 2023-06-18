@@ -9,16 +9,23 @@ package za.ac.cput.domain.impl;
 
 import za.ac.cput.domain.IInsurance;
 
+import javax.persistence.Entity;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Insurance implements IInsurance {
+@Entity
+public class Insurance implements IInsurance, Serializable {
+
     private int insuranceId;
     private String insuranceType;
     private double insuranceAmount;
     private LocalDate insuranceCoverageStartDate;
     private LocalDate insuranceCoverageEndDate;
     private Rental rentalId;
+
+    public Insurance() {
+    }
 
     public Insurance(Builder builder) {
         this.insuranceId = builder.insuranceId;

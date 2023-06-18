@@ -1,11 +1,12 @@
 package za.ac.cput.service.impl;
 
+import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.Payment;
 import za.ac.cput.repository.impl.IPaymentRepositoryImpl;
 import za.ac.cput.service.IPaymentService;
 
 import java.util.List;
-
+@Service
 public class IPaymentServiceImpl implements IPaymentService {
     private static IPaymentServiceImpl service;
     private static IPaymentRepositoryImpl repository;
@@ -13,7 +14,6 @@ public class IPaymentServiceImpl implements IPaymentService {
     private IPaymentServiceImpl() {
         repository = IPaymentRepositoryImpl.getRepository();
     }
-
 
     public static IPaymentServiceImpl getPaymentService() {
         if (service == null) {

@@ -1,28 +1,24 @@
 package za.ac.cput.domain.impl;
 
-import za.ac.cput.domain.IBranch;
+import java.util.Objects;
 
-public class Branch implements IBranch {
+public class Branch {
 
-    private int branchId;
+    private int id;
 
     private String branchName;
     private Address address;
     private String email;
 
     private Branch(Builder builder) {
-        this.branchId = builder.branchId;
+        this.id = builder.id;
         this.branchName = builder.branchName;
         this.address = builder.address;
         this.email = builder.email;
     }
 
-    public static Branch.Builder builder() {
-        return new Branch.Builder();
-    }
-
-    public int getBranchId() {
-        return branchId;
+    public int getId() {
+        return id;
     }
 
     public String getBranchName() {
@@ -37,29 +33,40 @@ public class Branch implements IBranch {
         return email;
     }
 
+    public static Branch.Builder builder() {
+        return new Branch.Builder();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Branch branch)) return false;
+        return id == branch.id && Objects.equals(branchName, branch.branchName) && Objects.equals(address, branch.address) && Objects.equals(email, branch.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, branchName, address, email);
+    }
+
     @Override
     public String toString() {
         return "Branch{" +
-                "branchId=" + branchId +
+                "id=" + id +
                 ", branchName='" + branchName + '\'' +
                 ", address=" + address +
                 ", email=" + email +
                 '}';
     }
 
-    @Override
-    public int getId() {
-        return 0;
-    }
-
     public static class Builder {
-        private int branchId;
+        private int id;
         private String branchName;
         private Address address;
         private String email;
 
-        public Builder setBranchId(int branchId) {
-            this.branchId = branchId;
+        public Builder setId(int id) {
+            this.id = id;
             return this;
         }
 
@@ -79,7 +86,7 @@ public class Branch implements IBranch {
         }
 
         public Builder copy(Branch branch) {
-            this.branchId = branch.branchId;
+            this.id = branch.id;
             this.branchName = branch.branchName;
             this.address = branch.address;
             this.email = branch.email;
@@ -90,7 +97,7 @@ public class Branch implements IBranch {
             return new Branch(this);
         }
 
-        public Builder branchId(int nextInt) {
+        public Builder id(int nextInt) {
             return null;
         }
     }
