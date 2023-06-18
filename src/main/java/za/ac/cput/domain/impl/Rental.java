@@ -1,5 +1,9 @@
 package za.ac.cput.domain.impl;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.IRent;
 
 /**
@@ -9,10 +13,12 @@ import za.ac.cput.domain.IRent;
  */
 
 
+@Entity
 public class Rental implements IRent {
-
     //Declare the private variables
-
+    @jakarta.persistence.Id
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int rentalId;
     private String borrower;
     private String car;
@@ -50,6 +56,10 @@ public class Rental implements IRent {
         this.issuedDate = builder.dateReturned;
         this.dateReturned = builder.receiver;
         this.finePaid = builder.finePaid;
+
+    }
+
+    public Rental() {
 
     }
 

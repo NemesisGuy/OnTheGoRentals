@@ -9,12 +9,13 @@ package za.ac.cput.domain.impl;
 
 import za.ac.cput.domain.IInsurance;
 
-import javax.persistence.Entity;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Entity
+
+
 public class Insurance implements IInsurance, Serializable {
 
     private int insuranceId;
