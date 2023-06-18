@@ -9,15 +9,20 @@ package za.ac.cput.domain.impl;
 
 import za.ac.cput.domain.IPayment;
 
+import javax.persistence.Entity;
 import java.time.LocalDate;
 import java.util.Objects;
 
+@Entity
 public class Payment implements IPayment {
     private int paymentId;
     private double paymentAmount;
     private String paymentMethod;
     private LocalDate paymentDate;
     private Rental rentalId;
+
+    public Payment() {
+    }
 
     public Payment(Builder builder) {
         this.paymentId = builder.paymentId;
