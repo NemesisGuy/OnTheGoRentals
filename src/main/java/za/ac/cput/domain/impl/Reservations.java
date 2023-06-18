@@ -29,6 +29,7 @@ public class Reservations implements Serializable {
     private Time returnTme;
 
     private Reservations() {
+
     }
 
     public Reservations(Builder builder) {
