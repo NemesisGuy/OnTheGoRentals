@@ -7,19 +7,27 @@ package za.ac.cput.domain.impl;
  */
 
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.IPayment;
 
-import javax.persistence.Entity;
+
+import jakarta.persistence.Entity;
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
 public class Payment implements IPayment {
+    @jakarta.persistence.Id
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int paymentId;
     private double paymentAmount;
     private String paymentMethod;
     private LocalDate paymentDate;
-    private Rental rentalId;
+    //private Rental rentalId;
+    private String rentalId;
 
     public Payment() {
     }
@@ -48,7 +56,7 @@ public class Payment implements IPayment {
         return paymentDate;
     }
 
-    public Rental getRentalId() {
+    public String getRentalId() {
         return rentalId;
     }
 
@@ -82,7 +90,7 @@ public class Payment implements IPayment {
         private double paymentAmount;
         private String paymentMethod;
         private LocalDate paymentDate;
-        private Rental rentalId;
+        private String rentalId;
 
         public Builder setPaymentId(int paymentId) {
             this.paymentId = paymentId;
@@ -104,7 +112,7 @@ public class Payment implements IPayment {
             return this;
         }
 
-        public Builder setRentalId(Rental rentalId) {
+        public Builder setRentalId(String rentalId) {
             this.rentalId = rentalId;
             return this;
         }

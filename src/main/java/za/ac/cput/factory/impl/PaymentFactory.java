@@ -15,7 +15,7 @@ import java.util.Random;
 
 public class PaymentFactory implements IFactory<Payment> {
 
-    public static Payment createPayment(Double paymentAmount, String paymentMethod, LocalDate paymentDate, Rental rentalId) {
+    public static Payment createPayment(Double paymentAmount, String paymentMethod, LocalDate paymentDate, String rentalId) {
         return new Payment.Builder()
                 .setPaymentId(new Random().nextInt(1000000))
                 .setPaymentAmount(paymentAmount)
