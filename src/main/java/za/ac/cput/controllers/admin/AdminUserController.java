@@ -1,5 +1,12 @@
 package za.ac.cput.controllers.admin;
 
+/**
+ * AdminUserController.java
+ * This is the controller for the user entity
+ * Author: Peter Buckingham (220165289)
+ * Date: 05 April 2023
+ */
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.impl.Car;

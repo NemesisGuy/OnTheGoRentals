@@ -1,4 +1,10 @@
 package za.ac.cput.controllers.admin;
+/**
+ * AdminCarController.java
+ * This is the controller for the Car entity
+ * Author: Peter Buckingham (220165289)
+ * Date: 05 April 2023
+ */
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

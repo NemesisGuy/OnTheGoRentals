@@ -1,5 +1,12 @@
 package za.ac.cput.controllers;
 
+/**
+ * UserController.java
+ * This is the controller for the user pages
+ * Author: Peter Buckingham (220165289)
+ * Date: 05 April 2023
+ */
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
