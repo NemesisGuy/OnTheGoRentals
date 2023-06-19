@@ -1,9 +1,7 @@
 package za.ac.cput.domain.impl;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.IDomain;
 
@@ -26,6 +24,7 @@ public class Car implements IDomain {
     private String model;
     private int year;
     private String category;
+    @Enumerated(EnumType.STRING)
     private PriceGroup priceGroup;
     private String licensePlate;
 

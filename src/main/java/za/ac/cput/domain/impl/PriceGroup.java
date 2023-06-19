@@ -1,4 +1,12 @@
 package za.ac.cput.domain.impl;
+/**
+ * FileName: PriceGroup.java
+ * Author: Group
+ * Purpose: PriceGroup enum for the different price groups of the vehicles
+ * Date: 10 June 2023
+ * Version: 1.0
+ *
+ * **/
 
 import java.io.Serializable;
 import java.util.Arrays;
