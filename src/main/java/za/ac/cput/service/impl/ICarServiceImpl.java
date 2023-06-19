@@ -1,86 +1,78 @@
 package za.ac.cput.service.impl;
 
+import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.Car;
 import za.ac.cput.repository.ICarRepository;
-import za.ac.cput.repository.impl.ICarRepositoryImpl;
 import za.ac.cput.service.ICarService;
-
 import java.util.ArrayList;
-
+import java.util.Collections;
+@Service("carServiceImpl")
 public class ICarServiceImpl implements ICarService {
-    private static ICarRepositoryImpl repository = null;
-    private ICarServiceImpl service = null;
-    private ArrayList<Car> cars;
 
-    public ICarServiceImpl() {
-        repository = ICarRepositoryImpl.getRepository();
-    }
+    private  ICarRepository repository = null;
 
-    public ICarServiceImpl(ICarRepositoryImpl repository) {
 
-        ICarServiceImpl.repository = repository;
-    }
-
-    public ICarServiceImpl(ICarRepository carRepository) {
+    public ICarServiceImpl(ICarRepository repository) {
 
         this.repository = repository;
     }
 
-    public ICarRepositoryImpl getRepository() {
-        if (repository == null) {
-            repository = ICarRepositoryImpl.getRepository();
-        }
-        return repository;
-    }
 
-    public ICarServiceImpl getService() {
-        if (service == null) {
-            service = new ICarServiceImpl();
-        }
-        return service;
-    }
-
-    @Override
-    public Car create(Car car) {
-
-        return repository.create(car);
-    }
 
     @Override
     public Car read(Integer integer) {
 
-        return repository.read(integer);
+        return (Car) repository.findAllById(Collections.singleton(integer));
+    }
+
+    @Override
+    public Car create(Car car) {
+        return this.repository.save(car);
+
     }
 
     @Override
     public Car read(int id) {
 
-        return repository.read(id);
+        return (Car) repository.findAllById(Collections.singleton(id));
     }
 
     @Override
     public Car update(Car car) {
+        if(this.repository.existsById(car.getId())) {
+           return this.repository.save(car);
+        }
 
-        return repository.update(car);
+        return null;
     }
 
     @Override
     public boolean delete(Integer integer) {
+        if (this.repository.existsById(integer)) {
+            this.repository.deleteById(integer);
+            return true;
+        }
 
-        return repository.delete(integer);
+        return false ;
     }
 
     @Override
     public boolean delete(int id) {
+        if (this.repository.existsById(id)) {
+            this.repository.deleteById(id);
+            return true;
+        }
 
-        return repository.delete(id);
+        return false;
 
     }
 
     @Override
     public ArrayList<Car> getAll() {
 
-        return (ArrayList<Car>) repository.getAllCars();
+        ArrayList<Car> all = (ArrayList<Car>) this.repository.findAll();
+        return all;
+
 
     }
 

@@ -1,6 +1,8 @@
 package za.ac.cput.domain.impl;
 
 
+import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.IDomain;
 
 import java.util.Objects;
@@ -12,12 +14,17 @@ import java.util.Objects;
  * Date: 29 March 2021
  */
 
+@Entity
 public class Car implements IDomain {
+    @jakarta.persistence.Id
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String make;
     private String model;
     private int year;
     private String category;
+    @Enumerated(EnumType.STRING)
     private PriceGroup priceGroup;
     private String licensePlate;
 

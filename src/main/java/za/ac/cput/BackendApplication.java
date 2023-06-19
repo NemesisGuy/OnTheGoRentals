@@ -22,10 +22,10 @@ public class BackendApplication {
     //public BranchServiceImpl branchService(){
         //return new BranchServiceImpl();
     //}
-    @Bean
+ /*   @Bean
     public ICarServiceImpl carService() {
         return new ICarServiceImpl();
-    }
+    }*/
 
     //factory, repos, domain, controllers and services
 }
