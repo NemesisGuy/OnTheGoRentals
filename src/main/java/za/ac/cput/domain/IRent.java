@@ -12,9 +12,9 @@ public interface IRent extends IDomain {
 
     int getId();
 
-    String getBorrower();
+    int getBorrower();
 
-    String getCar();
+
 
     String getIssuer();
 

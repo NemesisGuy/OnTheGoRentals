@@ -1,9 +1,8 @@
 package za.ac.cput.domain.impl;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import org.springframework.data.annotation.Id;
+import za.ac.cput.domain.IDomain;
 import za.ac.cput.domain.IRent;
 
 /**
@@ -16,15 +15,25 @@ import za.ac.cput.domain.IRent;
 @Entity
 public class Rental implements IRent {
     //Declare the private variables
+
     @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int rentalId;
-    private String borrower;
-    private String car;
+    //users rent cars ,
+
+    // Define the relationships
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "carId")
+    private Car car;
+
+
     private String issuer;
     private String issuedDate;
-
     private String Date;
     private String dateReturned;
     private String receiver;
@@ -32,11 +41,12 @@ public class Rental implements IRent {
 
 
     //Initializing a parameterized constructor
-    public Rental(int rentalId, String borrower, String car, String issuer, String issuedDate, String Date, String DateReturned, String receiver, boolean fine) {
+    public Rental(int rentalId, Car car,  String issuer, String issuedDate, String Date, String DateReturned, String receiver, boolean fine) {
 
         this.rentalId = rentalId;
-        this.borrower = borrower;
         this.car = car;
+
+
         this.issuer = issuer;
         this.issuedDate = issuedDate;
         this.Date = Date;
@@ -49,8 +59,6 @@ public class Rental implements IRent {
     private Rental(RentalBuilder builder) {
 
         this.rentalId = builder.rentalId;
-        this.borrower = builder.borrower;
-        this.car = builder.car;
         this.issuer = builder.issuer;
         this.Date = builder.Date;
         this.issuedDate = builder.dateReturned;
@@ -67,9 +75,7 @@ public class Rental implements IRent {
         return this.rentalId;
     }
 
-    public String getBorrower(String borrower) {
-        return this.borrower;
-    }
+
 
     @Override
     public int getId() {
@@ -77,13 +83,10 @@ public class Rental implements IRent {
     }
 
     @Override
-    public String getBorrower() {
-        return null;
+    public int getBorrower() {
+        return 0;
     }
 
-    public String getCar() {
-        return car;
-    }
 
     public String getIssuer() {
         return issuer;
@@ -119,8 +122,8 @@ public class Rental implements IRent {
     public String toString() {
         return "Rental{" +
                 "rentalId=" + rentalId +
-                "borrower='" + borrower + '\'' +
-                ", car ='" + car + '\'' +
+
+
                 ", issuer='" + issuer + '\'' +
                 ", issuedDate='" + issuedDate + '\'' +
                 ", dateReturned='" + dateReturned + '\'' +
@@ -129,12 +132,28 @@ public class Rental implements IRent {
                 '}';
     }
 
+    public User getUser() {
+        return user;
+
+    }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    public void setCar(Car car) {
+        this.car = car;
+    }
+
     //Builder Class
     public static class RentalBuilder {
 
         private int rentalId;
-        private String borrower;
-        private String car;
+        private int userId;
+        private int carId;
         private String issuer;
 
         private String Date;
@@ -149,13 +168,13 @@ public class Rental implements IRent {
             return this;
         }
 
-        public Rental.RentalBuilder setBorrower(String borrower) {
-            this.borrower = borrower;
+        public Rental.RentalBuilder setBorrower(int userId) {
+            this.userId = userId;
             return this;
         }
 
-        public Rental.RentalBuilder setCar(String car) {
-            this.car = car;
+        public Rental.RentalBuilder setCar(int carId) {
+            this.carId = carId;
             return this;
         }
 

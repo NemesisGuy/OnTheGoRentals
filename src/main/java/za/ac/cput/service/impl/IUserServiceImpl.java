@@ -66,6 +66,7 @@ public class IUserServiceImpl implements IUserService {
 
     @Override
     public ArrayList<User> getAll() {
+
         return (ArrayList<User>) this.repository.findAll();
     }
 
