@@ -28,27 +28,27 @@ public class CarController {
     @Autowired
     private ICarServiceImpl carService;
 
-    @GetMapping("/api/cars/all")
+    @GetMapping("/api/cars/list/all")
     public List<Car> getCars() {
         List<Car> allCars = new ArrayList<>(carService.getAll());
         return allCars;
     }
 
-    @GetMapping("/api/cars/economy")
+    @GetMapping("/api/cars/list/economy")
     public List<Car> getEconomyCars() {
         List<Car> economyCars = new ArrayList<>(carService.getAll());
         economyCars.removeIf(car -> car.getPriceGroup() != PriceGroup.ECONOMY);
         return economyCars;
     }
 
-    @GetMapping("/api/cars/luxury")
+    @GetMapping("/api/cars/list/luxury")
     public List<Car> getLuxuryCars() {
         List<Car> luxuryCars = new ArrayList<>(carService.getAll());
         luxuryCars.removeIf(car -> car.getPriceGroup() != PriceGroup.LUXURY);
         return luxuryCars;
     }
 
-    @GetMapping("/api/cars/special")
+    @GetMapping("/api/cars/list/special")
     public List<Car> getSpecialCars() {
         List<Car> specialCars = new ArrayList<>(carService.getAll());
         specialCars.removeIf(car -> car.getPriceGroup() != PriceGroup.SPECIAL);

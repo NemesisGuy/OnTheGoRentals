@@ -23,9 +23,16 @@ public class AdminUserController {
     @Autowired
     private IUserServiceImpl userService;
 
-    @RequestMapping("/all")
+    @RequestMapping("/list/all")
     public ArrayList<User> getAll() {
         ArrayList<User> users = new ArrayList<>(userService.getAll());
+        return users;
+    }
+    //list users by argument
+    @RequestMapping("/list/{argument}")
+    public ArrayList<User> getAllByArgument(@PathVariable String argument) {
+        ArrayList<User> users = new ArrayList<>(userService.getAll());
+        users.removeIf(user -> !user.toString().toLowerCase().contains(argument.toLowerCase()));
         return users;
     }
     @PostMapping("/create")
@@ -35,7 +42,7 @@ public User createUser(@RequestBody User user) {
         User createdUser = userService.create(user);
         return createdUser;
     }
-    @PostMapping("/read/{userId}")
+    @GetMapping ("/read/{userId}")
     public User readUser(@PathVariable Integer userId) {
         System.out.println("/api/admin/users/read was triggered");
         System.out.println("UserService was created...attempting to read user...");
