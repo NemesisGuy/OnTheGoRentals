@@ -1,5 +1,7 @@
 package za.ac.cput.domain;
 
+import java.time.LocalDateTime;
+
 /**
  * Lonwabo Magazi-218331851
  * Date: March 2023
@@ -12,21 +14,20 @@ public interface IRent extends IDomain {
 
     int getId();
 
-    String getBorrower();
+    int getBorrower();
 
-    String getCar();
 
-    String getIssuer();
 
-    String getIssuedDate();
+    int getIssuer();
 
-    String getDate();
+    LocalDateTime getIssuedDate();
 
-    String getDateReturned();
+    LocalDateTime getReturnedDate();
 
-    String getReceiver();
+    int getReceiver();
 
     boolean finePaid();
+
 
 
 }
