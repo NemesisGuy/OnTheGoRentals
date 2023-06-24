@@ -29,9 +29,8 @@ public class ReservationsController {
     @PostMapping("/create")
     public Reservations create(@RequestBody Reservations reservations) {
 
-        Reservations reservationcreated = ReservationsFactory.createReservations(reservations.getPickUpLocation(), reservations.getPickUpDate(), reservations.getPickUpTime(), reservations.getReturnLocation(), reservations.getReturnDate(), reservations.getReturnTme());
+      //  Reservations reservationcreated = ReservationsFactory.createReservations(reservations.getId(), reservations.getPickUpLocation(), reservations.getPickUpDate(), reservations.getPickUpTime(), reservations.getReturnLocation(), reservations.getReturnDate(), reservations.getReturnTme());
         return reservationsService.create(reservations);
-        //commented out the other code because i'm avoiding creating different employee id's which might lead an error. haven't tested the class yet but let's see. I return reservations created in the test class
     }
 
     @PostMapping("/update")
@@ -49,6 +48,5 @@ public class ReservationsController {
 
         return reservationsService.getAll();
     }
-//added static in the factory class (createReservations) because of an error
-    //DD3 ended 32:37
+
 }

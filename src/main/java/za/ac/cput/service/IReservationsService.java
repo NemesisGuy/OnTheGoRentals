@@ -4,7 +4,7 @@ import za.ac.cput.domain.impl.Reservations;
 
 import java.util.List;
 
-public interface IReservationsService {
+public interface IReservationsService{
 
     Reservations create(Reservations reservations);
     Reservations update(Reservations reservations);

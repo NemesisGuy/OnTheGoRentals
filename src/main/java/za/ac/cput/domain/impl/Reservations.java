@@ -6,10 +6,12 @@ package za.ac.cput.domain.impl;
  * Date:  01 April 2023
  */
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+//import org.springframework.data.annotation.Id;
+
 import java.io.Serializable;
 import java.sql.Time;
 import java.time.LocalDate;
@@ -17,9 +19,10 @@ import java.util.Objects;
 
 @Entity
 
-public class Reservations implements Serializable {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class Reservations  {
+    //@jakarta.persistence.Id
     @Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String pickUpLocation;
     private LocalDate pickUpDate;
@@ -28,7 +31,7 @@ public class Reservations implements Serializable {
     private LocalDate returnDate;
     private Time returnTme;
 
-    private Reservations() {
+    protected Reservations() {
 
     }
 

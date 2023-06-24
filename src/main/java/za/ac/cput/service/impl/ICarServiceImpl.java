@@ -6,6 +6,8 @@ import za.ac.cput.repository.ICarRepository;
 import za.ac.cput.service.ICarService;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
+
 @Service("carServiceImpl")
 public class ICarServiceImpl implements ICarService {
 
@@ -22,7 +24,8 @@ public class ICarServiceImpl implements ICarService {
     @Override
     public Car read(Integer integer) {
 
-        return (Car) repository.findAllById(Collections.singleton(integer));
+        Optional<Car> optionalCar = this.repository.findById(integer);
+        return optionalCar.orElse(null);
     }
 
     @Override
@@ -33,8 +36,9 @@ public class ICarServiceImpl implements ICarService {
 
     @Override
     public Car read(int id) {
-
-        return (Car) repository.findAllById(Collections.singleton(id));
+        //optional
+        Optional<Car> optionalCar = this.repository.findById(id);
+        return optionalCar.orElse(null);
     }
 
     @Override

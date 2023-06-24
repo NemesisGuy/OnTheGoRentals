@@ -21,7 +21,7 @@ class PaymentTest {
                 .setPaymentAmount(paymentAmount)
                 .setPaymentMethod(paymentMethod)
                 .setPaymentDate(paymentDate)
-                .setRentalId(rentalId)
+                .setRentalId(rentalId.getRentalId()) //the error is in the payment
                 .build();
 
         System.out.println(payment.toString());
