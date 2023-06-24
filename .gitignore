@@ -58,7 +58,7 @@ HELP.md
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-!src/main/resources/application.properties
+!src/main/resources/mysql-db.properties
 /OnTheGoRentals.drawio
-/src/main/resources/application.properties
+/src/main/resources/mysql-db.properties
 /dev/
