@@ -1,5 +1,13 @@
 package za.ac.cput.service.impl;
 
+/**
+ * DamageReportImplt.java
+ * Class for the Damage Report Implementation
+ * Author: Cwenga Dlova (214310671)
+ * Date:  11 June 2023
+ * 12 June 2023: changes made by Cwenga
+ */
+
 import za.ac.cput.domain.impl.DamageReport;
 import za.ac.cput.repository.impl.DamageReportRepositoryImpl;
 import za.ac.cput.service.IDamageReportService;
@@ -16,7 +24,7 @@ public class DamageReportServiceImpl implements IDamageReportService {
         repository = DamageReportRepositoryImpl.getRepository();
     }
 
-    private static IDamageReportService getService() {
+    public static DamageReportServiceImpl getService() {
         if (service == null) {
             service = new DamageReportServiceImpl();
         }
@@ -30,12 +38,14 @@ public class DamageReportServiceImpl implements IDamageReportService {
     }
 
     @Override
-    public boolean delete(Integer id) {
-        return false;
+    public boolean delete(int id) {
+
+        return repository.delete(id);
     }
     @Override
     public List<DamageReport> getAll() {
-        return null;
+
+        return getAll();
     }
 
 }

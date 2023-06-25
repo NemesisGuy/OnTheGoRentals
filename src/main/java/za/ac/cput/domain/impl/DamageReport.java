@@ -2,8 +2,6 @@ package za.ac.cput.domain.impl;
 
 
 
-import za.ac.cput.domain.IDamageReport;
-
 import java.time.LocalDate;
 /**
  * DamageReport.java
@@ -11,7 +9,7 @@ import java.time.LocalDate;
  * Author: Cwenga Dlova (214310671)
  * Date:  01 April 2023
  */
-public class DamageReport implements IDamageReport {
+public class DamageReport  {
     private int id;
     private Rental rentalId;
     private Customer customerId;
@@ -19,6 +17,9 @@ public class DamageReport implements IDamageReport {
     private LocalDate reportDate;
     private String damageLocation;
     private String description;
+
+    public DamageReport() {
+    }
 
     public DamageReport(Builder builder) {
         this.id = builder.id;

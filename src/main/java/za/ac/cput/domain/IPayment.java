@@ -19,5 +19,5 @@ public interface IPayment extends IDomain {
 
     LocalDate getPaymentDate();
 
-    String getRentalId();
+    int getRentalId();
 }

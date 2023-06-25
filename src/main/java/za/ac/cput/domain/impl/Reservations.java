@@ -6,13 +6,23 @@ package za.ac.cput.domain.impl;
  * Date:  01 April 2023
  */
 
-import za.ac.cput.domain.IDomain;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+//import org.springframework.data.annotation.Id;
 
+import java.io.Serializable;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.util.Objects;
 
+@Entity
 
-public class Reservations {
+public class Reservations  {
+    //@jakarta.persistence.Id
+    @Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String pickUpLocation;
     private LocalDate pickUpDate;
@@ -21,7 +31,8 @@ public class Reservations {
     private LocalDate returnDate;
     private Time returnTme;
 
-    public Reservations() {
+    protected Reservations() {
+
     }
 
     public Reservations(Builder builder) {
@@ -60,6 +71,19 @@ public class Reservations {
 
     public Time getReturnTme() {
         return returnTme;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reservations that = (Reservations) o;
+        return id == that.id && Objects.equals(pickUpLocation, that.pickUpLocation) && Objects.equals(pickUpDate, that.pickUpDate) && Objects.equals(pickUpTime, that.pickUpTime) && Objects.equals(returnLocation, that.returnLocation) && Objects.equals(returnDate, that.returnDate) && Objects.equals(returnTme, that.returnTme);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, pickUpLocation, pickUpDate, pickUpTime, returnLocation, returnDate, returnTme);
     }
 
     @Override

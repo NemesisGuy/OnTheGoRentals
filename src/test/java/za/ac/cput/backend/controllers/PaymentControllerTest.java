@@ -33,7 +33,7 @@ class PaymentControllerTest {
             2000.00,
             "cash",
             LocalDate.parse("01-01-23", DateTimeFormatter.ofPattern("MM-dd-yy")),
-            null
+            01
     );
 
     @Test

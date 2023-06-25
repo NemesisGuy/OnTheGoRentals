@@ -6,12 +6,13 @@ package za.ac.cput.repository;
  * Date:  07 April 2023
  */
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import za.ac.cput.domain.impl.Reservations;
 
-import java.util.List;
+@Repository
+public interface IReservationsRepository extends JpaRepository<Reservations, Integer> {
 
-public interface IReservationsReposatory extends IRepository<Reservations, Integer> {
-    List<Reservations> getAllReservationsMade();
 
 
 }

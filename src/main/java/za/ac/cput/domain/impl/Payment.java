@@ -27,7 +27,7 @@ public class Payment implements IPayment {
     private String paymentMethod;
     private LocalDate paymentDate;
     //private Rental rentalId;
-    private String rentalId;
+    private int rentalId;
 
     public Payment() {
     }
@@ -56,7 +56,7 @@ public class Payment implements IPayment {
         return paymentDate;
     }
 
-    public String getRentalId() {
+    public int getRentalId() {
         return rentalId;
     }
 
@@ -90,7 +90,7 @@ public class Payment implements IPayment {
         private double paymentAmount;
         private String paymentMethod;
         private LocalDate paymentDate;
-        private String rentalId;
+        private int rentalId;
 
         public Builder setPaymentId(int paymentId) {
             this.paymentId = paymentId;
@@ -112,7 +112,7 @@ public class Payment implements IPayment {
             return this;
         }
 
-        public Builder setRentalId(String rentalId) {
+        public Builder setRentalId(int rentalId) {
             this.rentalId = rentalId;
             return this;
         }

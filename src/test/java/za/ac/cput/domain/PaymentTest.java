@@ -12,6 +12,7 @@ class PaymentTest {
     private double paymentAmount = 2000.0;
     private String paymentMethod = "Credit";
     private LocalDate paymentDate = LocalDate.parse("2023-01-01");
+    private Rental rentalId = null;
 
     @Test
     public void testPayment() {
@@ -20,6 +21,7 @@ class PaymentTest {
                 .setPaymentAmount(paymentAmount)
                 .setPaymentMethod(paymentMethod)
                 .setPaymentDate(paymentDate)
+                .setRentalId(rentalId.getRentalId()) //the error is in the payment
                 .build();
 
         System.out.println(payment.toString());
@@ -27,6 +29,7 @@ class PaymentTest {
         Assertions.assertEquals(paymentAmount, payment.getPaymentAmount());
         Assertions.assertEquals(paymentMethod, payment.getPaymentMethod());
         Assertions.assertEquals(paymentDate, payment.getPaymentDate());
+        Assertions.assertEquals(rentalId, payment.getRentalId());
     }
 
 }
