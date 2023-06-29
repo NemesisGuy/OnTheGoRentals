@@ -19,31 +19,44 @@ public class IRentalServiceImpl implements IRentalService {
 
     @Override
     public Rental create(Rental rental) {
-        return null;
+
+        return this.repository.save(rental);
     }
 
     @Override
     public Rental read(Integer integer) {
-        return null;
+      return this.repository.findById(integer).orElse(null);
     }
+
 
     @Override
     public Rental read(int id) {
-        return null;
+        return this.repository.findById(id).orElse(null);
     }
 
     @Override
     public Rental update(Rental rental) {
-        return null;
+        return this.repository.save(rental);
     }
 
     @Override
     public boolean delete(Integer integer) {
+
+        if (this.repository.existsById(integer))
+        {
+            this.repository.deleteById(integer);
+            return true;
+        }
         return false;
     }
 
     @Override
     public boolean delete(int id) {
+        if (this.repository.existsById(id))
+        {
+            this.repository.deleteById(id);
+            return true;
+        }
         return false;
     }
 
