@@ -15,18 +15,15 @@ import java.time.LocalDateTime;
 
 @Entity
 public class Rental implements IRent {
-    //Declare the private variables
     @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int rentalId;
-    //users rent cars ,
-    // Define the relationships
+    private int id;
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne
-    @JoinColumn(name = "carId")
+    @JoinColumn(name = "car_id")
     private Car car;
     private int issuer;
     private int receiver;
@@ -38,9 +35,10 @@ public class Rental implements IRent {
 
 
     //Initializing a parameterized constructor
-    public Rental(int rentalId, Car car,  int issuer,int receiver, int fine, LocalDateTime issuedDate,  LocalDateTime returnedDate) {
+    public Rental(int rentalId,User user, Car car,  int issuer,int receiver, int fine, LocalDateTime issuedDate,  LocalDateTime returnedDate) {
 
-        this.rentalId = rentalId;
+        this.id = rentalId;
+        this.user = user;
         this.car = car;
         this.issuer = issuer;
         this.issuedDate = issuedDate;
@@ -50,13 +48,17 @@ public class Rental implements IRent {
     }
 
 
-    private Rental(RentalBuilder builder) {
+    private Rental(Builder builder) {
 
-        this.rentalId = builder.rentalId;
+        this.id = builder.id;
+        this.user = builder.user;
+        this.car = builder.car;
+        this.receiver = builder.receiver;
         this.issuer = builder.issuer;
         this.issuedDate = builder.issuedDate;
         this.returnedDate = builder.returnedDate;
         this.fine = builder.fine;
+
 
     }
 
@@ -64,8 +66,10 @@ public class Rental implements IRent {
 
     }
 
+
+
     public int getRentalId() {
-        return this.rentalId;
+        return this.id;
     }
 
 
@@ -108,7 +112,7 @@ public class Rental implements IRent {
     @Override
     public String toString() {
         return "Rental{" +
-                "rentalId=" + rentalId +
+                "rentalId=" + id +
 
 
                 ", issuer='" + issuer + '\'' +
@@ -120,12 +124,12 @@ public class Rental implements IRent {
     }
 
     public User getUser() {
-        return user;
+        return this.user;
 
     }
 
     public Car getCar() {
-        return car;
+        return this.car;
     }
 
     public void setUser(User user) {
@@ -136,11 +140,14 @@ public class Rental implements IRent {
     }
 
     //Builder Class
-    public static class RentalBuilder {
+    public static Builder builder() {
+        return new Builder();
+    }
+    public static class Builder {
 
-        private int rentalId;
-        private int userId;
-        private int carId;
+        private int id;
+        private User user;
+        private Car car;
         private int issuer;
         private int receiver;
         private int fine;
@@ -148,50 +155,61 @@ public class Rental implements IRent {
         private LocalDateTime issuedDate;
         private LocalDateTime returnedDate;
 
-        public Rental.RentalBuilder setRentalId(int rentalId) {
-            this.rentalId = rentalId;
+        public Builder setId(int id) {
+            this.id = id;
             return this;
         }
 
-        public Rental.RentalBuilder setBorrower(int userId) {
-            this.userId = userId;
+        public Builder setUser(User user) {
+            this.user = user;
             return this;
         }
 
-        public Rental.RentalBuilder setCar(int carId) {
-            this.carId = carId;
+        public Builder setCar(Car car) {
+            this.car = car;
             return this;
         }
 
-        public Rental.RentalBuilder setIssuer(int issuer) {
+        public Builder setIssuer(int issuer) {
             this.issuer = issuer;
             return this;
         }
 
 
 
-        public Rental.RentalBuilder setIssuedDate(LocalDateTime issuedDate) {
+        public Builder setIssuedDate(LocalDateTime issuedDate) {
             this.issuedDate = issuedDate;
             return this;
         }
 
-        public Rental.RentalBuilder setDateReturned(LocalDateTime returnedDate) {
+        public Builder setDateReturned(LocalDateTime returnedDate) {
             this.returnedDate = returnedDate;
             return this;
         }
 
-        public Rental.RentalBuilder setReceiver(int receiver) {
+        public Builder setReceiver(int receiver) {
             this.receiver = receiver;
             return this;
         }
 
-        public Rental.RentalBuilder setFinePaid(int fine) {
+        public Builder setFine(int fine) {
             this.fine = fine;
             return this;
         }
 
         public Rental build() {
             return new Rental(this);
+        }
+        public Builder copy(Rental rental) {
+            this.id = rental.id;
+            this.user = rental.user;
+            this.car = rental.car;
+            this.issuer = rental.issuer;
+            this.issuedDate = rental.issuedDate;
+            this.returnedDate = rental.returnedDate;
+            this.receiver = rental.receiver;
+            this.fine = rental.fine;
+            return this;
         }
     }
 }

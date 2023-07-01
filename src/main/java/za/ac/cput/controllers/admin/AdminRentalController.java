@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.impl.Car;
 import za.ac.cput.domain.impl.Rental;
 import za.ac.cput.domain.impl.User;
+import za.ac.cput.factory.impl.RentalFactory;
 import za.ac.cput.service.impl.ICarServiceImpl;
 import za.ac.cput.service.impl.IRentalServiceImpl;
 import za.ac.cput.service.impl.IUserServiceImpl;
@@ -21,6 +22,9 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("/api/admin/rentals")
 public class AdminRentalController {
+    @Autowired
+    private RentalFactory rentalFactory;
+
     @Autowired
     private IRentalServiceImpl rentalService;
 
@@ -42,13 +46,14 @@ public class AdminRentalController {
         System.out.println("RentalService was created...attempting to create rental...");
 
         // Retrieve user and car based on their IDs
-        User user = userService.read(rental.getUser().getId());
+       /* User user = userService.read(rental.getUser().getId());
         Car car = carService.read(rental.getCar().getId());
 
         rental.setUser(user);
-        rental.setCar(car);
+        rental.setCar(car);*/
 
-        Rental createdRental = rentalService.create(rental);
+        Rental createdRental = rentalFactory.create(rental);
+        createdRental = rentalService.create(createdRental);
         return createdRental;
     }
 

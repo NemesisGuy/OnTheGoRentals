@@ -1,8 +1,11 @@
 package za.ac.cput.service.impl;
 
+import jakarta.persistence.Access;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.Rental;
 import za.ac.cput.domain.impl.User;
+import za.ac.cput.factory.impl.RentalFactory;
 import za.ac.cput.repository.IRentalRepository;
 import za.ac.cput.service.IRentalService;
 
@@ -10,7 +13,10 @@ import java.util.ArrayList;
 
 @Service("rentalServiceImpl")
 public class IRentalServiceImpl implements IRentalService {
-    private IRentalRepository repository = null;
+    @Autowired
+    private IRentalRepository repository ;
+    @Autowired
+    private RentalFactory rentalFactory;
 
     private IRentalServiceImpl(IRentalRepository repository) {
         this.repository = repository;
@@ -19,8 +25,9 @@ public class IRentalServiceImpl implements IRentalService {
 
     @Override
     public Rental create(Rental rental) {
+        Rental newRental = rentalFactory.create(rental);
+        return repository.save(newRental);
 
-        return this.repository.save(rental);
     }
 
     @Override

@@ -1,10 +1,13 @@
 package za.ac.cput.factory.impl;
 
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.Car;
 import za.ac.cput.domain.impl.PriceGroup;
+import za.ac.cput.domain.impl.User;
 import za.ac.cput.factory.IFactory;
 
-
+@Component
 public class CarFactory implements IFactory<Car> {
 
 
@@ -24,8 +27,15 @@ public class CarFactory implements IFactory<Car> {
 
 
     @Override
-    public Car create() {
+    public  Car create() {
         return Car.builder().build();
+    }
+
+
+    public  Car create(Car car) {
+        return Car.builder()
+                .copy(car)
+                .build();
     }
 }
 

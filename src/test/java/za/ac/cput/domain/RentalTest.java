@@ -1,6 +1,8 @@
 package za.ac.cput.domain;
 
+import za.ac.cput.domain.impl.Car;
 import za.ac.cput.domain.impl.Rental;
+import za.ac.cput.domain.impl.User;
 
 import java.time.LocalDateTime;
 
@@ -11,8 +13,8 @@ public class RentalTest {
 
 
     private int rentalId;
-    private int userId;
-    private int carId;
+    private User user;
+    private Car car;
     private int rentalIssuer;
     private LocalDateTime rentalIssuedDate;
     private LocalDateTime rentalDateReturned;
@@ -20,10 +22,10 @@ public class RentalTest {
 
     public void testRental() {
 
-        Rental rental = new Rental.RentalBuilder()
-                .setRentalId(rentalId)
-                .setBorrower(userId)
-                .setCar(carId)
+        Rental rental = new Rental.Builder()
+                .setId(rentalId)
+                .setUser(user)
+                .setCar(car)
                 .setIssuer(rentalIssuer)
                 .setIssuedDate(rentalIssuedDate)
                 .setDateReturned(rentalDateReturned)
@@ -33,8 +35,8 @@ public class RentalTest {
         System.out.println(rental.toString());
 
         assertEquals(rentalId, rental.getRentalId());
-        assertEquals(userId, rental.getBorrower());
-        assertEquals(carId, rental.getCar());
+        assertEquals(user.getId(), rental.getBorrower());
+        assertEquals(car.getId(), rental.getRentalId());
         assertEquals(rentalIssuer, rental.getIssuer());
         assertEquals(rentalIssuedDate, rental.getIssuedDate());
 

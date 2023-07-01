@@ -1,27 +1,29 @@
 package za.ac.cput.domain.impl;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.*;
 import za.ac.cput.domain.IDomain;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
 public class User implements IDomain{
-    @jakarta.persistence.Id
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @OneToMany(mappedBy = "user")
+    private List<Rental> rentals = new ArrayList<>();
     private String userName;
-    private String email;
-    private String pictureUrl;
     private String firstName;
     private String lastName;
     private String phoneNumber;
     private String password;
+    private String email;
+    private String pictureUrl;
     private String role;
+
 
     public User() {
         // Default constructor
@@ -33,6 +35,7 @@ public class User implements IDomain{
     public int getId() {
         return id;
     }
+
 
     public User(int id, String userName, String email, String pictureUrl) {
         this.id = id;

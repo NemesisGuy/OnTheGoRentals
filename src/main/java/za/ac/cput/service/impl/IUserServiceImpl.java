@@ -1,5 +1,6 @@
 package za.ac.cput.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.Car;
 import za.ac.cput.domain.impl.User;
@@ -8,20 +9,25 @@ import za.ac.cput.service.IUserService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
+import za.ac.cput.factory.impl.UserFactory;
 
 @Service("userServiceImpl")
 public class IUserServiceImpl implements IUserService {
     private  IUserRepository repository = null;
+    private UserFactory userFactory;
 
-    private IUserServiceImpl(IUserRepository repository) {
-
+    @Autowired
+    private IUserServiceImpl(IUserRepository repository, UserFactory userFactory) {
         this.repository = repository;
+        this.userFactory = userFactory;
     }
+
+
 
     @Override
     public User create(User user) {
-        return this.repository.save(user);
-
+        User newUser = userFactory.create(user);
+        return repository.save(newUser);
     }
 
     @Override
@@ -41,11 +47,13 @@ public class IUserServiceImpl implements IUserService {
 
     @Override
     public User update(User user) {
-        if (this.repository.existsById(user.getId()))
-            return this.repository.save(user);
-
+        if (repository.existsById(user.getId())) {
+            User updatedUser = userFactory.create(user);
+            return repository.save(updatedUser);
+        }
         return null;
     }
+
 
     @Override
     public boolean delete(int id) {
@@ -70,8 +78,6 @@ public class IUserServiceImpl implements IUserService {
         return (ArrayList<User>) this.repository.findAll();
     }
 
-
-    ///////////
 
 
 }
