@@ -3,19 +3,18 @@ package za.ac.cput.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.Car;
-import za.ac.cput.domain.impl.User;
 import za.ac.cput.factory.impl.CarFactory;
 import za.ac.cput.repository.ICarRepository;
 import za.ac.cput.service.ICarService;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Optional;
 
 @Service("carServiceImpl")
 public class ICarServiceImpl implements ICarService {
 
     @Autowired
-    private  ICarRepository repository;
+    private ICarRepository repository;
     @Autowired
     private CarFactory carFactory;
 
@@ -38,12 +37,14 @@ public class ICarServiceImpl implements ICarService {
         Optional<Car> optionalCar = this.repository.findById(integer);
         return optionalCar.orElse(null);
     }
+
     @Override
     public Car read(int id) {
         //optional
         Optional<Car> optionalCar = this.repository.findById(id);
         return optionalCar.orElse(null);
     }
+
     @Override
     public Car update(Car car) {
         if (this.repository.existsById(car.getId())) {
@@ -60,7 +61,7 @@ public class ICarServiceImpl implements ICarService {
             return true;
         }
 
-        return false ;
+        return false;
     }
 
     @Override

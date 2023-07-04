@@ -29,13 +29,9 @@ public class Rental implements IRent {
     private int receiver;
     private int fine;
     private LocalDateTime issuedDate;
-    private LocalDateTime  returnedDate;
-
-
-
-
+    private LocalDateTime returnedDate;
     //Initializing a parameterized constructor
-    public Rental(int rentalId,User user, Car car,  int issuer,int receiver, int fine, LocalDateTime issuedDate,  LocalDateTime returnedDate) {
+    public Rental(int rentalId, User user, Car car, int issuer, int receiver, int fine, LocalDateTime issuedDate, LocalDateTime returnedDate) {
 
         this.id = rentalId;
         this.user = user;
@@ -46,7 +42,6 @@ public class Rental implements IRent {
         this.receiver = receiver;
         this.fine = fine;
     }
-
 
     private Rental(Builder builder) {
 
@@ -59,31 +54,29 @@ public class Rental implements IRent {
         this.returnedDate = builder.returnedDate;
         this.fine = builder.fine;
 
-
     }
 
     public Rental() {
 
     }
 
-
+    //Builder Class
+    public static Builder builder() {
+        return new Builder();
+    }
 
     public int getRentalId() {
         return this.id;
     }
-
-
 
     @Override
     public int getId() {
         return 0;
     }
 
-    @Override
-    public int getBorrower() {
-        return 0;
+    public int getFine() {
+        return fine;
     }
-
 
     public int getIssuer() {
         return issuer;
@@ -92,7 +85,6 @@ public class Rental implements IRent {
     public LocalDateTime getIssuedDate() {
         return issuedDate;
     }
-
 
     @Override
     public LocalDateTime getReturnedDate() {
@@ -107,7 +99,6 @@ public class Rental implements IRent {
     public boolean finePaid() {
         return false;
     }
-
 
     @Override
     public String toString() {
@@ -128,21 +119,18 @@ public class Rental implements IRent {
 
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public Car getCar() {
         return this.car;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
     public void setCar(Car car) {
         this.car = car;
     }
 
-    //Builder Class
-    public static Builder builder() {
-        return new Builder();
-    }
     public static class Builder {
 
         private int id;
@@ -176,7 +164,6 @@ public class Rental implements IRent {
         }
 
 
-
         public Builder setIssuedDate(LocalDateTime issuedDate) {
             this.issuedDate = issuedDate;
             return this;
@@ -200,6 +187,7 @@ public class Rental implements IRent {
         public Rental build() {
             return new Rental(this);
         }
+
         public Builder copy(Rental rental) {
             this.id = rental.id;
             this.user = rental.user;

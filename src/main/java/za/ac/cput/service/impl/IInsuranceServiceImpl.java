@@ -6,6 +6,7 @@ import za.ac.cput.repository.impl.IInsuranceRepositoryImpl;
 import za.ac.cput.service.IInsuranceService;
 
 import java.util.List;
+
 @Service
 public class IInsuranceServiceImpl implements IInsuranceService {
     private static IInsuranceServiceImpl service;

@@ -7,7 +7,6 @@ import za.ac.cput.domain.impl.User;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class RentalTest {
 
@@ -35,7 +34,7 @@ public class RentalTest {
         System.out.println(rental.toString());
 
         assertEquals(rentalId, rental.getRentalId());
-        assertEquals(user.getId(), rental.getBorrower());
+
         assertEquals(car.getId(), rental.getRentalId());
         assertEquals(rentalIssuer, rental.getIssuer());
         assertEquals(rentalIssuedDate, rental.getIssuedDate());

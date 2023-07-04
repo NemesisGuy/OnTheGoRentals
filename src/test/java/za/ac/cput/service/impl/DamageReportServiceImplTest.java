@@ -12,7 +12,7 @@ import za.ac.cput.domain.impl.DamageReport;
 import za.ac.cput.factory.impl.DamageReportFactory;
 import za.ac.cput.repository.impl.DamageReportRepositoryImpl;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DamageReportServiceImplTest {
 
@@ -27,8 +27,9 @@ class DamageReportServiceImplTest {
         assertEquals(created.getId(), report1.getId());
         System.out.println("Created: " + created);
     }
+
     @Test
-    public void test_2(){
+    public void test_2() {
         boolean deleted = repository.delete(report1.getId());
         //assertTrue(deleted);
         System.out.println("Deleted: " + deleted);

@@ -10,7 +10,6 @@ package za.ac.cput.controllers.admin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.impl.User;
-import za.ac.cput.factory.impl.UserFactory;
 import za.ac.cput.service.impl.IUserServiceImpl;
 
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ public class AdminUserController {
         System.out.println("UserService was created...attempting to update user...");
 
         // Use the UserFactory to create a new User object with the updated properties
-        User userToUpdate = userService.create(updatedUser);
+        User userToUpdate = userService.update(updatedUser);
 
 
         return userToUpdate;

@@ -8,7 +8,7 @@ import za.ac.cput.factory.impl.BranchFactory;
 
 class BranchFactoryTest {
     @Test
-    public void test(){
+    public void test() {
         BranchFactory branchFactory = new BranchFactory();
         Branch branch = branchFactory.create();
 

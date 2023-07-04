@@ -7,12 +7,10 @@ package za.ac.cput.factory.impl;
  */
 
 import za.ac.cput.domain.impl.Insurance;
-import za.ac.cput.domain.impl.Payment;
 import za.ac.cput.domain.impl.Rental;
 import za.ac.cput.factory.IFactory;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Random;
 
 public class InsuranceFactory implements IFactory<Insurance> {

@@ -8,8 +8,6 @@ package za.ac.cput;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import za.ac.cput.service.impl.ICarServiceImpl;
 
 @SpringBootApplication
 public class BackendApplication {
@@ -20,7 +18,7 @@ public class BackendApplication {
 
     //@Bean
     //public BranchServiceImpl branchService(){
-        //return new BranchServiceImpl();
+    //return new BranchServiceImpl();
     //}
  /*   @Bean
     public ICarServiceImpl carService() {

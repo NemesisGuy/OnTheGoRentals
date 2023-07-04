@@ -16,19 +16,21 @@ class BranchRepositoryImplTest {
     private static BranchFactory repositoryFactory = new BranchFactory();
     private static Branch branch = repositoryFactory.create();
     private static Branch branch2;
+
     @Test
     void a_create() {
         Branch created = repository.create(branch);
-        assertEquals(branch.getId(),created.getId());
-        System.out.println("Create: "+created);
+        assertEquals(branch.getId(), created.getId());
+        System.out.println("Create: " + created);
     }
 
     @Test
-    void b_read(){
+    void b_read() {
         Branch read = repository.read(branch.getId());
         assertNotNull(read);
-        System.out.println("Read: "+read);
+        System.out.println("Read: " + read);
     }
+
     @Test
     void c_update() {
 
@@ -44,15 +46,15 @@ class BranchRepositoryImplTest {
 
     @Test
     void d_delete() {
-       Integer id = branch.getId();
-       boolean success = repository.delete(id);
-       assertFalse(success);
-        System.out.println("Success: "+success);
+        Integer id = branch.getId();
+        boolean success = repository.delete(id);
+        assertFalse(success);
+        System.out.println("Success: " + success);
     }
 
     //@Test
     //void e_getAll() {
-       // System.out.println("Show all: ");
-        //System.out.println(getAll);
+    // System.out.println("Show all: ");
+    //System.out.println(getAll);
     //}
 }

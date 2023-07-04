@@ -14,6 +14,5 @@ import za.ac.cput.domain.impl.Reservations;
 public interface IReservationsRepository extends JpaRepository<Reservations, Integer> {
 
 
-
 }
 

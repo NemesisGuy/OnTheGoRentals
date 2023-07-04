@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.Random;
 
 public class MaintenanceFactory implements IFactory<Maintenance> {
-    public Maintenance createMaintenance(String maintenanceType, String serviceProvider,LocalDate serviceDate){
+    public Maintenance createMaintenance(String maintenanceType, String serviceProvider, LocalDate serviceDate) {
         return new Maintenance.Builder()
                 .setId(new Random().nextInt(1000000))
                 .setMaintenanceType(maintenanceType)

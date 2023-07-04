@@ -14,11 +14,13 @@ import za.ac.cput.repository.IReservationsRepository;
 import za.ac.cput.service.IReservationsService;
 
 import java.util.List;
+
 @Service
 public class ReservationsServiceImpl implements IReservationsService {
 
     @Autowired
     private IReservationsRepository repository;
+
     private ReservationsServiceImpl(IReservationsRepository repository) {
         this.repository = repository;
     }

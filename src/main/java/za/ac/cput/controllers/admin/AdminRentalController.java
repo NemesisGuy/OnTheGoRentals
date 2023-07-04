@@ -9,13 +9,8 @@ package za.ac.cput.controllers.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.impl.Car;
 import za.ac.cput.domain.impl.Rental;
-import za.ac.cput.domain.impl.User;
-import za.ac.cput.factory.impl.RentalFactory;
-import za.ac.cput.service.impl.ICarServiceImpl;
 import za.ac.cput.service.impl.IRentalServiceImpl;
-import za.ac.cput.service.impl.IUserServiceImpl;
 
 import java.util.ArrayList;
 
@@ -23,16 +18,7 @@ import java.util.ArrayList;
 @RequestMapping("/api/admin/rentals")
 public class AdminRentalController {
     @Autowired
-    private RentalFactory rentalFactory;
-
-    @Autowired
     private IRentalServiceImpl rentalService;
-
-    @Autowired
-    private IUserServiceImpl userService;
-
-    @Autowired
-    private ICarServiceImpl carService;
 
     @GetMapping("/list/all")
     public ArrayList<Rental> getAll() {
@@ -49,12 +35,15 @@ public class AdminRentalController {
        /* User user = userService.read(rental.getUser().getId());
         Car car = carService.read(rental.getCar().getId());
 
-        rental.setUser(user);
-        rental.setCar(car);*/
+*/
 
-        Rental createdRental = rentalFactory.create(rental);
-        createdRental = rentalService.create(createdRental);
-        return createdRental;
+        System.out.println(rental.getUser());
+        System.out.println(rental.getCar());
+        System.out.println(rental.getIssuedDate());
+        System.out.println(rental.getReturnedDate());
+
+
+        return rentalService.create(rental);
     }
 
     @GetMapping("/read/{rentalId}")
@@ -66,8 +55,22 @@ public class AdminRentalController {
     }
 
     @PutMapping("/update/{rentalId}")
-    public Rental updateRental(@PathVariable int rentalId, @RequestBody Rental updatedRental) {
-        Rental updated = rentalService.update(updatedRental);
+    public Rental updateRental(@PathVariable int rentalId, @RequestBody Rental rental) {
+
+        System.out.println("/api/admin/rentals/update was triggered");
+        System.out.println(rental.toString());
+        System.out.println("issued by: " + rental.getIssuer());
+        System.out.println("rental Id: " + rental.getRentalId());
+        System.out.println("rental user: " + rental.getUser());
+        System.out.println("rental car: " + rental.getCar());
+        System.out.println("rental issued date: " + rental.getIssuedDate());
+        System.out.println("rental returned date: " + rental.getReturnedDate());
+
+
+        Rental updated = rentalService.update(rental);
+        System.out.println("updated rental: " + updated);//no id here ??
+
+
         return updated;
     }
 

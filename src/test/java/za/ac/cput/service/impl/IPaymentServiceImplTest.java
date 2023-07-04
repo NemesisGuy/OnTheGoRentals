@@ -1,13 +1,14 @@
 package za.ac.cput.service.impl;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import za.ac.cput.domain.impl.Payment;
 import za.ac.cput.factory.impl.PaymentFactory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class IPaymentServiceImplTest {

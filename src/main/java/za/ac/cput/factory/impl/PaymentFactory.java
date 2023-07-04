@@ -7,7 +7,6 @@ package za.ac.cput.factory.impl;
  */
 
 import za.ac.cput.domain.impl.Payment;
-import za.ac.cput.domain.impl.Rental;
 import za.ac.cput.factory.IFactory;
 
 import java.time.LocalDate;

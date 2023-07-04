@@ -25,6 +25,10 @@ public class Address {
         this.postcode = builder.postcode;
     }
 
+    public static Address.Builder builder() {
+        return new Address.Builder();
+    }
+
     public String getStreetNumber() {
         return streetNumber;
     }
@@ -48,9 +52,6 @@ public class Address {
     public int getPostcode() {
         return postcode;
     }
-    public static Address.Builder builder() {
-        return new Address.Builder();
-    }
 
     @Override
     public String toString() {
@@ -64,7 +65,7 @@ public class Address {
                 '}';
     }
 
-    public static class Builder{
+    public static class Builder {
         private String streetNumber;
         private String streetName;
         private String suburb;
@@ -102,7 +103,8 @@ public class Address {
             this.postcode = postcode;
             return this;
         }
-        public Builder copy (Address address){
+
+        public Builder copy(Address address) {
             this.streetNumber = Address.streetNumber;
             this.streetName = Address.streetName;
             this.suburb = Address.suburb;
@@ -111,6 +113,7 @@ public class Address {
             this.postcode = Address.postcode;
             return this;
         }
+
         public Address build() {
             return new Address(this);
         }

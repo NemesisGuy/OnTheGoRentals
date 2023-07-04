@@ -13,6 +13,7 @@ import java.util.List;
 
 public interface IDamageReportService {
     DamageReport create(DamageReport damageReport);
+
     boolean delete(int id);
 
     List<DamageReport> getAll();

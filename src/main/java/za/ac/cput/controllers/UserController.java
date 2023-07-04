@@ -43,6 +43,7 @@ public class UserController {
         // Return an appropriate response, such as a success message or error message
         return "User logged in successfully";
     }
+
     @GetMapping("/profile/{userId}")
     public User readUser(@PathVariable Integer userId) {
         System.out.println("/api/admin/users/read was triggered");

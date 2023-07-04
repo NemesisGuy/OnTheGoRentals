@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class MaintenanceRepositoryImpl implements IMaintenanceRepository {
     private static MaintenanceRepositoryImpl repository = null;
-    private Set<Maintenance> maintenanceDB=null;
+    private Set<Maintenance> maintenanceDB = null;
 
     private MaintenanceRepositoryImpl() {
         maintenanceDB = new HashSet<Maintenance>();
@@ -31,15 +31,15 @@ public class MaintenanceRepositoryImpl implements IMaintenanceRepository {
     @Override
     public Maintenance create(Maintenance maintenance) {
         boolean success = maintenanceDB.add(maintenance);
-        if(!success)
+        if (!success)
             return null;
         return maintenance;
     }
 
     @Override
     public Maintenance read(Integer id) {
-        for(Maintenance m: maintenanceDB){
-            if(m.getId()==(id)){
+        for (Maintenance m : maintenanceDB) {
+            if (m.getId() == (id)) {
                 return m;
             }
         }
@@ -49,15 +49,15 @@ public class MaintenanceRepositoryImpl implements IMaintenanceRepository {
     @Override
     public Maintenance update(Maintenance maintenance) {
         Maintenance maintenanceOriginal = read(maintenance.getId());
-        if(maintenanceOriginal == null)
+        if (maintenanceOriginal == null)
             return null;
 
         boolean successDelete = maintenanceDB.remove(maintenanceOriginal);
-        if(!successDelete)
+        if (!successDelete)
             return null;
 
         boolean successAdd = maintenanceDB.add(maintenance);
-        if(!successAdd)
+        if (!successAdd)
             return null;
         return maintenance;
     }
@@ -69,8 +69,8 @@ public class MaintenanceRepositoryImpl implements IMaintenanceRepository {
 
         if (maintenanceToDelete == null)
             return false;
-            maintenanceDB.remove(maintenanceToDelete);
-            return true;
+        maintenanceDB.remove(maintenanceToDelete);
+        return true;
 
     }
 

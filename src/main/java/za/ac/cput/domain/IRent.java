@@ -14,9 +14,6 @@ public interface IRent extends IDomain {
 
     int getId();
 
-    int getBorrower();
-
-
 
     int getIssuer();
 
@@ -27,7 +24,6 @@ public interface IRent extends IDomain {
     int getReceiver();
 
     boolean finePaid();
-
 
 
 }

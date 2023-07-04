@@ -6,6 +6,7 @@ import za.ac.cput.repository.impl.IPaymentRepositoryImpl;
 import za.ac.cput.service.IPaymentService;
 
 import java.util.List;
+
 @Service
 public class IPaymentServiceImpl implements IPaymentService {
     private static IPaymentServiceImpl service;

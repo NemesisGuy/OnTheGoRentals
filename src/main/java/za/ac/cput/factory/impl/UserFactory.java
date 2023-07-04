@@ -3,6 +3,7 @@ package za.ac.cput.factory.impl;
 import org.springframework.stereotype.Component;
 import za.ac.cput.domain.impl.User;
 import za.ac.cput.factory.IFactory;
+
 @Component
 public class UserFactory implements IFactory<User> {
 
@@ -26,6 +27,7 @@ public class UserFactory implements IFactory<User> {
 
         return User.builder().build();
     }
+
     public User create(User user) {
         return User.builder()
                 .copy(user)

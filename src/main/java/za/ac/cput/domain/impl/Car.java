@@ -22,11 +22,6 @@ public class Car implements IDomain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-/*
-    @OneToMany(mappedBy = "user")
-    private List<Rental> rentals = new ArrayList<>();
-*/
-
     @OneToMany(mappedBy = "car")
     private List<Rental> rentals = new ArrayList<>();
     private String make;
@@ -100,8 +95,9 @@ public class Car implements IDomain {
         return Objects.hash(getId(), getMake(), getModel(), getYear(), getCategory(), getLicensePlate());
     }
 
+
     public String getPriceGroupString() {
-        return priceGroup.toString();
+        return priceGroup != null ? priceGroup.toString() : "NONE";
     }
 
     @Override
@@ -116,6 +112,7 @@ public class Car implements IDomain {
                 ", licensePlate='" + licensePlate + '\'' +
                 '}';
     }
+
 
     public static class Builder {
         private int id;

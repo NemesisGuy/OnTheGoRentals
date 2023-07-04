@@ -7,19 +7,15 @@ package za.ac.cput.domain.impl;
  */
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-//import org.springframework.data.annotation.Id;
 
-import java.io.Serializable;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
 
-public class Reservations  {
+public class Reservations {
     //@jakarta.persistence.Id
     @Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,11 +26,9 @@ public class Reservations  {
     private String returnLocation;
     private LocalDate returnDate;
     private Time returnTme;
-
     protected Reservations() {
 
     }
-
     public Reservations(Builder builder) {
         this.id = builder.id;
         this.pickUpLocation = builder.pickUpLocation;

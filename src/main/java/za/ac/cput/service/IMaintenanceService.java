@@ -5,10 +5,13 @@ import za.ac.cput.domain.impl.Maintenance;
 import java.util.Set;
 
 public interface IMaintenanceService {
-        Maintenance create(Maintenance maintenance);
-        Maintenance read(Integer id);
-        Maintenance update(Maintenance maintenance);
-        boolean delete(Integer id);
+    Maintenance create(Maintenance maintenance);
 
-        Set<Maintenance> getAll();
-    }
+    Maintenance read(Integer id);
+
+    Maintenance update(Maintenance maintenance);
+
+    boolean delete(Integer id);
+
+    Set<Maintenance> getAll();
+}

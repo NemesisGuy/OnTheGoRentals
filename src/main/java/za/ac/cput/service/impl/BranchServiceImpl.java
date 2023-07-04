@@ -18,16 +18,17 @@ public class BranchServiceImpl implements IBranchService {
     private static BranchServiceImpl service;
     private static BranchRepositoryImpl repository;
 
-    private BranchServiceImpl(){
+    private BranchServiceImpl() {
         repository = BranchRepositoryImpl.getRepository();
     }
 
-    public static BranchServiceImpl getService(){
-        if (service == null){
+    public static BranchServiceImpl getService() {
+        if (service == null) {
             service = new BranchServiceImpl();
         }
         return service;
     }
+
     @Override
     public Branch create(Branch branch) {
         Branch created = repository.create(branch);

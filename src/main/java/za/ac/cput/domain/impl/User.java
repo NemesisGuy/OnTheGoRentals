@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-public class User implements IDomain{
-
+public class User implements IDomain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -24,24 +23,26 @@ public class User implements IDomain{
     private String pictureUrl;
     private String role;
 
-
     public User() {
         // Default constructor
     }
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
 
     public User(int id, String userName, String email, String pictureUrl) {
         this.id = id;
         this.userName = userName;
         this.email = email;
         this.pictureUrl = pictureUrl;
+    }
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getUserName() {
@@ -83,12 +84,10 @@ public class User implements IDomain{
         User user = (User) o;
         return id == user.id && Objects.equals(userName, user.userName) && Objects.equals(email, user.email) && Objects.equals(pictureUrl, user.pictureUrl) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(phoneNumber, user.phoneNumber) && Objects.equals(password, user.password) && Objects.equals(role, user.role);
     }
-
     @Override
     public int hashCode() {
         return Objects.hash(id, userName, email, pictureUrl, firstName, lastName, phoneNumber, password, role);
     }
-
     @Override
     public String toString() {
         return "User{" +
@@ -102,10 +101,6 @@ public class User implements IDomain{
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
                 '}';
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
     public static class Builder {
         private int id;
@@ -132,7 +127,6 @@ public class User implements IDomain{
             this.email = email;
             return this;
         }
-
         public Builder pictureUrl(String pictureUrl) {
             this.pictureUrl = pictureUrl;
             return this;
@@ -189,6 +183,5 @@ public class User implements IDomain{
             this.role = user.role;
             return this;
         }
-
     }
 }

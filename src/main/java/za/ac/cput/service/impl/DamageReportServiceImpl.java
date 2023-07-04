@@ -42,6 +42,7 @@ public class DamageReportServiceImpl implements IDamageReportService {
 
         return repository.delete(id);
     }
+
     @Override
     public List<DamageReport> getAll() {
 

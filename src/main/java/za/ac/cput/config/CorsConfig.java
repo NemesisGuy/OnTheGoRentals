@@ -5,6 +5,7 @@ package za.ac.cput.config;
  * Author: Peter Buckingham (220165289)
  * Date: 05 April 2023
  */
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

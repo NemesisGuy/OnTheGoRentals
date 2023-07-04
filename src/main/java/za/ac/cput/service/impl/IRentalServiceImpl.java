@@ -1,10 +1,8 @@
 package za.ac.cput.service.impl;
 
-import jakarta.persistence.Access;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.impl.Rental;
-import za.ac.cput.domain.impl.User;
 import za.ac.cput.factory.impl.RentalFactory;
 import za.ac.cput.repository.IRentalRepository;
 import za.ac.cput.service.IRentalService;
@@ -14,7 +12,7 @@ import java.util.ArrayList;
 @Service("rentalServiceImpl")
 public class IRentalServiceImpl implements IRentalService {
     @Autowired
-    private IRentalRepository repository ;
+    private IRentalRepository repository;
     @Autowired
     private RentalFactory rentalFactory;
 
@@ -32,7 +30,7 @@ public class IRentalServiceImpl implements IRentalService {
 
     @Override
     public Rental read(Integer integer) {
-      return this.repository.findById(integer).orElse(null);
+        return this.repository.findById(integer).orElse(null);
     }
 
 
@@ -43,14 +41,25 @@ public class IRentalServiceImpl implements IRentalService {
 
     @Override
     public Rental update(Rental rental) {
-        return this.repository.save(rental);
+        System.out.println("IRentalServiceImpl.update : ");
+        System.out.println("rental Id recived : " + rental.getRentalId());
+
+        if (repository.existsById(rental.getRentalId())) {
+
+            System.out.println("Rental " + rental.getRentalId() + " found");
+            System.out.println(rental.toString());
+            Rental updatedRental = rentalFactory.create(rental);
+            return repository.save(updatedRental);
+        }
+        System.out.println("Rental " + rental.getRentalId() + " not found");
+        return null;
     }
+
 
     @Override
     public boolean delete(Integer integer) {
 
-        if (this.repository.existsById(integer))
-        {
+        if (this.repository.existsById(integer)) {
             this.repository.deleteById(integer);
             return true;
         }
@@ -59,8 +68,7 @@ public class IRentalServiceImpl implements IRentalService {
 
     @Override
     public boolean delete(int id) {
-        if (this.repository.existsById(id))
-        {
+        if (this.repository.existsById(id)) {
             this.repository.deleteById(id);
             return true;
         }
@@ -73,3 +81,4 @@ public class IRentalServiceImpl implements IRentalService {
         return (ArrayList<Rental>) this.repository.findAll();
     }
 }
+

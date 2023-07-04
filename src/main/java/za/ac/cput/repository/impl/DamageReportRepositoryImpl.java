@@ -5,6 +5,7 @@ package za.ac.cput.repository.impl;
  * Author: Cwenga Dlova (214310671)
  * Date:  07 April 2023
  */
+
 import za.ac.cput.domain.impl.DamageReport;
 import za.ac.cput.repository.IDamageReportRepository;
 
@@ -13,11 +14,10 @@ import java.util.List;
 
 public class DamageReportRepositoryImpl implements IDamageReportRepository {
 
+    private static DamageReportRepositoryImpl repository = null;
     private List<DamageReport> reportDB;
 
-    private static DamageReportRepositoryImpl repository = null;
-
-    private DamageReportRepositoryImpl(){
+    private DamageReportRepositoryImpl() {
         reportDB = new ArrayList<>();
     }
 
@@ -27,6 +27,7 @@ public class DamageReportRepositoryImpl implements IDamageReportRepository {
         }
         return repository;
     }
+
     @Override
     public DamageReport create(DamageReport damageReport) {
         reportDB.add(damageReport);
@@ -35,7 +36,7 @@ public class DamageReportRepositoryImpl implements IDamageReportRepository {
 
     @Override
     public DamageReport read(Integer id) {
-        DamageReport damageReport = reportDB.stream().filter(r -> r.getId() == id).findAny().orElse(null) ;
+        DamageReport damageReport = reportDB.stream().filter(r -> r.getId() == id).findAny().orElse(null);
         return damageReport;
 
     }
@@ -59,6 +60,7 @@ public class DamageReportRepositoryImpl implements IDamageReportRepository {
         reportDB.remove(deleteReport);
         return true;
     }
+
     @Override
     public DamageReport getDamageReportById(Integer id) {
         return null;

@@ -17,24 +17,23 @@ import za.ac.cput.factory.impl.PaymentFactory;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class PaymentControllerTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
-
     //testing
     private final String baseURL = "http://localhost:8080/api/payment";
-
     Payment payment = PaymentFactory.createPayment(
             2000.00,
             "cash",
             LocalDate.parse("01-01-23", DateTimeFormatter.ofPattern("MM-dd-yy")),
             01
     );
+    @Autowired
+    private TestRestTemplate restTemplate;
 
     @Test
     void a_processPayment() {

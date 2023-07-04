@@ -6,15 +6,15 @@ import za.ac.cput.domain.impl.Maintenance;
 import za.ac.cput.factory.impl.MaintenanceFactory;
 
 class MaintenanceFactoryTest {
-@Test
-    void testMaintenance(){
+    @Test
+    void testMaintenance() {
 
-    MaintenanceFactory maintenanceFactory = new MaintenanceFactory();
-    Maintenance maintenance = maintenanceFactory.create();
+        MaintenanceFactory maintenanceFactory = new MaintenanceFactory();
+        Maintenance maintenance = maintenanceFactory.create();
 
-    Assertions.assertNotNull(maintenance);
-    Assertions.assertNotNull(maintenance.getId());
+        Assertions.assertNotNull(maintenance);
+        Assertions.assertNotNull(maintenance.getId());
 
-}
+    }
 
 }

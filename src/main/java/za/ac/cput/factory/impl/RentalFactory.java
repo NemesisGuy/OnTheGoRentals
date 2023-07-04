@@ -1,16 +1,11 @@
 package za.ac.cput.factory.impl;
 
-import jakarta.persistence.*;
-import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Component;
-import za.ac.cput.domain.IRent;
 import za.ac.cput.domain.impl.Car;
 import za.ac.cput.domain.impl.Rental;
 import za.ac.cput.domain.impl.User;
 
-
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -52,20 +47,19 @@ public class RentalFactory {
 */
 
 
+    public Rental create(int id, User user, Car car, int issuer, int receiver, int fine, LocalDateTime issuedDate, LocalDateTime returnedDate) {
 
-            public Rental create(int id,User user,Car  car,  int issuer,int receiver, int fine, LocalDateTime issuedDate,  LocalDateTime returnedDate) {
-
-            return new Rental.Builder()
-                    .setId(id)
-                    .setUser(user)
-                    .setCar(car)
-                    .setIssuer(issuer)
-                    .setReceiver(receiver)
-                    .setFine(fine)
-                    .setIssuedDate(issuedDate)
-                    .setDateReturned(returnedDate)
-                    .build();
-        }
+        return new Rental.Builder()
+                .setId(id)
+                .setUser(user)
+                .setCar(car)
+                .setIssuer(issuer)
+                .setReceiver(receiver)
+                .setFine(fine)
+                .setIssuedDate(issuedDate)
+                .setDateReturned(returnedDate)
+                .build();
     }
+}
 
 

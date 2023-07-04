@@ -1,4 +1,3 @@
-
 /* BranchRepositoryImpl.java
  Entity for the Branch
  Author: Asiphe Funda (215092317)
@@ -19,24 +18,26 @@ public class BranchRepositoryImpl implements IBranchRepository {
     private BranchRepositoryImpl() {
         branchDB = new HashSet<Branch>();
     }
-    public static BranchRepositoryImpl getRepository(){
-        if(repository ==null){
+
+    public static BranchRepositoryImpl getRepository() {
+        if (repository == null) {
             repository = new BranchRepositoryImpl();
         }
         return repository;
     }
+
     @Override
     public Branch create(Branch branch) {
         boolean success = branchDB.add(branch);
-        if(!success)
+        if (!success)
             return null;
         return branch;
     }
 
     @Override
     public Branch read(Integer id) {
-        for(Branch b: branchDB){
-            if(b.getId()==(id)){
+        for (Branch b : branchDB) {
+            if (b.getId() == (id)) {
                 return b;
             }
         }
@@ -46,15 +47,15 @@ public class BranchRepositoryImpl implements IBranchRepository {
     @Override
     public Branch update(Branch branch) {
         Branch branchOriginal = read(branch.getId());
-        if(branchOriginal == null)
+        if (branchOriginal == null)
             return null;
 
         boolean successDelete = branchDB.remove(branchOriginal);
-        if(!successDelete)
+        if (!successDelete)
             return null;
 
         boolean successAdd = branchDB.add(branch);
-        if(!successAdd)
+        if (!successAdd)
             return null;
         return branch;
     }
@@ -62,15 +63,17 @@ public class BranchRepositoryImpl implements IBranchRepository {
     @Override
     public boolean delete(Integer id) {
         Branch branchToDelete = read(id);
-        if(branchToDelete == null)
+        if (branchToDelete == null)
             return false;
         branchDB.remove(branchToDelete);
         return true;
     }
+
     @Override
     public Set<Branch> getAll() {
         return branchDB;
     }
+
     @Override
     public Branch getBranchById(Integer id) {
 

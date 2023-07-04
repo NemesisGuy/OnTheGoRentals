@@ -7,13 +7,12 @@ package za.ac.cput.domain.impl;
  */
 
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.IPayment;
 
-
-import jakarta.persistence.Entity;
 import java.time.LocalDate;
 import java.util.Objects;
 

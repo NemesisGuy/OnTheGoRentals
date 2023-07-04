@@ -3,9 +3,7 @@ package za.ac.cput.domain.impl;
 import java.util.Objects;
 
 public class Branch {
-
     private int id;
-
     private String branchName;
     private Address address;
     private String email;
@@ -15,6 +13,10 @@ public class Branch {
         this.branchName = builder.branchName;
         this.address = builder.address;
         this.email = builder.email;
+    }
+
+    public static Branch.Builder builder() {
+        return new Branch.Builder();
     }
 
     public int getId() {
@@ -31,10 +33,6 @@ public class Branch {
 
     public String getEmail() {
         return email;
-    }
-
-    public static Branch.Builder builder() {
-        return new Branch.Builder();
     }
 
     @Override

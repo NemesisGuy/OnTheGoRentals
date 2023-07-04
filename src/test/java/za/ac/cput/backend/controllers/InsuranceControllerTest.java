@@ -12,23 +12,21 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import za.ac.cput.domain.impl.Insurance;
-import za.ac.cput.domain.impl.Payment;
 import za.ac.cput.factory.impl.InsuranceFactory;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class InsuranceControllerTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
-
     //testing
     private final String baseURL = "http://localhost:8080/api/insurance";
-
+    @Autowired
+    private TestRestTemplate restTemplate;
     private Insurance insurance = InsuranceFactory.createInsurance(
             "Collision Damage Waiver",
             42000.0,
@@ -50,6 +48,7 @@ class InsuranceControllerTest {
         assertEquals(saved.getId(), saved.getId());
         System.out.println("Saved data: " + saved);
     }
+
     @Disabled
     @Test
     void b_read() {

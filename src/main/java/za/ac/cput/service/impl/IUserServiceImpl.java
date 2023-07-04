@@ -2,18 +2,17 @@ package za.ac.cput.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.impl.Car;
 import za.ac.cput.domain.impl.User;
+import za.ac.cput.factory.impl.UserFactory;
 import za.ac.cput.repository.IUserRepository;
 import za.ac.cput.service.IUserService;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Optional;
-import za.ac.cput.factory.impl.UserFactory;
 
 @Service("userServiceImpl")
 public class IUserServiceImpl implements IUserService {
-    private  IUserRepository repository = null;
+    private IUserRepository repository = null;
     private UserFactory userFactory;
 
     @Autowired
@@ -21,7 +20,6 @@ public class IUserServiceImpl implements IUserService {
         this.repository = repository;
         this.userFactory = userFactory;
     }
-
 
 
     @Override
@@ -32,8 +30,8 @@ public class IUserServiceImpl implements IUserService {
 
     @Override
     public User read(Integer integer) {
-      //  Optional<Car> optionalCar = this.repository.findById(id);
-        Optional <User> optionalUser = this.repository.findById(integer);
+        //  Optional<Car> optionalCar = this.repository.findById(id);
+        Optional<User> optionalUser = this.repository.findById(integer);
         return optionalUser.orElse(null);
 
 
@@ -77,7 +75,6 @@ public class IUserServiceImpl implements IUserService {
 
         return (ArrayList<User>) this.repository.findAll();
     }
-
 
 
 }

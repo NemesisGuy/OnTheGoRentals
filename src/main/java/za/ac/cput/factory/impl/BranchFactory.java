@@ -14,8 +14,7 @@ import java.util.Random;
 
 public class BranchFactory implements IFactory<Branch> {
 
-    public static Branch createBranch(String branchName)
-    {
+    public static Branch createBranch(String branchName) {
         return new Branch.Builder()
                 .setId(new Random().nextInt(1000))
                 .setBranchName(branchName)

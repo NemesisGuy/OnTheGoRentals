@@ -5,14 +5,11 @@ package za.ac.cput.controllers;
  * Class for the Reservations Controller
  * Author: Cwenga Dlova (214310671)
  * Date:  13 June 2023
- *
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.impl.Reservations;
-import za.ac.cput.factory.impl.ReservationsFactory;
 import za.ac.cput.service.impl.ReservationsServiceImpl;
 
 import java.util.List;
@@ -29,7 +26,7 @@ public class ReservationsController {
     @PostMapping("/create")
     public Reservations create(@RequestBody Reservations reservations) {
 
-      //  Reservations reservationcreated = ReservationsFactory.createReservations(reservations.getId(), reservations.getPickUpLocation(), reservations.getPickUpDate(), reservations.getPickUpTime(), reservations.getReturnLocation(), reservations.getReturnDate(), reservations.getReturnTme());
+        //  Reservations reservationcreated = ReservationsFactory.createReservations(reservations.getId(), reservations.getPickUpLocation(), reservations.getPickUpDate(), reservations.getPickUpTime(), reservations.getReturnLocation(), reservations.getReturnDate(), reservations.getReturnTme());
         return reservationsService.create(reservations);
     }
 

@@ -10,10 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import za.ac.cput.domain.impl.Car;
 
 
-
-
 public interface ICarRepository extends JpaRepository<Car, Integer> {
-
 
 
 }
