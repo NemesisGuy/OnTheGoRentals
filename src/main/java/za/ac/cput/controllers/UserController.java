@@ -9,6 +9,11 @@ package za.ac.cput.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+/*import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;*/
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.impl.User;
 import za.ac.cput.service.impl.IUserServiceImpl;
@@ -20,6 +25,11 @@ public class UserController {
     @Qualifier("userServiceImpl")
     private IUserServiceImpl userService;
 
+
+
+ /*   @Autowired
+    UserDetailsService userDetailsService;
+*/
 
     @PostMapping("/register")
     public User register(@RequestBody User registrationRequest) {
@@ -36,13 +46,29 @@ public class UserController {
         return createdUser;
     }
 
+
     @PostMapping("/login")
     public String login(@RequestBody User loginRequest) {
         // Implement the logic to handle user login
-        // Retrieve the user credentials from the request and authenticate the user
-        // Return an appropriate response, such as a success message or error message
+        String username = loginRequest.getUserName();
+        String password = loginRequest.getPassword();
         return "User logged in successfully";
+
+    /*    // Authenticate the user
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, password);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Return an appropriate response
+        if (authentication.isAuthenticated()) {
+            // User is authenticated
+            return "User logged in successfully";
+        } else {
+            // Authentication failed
+            return "Authentication failed";
+        }*/
     }
+
 
     @GetMapping("/profile/{userId}")
     public User readUser(@PathVariable Integer userId) {

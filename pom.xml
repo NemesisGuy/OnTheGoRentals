@@ -62,11 +62,13 @@
             <scope>compile</scope>
         </dependency>
 
-        <!--   <dependency>
+<!--
+        <dependency>
                <groupId>org.springframework.boot</groupId>
                <artifactId>spring-boot-starter-security</artifactId>
            </dependency>
-   -->
+-->
+
         <!-- Update the Jackson dependencies -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
