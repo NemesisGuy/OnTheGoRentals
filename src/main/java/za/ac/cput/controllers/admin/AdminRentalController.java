@@ -9,7 +9,7 @@ package za.ac.cput.controllers.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.impl.Rental;
+import za.ac.cput.domain.Rental;
 import za.ac.cput.service.impl.IRentalServiceImpl;
 
 import java.util.ArrayList;

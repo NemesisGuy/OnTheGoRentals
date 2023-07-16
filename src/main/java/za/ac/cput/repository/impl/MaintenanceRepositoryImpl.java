@@ -5,7 +5,7 @@
 */
 package za.ac.cput.repository.impl;
 
-import za.ac.cput.domain.impl.Maintenance;
+import za.ac.cput.domain.Maintenance;
 import za.ac.cput.repository.IMaintenanceRepository;
 
 import java.util.HashSet;

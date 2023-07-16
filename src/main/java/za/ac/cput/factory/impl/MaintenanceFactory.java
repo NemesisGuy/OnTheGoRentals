@@ -5,7 +5,7 @@
 */
 package za.ac.cput.factory.impl;
 
-import za.ac.cput.domain.impl.Maintenance;
+import za.ac.cput.domain.Maintenance;
 import za.ac.cput.factory.IFactory;
 
 import java.time.LocalDate;

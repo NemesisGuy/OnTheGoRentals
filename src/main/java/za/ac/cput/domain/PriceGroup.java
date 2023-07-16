@@ -1,4 +1,4 @@
-package za.ac.cput.domain.impl;
+package za.ac.cput.domain;
 /**
  * FileName: PriceGroup.java
  * Author: Group

@@ -15,7 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;*/
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.impl.User;
+import za.ac.cput.domain.User;
 import za.ac.cput.service.impl.IUserServiceImpl;
 
 @RestController

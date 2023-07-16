@@ -1,4 +1,4 @@
-package za.ac.cput.domain.impl;
+package za.ac.cput.domain;
 /**
  * Payment.java
  * Class for the Payment
@@ -11,13 +11,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import org.springframework.data.annotation.Id;
-import za.ac.cput.domain.IPayment;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-public class Payment implements IPayment {
+public class Payment  {
     @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,9 +1,5 @@
 package za.ac.cput.domain;
 
-import za.ac.cput.domain.impl.Car;
-import za.ac.cput.domain.impl.Rental;
-import za.ac.cput.domain.impl.User;
-
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

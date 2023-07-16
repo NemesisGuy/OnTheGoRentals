@@ -2,7 +2,7 @@ package za.ac.cput.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.impl.Branch;
+import za.ac.cput.domain.Branch;
 import za.ac.cput.factory.impl.BranchFactory;
 import za.ac.cput.service.IBranchService;
 

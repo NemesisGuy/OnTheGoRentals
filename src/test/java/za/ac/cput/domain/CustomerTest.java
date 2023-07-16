@@ -1,7 +1,5 @@
 package za.ac.cput.domain;
 
-import za.ac.cput.domain.impl.Customer;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CustomerTest {

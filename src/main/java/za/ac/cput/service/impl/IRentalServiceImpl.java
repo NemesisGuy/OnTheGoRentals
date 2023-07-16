@@ -2,13 +2,12 @@ package za.ac.cput.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.impl.Car;
-import za.ac.cput.domain.impl.Rental;
-import za.ac.cput.domain.impl.User;
+import za.ac.cput.domain.Car;
+import za.ac.cput.domain.Rental;
+import za.ac.cput.domain.User;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.UserCantRentMoreThanOneCarException;
 import za.ac.cput.factory.impl.RentalFactory;
-import za.ac.cput.repository.ICarRepository;
 import za.ac.cput.repository.IRentalRepository;
 import za.ac.cput.service.IRentalService;
 
@@ -34,7 +33,7 @@ public class IRentalServiceImpl implements IRentalService {
     public Rental create(Rental rental) {
         if (isCarAvailable(rental)) {
             if (isCurrentlyRenting(rental.getUser())) {
-                throw new UserCantRentMoreThanOneCarException("User is currently renting a car and cannot rent another car.");
+                throw new UserCantRentMoreThanOneCarException(rental.getUser().getFirstName() + " " + rental.getUser().getLastName() + " is currently renting " +  getCurrentRental(rental.getUser()).getCar().getMake() + " " + getCurrentRental(rental.getUser()).getCar().getModel() + " " + getCurrentRental(rental.getUser()).getCar().getLicensePlate());
             }
             Rental newRental = rentalFactory.create(rental);
             return repository.save(newRental);
@@ -199,6 +198,18 @@ public class IRentalServiceImpl implements IRentalService {
 
         return false;
     }
+    public Rental getCurrentRental(User user) {
+        // Find active rentals for the user
+        List<Rental> activeRentals = repository.findByUserIdAndReturnedDateIsNull(user.getId());
+
+        // If the user has any active rentals, they are currently renting a car
+        if (!activeRentals.isEmpty()) {
+            return activeRentals.get(0);
+        }
+
+        return null;
+    }
+
 
 
 }

@@ -7,7 +7,7 @@ package za.ac.cput.service;
  * Date:  10 June 2023
  */
 
-import za.ac.cput.domain.impl.DamageReport;
+import za.ac.cput.domain.DamageReport;
 
 import java.util.List;
 

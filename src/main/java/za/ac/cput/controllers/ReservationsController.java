@@ -9,7 +9,7 @@ package za.ac.cput.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.impl.Reservations;
+import za.ac.cput.domain.Reservations;
 import za.ac.cput.service.impl.ReservationsServiceImpl;
 
 import java.util.List;

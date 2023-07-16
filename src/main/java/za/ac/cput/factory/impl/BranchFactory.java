@@ -7,7 +7,7 @@
 package za.ac.cput.factory.impl;
 
 
-import za.ac.cput.domain.impl.Branch;
+import za.ac.cput.domain.Branch;
 import za.ac.cput.factory.IFactory;
 
 import java.util.Random;

@@ -9,7 +9,7 @@ package za.ac.cput.controllers;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import za.ac.cput.domain.impl.Customer;
+import za.ac.cput.domain.Customer;
 
 import java.util.ArrayList;
 import java.util.List;

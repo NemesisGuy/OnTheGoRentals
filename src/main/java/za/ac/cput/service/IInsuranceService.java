@@ -1,6 +1,6 @@
 package za.ac.cput.service;
 
-import za.ac.cput.domain.impl.Insurance;
+import za.ac.cput.domain.Insurance;
 
 import java.util.List;
 

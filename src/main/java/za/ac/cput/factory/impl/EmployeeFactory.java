@@ -1,6 +1,6 @@
 package za.ac.cput.factory.impl;
 
-import za.ac.cput.domain.impl.Employee;
+import za.ac.cput.domain.Employee;
 import za.ac.cput.factory.IFactoryEmployee;
 
 import java.util.List;

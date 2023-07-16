@@ -2,7 +2,7 @@ package za.ac.cput.factory;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import za.ac.cput.domain.impl.Payment;
+import za.ac.cput.domain.Payment;
 import za.ac.cput.factory.impl.PaymentFactory;
 
 class PaymentFactoryTest {

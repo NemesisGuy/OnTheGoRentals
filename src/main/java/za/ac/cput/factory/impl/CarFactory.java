@@ -1,8 +1,8 @@
 package za.ac.cput.factory.impl;
 
 import org.springframework.stereotype.Component;
-import za.ac.cput.domain.impl.Car;
-import za.ac.cput.domain.impl.PriceGroup;
+import za.ac.cput.domain.Car;
+import za.ac.cput.domain.PriceGroup;
 import za.ac.cput.factory.IFactory;
 
 @Component

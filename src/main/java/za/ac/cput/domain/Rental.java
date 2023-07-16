@@ -1,8 +1,7 @@
-package za.ac.cput.domain.impl;
+package za.ac.cput.domain;
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.Id;
-import za.ac.cput.domain.IRent;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 
 
 @Entity
-public class Rental implements IRent {
+public class Rental {
     @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,7 +68,7 @@ public class Rental implements IRent {
         return this.id;
     }
 
-    @Override
+
     public int getId() {
         return 0;
     }
@@ -86,7 +85,7 @@ public class Rental implements IRent {
         return issuedDate;
     }
 
-    @Override
+
     public LocalDateTime getReturnedDate() {
         return returnedDate;
     }
@@ -95,7 +94,7 @@ public class Rental implements IRent {
         return receiver;
     }
 
-    @Override
+
     public boolean finePaid() {
         return false;
     }

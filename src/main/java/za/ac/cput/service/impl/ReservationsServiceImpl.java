@@ -9,7 +9,7 @@ package za.ac.cput.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.impl.Reservations;
+import za.ac.cput.domain.Reservations;
 import za.ac.cput.repository.IReservationsRepository;
 import za.ac.cput.service.IReservationsService;
 

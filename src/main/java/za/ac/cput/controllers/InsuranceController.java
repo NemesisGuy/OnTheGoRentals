@@ -2,7 +2,7 @@ package za.ac.cput.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.impl.Insurance;
+import za.ac.cput.domain.Insurance;
 import za.ac.cput.service.IInsuranceService;
 
 import java.util.List;

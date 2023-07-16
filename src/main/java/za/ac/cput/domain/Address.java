@@ -4,7 +4,7 @@
  Date: 19 March 2023
 */
 
-package za.ac.cput.domain.impl;
+package za.ac.cput.domain;
 
 
 public class Address {

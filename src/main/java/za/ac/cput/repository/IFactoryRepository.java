@@ -6,7 +6,7 @@ package za.ac.cput.repository;
  * Date: 1 April 2023
  */
 
-import za.ac.cput.domain.impl.Feedback;
+import za.ac.cput.domain.Feedback;
 
 import java.util.List;
 

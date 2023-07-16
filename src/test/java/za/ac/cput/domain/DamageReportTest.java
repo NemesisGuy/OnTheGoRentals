@@ -8,10 +8,6 @@ package za.ac.cput.domain;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import za.ac.cput.domain.impl.Car;
-import za.ac.cput.domain.impl.Customer;
-import za.ac.cput.domain.impl.DamageReport;
-import za.ac.cput.domain.impl.Rental;
 
 import java.time.LocalDate;
 

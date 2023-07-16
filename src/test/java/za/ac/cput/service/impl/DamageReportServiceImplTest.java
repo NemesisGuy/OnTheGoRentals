@@ -8,7 +8,7 @@ package za.ac.cput.service.impl;
  */
 
 import org.junit.jupiter.api.Test;
-import za.ac.cput.domain.impl.DamageReport;
+import za.ac.cput.domain.DamageReport;
 import za.ac.cput.factory.impl.DamageReportFactory;
 import za.ac.cput.repository.impl.DamageReportRepositoryImpl;
 

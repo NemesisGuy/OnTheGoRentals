@@ -1,7 +1,7 @@
 package za.ac.cput.service.impl;
 
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.impl.Payment;
+import za.ac.cput.domain.Payment;
 import za.ac.cput.repository.impl.IPaymentRepositoryImpl;
 import za.ac.cput.service.IPaymentService;
 

@@ -1,7 +1,7 @@
 package za.ac.cput.service;
 
 
-import za.ac.cput.domain.impl.Branch;
+import za.ac.cput.domain.Branch;
 
 import java.util.Set;
 

@@ -1,6 +1,6 @@
 package za.ac.cput.factory.impl;
 
-import za.ac.cput.domain.impl.Customer;
+import za.ac.cput.domain.Customer;
 import za.ac.cput.factory.IFactoryCustomer;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package za.ac.cput.factory;
 
-import za.ac.cput.domain.impl.Rental;
+import za.ac.cput.domain.Rental;
 
 import java.util.List;
 

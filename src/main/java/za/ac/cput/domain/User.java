@@ -1,14 +1,13 @@
-package za.ac.cput.domain.impl;
+package za.ac.cput.domain;
 
 import jakarta.persistence.*;
-import za.ac.cput.domain.IDomain;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
-public class User implements IDomain {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

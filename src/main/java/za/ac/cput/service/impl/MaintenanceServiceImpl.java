@@ -6,7 +6,7 @@
  */
 package za.ac.cput.service.impl;
 
-import za.ac.cput.domain.impl.Maintenance;
+import za.ac.cput.domain.Maintenance;
 import za.ac.cput.repository.impl.MaintenanceRepositoryImpl;
 import za.ac.cput.service.IMaintenanceService;
 

@@ -6,10 +6,10 @@ package za.ac.cput.factory.impl;
  * Date:  06 April 2023
  */
 
-import za.ac.cput.domain.impl.Car;
-import za.ac.cput.domain.impl.Customer;
-import za.ac.cput.domain.impl.DamageReport;
-import za.ac.cput.domain.impl.Rental;
+import za.ac.cput.domain.Car;
+import za.ac.cput.domain.Customer;
+import za.ac.cput.domain.DamageReport;
+import za.ac.cput.domain.Rental;
 import za.ac.cput.factory.IFactory;
 
 import java.time.LocalDate;

@@ -1,7 +1,7 @@
 package za.ac.cput.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import za.ac.cput.domain.impl.Rental;
+import za.ac.cput.domain.Rental;
 
 import java.util.List;
 import java.util.Optional;

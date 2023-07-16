@@ -3,13 +3,11 @@
  Author: Asiphe Funda (215092317)
  Date: 19 March 2023
 */
-package za.ac.cput.domain.impl;
-
-import za.ac.cput.domain.IDomain;
+package za.ac.cput.domain;
 
 import java.time.LocalDate;
 
-public class Maintenance implements IDomain {
+public class Maintenance  {
     private int id;
     private String maintenanceType;
     private String serviceProvider;

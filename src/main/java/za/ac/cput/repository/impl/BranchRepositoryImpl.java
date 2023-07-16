@@ -5,7 +5,7 @@
 */
 package za.ac.cput.repository.impl;
 
-import za.ac.cput.domain.impl.Branch;
+import za.ac.cput.domain.Branch;
 import za.ac.cput.repository.IBranchRepository;
 
 import java.util.HashSet;

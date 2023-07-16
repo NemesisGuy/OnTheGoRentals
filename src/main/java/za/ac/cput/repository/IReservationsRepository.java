@@ -8,7 +8,7 @@ package za.ac.cput.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import za.ac.cput.domain.impl.Reservations;
+import za.ac.cput.domain.Reservations;
 
 @Repository
 public interface IReservationsRepository extends JpaRepository<Reservations, Integer> {

@@ -11,7 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import za.ac.cput.domain.impl.Insurance;
+import za.ac.cput.domain.Insurance;
 import za.ac.cput.factory.impl.InsuranceFactory;
 
 import java.time.LocalDate;

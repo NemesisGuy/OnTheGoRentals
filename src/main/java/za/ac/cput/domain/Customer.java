@@ -1,6 +1,4 @@
-package za.ac.cput.domain.impl;
-
-import za.ac.cput.domain.IDomain;
+package za.ac.cput.domain;
 
 /**
  * Lonwabo Magazi-218331851
@@ -8,7 +6,7 @@ import za.ac.cput.domain.IDomain;
  * Customer.java
  */
 
-public class Customer implements IDomain {
+public class Customer{
     private int CustomerId;
     private String Name;
     private String ContactInfo;
@@ -71,7 +69,7 @@ public class Customer implements IDomain {
                 '}';
     }
 
-    @Override
+
     public int getId() {
         return 0;
     }

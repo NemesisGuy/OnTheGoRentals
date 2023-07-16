@@ -8,8 +8,8 @@ package za.ac.cput.controllers.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.impl.Car;
-import za.ac.cput.domain.impl.PriceGroup;
+import za.ac.cput.domain.Car;
+import za.ac.cput.domain.PriceGroup;
 import za.ac.cput.service.impl.ICarServiceImpl;
 
 import java.util.ArrayList;

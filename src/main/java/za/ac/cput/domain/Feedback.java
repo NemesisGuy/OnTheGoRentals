@@ -1,6 +1,4 @@
-package za.ac.cput.domain.impl;
-
-import za.ac.cput.domain.IFeedback;
+package za.ac.cput.domain;
 
 /**
  * Feedback.java
@@ -9,7 +7,7 @@ import za.ac.cput.domain.IFeedback;
  * Date: 01 April 2023
  */
 
-public class Feedback implements IFeedback {
+public class Feedback {
     private String name;
     private String comment;
     private int id;

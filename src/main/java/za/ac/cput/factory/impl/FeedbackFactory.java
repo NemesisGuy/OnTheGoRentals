@@ -1,6 +1,6 @@
 package za.ac.cput.factory.impl;
 
-import za.ac.cput.domain.impl.Feedback;
+import za.ac.cput.domain.Feedback;
 import za.ac.cput.factory.IFactoryFeedback;
 
 import java.util.List;

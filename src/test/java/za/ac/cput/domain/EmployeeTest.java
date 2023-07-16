@@ -1,7 +1,5 @@
 package za.ac.cput.domain;
 
-import za.ac.cput.domain.impl.Employee;
-
 /**
  * EmployeeTest.java
  * Test for employee

@@ -1,6 +1,6 @@
 package za.ac.cput.service;
 
-import za.ac.cput.domain.impl.Reservations;
+import za.ac.cput.domain.Reservations;
 
 import java.util.List;
 

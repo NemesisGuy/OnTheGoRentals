@@ -1,9 +1,9 @@
 package za.ac.cput.factory.impl;
 
 import org.springframework.stereotype.Component;
-import za.ac.cput.domain.impl.Car;
-import za.ac.cput.domain.impl.Rental;
-import za.ac.cput.domain.impl.User;
+import za.ac.cput.domain.Car;
+import za.ac.cput.domain.Rental;
+import za.ac.cput.domain.User;
 
 import java.time.LocalDateTime;
 import java.util.Random;

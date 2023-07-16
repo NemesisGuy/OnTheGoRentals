@@ -9,7 +9,7 @@ package za.ac.cput.factory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import za.ac.cput.domain.impl.Reservations;
+import za.ac.cput.domain.Reservations;
 import za.ac.cput.factory.impl.ReservationsFactory;
 
 import java.sql.Time;

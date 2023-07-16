@@ -2,7 +2,7 @@ package za.ac.cput.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.impl.Payment;
+import za.ac.cput.domain.Payment;
 import za.ac.cput.service.IPaymentService;
 
 import java.util.List;

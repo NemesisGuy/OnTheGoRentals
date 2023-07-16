@@ -6,7 +6,7 @@ package za.ac.cput.repository.impl;
  * Date: 1 April 2023
  */
 
-import za.ac.cput.domain.impl.Feedback;
+import za.ac.cput.domain.Feedback;
 import za.ac.cput.repository.IFactoryRepository;
 
 import java.util.ArrayList;

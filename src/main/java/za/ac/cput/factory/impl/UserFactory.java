@@ -1,7 +1,7 @@
 package za.ac.cput.factory.impl;
 
 import org.springframework.stereotype.Component;
-import za.ac.cput.domain.impl.User;
+import za.ac.cput.domain.User;
 import za.ac.cput.factory.IFactory;
 
 @Component

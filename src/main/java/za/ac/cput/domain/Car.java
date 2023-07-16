@@ -1,9 +1,8 @@
-package za.ac.cput.domain.impl;
+package za.ac.cput.domain;
 
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.Id;
-import za.ac.cput.domain.IDomain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ import java.util.Objects;
  */
 
 @Entity
-public class Car implements IDomain {
+public class Car {
     @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

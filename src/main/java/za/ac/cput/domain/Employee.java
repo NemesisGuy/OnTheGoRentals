@@ -5,11 +5,9 @@
  * Date: 20 March 2023
  */
 
-package za.ac.cput.domain.impl;
+package za.ac.cput.domain;
 
-import za.ac.cput.domain.IEmployee;
-
-public class Employee implements IEmployee {
+public class Employee  {
     private final int id;
     private final String firstName;
     private final String lastName;

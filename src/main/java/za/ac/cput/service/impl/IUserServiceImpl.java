@@ -2,7 +2,7 @@ package za.ac.cput.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.impl.User;
+import za.ac.cput.domain.User;
 import za.ac.cput.factory.impl.UserFactory;
 import za.ac.cput.repository.IUserRepository;
 import za.ac.cput.service.IUserService;

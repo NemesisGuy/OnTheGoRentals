@@ -7,8 +7,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import za.ac.cput.controllers.CarController;
-import za.ac.cput.domain.impl.Car;
-import za.ac.cput.domain.impl.PriceGroup;
+import za.ac.cput.domain.Car;
+import za.ac.cput.domain.PriceGroup;
 import za.ac.cput.service.impl.ICarServiceImpl;
 
 import java.util.ArrayList;

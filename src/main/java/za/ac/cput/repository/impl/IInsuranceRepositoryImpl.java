@@ -6,7 +6,7 @@ package za.ac.cput.repository.impl;
  * Date:  06 April 2023
  */
 
-import za.ac.cput.domain.impl.Insurance;
+import za.ac.cput.domain.Insurance;
 import za.ac.cput.repository.IInsuranceRepository;
 
 import java.util.ArrayList;

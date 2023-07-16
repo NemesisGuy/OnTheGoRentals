@@ -6,7 +6,7 @@
  */
 package za.ac.cput.repository;
 
-import za.ac.cput.domain.impl.Employee;
+import za.ac.cput.domain.Employee;
 
 import java.util.List;
 

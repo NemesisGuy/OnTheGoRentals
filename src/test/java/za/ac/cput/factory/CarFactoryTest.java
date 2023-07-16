@@ -2,8 +2,8 @@ package za.ac.cput.factory;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import za.ac.cput.domain.impl.Car;
-import za.ac.cput.domain.impl.PriceGroup;
+import za.ac.cput.domain.Car;
+import za.ac.cput.domain.PriceGroup;
 import za.ac.cput.factory.impl.CarFactory;
 
 class CarFactoryTest {

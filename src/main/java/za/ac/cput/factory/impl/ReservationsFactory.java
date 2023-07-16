@@ -6,7 +6,7 @@ package za.ac.cput.factory.impl;
  * Date:  06 April 2023
  */
 
-import za.ac.cput.domain.impl.Reservations;
+import za.ac.cput.domain.Reservations;
 import za.ac.cput.factory.IFactory;
 
 import java.sql.Time;

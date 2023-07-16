@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import za.ac.cput.domain.impl.Branch;
+import za.ac.cput.domain.Branch;
 import za.ac.cput.factory.impl.BranchFactory;
 import za.ac.cput.repository.impl.BranchRepositoryImpl;
 

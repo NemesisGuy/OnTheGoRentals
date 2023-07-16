@@ -1,4 +1,4 @@
-package za.ac.cput.domain.impl;
+package za.ac.cput.domain;
 /**
  * Insurance.java
  * Class for the Insurance
@@ -7,14 +7,12 @@ package za.ac.cput.domain.impl;
  */
 
 
-import za.ac.cput.domain.IInsurance;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
 
-public class Insurance implements IInsurance, Serializable {
+public class Insurance implements  Serializable {
 
     private int insuranceId;
     private String insuranceType;
