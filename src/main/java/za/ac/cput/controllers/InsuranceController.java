@@ -26,7 +26,7 @@ public class InsuranceController {
     }
 
     @GetMapping("/get-all")
-    public List<Insurance> getAllInsurances() {
+    public List<Insurance> getAllInsurancePolicies() {
         return service.getAllInsurancePolicies();
     }
 
