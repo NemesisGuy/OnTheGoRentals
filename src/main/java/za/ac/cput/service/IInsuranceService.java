@@ -6,6 +6,4 @@ import java.util.List;
 
 public interface IInsuranceService extends IService<Insurance, Integer> {
     List<Insurance> getAllInsurancePolicies();
-
-    Insurance getInsuranceById(Integer id);
 }

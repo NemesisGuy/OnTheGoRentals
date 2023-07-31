@@ -1,60 +1,55 @@
 package za.ac.cput.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Insurance;
-import za.ac.cput.repository.impl.IInsuranceRepositoryImpl;
+import za.ac.cput.repository.IInsuranceRepository;
 import za.ac.cput.service.IInsuranceService;
 
 import java.util.List;
 
 @Service
 public class IInsuranceServiceImpl implements IInsuranceService {
-    private static IInsuranceServiceImpl service;
-    private static IInsuranceRepositoryImpl repository;
 
-    private IInsuranceServiceImpl() {
-        repository = IInsuranceRepositoryImpl.getRepository();
-    }
+    private IInsuranceRepository repository;
 
-    public static IInsuranceServiceImpl getInsuranceService() {
-        if (service == null) {
-            service = new IInsuranceServiceImpl();
-        }
-        return service;
+    @Autowired
+    private IInsuranceServiceImpl(IInsuranceRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public Insurance create(Insurance account) {
-        Insurance created = repository.create(account);
-        return created;
+    public Insurance create(Insurance insurance) {
+        return this.repository.save(insurance);
     }
 
     @Override
     public Insurance read(Integer id) {
-        Insurance read = repository.read(id);
-        return read;
+        return this.repository.findById(id).orElse(null);
     }
 
     @Override
-    public Insurance update(Insurance account) {
-        Insurance updated = repository.update(account);
-        return updated;
+    public Insurance update(Insurance insurance) {
+        if (this.repository.existsById(insurance.getId())) {
+            return this.repository.save(insurance);
+        }
+        return null;
     }
 
     @Override
-    public boolean delete(Integer id) {
-        boolean success = repository.delete(id);
-        return success;
+    public boolean delete(Integer integer) {
+        if (this.repository.existsById(integer)) {
+            this.repository.deleteById(integer);
+            return true;
+        }
+        return false;
     }
 
-    @Override
     public List<Insurance> getAllInsurancePolicies() {
-        return repository.getAllInsurancePolicies();
+        return this.repository.findAll();
     }
 
-    @Override
-    public Insurance getInsuranceById(Integer id) {
-        Insurance getById = repository.getInsuranceById(id);
-        return getById;
+    public List<Insurance> findAllByInsuranceType(String insuranceType) {
+        return this.repository.findAllByInsuranceType(insuranceType);
     }
 }

@@ -4,15 +4,21 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import za.ac.cput.domain.Insurance;
 import za.ac.cput.factory.impl.InsuranceFactory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
+@SpringBootTest
 class IInsuranceServiceImplTest {
-    private static IInsuranceServiceImpl service = IInsuranceServiceImpl.getInsuranceService();
+
+    @Autowired
+    private IInsuranceServiceImpl service;
     private static InsuranceFactory insuranceFactory = new InsuranceFactory();
     private static Insurance insurance = insuranceFactory.create();
 
@@ -43,9 +49,14 @@ class IInsuranceServiceImplTest {
     }
 
     @Test
-    void d_getPaymentById() {
-        Insurance getById = service.getInsuranceById(insurance.getId());
-        System.out.println("Get By ID: " + getById);
+    void findByType() {
+        final String TYPE = "Liability Insurance";
+        System.out.println("show all by Type: " + TYPE);
+
+        List<Insurance> typeList = service.findAllByInsuranceType(TYPE);
+        for (Insurance insurance: typeList) {
+            System.out.println(insurance);
+        }
     }
 
     @Test

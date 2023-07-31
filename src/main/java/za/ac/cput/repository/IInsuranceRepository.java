@@ -6,13 +6,12 @@ package za.ac.cput.repository;
  * Date:  06 April 2023
  */
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import za.ac.cput.domain.Insurance;
 
 import java.util.List;
 
-public interface IInsuranceRepository extends IRepository<Insurance, Integer> {
-    List<Insurance> getAllInsurancePolicies();
-
-    Insurance getInsuranceById(Integer id);
+public interface IInsuranceRepository extends JpaRepository<Insurance, Integer> {
+    public List<Insurance> findAllByInsuranceType(String insuranceType);
 
 }
