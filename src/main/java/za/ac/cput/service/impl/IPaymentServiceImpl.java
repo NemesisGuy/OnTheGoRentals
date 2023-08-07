@@ -1,60 +1,56 @@
 package za.ac.cput.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import za.ac.cput.domain.Insurance;
 import za.ac.cput.domain.Payment;
-import za.ac.cput.repository.impl.IPaymentRepositoryImpl;
+import za.ac.cput.repository.IPaymentRepository;
 import za.ac.cput.service.IPaymentService;
 
 import java.util.List;
 
 @Service
 public class IPaymentServiceImpl implements IPaymentService {
-    private static IPaymentServiceImpl service;
-    private static IPaymentRepositoryImpl repository;
 
-    private IPaymentServiceImpl() {
-        repository = IPaymentRepositoryImpl.getRepository();
-    }
+    private IPaymentRepository repository;
 
-    public static IPaymentServiceImpl getPaymentService() {
-        if (service == null) {
-            service = new IPaymentServiceImpl();
-        }
-        return service;
+    @Autowired
+    private IPaymentServiceImpl(IPaymentRepository repository) {
+        this.repository = repository;
     }
 
     @Override
     public Payment create(Payment payment) {
-        Payment created = repository.create(payment);
-        return created;
+        return this.repository.save(payment);
     }
 
     @Override
     public Payment read(Integer id) {
-        Payment read = repository.read(id);
-        return read;
+        return this.repository.findById(id).orElse(null);
     }
 
     @Override
     public Payment update(Payment payment) {
-        Payment updated = repository.update(payment);
-        return updated;
+        if ( this.repository.existsById(payment.getId())) {
+            return this.repository.save(payment);
+        }
+        return null;
     }
 
     @Override
     public boolean delete(Integer id) {
-        boolean success = repository.delete(id);
-        return success;
+        if (this.repository.existsById(id)) {
+            this.repository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
-    @Override
     public List<Payment> getAllPayments() {
-        return repository.getAllPayments();
+        return this.repository.findAll();
     }
 
-    @Override
-    public Payment getPaymentById(Integer id) {
-        Payment getById = repository.getPaymentById(id);
-        return getById;
+    public List<Payment> findAllByPaymentMethod(String paymentMethod) {
+        return this.repository.findAllByPaymentMethod(paymentMethod);
     }
 }
