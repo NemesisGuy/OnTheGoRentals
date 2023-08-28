@@ -47,7 +47,7 @@ public class ICarServiceImpl implements ICarService {
 
     @Override
     public Car update(Car car) {
-        if (this.repository.existsById(car.getId())) {
+        if (this.repository.existsById((int) car.getId())) {
             Car updatedCar = carFactory.create(car);
             return this.repository.save(updatedCar);
         }

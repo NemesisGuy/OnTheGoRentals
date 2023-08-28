@@ -4,6 +4,11 @@ import org.springframework.stereotype.Component;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.PriceGroup;
 import za.ac.cput.factory.IFactory;
+/*
+* Author: Peter Buckingham (220169289)
+* Date: 10 June 2023
+* File: CarFactory.java
+* */
 
 @Component
 public class CarFactory implements IFactory<Car> {
@@ -11,8 +16,7 @@ public class CarFactory implements IFactory<Car> {
 
     public Car createCar(int id, String make, String model, int year, String category, PriceGroup priceGroup, String licensePlate) {
         return Car.builder()
-                //generate random number placeholder for id, will probably be replaced by database auto-increment value later
-                //.id(new Random().nextInt(1000000))
+
                 .id(id)
                 .make(make)
                 .model(model)

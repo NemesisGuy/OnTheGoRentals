@@ -6,8 +6,8 @@ import org.springframework.data.annotation.Id;
 import java.time.LocalDateTime;
 
 /**
- * Lonwabo Magazi-218331851
- * Date: March 2023
+ * Peter Buckingham - 220165289
+ * Date: April 2023
  * Rental Class.java
  */
 
@@ -29,10 +29,11 @@ public class Rental {
     private int fine;
     private LocalDateTime issuedDate;
     private LocalDateTime returnedDate;
-    //Initializing a parameterized constructor
-    public Rental(int rentalId, User user, Car car, int issuer, int receiver, int fine, LocalDateTime issuedDate, LocalDateTime returnedDate) {
 
-        this.id = rentalId;
+    //Initializing a parameterized constructor
+    public Rental(int id, User user, Car car, int issuer, int receiver, int fine, LocalDateTime issuedDate, LocalDateTime returnedDate) {
+
+        this.id = id;
         this.user = user;
         this.car = car;
         this.issuer = issuer;
@@ -67,8 +68,6 @@ public class Rental {
     public int getRentalId() {
         return this.id;
     }
-
-
     public int getId() {
         return 0;
     }
@@ -103,8 +102,6 @@ public class Rental {
     public String toString() {
         return "Rental{" +
                 "rentalId=" + id +
-
-
                 ", issuer='" + issuer + '\'' +
                 ", issuedDate='" + issuedDate + '\'' +
                 ", dateReturned='" + returnedDate + '\'' +

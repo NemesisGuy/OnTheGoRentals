@@ -49,7 +49,7 @@ public class Car {
         return new Builder();
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

@@ -24,12 +24,12 @@ public class IRentalServiceImpl implements IRentalService {
     @Autowired
     private RentalFactory rentalFactory;
 
-    private IRentalServiceImpl(IRentalRepository repository) {
+/*    private IRentalServiceImpl(IRentalRepository repository) {
         this.repository = repository;
-    }
+    }*/
 
 
-    @Override
+    /*@Override
     public Rental create(Rental rental) {
         if (isCarAvailable(rental)) {
             if (isCurrentlyRenting(rental.getUser())) {
@@ -40,7 +40,22 @@ public class IRentalServiceImpl implements IRentalService {
         } else {
             throw new CarNotAvailableException(rental.getCar().getMake() +" " + rental.getCar().getModel()+ " "+rental.getCar().getLicensePlate()+", is not available for rental at this time");
         }
+    }*/
+
+    @Override
+    public Rental create(Rental rental) {
+        if (isCarAvailable(rental)) {
+            if (isCurrentlyRenting(rental.getUser())) {
+                throw new UserCantRentMoreThanOneCarException(
+                        generateUserRentingErrorMessage(rental.getUser()));
+            }
+            Rental newRental = rentalFactory.create(rental);
+            return repository.save(newRental);
+        } else {
+            throw new CarNotAvailableException(generateCarNotAvailableErrorMessage(rental.getCar()));
+        }
     }
+
 
 
     @Override
@@ -98,31 +113,32 @@ public class IRentalServiceImpl implements IRentalService {
     //get all available cars
 
     public ArrayList<Rental> getAllAvailableCars() {
-        ArrayList<Rental> availableCars = new ArrayList<>();
-
-        // Retrieve all rentals from the repository
         List<Rental> allRentals = repository.findAll();
-
-        // Iterate over each rental to check if the car is available
-        for (Rental rental : allRentals) {
+        return filterAvailableCars(allRentals);
+    }
+    private ArrayList<Rental> filterAvailableCars(List<Rental> rentals) {
+        ArrayList<Rental> availableCars = new ArrayList<>();
+        for (Rental rental : rentals) {
             if (isCarAvailable(rental)) {
                 availableCars.add(rental);
             }
         }
-
         return availableCars;
+    }
+    private String generateCarNotAvailableErrorMessage(Car car) {
+        return car.getMake() + " " + car.getModel() + " " +
+                car.getLicensePlate() + " is not available for rental at this time";
+    }
+    private String generateUserRentingErrorMessage(User user) {
+        Rental currentRental = getCurrentRental(user);
+        Car rentedCar = currentRental.getCar();
+        return user.getFirstName() +" " + user.getLastName() + " is currently renting " +
+                rentedCar.getMake() + " " + rentedCar.getModel() + " " +
+                rentedCar.getLicensePlate();
+    }
 
 
-}
-
-
-
-
-
-
-
-
-    private boolean isCarAvailable(Rental rental) {
+   /* private boolean isCarAvailable(Rental rental) {
         Car carToRent = rental.getCar();
         //find rental by car id
         Optional<Rental> rentalByCarIdOrderByReturnedDateDesc = repository.findTopByCarIdOrderByReturnedDateDesc(carToRent.getId());
@@ -153,8 +169,46 @@ public class IRentalServiceImpl implements IRentalService {
 
         return false;
 
+    }*/
+
+    //refactored isCarAvailable
+    private boolean isCarAvailable(Rental rental) {
+        Car carToRent = rental.getCar();
+        Optional<Rental> rentalFromDatabaseOptional = findMostRecentRentalByCarId(carToRent.getId());
+        Rental rentalFromDatabase = rentalFromDatabaseOptional.orElse(null);
+
+        printRentalInfo(rentalFromDatabase, rental.getReturnedDate());
+
+        return isCarAvailableBasedOnRental(rentalFromDatabase, rental);
     }
-    public boolean isCarAvailableByCarId(Car car) {
+
+    private Optional<Rental> findMostRecentRentalByCarId(Long carId) {
+        return repository.findTopByCarIdOrderByReturnedDateDesc(Math.toIntExact(carId));
+    }
+
+    private void printRentalInfo(Rental rentalFromDatabase, LocalDateTime returnedDate) {
+        if (returnedDate != null) {
+            LocalDateTime timeSinceLastRental = returnedDate.minusDays(rentalFromDatabase.getReturnedDate().getDayOfMonth());
+            System.out.println("Rental Date - rentalFromDatabase: " + timeSinceLastRental);
+        } else {
+            System.out.println("The car has not been returned yet");
+            LocalDateTime timeSinceLastRental = LocalDateTime.now().minusDays(rentalFromDatabase.getIssuedDate().getDayOfMonth());
+            System.out.println("Rental Date - rentalFromDatabase: " + rentalFromDatabase.getIssuedDate().getDayOfMonth());
+        }
+    }
+
+    private boolean isCarAvailableBasedOnRental(Rental rentalFromDatabase, Rental rental) {
+        if (rentalFromDatabase == null) {
+            return true;
+        } else if (rentalFromDatabase.getReturnedDate() == null) {
+            return false;
+        } else {
+            return rentalFromDatabase.getReturnedDate().plusDays(1).isBefore(LocalDateTime.now());
+        }
+    }
+
+
+  /*  public boolean isCarAvailableByCarId(Car car) {
         // Find rental by car id
         Optional<Rental> rentalByCarIdOrderByReturnedDateDesc = repository.findTopByCarIdOrderByReturnedDateDesc(car.getId());
 
@@ -167,7 +221,7 @@ public class IRentalServiceImpl implements IRentalService {
             if (rentalFromDatabase.getReturnedDate() != null) {
                 LocalDateTime timeSinceLastRental = rentalFromDatabase.getReturnedDate().minusDays(rentalFromDatabase.getReturnedDate().getDayOfMonth());
                 System.out.println("RentalFromDatabase Rental, Rental was returned on:  " + rentalFromDatabase.getReturnedDate());
-               /* System.out.println("Rental Date - rentalFromDatabase: " + timeSinceLastRental);*/
+               *//* System.out.println("Rental Date - rentalFromDatabase: " + timeSinceLastRental);*//*
                 System.out.println("Car is available");
             } else {
                 System.out.println("The car has not been returned yet");
@@ -185,7 +239,47 @@ public class IRentalServiceImpl implements IRentalService {
 
         // If no rental has been made or the most recent rental has not been returned, the car is not available
         return false;
+    }*/
+
+    //refactored isCarAvailableByCarId
+    public boolean isCarAvailableByCarId(Car car) {
+        Optional<Rental> rentalByCarIdOrderByReturnedDateDesc = findMostRecentRentalByCarId(car.getId());
+
+        if (rentalByCarIdOrderByReturnedDateDesc.isPresent()) {
+            Rental rentalFromDatabase = rentalByCarIdOrderByReturnedDateDesc.get();
+
+            if (rentalFromDatabase.getReturnedDate() != null) {
+                printRentalInfoForCarAvailability(rentalFromDatabase, "Car is available");
+
+                // If the most recent rental is returned 24 hours before the new rental, then the car is available
+                if (isCarAvailableBasedOnRental(rentalFromDatabase)) {
+                    return true;
+                }
+            } else {
+                printRentalInfoForCarAvailability(rentalFromDatabase, "Car is not available");
+            }
+        }
+
+        return false;
     }
+
+    private void printRentalInfoForCarAvailability(Rental rentalFromDatabase, String availabilityMessage) {
+        if (rentalFromDatabase.getReturnedDate() != null) {
+            LocalDateTime timeSinceLastRental = rentalFromDatabase.getReturnedDate().minusDays(rentalFromDatabase.getReturnedDate().getDayOfMonth());
+            System.out.println("RentalFromDatabase Rental, Rental was returned on: " + rentalFromDatabase.getReturnedDate());
+        } else {
+            System.out.println("The car has not been returned yet");
+            LocalDateTime timeSinceLastRental = LocalDateTime.now().minusDays(rentalFromDatabase.getIssuedDate().getDayOfMonth());
+            System.out.println("Rental Date - rentalFromDatabase: " + rentalFromDatabase.getIssuedDate().getDayOfMonth());
+        }
+        System.out.println(availabilityMessage);
+    }
+
+    private boolean isCarAvailableBasedOnRental(Rental rentalFromDatabase) {
+        return rentalFromDatabase.getReturnedDate().plusDays(1).isBefore(LocalDateTime.now());
+    }
+
+
 
     public boolean isCurrentlyRenting(User user) {
         // Find active rentals for the user

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Lonwabo Magazi-218331851
+ * Peter Buckingham (220169289)
  * Date: March 2023
  * IRentalRepository.java
  */
