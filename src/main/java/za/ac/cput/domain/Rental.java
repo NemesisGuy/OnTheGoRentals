@@ -149,6 +149,7 @@ public class Rental {
             return this;
         }
 
+
         public Builder setUser(User user) {
             this.user = user;
             return this;
