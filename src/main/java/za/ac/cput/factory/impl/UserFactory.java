@@ -3,7 +3,11 @@ package za.ac.cput.factory.impl;
 import org.springframework.stereotype.Component;
 import za.ac.cput.domain.User;
 import za.ac.cput.factory.IFactory;
-
+/**
+ *
+ * Author: Peter Buckingham (220165289)
+ *
+ */
 @Component
 public class UserFactory implements IFactory<User> {
 

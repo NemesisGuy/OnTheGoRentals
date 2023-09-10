@@ -16,20 +16,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;*/
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.User;
-import za.ac.cput.service.impl.IUserServiceImpl;
+import za.ac.cput.service.impl.UserServiceImpl;
 
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
     @Autowired
     @Qualifier("userServiceImpl")
-    private IUserServiceImpl userService;
+    private UserServiceImpl userService;
 
-
-
- /*   @Autowired
-    UserDetailsService userDetailsService;
-*/
 
     @PostMapping("/register")
     public User register(@RequestBody User registrationRequest) {

@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import za.ac.cput.controllers.CarController;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.PriceGroup;
-import za.ac.cput.service.impl.ICarServiceImpl;
+import za.ac.cput.service.impl.CarServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class CarControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private ICarServiceImpl carService;
+    private CarServiceImpl carService;
 
     private List<Car> carList;
 

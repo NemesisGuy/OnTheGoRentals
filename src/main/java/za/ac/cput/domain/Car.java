@@ -2,6 +2,9 @@ package za.ac.cput.domain;
 
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
@@ -15,13 +18,16 @@ import java.util.Objects;
  * Date: 29 March 2021
  */
 
+
+
 @Entity
+
 public class Car {
     @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @OneToMany(mappedBy = "car")
+    @OneToMany(mappedBy = "car") //one car to many rentals
     private List<Rental> rentals = new ArrayList<>();
     private String make;
     private String model;
