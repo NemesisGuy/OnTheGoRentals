@@ -52,7 +52,6 @@ private static Driver driver = DriverFactory.createDriver("Cwenga","Dlova","10")
         ResponseEntity<Driver>response = restTemplate.postForEntity(url,updated,Driver.class);
         assertNotNull(response.getBody());
     }
-
     @Test
     void e_delete() {
         String url = baseURL + "/delete/"+driver.getId();

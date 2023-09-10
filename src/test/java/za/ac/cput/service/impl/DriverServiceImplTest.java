@@ -17,7 +17,6 @@ class DriverServiceImplTest {
     @Autowired
     private IDriverService service;
     private static Driver driver = DriverFactory.createDriver("Sanelisiwe","Hlazo","10");
-
     @Test
     void a_create() {
         Driver created = service.create(driver);

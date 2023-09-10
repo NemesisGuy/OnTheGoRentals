@@ -19,13 +19,4 @@ public class DriverFactory implements IFactory<Driver> {
                 .build();
     }
 
-    //@Override
-    //public Driver create() {
-       // return new Driver.Builder()
-               // .setId(new Random().nextInt(1000000))
-               // .setFirstName("Lonwabo")
-              //  .setLastName("Magazi")
-               // .setLicenseCode("10")
-                //.build();
-    //}
 }

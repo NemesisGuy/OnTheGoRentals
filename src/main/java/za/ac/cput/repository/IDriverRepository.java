@@ -7,4 +7,5 @@ import za.ac.cput.domain.Rental;
 
 @Repository
 public interface IDriverRepository extends JpaRepository<Driver, Integer> {
+
 }

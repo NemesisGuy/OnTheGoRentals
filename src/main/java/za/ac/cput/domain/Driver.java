@@ -13,9 +13,7 @@ public class Driver {
     private String lastName;
     private String licenseCode;
 
-    protected Driver(){
-
-    }
+    protected Driver(){}
 
     private Driver(Builder builder) {
         this.id = builder.id;
