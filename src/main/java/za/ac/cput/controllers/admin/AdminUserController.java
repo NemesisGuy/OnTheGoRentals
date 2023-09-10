@@ -10,7 +10,7 @@ package za.ac.cput.controllers.admin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.User;
-import za.ac.cput.service.impl.IUserServiceImpl;
+import za.ac.cput.service.impl.UserServiceImpl;
 
 import java.util.ArrayList;
 
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class AdminUserController {
 
     @Autowired
-    private IUserServiceImpl userService;
+    private UserServiceImpl userService;
 
     @RequestMapping("/list/all")
     public ArrayList<User> getAll() {
