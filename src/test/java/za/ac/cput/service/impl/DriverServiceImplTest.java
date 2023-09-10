@@ -22,6 +22,7 @@ class DriverServiceImplTest {
         Driver created = service.create(driver);
         assertEquals(driver.getId(),created.getId());
         System.out.println("Created: "+created);
+
     }
 
     @Test

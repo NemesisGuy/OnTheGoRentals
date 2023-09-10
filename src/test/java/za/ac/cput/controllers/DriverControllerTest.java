@@ -57,6 +57,7 @@ private static Driver driver = DriverFactory.createDriver("Cwenga","Dlova","10")
         String url = baseURL + "/delete/"+driver.getId();
         System.out.println("URL: "+url);
         restTemplate.delete(url);
+
     }
 
     @Test
