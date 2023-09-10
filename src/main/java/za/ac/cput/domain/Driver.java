@@ -1,7 +1,6 @@
 package za.ac.cput.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.Objects;
 
@@ -9,6 +8,7 @@ import java.util.Objects;
 public class Driver {
     @Id
     private int id;
+
     private String firstName;
     private String lastName;
     private String licenseCode;
@@ -30,7 +30,8 @@ public class Driver {
         return firstName;
     }
 
-    public String getLastName() {
+    public String getLastName()
+    {
         return lastName;
     }
 
