@@ -17,8 +17,6 @@ public class User {
     private int id;
     @OneToMany(mappedBy = "user")
     private List<Rental> rentals = new ArrayList<>();
-    @OneToOne(mappedBy = "user")
-    private Driver driver;
 
     private String userName;
     private String firstName;
