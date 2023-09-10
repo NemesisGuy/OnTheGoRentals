@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 import za.ac.cput.domain.DamageReport;
 @Repository
 public interface IDamageReportRepository extends JpaRepository<DamageReport, Integer> {
+
 }

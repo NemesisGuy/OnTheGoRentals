@@ -60,4 +60,5 @@ public class DamageReportServiceImpl implements IDamageReport {
         return this.repository.findAll();
     }
 
+
 }
