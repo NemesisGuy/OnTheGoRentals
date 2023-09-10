@@ -21,8 +21,8 @@ public class BackendApplication {
     //return new BranchServiceImpl();
     //}
  /*   @Bean
-    public ICarServiceImpl carService() {
-        return new ICarServiceImpl();
+    public CarServiceImpl carService() {
+        return new CarServiceImpl();
     }*/
 
     //factory, repos, domain, controllers and services

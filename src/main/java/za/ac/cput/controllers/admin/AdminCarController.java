@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.PriceGroup;
-import za.ac.cput.service.impl.ICarServiceImpl;
+import za.ac.cput.service.impl.CarServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api/admin/cars")
 public class AdminCarController {
     @Autowired
-    private ICarServiceImpl carService;
+    private CarServiceImpl carService;
 
     //@RequestMapping("/api/admin/cars")
     @GetMapping("/all")

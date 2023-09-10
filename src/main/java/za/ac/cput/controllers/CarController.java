@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.PriceGroup;
-import za.ac.cput.service.impl.ICarServiceImpl;
-import za.ac.cput.service.impl.IRentalServiceImpl;
+import za.ac.cput.service.impl.CarServiceImpl;
+import za.ac.cput.service.impl.RentalServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +27,9 @@ import java.util.List;
 public class CarController {
 
     @Autowired
-    private ICarServiceImpl carService;
+    private CarServiceImpl carService;
     @Autowired
-    private IRentalServiceImpl rentalService;
+    private RentalServiceImpl rentalService;
 
 
     @GetMapping("/api/cars/list/all")
@@ -72,12 +72,22 @@ public class CarController {
         return economyCars;
     }
 
-    @GetMapping("/api/cars/list/available/luxury")
+  /*  @GetMapping("/api/cars/list/available/luxury")
     public List<Car> getAvailableLuxuryCars() {
         List<Car> luxuryCars = new ArrayList<>(carService.getAll());
         luxuryCars.removeIf(car -> car.getPriceGroup() != PriceGroup.LUXURY || !rentalService.isCarAvailableByCarId(car));
         return luxuryCars;
     }
+*/
+
+    // TODO: migrate to this method for all the filtering, using the service to filter the list
+    @GetMapping("/api/cars/list/available/luxury")
+    public List<Car> getAvailableLuxuryCars() {
+        // Fetch already filtered list from service
+        List<Car> availableCars = rentalService.getAvailableCarsByPrice(PriceGroup.LUXURY);
+        return availableCars;
+    }
+
 
     @GetMapping("/api/cars/list/available/special")
     public List<Car> getAvailableSpecialCars() {
