@@ -32,17 +32,10 @@ public class AdminRentalController {
         System.out.println("RentalService was created...attempting to create rental...");
 
         // Retrieve user and car based on their IDs
-       /* User user = userService.read(rental.getUser().getId());
-        Car car = carService.read(rental.getCar().getId());
-
-*/
-
         System.out.println(rental.getUser());
         System.out.println(rental.getCar());
         System.out.println(rental.getIssuedDate());
         System.out.println(rental.getReturnedDate());
-
-
         return rentalService.create(rental);
     }
 
@@ -65,15 +58,10 @@ public class AdminRentalController {
         System.out.println("rental car: " + rental.getCar());
         System.out.println("rental issued date: " + rental.getIssuedDate());
         System.out.println("rental returned date: " + rental.getReturnedDate());
-
-
         Rental updated = rentalService.update(rental);
-        System.out.println("updated rental: " + updated);//no id here ??
-
-
+        System.out.println("updated rental: " + updated);
         return updated;
     }
-
     @DeleteMapping("/delete/{rentalId}")
     public boolean deleteRental(@PathVariable Integer rentalId) {
         System.out.println("/api/admin/rentals/delete was triggered");
