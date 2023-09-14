@@ -36,8 +36,6 @@ public class AdminUserController {
 
     @PostMapping("/create")
     public User createUser(@RequestBody User user) {
-        System.out.println("/api/admin/users/create was triggered");
-        System.out.println("UserService was created...attempting to create user...");
         User createdUser = userService.create(user);
         return createdUser;
     }

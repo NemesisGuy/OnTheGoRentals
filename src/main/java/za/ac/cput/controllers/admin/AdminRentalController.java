@@ -3,8 +3,8 @@ package za.ac.cput.controllers.admin;
 /**
  * AdminRentalController.java
  * This is the controller for the Rental entity
- * Author: [Author Name]
- * Date: [Date]
+ * Author: Peter Buckingham (220165289)
+ * Date: 10 April 2023
  */
 
 import org.springframework.beans.factory.annotation.Autowired;

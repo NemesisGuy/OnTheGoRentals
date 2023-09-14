@@ -22,7 +22,6 @@ public class AdminCarController {
     @Autowired
     private CarServiceImpl carService;
 
-
     @GetMapping("/all")
     public List<Car> getCars() {
         List<Car> allCars = new ArrayList<>(carService.getAll());
