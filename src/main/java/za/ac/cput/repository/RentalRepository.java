@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Peter Buckingham (220169289)
+ * Author: Peter Buckingham (220165289)
  * Date: March 2023
  * RentalRepository.java
  */
