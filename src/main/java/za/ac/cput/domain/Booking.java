@@ -127,10 +127,6 @@ public class Booking {
         public Booking build() {
             return new Booking(this);
         }
-
-        public Rental setId(int id) {
-        }
-        }
     }
 
     @Override
