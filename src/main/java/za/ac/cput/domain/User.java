@@ -5,7 +5,11 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+/**
+ *
+ * Author: Peter Buckingham (220165289)
+ *
+ */
 @Entity
 public class User {
     @Id
@@ -13,6 +17,7 @@ public class User {
     private int id;
     @OneToMany(mappedBy = "user")
     private List<Rental> rentals = new ArrayList<>();
+
     private String userName;
     private String firstName;
     private String lastName;
@@ -21,6 +26,7 @@ public class User {
     private String email;
     private String pictureUrl;
     private String role;
+
 
     public User() {
         // Default constructor

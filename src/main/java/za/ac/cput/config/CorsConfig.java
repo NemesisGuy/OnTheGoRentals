@@ -1,10 +1,4 @@
 package za.ac.cput.config;
-/**
- * CorsConfig.java
- * This is the configuration class for CORS, allowing the frontend to access the backend, and vice versa, without any issues.
- * Author: Peter Buckingham (220165289)
- * Date: 05 April 2023
- */
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,21 +10,15 @@ public class CorsConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
-
         return new WebMvcConfigurer() {
-            @SuppressWarnings("NullableProblems")
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        /*.allowedOrigins("http://localhost:5173")*/
-                        .allowedOrigins("http://localhost:5173", "http://192.168.0.105:5173", "http://192.168.56.1:5173", "http://172.31.112.1:5173", "http://192.0.0.0/8:5173", "http://192.169.0.101:5173")
+                        .allowedOrigins("http://localhost:5173") // Replace with your Vue.js frontend's URL
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true)
-                        .exposedHeaders("Access-Control-Allow-Origin")
                         .maxAge(3600);
-                System.out.println("CorsConfig was triggered");
-
             }
         };
     }

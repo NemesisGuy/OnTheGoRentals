@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*;
 
 public class ICarServiceImplTest {
 
-    private ICarServiceImpl carService;
+    private CarServiceImpl carService;
     @Mock
     private ICarRepositoryImpl carRepository;
 
@@ -24,9 +24,9 @@ public class ICarServiceImplTest {
 */
 /*    @BeforeEach
     void setUp() {
-        //  carRepository = Mockito.mock(ICarRepository.class);
+        //  carRepository = Mockito.mock(CarRepository.class);
         MockitoAnnotations.openMocks(this);
-        carService = new ICarServiceImpl(carRepository);
+        carService = new CarServiceImpl(carRepository);
     }*//*
 
 

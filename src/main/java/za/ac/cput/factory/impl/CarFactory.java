@@ -1,14 +1,16 @@
 package za.ac.cput.factory.impl;
-
+/**
+ * Author: Peter Buckingham (220169289)
+ * Date: 10 June 2023
+ * File: CarFactory.java
+ * */
 import org.springframework.stereotype.Component;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.PriceGroup;
 import za.ac.cput.factory.IFactory;
-/*
-* Author: Peter Buckingham (220169289)
-* Date: 10 June 2023
-* File: CarFactory.java
-* */
+
+
+
 
 @Component
 public class CarFactory implements IFactory<Car> {

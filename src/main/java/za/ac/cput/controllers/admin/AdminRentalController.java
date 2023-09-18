@@ -10,7 +10,7 @@ package za.ac.cput.controllers.admin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Rental;
-import za.ac.cput.service.impl.IRentalServiceImpl;
+import za.ac.cput.service.impl.RentalServiceImpl;
 
 import java.util.ArrayList;
 
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 @RequestMapping("/api/admin/rentals")
 public class AdminRentalController {
     @Autowired
-    private IRentalServiceImpl rentalService;
+    private RentalServiceImpl rentalService;
 
     @GetMapping("/list/all")
     public ArrayList<Rental> getAll() {
