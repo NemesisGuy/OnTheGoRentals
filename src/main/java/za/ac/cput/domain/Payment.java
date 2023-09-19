@@ -17,6 +17,7 @@ public class Payment {
 
     public Payment() {
     }
+
     public Payment(Builder builder) {
         this.id = builder.id;
         this.paymentMethod = builder.paymentMethod;
@@ -103,6 +104,5 @@ public class Payment {
         public Payment build() {
             return new Payment(this);
         }
-
     }
 }

@@ -1,5 +1,14 @@
 package za.ac.cput.factory.impl;
 
-import org.springframework.stereotype.Component;
 import za.ac.cput.domain.Payment;
-import za.ac.cput.factory.IFactory;
+
+public class PaymentFactory {
+    public static Payment createPayment(int id, String paymentMethod, double amount, String status) {
+        return new Payment.Builder()
+                .setId(id)
+                .setPaymentMethod(paymentMethod)
+                .setAmount(amount)
+                .setStatus(status)
+                .build();
+    }
+}

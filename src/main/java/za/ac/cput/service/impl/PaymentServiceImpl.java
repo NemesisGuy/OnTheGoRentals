@@ -6,6 +6,7 @@ import za.ac.cput.domain.Payment;
 import za.ac.cput.factory.impl.PaymentFactory;
 import za.ac.cput.repository.PaymentRepository;
 import za.ac.cput.service.PaymentService;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -16,21 +17,21 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentFactory paymentFactory;
 
     @Autowired
-    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentFactory paymentFactory) {
+    public PaymentServiceImpl() {
         this.paymentRepository = paymentRepository;
         this.paymentFactory = paymentFactory;
     }
 
     @Override
     public Payment createPayment(Payment payment) {
-        Payment newPayment = paymentFactory.create(payment);
+        Payment newPayment = paymentFactory.createPayment(payment.getId(), payment.getPaymentMethod(), payment.getAmount(), payment.getStatus());
         return paymentRepository.save(newPayment);
     }
 
     @Override
     public Payment updatePayment(Payment payment) {
         if (paymentRepository.existsById(payment.getId())) {
-            Payment updatedPayment = paymentFactory.create(payment);
+            Payment updatedPayment = paymentFactory.createPayment(payment.getId(), payment.getPaymentMethod(), payment.getAmount(), payment.getStatus());
             return paymentRepository.save(updatedPayment);
         }
         return null;
@@ -48,12 +49,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<Payment> getPaymentsByUserId(int userId) {
-        return paymentRepository.findByUserId(userId);
+        return null;
     }
 
     @Override
     public List<Payment> getPaymentsByRentalId(int rentalId) {
-        return paymentRepository.findByRentalId(rentalId);
+        return null;
     }
 
     @Override

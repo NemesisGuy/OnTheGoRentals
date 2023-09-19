@@ -9,9 +9,8 @@ import java.util.List;
 
 /**
  * PaymentController.java
- * Controller for handling Payment-related endpoints
- * Author: Your Name (Your Student Number)
- * Date: Date of Creation
+ * Author: Lonwabo Magazi-218331851
+ * Date: September 2023
  */
 
 @RestController

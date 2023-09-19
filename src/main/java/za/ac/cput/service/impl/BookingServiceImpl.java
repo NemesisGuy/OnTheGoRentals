@@ -24,14 +24,30 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking createBooking(Booking booking) {
-        Booking newBooking = bookingFactory.create(booking);
+        Booking newBooking = bookingFactory.createBooking(
+                booking.getId(),
+                booking.getUser(),
+                booking.getCar(),
+                booking.getStartDate(),
+                booking.getEndDate(),
+                booking.getTotalPrice(),
+                booking.isConfirmed()
+        );
         return bookingRepository.save(newBooking);
     }
 
     @Override
     public Booking updateBooking(Booking booking) {
         if (bookingRepository.existsById(booking.getId())) {
-            Booking updatedBooking = bookingFactory.create(booking);
+            Booking updatedBooking = bookingFactory.createBooking(
+                    booking.getId(),
+                    booking.getUser(),
+                    booking.getCar(),
+                    booking.getStartDate(),
+                    booking.getEndDate(),
+                    booking.getTotalPrice(),
+                    booking.isConfirmed()
+            );
             return bookingRepository.save(updatedBooking);
         }
         return null;
