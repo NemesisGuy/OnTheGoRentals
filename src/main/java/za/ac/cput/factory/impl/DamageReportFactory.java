@@ -1,5 +1,6 @@
 package za.ac.cput.factory.impl;
-/**DamageReportFactory.java
+/**
+ * DamageReportFactory.java
  * Factory Class for the Damage Report
  * Author: Cwenga Dlova (214310671)
  * Date: 08/09/2023

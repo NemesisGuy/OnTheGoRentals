@@ -23,6 +23,7 @@ public class DamageReport {
     private String location;
     private double repairCost;
 
+
     public DamageReport() {
     }
 

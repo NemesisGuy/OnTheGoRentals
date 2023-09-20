@@ -1,7 +1,7 @@
 package za.ac.cput.domain;
 /**
  * FileName: PriceGroup.java
- * Author: Group
+ * Author: Peter Buckingham (220165289)
  * Purpose: PriceGroup enum for the different price groups of the vehicles
  * Date: 10 June 2023
  * Version: 1.0
