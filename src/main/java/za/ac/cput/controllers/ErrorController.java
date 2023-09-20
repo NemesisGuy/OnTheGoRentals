@@ -14,7 +14,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 @ControllerAdvice
 public class ErrorController {
-
     @RequestMapping(value = "/error", produces = "text/html")
     public ModelAndView error(HttpServletRequest request, HttpServletResponse response, Exception exception) {
         ModelAndView mav = new ModelAndView();
