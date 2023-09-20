@@ -49,12 +49,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<Payment> getPaymentsByUserId(int userId) {
-        return null; // Implement this method if needed
+        return null;
     }
 
     @Override
     public List<Payment> getPaymentsByRentalId(int rentalId) {
-        return null; // Implement this method if needed
+        return null;
     }
 
     @Override

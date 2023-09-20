@@ -49,10 +49,9 @@ public class BookingControllerTest {
 
     @Test
     public void testGetBookingsByUser() throws Exception {
-        int userId = 1; // Re
+        int userId = 1;
         when(bookingService.getBookingsByUserId(userId)).thenReturn(bookingList);
 
-        // Perform the GET request
         mockMvc.perform(get("/api/bookings/list/user/{userId}", userId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
