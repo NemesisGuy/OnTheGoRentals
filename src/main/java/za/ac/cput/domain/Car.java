@@ -36,6 +36,7 @@ public class Car {
     @Enumerated(EnumType.STRING)
     private PriceGroup priceGroup;
     private String licensePlate;
+    private boolean isAvailable;
 
     public Car() {
         // Default constructor
@@ -49,6 +50,7 @@ public class Car {
         this.category = builder.category;
         this.priceGroup = builder.priceGroup;
         this.licensePlate = builder.licensePlate;
+        this.isAvailable = builder.isAvailable;
     }
 
     public static Builder builder() {
@@ -77,6 +79,14 @@ public class Car {
 
     public PriceGroup getPriceGroup() {
         return priceGroup;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
     }
 
     public void setPriceGroup(PriceGroup priceGroupEnum) {
@@ -115,6 +125,7 @@ public class Car {
                 ", category='" + category + '\'' +
                 ", priceGroup=" + priceGroup +
                 ", licensePlate='" + licensePlate + '\'' +
+                ", isAvailable=" + isAvailable +
                 '}';
     }
 
@@ -129,6 +140,7 @@ public class Car {
         private PriceGroup priceGroup;
 
         private String licensePlate;
+        private boolean isAvailable;
 
         public Builder id(int id) {
             this.id = id;
@@ -166,6 +178,11 @@ public class Car {
 
         }
 
+        public Builder isAvailable(boolean isAvailable) {
+            this.isAvailable = isAvailable;
+            return this;
+        }
+
         public Builder copy(Car car) {
             this.id = car.id;
             this.make = car.make;
@@ -174,6 +191,7 @@ public class Car {
             this.category = car.category;
             this.priceGroup = car.priceGroup;
             this.licensePlate = car.licensePlate;
+            this.isAvailable = car.isAvailable;
             return this;
         }
 
