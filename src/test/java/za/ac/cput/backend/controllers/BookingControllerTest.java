@@ -37,10 +37,10 @@ public class BookingControllerTest {
 
     @Test
     public void testGetAllBookings() throws Exception {
-        // Mock the service method
+
         when(bookingService.getAllBookings()).thenReturn(bookingList);
 
-        // Perform the GET request
+
         mockMvc.perform(get("/api/bookings/list/all"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))

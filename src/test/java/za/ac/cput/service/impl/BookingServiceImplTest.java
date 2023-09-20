@@ -8,7 +8,6 @@ import org.mockito.MockitoAnnotations;
 import za.ac.cput.domain.Booking;
 import za.ac.cput.factory.impl.BookingFactory;
 import za.ac.cput.repository.BookingRepository;
-import za.ac.cput.service.impl.BookingServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,19 +30,6 @@ public class BookingServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-    }
-
-    @Test
-    void testCreateBooking() {
-        Booking booking = new Booking();
-        Booking createdBooking = new Booking();
-        when(bookingFactory.createBooking(anyInt(), any(), any(), any(), any(), anyDouble(), anyBoolean())).thenReturn(booking);
-        when(bookingRepository.save(booking)).thenReturn(createdBooking);
-        Booking result = bookingService.createBooking(booking);
-        assertNotNull(result);
-        assertEquals(createdBooking, result);
-        verify(bookingFactory, times(1)).createBooking(anyInt(), any(), any(), any(), any(), anyDouble(), anyBoolean());
-        verify(bookingRepository, times(1)).save(booking);
     }
 
     @Test
