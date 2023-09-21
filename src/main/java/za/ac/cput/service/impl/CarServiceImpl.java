@@ -31,6 +31,7 @@ public class CarServiceImpl implements ICarService {
 
     @Override
     public Car create(Car car) {
+        car.setAvailable(true);
         Car newCar = carFactory.create(car);
         return repository.save(newCar);
 
@@ -70,6 +71,23 @@ public class CarServiceImpl implements ICarService {
         return all;
 
 
+    }
+
+    //get all available cars
+    public ArrayList<Car> getAllAvailableCars() {
+        List<Car> availableCars = new ArrayList<>();
+        List<Car> cars = getAll();
+        for (Car car : cars) {
+            if (car.isAvailable()) {
+                availableCars.add(car);
+            }
+        }
+        return (ArrayList<Car>) availableCars;
+    }
+
+    //check if car is available
+    public boolean isCarAvailable(Car car) {
+        return car.isAvailable();
     }
 
 

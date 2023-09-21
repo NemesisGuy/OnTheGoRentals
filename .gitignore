@@ -61,5 +61,5 @@ HELP.md
 !src/main/resources/mysql-db.properties
 /OnTheGoRentals.drawio
 /src/main/resources/mysql-db.properties
-/src/main/resources/application-api.properties
+/src/main/resources/application.properties
 /dev/

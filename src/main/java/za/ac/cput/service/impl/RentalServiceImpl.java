@@ -32,7 +32,18 @@ public class RentalServiceImpl implements IRentalService {
 
     @Autowired
     private RentalFactory rentalFactory;
+    private Car car;
 
+    //is car available
+    public boolean isCarAvailable(Rental rental) {
+        Car carToRent = rental.getCar();
+        return carRepository.existsByIdAndIsAvailableIsTrue((int) carToRent.getId());
+    }
+
+    public boolean isCarAvailableByCarId(Car car) {
+        this.car = car;
+        return carRepository.existsByIdAndIsAvailableIsTrue((int) car.getId());
+    }
     @Override
     public Rental create(Rental rental) {
         if (isCarAvailable(rental)) {
@@ -41,6 +52,7 @@ public class RentalServiceImpl implements IRentalService {
                         generateUserRentingErrorMessage(rental.getUser()));
             }
             Rental newRental = rentalFactory.create(rental);
+            carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
             return repository.save(newRental);
         } else {
             throw new CarNotAvailableException(generateCarNotAvailableErrorMessage(rental.getCar()));
@@ -62,6 +74,14 @@ public class RentalServiceImpl implements IRentalService {
             System.out.println("Rental " + rental.getRentalId() + " found");
             System.out.println(rental);
             Rental updatedRental = rentalFactory.create(rental);
+            // Set car to available if the rental was returned
+            if (updatedRental.getReturnedDate() != null) {
+                Car car = updatedRental.getCar();
+                car.setAvailable(true);
+                carRepository.setIsAvailableToTrue((int) car.getId());
+                //  carRepository.save(car); // Save the updated car entity
+            }
+
             return repository.save(updatedRental);
         }
         System.out.println("Rental " + rental.getRentalId() + " not found");
@@ -101,6 +121,7 @@ public class RentalServiceImpl implements IRentalService {
         return availableCars;
     }
 
+
     private String generateCarNotAvailableErrorMessage(Car car) {
         return car.getMake() + " " + car.getModel() + " " +
                 car.getLicensePlate() + " is not available for rental at this time";
@@ -115,13 +136,13 @@ public class RentalServiceImpl implements IRentalService {
     }
 
     //refactored isCarAvailable
-    private boolean isCarAvailable(Rental rental) {
-        Car carToRent = rental.getCar();
-        Optional<Rental> rentalFromDatabaseOptional = findMostRecentRentalByCarId(carToRent.getId());
-        Rental rentalFromDatabase = rentalFromDatabaseOptional.orElse(null);
-        printRentalInfo(rentalFromDatabase, rental.getReturnedDate());
-        return isCarAvailableBasedOnRental(rental);
-    }
+//    private boolean isCarAvailable(Rental rental) {
+//        Car carToRent = rental.getCar();
+//        Optional<Rental> rentalFromDatabaseOptional = findMostRecentRentalByCarId(carToRent.getId());
+//        Rental rentalFromDatabase = rentalFromDatabaseOptional.orElse(null);
+//        printRentalInfo(rentalFromDatabase, rental.getReturnedDate());
+//        return isCarAvailableBasedOnRental(rental);
+//    }
 
     private Optional<Rental> findMostRecentRentalByCarId(Long carId) {
         return repository.findTopByCarIdOrderByReturnedDateDesc(Math.toIntExact(carId));
@@ -140,23 +161,23 @@ public class RentalServiceImpl implements IRentalService {
 
 
     //refactored isCarAvailableByCarId
-    public boolean isCarAvailableByCarId(Car car) {
-        Optional<Rental> rentalByCarIdOrderByReturnedDateDesc = findMostRecentRentalByCarId(car.getId());
-
-        if (rentalByCarIdOrderByReturnedDateDesc.isPresent()) {
-            Rental rentalFromDatabase = rentalByCarIdOrderByReturnedDateDesc.get();
-
-            if (rentalFromDatabase.getReturnedDate() != null) {
-                printRentalInfoForCarAvailability(rentalFromDatabase, "Car is available");
-                // If the most recent rental is returned 24 hours before the new rental, then the car is available
-                return isCarAvailableBasedOnRental(rentalFromDatabase);
-            } else {
-                printRentalInfoForCarAvailability(rentalFromDatabase, "Car is not available");
-            }
-        }
-
-        return false;
-    }
+//    public boolean isCarAvailableByCarId(Car car) {
+//        Optional<Rental> rentalByCarIdOrderByReturnedDateDesc = findMostRecentRentalByCarId(car.getId());
+//
+//        if (rentalByCarIdOrderByReturnedDateDesc.isPresent()) {
+//            Rental rentalFromDatabase = rentalByCarIdOrderByReturnedDateDesc.get();
+//
+//            if (rentalFromDatabase.getReturnedDate() != null) {
+//                printRentalInfoForCarAvailability(rentalFromDatabase, "Car is available");
+//                // If the most recent rental is returned 24 hours before the new rental, then the car is available
+//                return isCarAvailableBasedOnRental(rentalFromDatabase);
+//            } else {
+//                printRentalInfoForCarAvailability(rentalFromDatabase, "Car is not available");
+//            }
+//        }
+//
+//        return false;
+//    }
 
     /// refactored
     private void printRentalInfoForCarAvailability(Rental rentalFromDatabase, String availabilityMessage) {
