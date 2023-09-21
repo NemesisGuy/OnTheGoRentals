@@ -1,4 +1,4 @@
-package za.ac.cput.service.impl;
+/**package za.ac.cput.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,4 +62,4 @@ public class PaymentServiceImpl implements PaymentService {
         Optional<Payment> optionalPayment = paymentRepository.findById(paymentId);
         return optionalPayment.orElse(null);
     }
-}
+}*/

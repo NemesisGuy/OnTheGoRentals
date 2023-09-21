@@ -14,17 +14,18 @@ import java.util.Optional;
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
-    private final BookingFactory bookingFactory;
+    //private final BookingFactory bookingFactory;
 
     @Autowired
-    public BookingServiceImpl(BookingRepository bookingRepository, BookingFactory bookingFactory) {
+    public BookingServiceImpl(BookingRepository bookingRepository) {
+        //BookingFactory bookingFactory
         this.bookingRepository = bookingRepository;
-        this.bookingFactory = bookingFactory;
+        //this.bookingFactory = bookingFactory;
     }
 
     @Override
     public Booking createBooking(Booking booking) {
-        Booking newBooking = bookingFactory.createBooking(
+        Booking newBooking = BookingFactory.createBooking(
                 booking.getId(),
                 booking.getUser(),
                 booking.getCar(),
@@ -39,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking updateBooking(Booking booking) {
         if (bookingRepository.existsById(booking.getId())) {
-            Booking updatedBooking = bookingFactory.createBooking(
+            Booking updatedBooking = BookingFactory.createBooking(
                     booking.getId(),
                     booking.getUser(),
                     booking.getCar(),

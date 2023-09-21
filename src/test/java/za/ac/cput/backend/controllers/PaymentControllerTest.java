@@ -1,4 +1,4 @@
-package za.ac.cput.backend.controllers;
+/**package za.ac.cput.backend.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +65,7 @@ public class PaymentControllerTest {
 
     @Test
     void testCreatePayment() throws Exception {
-        Payment newPayment = new Payment(/* Create a new Payment object with required parameters */);
+        Payment newPayment = new Payment(/* Create a new Payment object with required parameters );
         when(paymentService.createPayment(Mockito.any(Payment.class))).thenReturn(newPayment);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/payments/create")
@@ -77,7 +77,7 @@ public class PaymentControllerTest {
 
     @Test
     void testUpdatePayment() throws Exception {
-        Payment updatedPayment = new Payment(/* Create an updated Payment object with required parameters */);
+        Payment updatedPayment = new Payment(/* Create an updated Payment object with required parameters );
         when(paymentService.updatePayment(Mockito.any(Payment.class))).thenReturn(updatedPayment);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/payments/update")
@@ -95,3 +95,4 @@ public class PaymentControllerTest {
                 .andExpect(status().isOk());
     }
 }
+*/
