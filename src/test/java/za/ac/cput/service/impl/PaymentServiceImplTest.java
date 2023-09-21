@@ -2,24 +2,30 @@ package za.ac.cput.service.impl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import za.ac.cput.domain.Payment;
-import za.ac.cput.service.PaymentService;
-import za.ac.cput.service.impl.PaymentServiceImpl;
+import za.ac.cput.factory.impl.PaymentFactory;
+import za.ac.cput.repository.PaymentRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class PaymentServiceImplTest {
 
-    private PaymentService paymentService = new PaymentServiceImpl();
+    @InjectMocks
+    private PaymentServiceImpl paymentService;
 
     @Mock
-    private PaymentService mockPaymentService;
+    private PaymentRepository paymentRepository;
+
+    @Mock
+    private PaymentFactory paymentFactory;
 
     @BeforeEach
     void setUp() {
@@ -27,94 +33,71 @@ public class PaymentServiceImplTest {
     }
 
     @Test
-    void testCreatePayment() {
+    void testUpdatePayment() {
         Payment payment = new Payment();
+        Payment updatedPayment = new Payment();
 
-        when(mockPaymentService.createPayment(payment)).thenReturn(payment);
+        when(paymentRepository.existsById(anyInt())).thenReturn(true);
+        when(paymentRepository.save(payment)).thenReturn(updatedPayment);
 
-        Payment createdPayment = paymentService.createPayment(payment);
+        Payment result = paymentService.updatePayment(payment);
 
-        assertEquals(payment, createdPayment);
+        assertNotNull(result);
+        assertEquals(updatedPayment, result);
 
-        verify(mockPaymentService, times(1)).createPayment(payment);
+        verify(paymentRepository, times(1)).existsById(anyInt());
+        verify(paymentRepository, times(1)).save(payment);
     }
 
     @Test
-    void testUpdatePayment() {
+    void testUpdatePaymentWhenNotExists() {
         Payment payment = new Payment();
 
-        when(mockPaymentService.updatePayment(payment)).thenReturn(payment);
+        when(paymentRepository.existsById(anyInt())).thenReturn(false);
 
-        Payment updatedPayment = paymentService.updatePayment(payment);
+        Payment result = paymentService.updatePayment(payment);
 
-        assertEquals(payment, updatedPayment);
+        assertNull(result);
 
-        verify(mockPaymentService, times(1)).updatePayment(payment);
+        verify(paymentRepository, times(1)).existsById(anyInt());
+        verify(paymentRepository, never()).save(payment);
     }
 
     @Test
     void testDeletePayment() {
         int paymentId = 1;
-
-        doNothing().when(mockPaymentService).deletePayment(paymentId);
-
         paymentService.deletePayment(paymentId);
-
-        verify(mockPaymentService, times(1)).deletePayment(paymentId);
+        verify(paymentRepository, times(1)).deleteById(paymentId);
     }
 
     @Test
     void testGetAllPayments() {
         List<Payment> payments = new ArrayList<>();
-
-        when(mockPaymentService.getAllPayments()).thenReturn(payments);
-
-        List<Payment> retrievedPayments = paymentService.getAllPayments();
-
-        assertEquals(payments, retrievedPayments);
-
-        verify(mockPaymentService, times(1)).getAllPayments();
-    }
-
-    @Test
-    void testGetPaymentsByUserId() {
-        int userId = 1;
-        List<Payment> payments = new ArrayList<>();
-
-        when(mockPaymentService.getPaymentsByUserId(userId)).thenReturn(payments);
-
-        List<Payment> retrievedPayments = paymentService.getPaymentsByUserId(userId);
-
-        assertEquals(payments, retrievedPayments);
-
-        verify(mockPaymentService, times(1)).getPaymentsByUserId(userId);
-    }
-
-    @Test
-    void testGetPaymentsByRentalId() {
-        int rentalId = 1;
-        List<Payment> payments = new ArrayList<>();
-
-        when(mockPaymentService.getPaymentsByRentalId(rentalId)).thenReturn(payments);
-
-        List<Payment> retrievedPayments = paymentService.getPaymentsByRentalId(rentalId);
-
-        assertEquals(payments, retrievedPayments);
-
-        verify(mockPaymentService, times(1)).getPaymentsByRentalId(rentalId);
+        when(paymentRepository.findAll()).thenReturn(payments);
+        List<Payment> result = paymentService.getAllPayments();
+        assertNotNull(result);
+        assertEquals(payments, result);
+        verify(paymentRepository, times(1)).findAll();
     }
 
     @Test
     void testGetPaymentById() {
         int paymentId = 1;
         Payment payment = new Payment();
+        Optional<Payment> optionalPayment = Optional.of(payment);
+        when(paymentRepository.findById(paymentId)).thenReturn(optionalPayment);
+        Payment result = paymentService.getPaymentById(paymentId);
+        assertNotNull(result);
+        assertEquals(payment, result);
+        verify(paymentRepository, times(1)).findById(paymentId);
+    }
 
-        when(mockPaymentService.getPaymentById(paymentId)).thenReturn(payment);
-
-        Payment retrievedPayment = paymentService.getPaymentById(paymentId);
-
-        assertEquals(payment, retrievedPayment);
-
-        verify(mockPaymentService, times(1)).getPaymentById(paymentId);
+    @Test
+    void testGetPaymentByIdWhenNotExists() {
+        int paymentId = 1;
+        when(paymentRepository.findById(paymentId)).thenReturn(Optional.empty());
+        Payment result = paymentService.getPaymentById(paymentId);
+        assertNull(result);
+        verify(paymentRepository, times(1)).findById(paymentId);
     }
 }
