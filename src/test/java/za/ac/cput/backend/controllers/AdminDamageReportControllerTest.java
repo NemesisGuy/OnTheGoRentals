@@ -98,3 +98,4 @@ public class AdminDamageReportControllerTest {
         restTemplate.delete(url);
     }
 }
+
