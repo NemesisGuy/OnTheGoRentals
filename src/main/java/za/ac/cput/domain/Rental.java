@@ -18,10 +18,10 @@ public class Rental {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @ManyToOne //many rentals to one user
+    @ManyToOne (cascade = CascadeType.ALL)//many rentals to one user
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne //many rentals to one car
+    @ManyToOne (cascade = CascadeType.ALL) //many rentals to one car
     @JoinColumn(name = "car_id")
     private Car car;
     //driver
