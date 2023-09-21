@@ -38,10 +38,15 @@ public class DamageReportServiceImpl implements IDamageReport {
 
     @Override
     public DamageReport update(DamageReport damageReport) {
-        if (this.repository.existsById(damageReport.getId()))
-            this.repository.save(damageReport);
+        if (this.repository.existsById(damageReport.getId())) {
+            return this.repository.save(damageReport);
+        }
         return null;
     }
+
+
+
+
     @Override
     public Boolean deleteById(int id) {
         if (this.repository.existsById(id)){
@@ -59,5 +64,6 @@ public class DamageReportServiceImpl implements IDamageReport {
     public List<DamageReport> getAll() {
         return this.repository.findAll();
     }
+
 
 }

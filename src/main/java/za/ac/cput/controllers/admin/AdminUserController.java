@@ -10,7 +10,7 @@ package za.ac.cput.controllers.admin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.User;
-import za.ac.cput.service.impl.IUserServiceImpl;
+import za.ac.cput.service.impl.UserServiceImpl;
 
 import java.util.ArrayList;
 
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class AdminUserController {
 
     @Autowired
-    private IUserServiceImpl userService;
+    private UserServiceImpl userService;
 
     @RequestMapping("/list/all")
     public ArrayList<User> getAll() {
@@ -27,7 +27,6 @@ public class AdminUserController {
         return users;
     }
 
-    //list users by argument
     @RequestMapping("/list/{argument}")
     public ArrayList<User> getAllByArgument(@PathVariable String argument) {
         ArrayList<User> users = new ArrayList<>(userService.getAll());
@@ -37,14 +36,9 @@ public class AdminUserController {
 
     @PostMapping("/create")
     public User createUser(@RequestBody User user) {
-        System.out.println("/api/admin/users/create was triggered");
-        System.out.println("UserService was created...attempting to create user...");
-
         User createdUser = userService.create(user);
-
         return createdUser;
     }
-
     @GetMapping("/read/{userId}")
     public User readUser(@PathVariable Integer userId) {
         System.out.println("/api/admin/users/read was triggered");
@@ -52,19 +46,13 @@ public class AdminUserController {
         User readUser = userService.read(userId);
         return readUser;
     }
-
     @PutMapping("/update/{userId}")
     public User updateUser(@PathVariable int userId, @RequestBody User updatedUser) {
         System.out.println("/api/admin/users/update was triggered");
         System.out.println("UserService was created...attempting to update user...");
-
-        // Use the UserFactory to create a new User object with the updated properties
         User userToUpdate = userService.update(updatedUser);
-
-
         return userToUpdate;
     }
-
     @DeleteMapping("/delete/{userId}")
     public boolean deleteUser(@PathVariable Integer userId) {
         System.out.println("/api/admin/users/delete was triggered");

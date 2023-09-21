@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.atomic.AtomicLong;
-
+//TODO: remove this class this was just for testing purposes
 @RestController
 public class IndexController {
     private static final String template = "Hello, %s!";

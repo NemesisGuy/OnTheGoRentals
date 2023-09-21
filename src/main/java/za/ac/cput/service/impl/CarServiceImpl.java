@@ -1,45 +1,44 @@
 package za.ac.cput.service.impl;
-
+/**
+ *
+ * Author: Peter Buckingham (220165289)
+ *
+ */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Car;
 import za.ac.cput.factory.impl.CarFactory;
-import za.ac.cput.repository.ICarRepository;
+import za.ac.cput.repository.CarRepository;
 import za.ac.cput.service.ICarService;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service("carServiceImpl")
-public class ICarServiceImpl implements ICarService {
+public class CarServiceImpl implements ICarService {
 
     @Autowired
-    private ICarRepository repository;
+    private CarRepository repository;
     @Autowired
     private CarFactory carFactory;
 
 
-    public ICarServiceImpl(ICarRepository repository) {
+    public CarServiceImpl(CarRepository repository) {
 
         this.repository = repository;
     }
 
     @Override
     public Car create(Car car) {
+        car.setAvailable(true);
         Car newCar = carFactory.create(car);
         return repository.save(newCar);
 
     }
 
     @Override
-    public Car read(Integer integer) {
-
-        Optional<Car> optionalCar = this.repository.findById(integer);
-        return optionalCar.orElse(null);
-    }
-
-    @Override
-    public Car read(int id) {
+    public Car read(Integer id) {
         //optional
         Optional<Car> optionalCar = this.repository.findById(id);
         return optionalCar.orElse(null);
@@ -55,17 +54,7 @@ public class ICarServiceImpl implements ICarService {
     }
 
     @Override
-    public boolean delete(Integer integer) {
-        if (this.repository.existsById(integer)) {
-            this.repository.deleteById(integer);
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean delete(int id) {
+    public boolean delete(Integer id) {
         if (this.repository.existsById(id)) {
             this.repository.deleteById(id);
             return true;
@@ -83,6 +72,24 @@ public class ICarServiceImpl implements ICarService {
 
 
     }
+
+    //get all available cars
+    public ArrayList<Car> getAllAvailableCars() {
+        List<Car> availableCars = new ArrayList<>();
+        List<Car> cars = getAll();
+        for (Car car : cars) {
+            if (car.isAvailable()) {
+                availableCars.add(car);
+            }
+        }
+        return (ArrayList<Car>) availableCars;
+    }
+
+    //check if car is available
+    public boolean isCarAvailable(Car car) {
+        return car.isAvailable();
+    }
+
 
 
 }

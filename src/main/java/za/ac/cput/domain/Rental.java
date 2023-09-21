@@ -18,12 +18,17 @@ public class Rental {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne (cascade = CascadeType.ALL)//many rentals to one user
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne (cascade = CascadeType.ALL) //many rentals to one car
     @JoinColumn(name = "car_id")
     private Car car;
+    //driver
+    @ManyToOne //many rentals to one driver
+    @JoinColumn(name = "driver_id")
+    private Driver driver;
+
     private int issuer;
     private int receiver;
     private int fine;
@@ -143,6 +148,7 @@ public class Rental {
             this.id = id;
             return this;
         }
+
 
         public Builder setUser(User user) {
             this.user = user;

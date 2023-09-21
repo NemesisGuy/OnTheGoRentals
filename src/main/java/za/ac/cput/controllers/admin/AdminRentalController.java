@@ -3,14 +3,14 @@ package za.ac.cput.controllers.admin;
 /**
  * AdminRentalController.java
  * This is the controller for the Rental entity
- * Author: [Author Name]
- * Date: [Date]
+ * Author: Peter Buckingham (220165289)
+ * Date: 10 April 2023
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Rental;
-import za.ac.cput.service.impl.IRentalServiceImpl;
+import za.ac.cput.service.impl.RentalServiceImpl;
 
 import java.util.ArrayList;
 
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 @RequestMapping("/api/admin/rentals")
 public class AdminRentalController {
     @Autowired
-    private IRentalServiceImpl rentalService;
+    private RentalServiceImpl rentalService;
 
     @GetMapping("/list/all")
     public ArrayList<Rental> getAll() {
@@ -32,17 +32,10 @@ public class AdminRentalController {
         System.out.println("RentalService was created...attempting to create rental...");
 
         // Retrieve user and car based on their IDs
-       /* User user = userService.read(rental.getUser().getId());
-        Car car = carService.read(rental.getCar().getId());
-
-*/
-
         System.out.println(rental.getUser());
         System.out.println(rental.getCar());
         System.out.println(rental.getIssuedDate());
         System.out.println(rental.getReturnedDate());
-
-
         return rentalService.create(rental);
     }
 
@@ -65,15 +58,10 @@ public class AdminRentalController {
         System.out.println("rental car: " + rental.getCar());
         System.out.println("rental issued date: " + rental.getIssuedDate());
         System.out.println("rental returned date: " + rental.getReturnedDate());
-
-
         Rental updated = rentalService.update(rental);
-        System.out.println("updated rental: " + updated);//no id here ??
-
-
+        System.out.println("updated rental: " + updated);
         return updated;
     }
-
     @DeleteMapping("/delete/{rentalId}")
     public boolean deleteRental(@PathVariable Integer rentalId) {
         System.out.println("/api/admin/rentals/delete was triggered");

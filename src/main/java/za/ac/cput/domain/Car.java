@@ -2,6 +2,9 @@ package za.ac.cput.domain;
 
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
@@ -15,13 +18,16 @@ import java.util.Objects;
  * Date: 29 March 2021
  */
 
+
+
 @Entity
+
 public class Car {
     @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @OneToMany(mappedBy = "car")
+    @OneToMany(mappedBy = "car") //one car to many rentals
     private List<Rental> rentals = new ArrayList<>();
     private String make;
     private String model;
@@ -30,6 +36,7 @@ public class Car {
     @Enumerated(EnumType.STRING)
     private PriceGroup priceGroup;
     private String licensePlate;
+    private boolean isAvailable;
 
     public Car() {
         // Default constructor
@@ -43,6 +50,7 @@ public class Car {
         this.category = builder.category;
         this.priceGroup = builder.priceGroup;
         this.licensePlate = builder.licensePlate;
+        this.isAvailable = builder.isAvailable;
     }
 
     public static Builder builder() {
@@ -71,6 +79,14 @@ public class Car {
 
     public PriceGroup getPriceGroup() {
         return priceGroup;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
     }
 
     public void setPriceGroup(PriceGroup priceGroupEnum) {
@@ -109,6 +125,7 @@ public class Car {
                 ", category='" + category + '\'' +
                 ", priceGroup=" + priceGroup +
                 ", licensePlate='" + licensePlate + '\'' +
+                ", isAvailable=" + isAvailable +
                 '}';
     }
 
@@ -123,6 +140,7 @@ public class Car {
         private PriceGroup priceGroup;
 
         private String licensePlate;
+        private boolean isAvailable;
 
         public Builder id(int id) {
             this.id = id;
@@ -160,6 +178,11 @@ public class Car {
 
         }
 
+        public Builder isAvailable(boolean isAvailable) {
+            this.isAvailable = isAvailable;
+            return this;
+        }
+
         public Builder copy(Car car) {
             this.id = car.id;
             this.make = car.make;
@@ -168,6 +191,7 @@ public class Car {
             this.category = car.category;
             this.priceGroup = car.priceGroup;
             this.licensePlate = car.licensePlate;
+            this.isAvailable = car.isAvailable;
             return this;
         }
 
