@@ -38,6 +38,7 @@ public class Booking {
         // Default constructor
     }
 
+
     private Booking(Builder builder) {
         this.id = builder.id;
         this.user = builder.user;

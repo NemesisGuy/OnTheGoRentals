@@ -104,3 +104,4 @@ public class BookingServiceImplTest {
         verify(bookingRepository, times(1)).findById(bookingId);
     }
 }
+

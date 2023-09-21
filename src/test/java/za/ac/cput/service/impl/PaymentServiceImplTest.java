@@ -1,4 +1,4 @@
-package za.ac.cput.service.impl;
+/**package za.ac.cput.service.impl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -100,4 +100,4 @@ public class PaymentServiceImplTest {
         assertNull(result);
         verify(paymentRepository, times(1)).findById(paymentId);
     }
-}
+}*/

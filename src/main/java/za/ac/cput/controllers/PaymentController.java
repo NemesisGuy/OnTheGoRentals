@@ -1,4 +1,4 @@
-package za.ac.cput.controllers;
+/**package za.ac.cput.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import java.util.List;
  * PaymentController.java
  * Author: Lonwabo Magazi-218331851
  * Date: September 2023
- */
+
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -56,3 +56,4 @@ public class PaymentController {
         paymentService.deletePayment(paymentId);
     }
 }
+*/
