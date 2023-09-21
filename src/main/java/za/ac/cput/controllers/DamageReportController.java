@@ -16,12 +16,12 @@ import za.ac.cput.service.impl.DamageReportServiceImpl;
 import java.util.List;
 
 @RestController
-@RequestMapping("/damageReport")
+@RequestMapping("/damageReport") // no api? look at my examples please!
 public class DamageReportController {
 @Autowired
 private DamageReportServiceImpl damageReportService;
 
-@PostMapping("createReport")
+    @PostMapping("createReport")//please put leading slashes on all these paths, make them one word @Cwenga
     public ResponseEntity<DamageReport> create(@RequestBody DamageReport damageReport){
 
     DamageReport newDamageReport = DamageReportFactory.createReport(damageReport.getId(), damageReport.getRental(), damageReport.getDescription(), damageReport.getDateAndTime(), damageReport.getLocation(), damageReport.getRepairCost());

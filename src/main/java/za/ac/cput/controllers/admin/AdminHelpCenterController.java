@@ -41,7 +41,7 @@ public class AdminHelpCenterController {
         return helpCenterService.delete(id);
     }
 
-    @GetMapping("/get-all")
+    @GetMapping("/get-all")//lets drop the dashes and the word get in the url look at my examples please
     public ArrayList<HelpCenter> getAll() {
         ArrayList<HelpCenter> helpCenterList = new ArrayList<>(helpCenterService.getAll());
         return helpCenterList;

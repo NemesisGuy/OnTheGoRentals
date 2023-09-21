@@ -9,7 +9,7 @@ import za.ac.cput.service.IDriverService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/driver")
+@RequestMapping("/driver") // // no api? look at my examples please!
 public class DriverController {
     @Autowired
     private IDriverService driverService;
@@ -25,11 +25,13 @@ public class DriverController {
     public Driver updated(@RequestBody Driver driver){
         return driverService.update(driver);
     }
-    @DeleteMapping("delete/{id}")
+
+    @DeleteMapping("delete/{id}")//leading slash is important
     public boolean delete(@PathVariable Integer id){
         return driverService.delete(id);
     }
-    @RequestMapping({"/getall"})
+
+    @RequestMapping({"/getall"})//lets drop the get in the url look at my examples please
     public List<Driver> getall(){
         return driverService.getAll();
     }

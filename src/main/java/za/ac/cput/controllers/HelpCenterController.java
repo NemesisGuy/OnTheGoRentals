@@ -23,13 +23,13 @@ public class HelpCenterController {
     @Autowired
     private IHelpCenterServiceImpl helpCenterService;
 
-    @GetMapping("/get-all")
+    @GetMapping("/get-all") //lets drop the dashes in the url
     public ArrayList<HelpCenter> getAll() {
         ArrayList<HelpCenter> helpCenterList = new ArrayList<>(helpCenterService.getAll());
         return helpCenterList;
     }
 
-    @GetMapping("/get-all-by-category/{category}")
+    @GetMapping("/get-all-by-category/{category}")//lets drop the dashes in the url look at my examples please
     public ArrayList<HelpCenter> getAllByCategory(@PathVariable String category) {
         return helpCenterService.getAllByCategory(category);
     }

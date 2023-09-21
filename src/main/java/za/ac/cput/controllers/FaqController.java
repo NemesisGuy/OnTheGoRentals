@@ -22,7 +22,7 @@ public class FaqController {
     @Autowired
     private IFaqServiceImpl faqService;
 
-    @GetMapping("/get-all")
+    @GetMapping("/get-all")//lets drop the dashes and get in the url look at my examples please
     public ArrayList<Faq> getAll() {
         ArrayList<Faq> allFaq = new ArrayList<>(faqService.getAll());
         return allFaq;

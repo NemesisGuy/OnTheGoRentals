@@ -16,13 +16,17 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("admin/damageReport")
+@RequestMapping("admin/damageReport")// no api? look at my examples please!
 public class AdminDamageReportController {
 
     @Autowired
     private DamageReportServiceImpl damageReportService;
 
     @PostMapping("createReport")
+//lets use slashes in the url look at my examples please, too much use of the word report, think about it please @Cwenga
+    //http://localhost:8080/admin/damageReport/createReport this is strange @Cwenga
+    //http://localhost:8080/damageReport/getAllReports  this is strange @Cwenga
+
     public ResponseEntity<DamageReport> create(@RequestBody DamageReport damageReport){
 
         DamageReport newDamageReport = DamageReportFactory.createReport(damageReport.getId(), damageReport.getRental(), damageReport.getDescription(), damageReport.getDateAndTime(), damageReport.getLocation(), damageReport.getRepairCost());

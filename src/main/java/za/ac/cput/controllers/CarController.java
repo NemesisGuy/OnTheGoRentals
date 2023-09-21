@@ -75,15 +75,6 @@ public class CarController {
         return economyCars;
     }
 
-  /*  @GetMapping("/api/cars/list/available/luxury")
-    public List<Car> getAvailableLuxuryCars() {
-        List<Car> luxuryCars = new ArrayList<>(carService.getAll());
-        luxuryCars.removeIf(car -> car.getPriceGroup() != PriceGroup.LUXURY || !rentalService.isCarAvailableByCarId(car));
-        return luxuryCars;
-    }
-*/
-
-    // TODO: migrate to this method for all the filtering, using the service to filter the list
     @GetMapping("/list/available/luxury")
     public List<Car> getAvailableLuxuryCars() {
         // Fetch already filtered list from service
