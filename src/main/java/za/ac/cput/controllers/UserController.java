@@ -25,7 +25,6 @@ public class UserController {
     @Qualifier("userServiceImpl")
     private UserServiceImpl userService;
 
-
     @PostMapping("/register")
     public User register(@RequestBody User registrationRequest) {
         // Extract the registration details from the request object
