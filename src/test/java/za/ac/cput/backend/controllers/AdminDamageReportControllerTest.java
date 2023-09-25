@@ -33,16 +33,16 @@ public class AdminDamageReportControllerTest {
         Car car2 = new Car.Builder().id(10).make("Suzuki").model("Swift").priceGroup(PriceGroup.ECONOMY).category("Compact").year(2023).licensePlate("ADC123").build();
         Car car3 = new Car.Builder().id(11).make("Suzuki").model("Baleno").priceGroup(PriceGroup.STANDARD).category("Compact").year(2023).licensePlate("ADE123").build();
 
-        User user1 = new User.Builder().id(11).userName("Zakes").email("zakes.james@yahoo.com").firstName("Zelino").lastName("James").pictureUrl("image-1.jpg").phoneNumber("081 456 2746").password("zakes#2023").role("Driver").build();
-        Rental rental1 = new Rental.Builder().setId(10).setUser(user1).setCar(car3).setIssuer(9).setReceiver(3).setFine(250).setIssuedDate(LocalDateTime.now()).setDateReturned(java.time.LocalDateTime.parse("2023-09-16T20:30:53")).build();
-        damageReport1 = DamageReportFactory.createReport(10,rental1, "Broken left headlight", LocalDateTime.parse("2023-09-16T20:40:56"), "Paarl", 2000.00);
-        baseURL = "http://localhost:8080" + "/admin/damageReport";
+        User user1 = new User.Builder().id(11).userName("Eddie").email("jacobse@cput.ac.za").firstName("Edison").lastName("Jacobs").pictureUrl("image-9.jpg").phoneNumber("079 576 0088").password("eddie#2023").role("Driver").build();
+        Rental rental1 = new Rental.Builder().setId(10).setUser(user1).setCar(car1).setIssuer(5).setReceiver(1).setFine(700).setIssuedDate(LocalDateTime.now()).setDateReturned(java.time.LocalDateTime.parse("2023-09-25T20:30:53")).build();
+        damageReport1 = DamageReportFactory.createReport(13,rental1, "Scratches on the bumper.", LocalDateTime.parse("2023-09-25T20:40:56"), "Paarl", 3500.00);
+        baseURL = "http://localhost:8080" + "/api/admin/damageReport";
     }
     @Test
     @Order(1)
     void save(){
         assertNotNull(controller);
-        String url = baseURL + "/createReport";
+        String url = baseURL + "/create";
         ResponseEntity<DamageReport> damageReportResponseEntity = restTemplate.postForEntity(url, damageReport1, DamageReport.class);
         assertNotNull(damageReportResponseEntity);
         assertEquals(HttpStatus.OK, damageReportResponseEntity.getStatusCode());
@@ -56,7 +56,7 @@ public class AdminDamageReportControllerTest {
     @Order(2)
     void findById(){
 
-        String url = baseURL + "/readReport/" + damageReport1.getId();
+        String url = baseURL + "/read/" + damageReport1.getId();
         System.out.println("URL" + url);
 
         ResponseEntity<DamageReport> response = restTemplate.getForEntity(url, DamageReport.class);
@@ -69,7 +69,7 @@ public class AdminDamageReportControllerTest {
 
         DamageReport updated = new DamageReport.Builder().copy(damageReport1)
                 .setRepairCost(3000.00).build();
-        String url = baseURL + "/updateReport";
+        String url = baseURL + "/update";
         System.out.println("URL" + url);
         System.out.println("Updated report: " + updated);
 
@@ -82,7 +82,7 @@ public class AdminDamageReportControllerTest {
     @Test
     @Order(4)
     void getAll(){
-        String url = baseURL + "/getAllReports";
+        String url = baseURL + "/All";
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> entity = new HttpEntity<>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
@@ -93,7 +93,7 @@ public class AdminDamageReportControllerTest {
     @Test
     @Order(5)
     void deleteById(){
-        String url = baseURL + "/deleteReport/" + damageReport1.getId();
+        String url = baseURL + "/delete/" + damageReport1.getId();
         System.out.println("URL: " + url);
         restTemplate.delete(url);
     }
