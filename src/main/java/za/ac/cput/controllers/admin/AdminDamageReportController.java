@@ -46,7 +46,7 @@ public class AdminDamageReportController {
         return new ResponseEntity<>(updateReport,HttpStatus.OK);
     }
 
-    @GetMapping("/All")
+    @GetMapping("/all")
     public ResponseEntity<List<DamageReport>> getAll(){
         List<DamageReport> damageReportList = this.damageReportService.getAll();
         return ResponseEntity.ok(damageReportList);
