@@ -57,9 +57,6 @@ class DamageReportServiceImplTest {
         this.service.deleteById(report1.getId());
         List<DamageReport> damageReportList = this.service.getAll();
         assertEquals(0, damageReportList.size());
-        /**    this.service.deleteById(address.getId());
-         List<Address> addressList = this.service.findAll();
-         assertEquals(0, addressList.size());
-         }*/
+
     }
 }
