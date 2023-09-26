@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Peter Buckingham - 220165289
@@ -24,6 +26,9 @@ public class Rental {
     @ManyToOne (cascade = CascadeType.ALL) //many rentals to one car
     @JoinColumn(name = "car_id")
     private Car car;
+
+    @OneToMany(mappedBy = "rental")
+    private List<DamageReport> damageReportList = new ArrayList<>();
     //driver
     @ManyToOne //many rentals to one driver
     @JoinColumn(name = "driver_id")

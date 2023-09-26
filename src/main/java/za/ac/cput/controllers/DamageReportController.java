@@ -1,9 +1,9 @@
-package za.ac.cput.controllers;
+/**package za.ac.cput.controllers;
 /**DamageReportController.java
  * Controller Class for the Damage Report
  * Author: Cwenga Dlova (214310671)
  * Date: 08/09/2023
- * */
+ *
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +16,12 @@ import za.ac.cput.service.impl.DamageReportServiceImpl;
 import java.util.List;
 
 @RestController
-@RequestMapping("/damageReport")
+@RequestMapping("/damageReport") // no api? look at my examples please!
 public class DamageReportController {
 @Autowired
 private DamageReportServiceImpl damageReportService;
 
-@PostMapping("createReport")
+    @PostMapping("createReport")//please put leading slashes on all these paths, make them one word @Cwenga
     public ResponseEntity<DamageReport> create(@RequestBody DamageReport damageReport){
 
     DamageReport newDamageReport = DamageReportFactory.createReport(damageReport.getId(), damageReport.getRental(), damageReport.getDescription(), damageReport.getDateAndTime(), damageReport.getLocation(), damageReport.getRepairCost());
@@ -55,3 +55,4 @@ private DamageReportServiceImpl damageReportService;
 
 
 }
+*/

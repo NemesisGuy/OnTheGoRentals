@@ -8,8 +8,9 @@ import za.ac.cput.service.IFeedbackService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/feedback")
-@CrossOrigin(origins = "http://localhost:8080") // Allow requests from your Vue.js frontend's domain
+@RequestMapping("/feedback") // no api? look at my examples please!
+@CrossOrigin(origins = "http://localhost:8080")
+// Allow requests from your Vue.js frontend's domain *****this is a lie*****
 public class FeedbackController {
 
     @Autowired
@@ -35,7 +36,7 @@ public class FeedbackController {
         return feedbackService.delete(id);
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/getAll")////lets drop the get in the url look at my examples please
     public List<Feedback> getAll() {
         return feedbackService.getAll();
     }
