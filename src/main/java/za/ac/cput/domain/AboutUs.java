@@ -21,7 +21,7 @@ public class AboutUs {
     private String telephone;
     private String whatsApp;
 
-    public AboutUs() {
+    protected AboutUs() {
     }
 
     public AboutUs(Builder builder) {
