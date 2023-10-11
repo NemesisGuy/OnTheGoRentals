@@ -40,8 +40,8 @@ public class AdminDamageReportController {
         return ResponseEntity.ok(readDamageReport);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<DamageReport> update(@RequestBody DamageReport updatedReport){
+    @PutMapping("/update/{damageReportId}")
+    public ResponseEntity<DamageReport> update(@PathVariable int damageReportId, DamageReport updatedReport){
         DamageReport updateReport = damageReportService.update(updatedReport);
         return new ResponseEntity<>(updateReport,HttpStatus.OK);
     }

@@ -5,3 +5,4 @@ import za.ac.cput.domain.AboutUs;
 
 public interface AboutUsRepository extends JpaRepository<AboutUs, Integer> {
 }
+

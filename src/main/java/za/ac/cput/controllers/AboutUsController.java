@@ -21,9 +21,10 @@ public class AboutUsController {
     @Autowired
     private AboutUsServiceImpl service;
 
-    @GetMapping("/read{id}")
+    @GetMapping("/read/{id}")
     public ResponseEntity<AboutUs> read(@PathVariable("id") int id) {
         AboutUs readAbout = this.service.read(id);
         return ResponseEntity.ok(readAbout);
     }
 }
+

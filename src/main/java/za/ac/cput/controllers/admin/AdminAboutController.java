@@ -22,16 +22,6 @@ public class AdminAboutController {
 
     @Autowired
     private AboutUsServiceImpl aboutUsService;
-   /** @GetMapping("/about")
-    public Map<String, String> aboutPage() {
-        Map<String, String> aboutInfo = new HashMap<>();
-        aboutInfo.put("address", "Cape Town International Apt, Cape Town");
-        aboutInfo.put("officeHours", "Monday - Sunday: 6:00am - 22:30pm");
-        aboutInfo.put("email", "info@onthegorental.com");
-        aboutInfo.put("telephone", "+27 21 461 6182");
-        aboutInfo.put("whatsapp", "+27 78 303 9813");
-        return aboutInfo;
-    }*/
 
    @PostMapping("/create")
    public ResponseEntity<AboutUs> create(@RequestBody AboutUs aboutUs){
@@ -39,14 +29,14 @@ public class AdminAboutController {
        AboutUs aboutUsSaved = this.aboutUsService.create(newAbout);
        return ResponseEntity.ok(aboutUsSaved);
    }
-   @GetMapping("/read{id}")
+   @GetMapping("/read/{id}")
    public ResponseEntity<AboutUs> read(@PathVariable("id") int id) {
        AboutUs readAbout = this.aboutUsService.read(id);
        return ResponseEntity.ok(readAbout);
    }
-   @PutMapping("/update")
-    public ResponseEntity<AboutUs> update(@RequestBody AboutUs updatedAbout){
-       AboutUs updateAbout = aboutUsService.update(updatedAbout);
+   @PutMapping("/update/{id}")
+    public ResponseEntity<AboutUs> update(@PathVariable int id, @RequestBody AboutUs updatedAbout){
+       AboutUs updateAbout = aboutUsService.update( updatedAbout);
        return new ResponseEntity<>(updateAbout, HttpStatus.OK);
    }
    @GetMapping("/all")
@@ -54,7 +44,7 @@ public class AdminAboutController {
        List aboutList = this.aboutUsService.getAll();
        return ResponseEntity.ok(aboutList);
    }
-   @DeleteMapping("/delete")
+   @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") int id){
        this.aboutUsService.delete(id);
        return new ResponseEntity<>(HttpStatus.OK);
