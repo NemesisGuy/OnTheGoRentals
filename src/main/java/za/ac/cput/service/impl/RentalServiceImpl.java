@@ -16,7 +16,6 @@ import za.ac.cput.factory.impl.RentalFactory;
 import za.ac.cput.repository.CarRepository;
 import za.ac.cput.repository.RentalRepository;
 import za.ac.cput.service.IRentalService;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
