@@ -3,6 +3,7 @@ package za.ac.cput.service.impl;
  * Author: Peter Buckingham (220165289)
  */
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Car;
@@ -15,7 +16,6 @@ import za.ac.cput.factory.impl.RentalFactory;
 import za.ac.cput.repository.CarRepository;
 import za.ac.cput.repository.RentalRepository;
 import za.ac.cput.service.IRentalService;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,6 +45,7 @@ public class RentalServiceImpl implements IRentalService {
         return carRepository.existsByIdAndIsAvailableIsTrue((int) car.getId());
     }
     @Override
+    @Transactional
     public Rental create(Rental rental) {
         if (isCarAvailable(rental)) {
             if (isCurrentlyRenting(rental.getUser())) {
@@ -52,7 +53,10 @@ public class RentalServiceImpl implements IRentalService {
                         generateUserRentingErrorMessage(rental.getUser()));
             }
             Rental newRental = rentalFactory.create(rental);
-            carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
+            if (newRental.getReturnedDate() != null) {
+                carRepository.setIsAvailableToTrue((int) newRental.getCar().getId());
+            }
+           // carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
             return repository.save(newRental);
         } else {
             throw new CarNotAvailableException(generateCarNotAvailableErrorMessage(rental.getCar()));
