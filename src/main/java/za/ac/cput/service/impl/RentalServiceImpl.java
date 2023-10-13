@@ -124,7 +124,6 @@ public class RentalServiceImpl implements IRentalService {
         return filterAvailableCars(allRentals);
     }
 
-
     private ArrayList<Rental> filterAvailableCars(List<Rental> rentals) {
         ArrayList<Rental> availableCars = new ArrayList<>();
         for (Rental rental : rentals) {
@@ -134,7 +133,6 @@ public class RentalServiceImpl implements IRentalService {
         }
         return availableCars;
     }
-
 
     private String generateCarNotAvailableErrorMessage(Car car) {
         return car.getMake() + " " + car.getModel() + " " +
