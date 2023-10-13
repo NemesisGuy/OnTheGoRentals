@@ -69,6 +69,7 @@ public class RentalServiceImpl implements IRentalService {
     }
 
     @Override
+    @Transactional
     public Rental update(Rental rental) {
         System.out.println("RentalServiceImpl.update : ");
         System.out.println("rental Id received : " + rental.getRentalId());
@@ -82,7 +83,13 @@ public class RentalServiceImpl implements IRentalService {
             if (updatedRental.getReturnedDate() != null) {
                 Car car = updatedRental.getCar();
                 car.setAvailable(true);
-                carRepository.setIsAvailableToTrue((int) car.getId());
+                Rental newRental = rentalFactory.create(rental);
+                if (newRental.getReturnedDate() != null) {
+                    carRepository.setIsAvailableToTrue((int) newRental.getCar().getId());
+                }else {
+                    carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
+                }
+                //  carRepository.setIsAvailableToTrue((int) car.getId());
                 //  carRepository.save(car); // Save the updated car entity
             }
 
