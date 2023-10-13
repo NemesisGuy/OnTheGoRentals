@@ -55,8 +55,10 @@ public class RentalServiceImpl implements IRentalService {
             Rental newRental = rentalFactory.create(rental);
             if (newRental.getReturnedDate() != null) {
                 carRepository.setIsAvailableToTrue((int) newRental.getCar().getId());
+                System.out.println("Is car available after update: " + newRental.getCar().isAvailable());
             }else {
                 carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
+                System.out.println("Is car available after update: " + newRental.getCar().isAvailable());
             }
            // carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
             return repository.save(newRental);
@@ -85,14 +87,13 @@ public class RentalServiceImpl implements IRentalService {
             if (updatedRental.getReturnedDate() != null) {
                 Car car = updatedRental.getCar();
                 car.setAvailable(true);
-                Rental newRental = rentalFactory.create(rental);
-                if (newRental.getReturnedDate() != null) {
-                    carRepository.setIsAvailableToTrue((int) newRental.getCar().getId());
-                }else {
-                    carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
-                }
-                //  carRepository.setIsAvailableToTrue((int) car.getId());
-                //  carRepository.save(car); // Save the updated car entity
+                carRepository.save(car); // Save the updated car entity
+                System.out.println("Is car available after update: " + car.isAvailable());
+            }else {
+                Car car = updatedRental.getCar();
+                car.setAvailable(false);
+                carRepository.save(car); // Save the updated car entity
+                System.out.println("Is car available after update: " + car.isAvailable());
             }
 
             return repository.save(updatedRental);
