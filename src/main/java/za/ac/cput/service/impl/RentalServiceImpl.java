@@ -55,6 +55,8 @@ public class RentalServiceImpl implements IRentalService {
             Rental newRental = rentalFactory.create(rental);
             if (newRental.getReturnedDate() != null) {
                 carRepository.setIsAvailableToTrue((int) newRental.getCar().getId());
+            }else {
+                carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
             }
            // carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
             return repository.save(newRental);
