@@ -2,6 +2,7 @@ package za.ac.cput.domain;
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.Id;
+import za.ac.cput.domain.security.User;
 
 import java.time.LocalDateTime;
 

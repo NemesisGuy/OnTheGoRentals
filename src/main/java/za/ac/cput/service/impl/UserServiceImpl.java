@@ -1,9 +1,12 @@
+/*
 package za.ac.cput.service.impl;
+*/
 /**
  *
  * Author: Peter Buckingham (220165289)
  *
- */
+ *//*
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.User;
@@ -65,3 +68,4 @@ public class UserServiceImpl implements IUserService {
 
 
 }
+*/

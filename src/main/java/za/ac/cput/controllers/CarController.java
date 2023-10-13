@@ -23,7 +23,7 @@ import java.util.List;
 
 
 //set url
-@CrossOrigin(origins = "http://localhost:5173")
+/*@CrossOrigin(origins = "http://localhost:5173")*/
 public class CarController {
 
     @Autowired

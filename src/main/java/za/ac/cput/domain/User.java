@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.domain;
 
 import jakarta.persistence.*;
@@ -5,11 +6,13 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+*/
 /**
  *
  * Author: Peter Buckingham (220165289)
  *
- */
+ *//*
+
 @Entity
 public class User {
     @Id
@@ -190,3 +193,4 @@ public class User {
         }
     }
 }
+*/

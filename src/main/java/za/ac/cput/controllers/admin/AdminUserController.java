@@ -1,16 +1,19 @@
 package za.ac.cput.controllers.admin;
-
 /**
+ *
  * AdminUserController.java
  * This is the controller for the user entity
  * Author: Peter Buckingham (220165289)
  * Date: 05 April 2023
  */
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.User;
-import za.ac.cput.service.impl.UserServiceImpl;
+import za.ac.cput.service.impl.UserService;
+import za.ac.cput.domain.security.User;
+/*import za.ac.cput.domain.User;
+import za.ac.cput.service.impl.UserServiceImpl;*/
 
 import java.util.ArrayList;
 
@@ -18,10 +21,12 @@ import java.util.ArrayList;
 @RequestMapping("/api/admin/users")
 public class AdminUserController {
 
+    /* @Autowired
+     private UserServiceImpl userService;*/
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
 
-    @RequestMapping("/list/all")
+    @GetMapping("/list/all")
     public ArrayList<User> getAll() {
         ArrayList<User> users = new ArrayList<>(userService.getAll());
         return users;

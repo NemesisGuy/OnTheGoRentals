@@ -9,12 +9,13 @@ import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.PriceGroup;
 import za.ac.cput.domain.Rental;
-import za.ac.cput.domain.User;
+/*import za.ac.cput.domain.User;*/
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.UserCantRentMoreThanOneCarException;
 import za.ac.cput.factory.impl.RentalFactory;
 import za.ac.cput.repository.CarRepository;
 import za.ac.cput.repository.RentalRepository;
+import za.ac.cput.domain.security.User;
 import za.ac.cput.service.IRentalService;
 import java.time.Duration;
 import java.time.LocalDateTime;
