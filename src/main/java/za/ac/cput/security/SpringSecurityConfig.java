@@ -33,14 +33,40 @@ public class SpringSecurityConfig {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeHttpRequests()
+
+            //user endpoints
+            //user registration endpoints
             .requestMatchers("/api/user/register").permitAll()
             .requestMatchers("/api/user/authenticate").permitAll()
-            .requestMatchers("/api/cars/list/**").permitAll()
+            //user car endpoints
+            .requestMatchers("/api/cars/list/*").permitAll()
+            .requestMatchers("/api/cars/list/available/*").permitAll()
             .requestMatchers("/api/settings/read").permitAll()
-            .requestMatchers("/api/user/profile/**").hasAuthority("USER")
+             .requestMatchers("/api/user/profile/*").permitAll()
+            //admin endpoints
+            //admin cars endpoints
+            .requestMatchers("/api/admin/cars/all").permitAll()
+            .requestMatchers("/api/admin/cars/create").permitAll()
+            .requestMatchers("/api/admin/cars/read/*").permitAll()
+            .requestMatchers("/api/admin/cars/update/*").permitAll()
+            .requestMatchers("/api/admin/cars/delete/*").permitAll()
+            //admin users endpoints
+            .requestMatchers("/api/admin/users/list/*").permitAll()
+            .requestMatchers("/api/admin/users/create").permitAll()
+            .requestMatchers("/api/admin/users/read/*").permitAll()
+            .requestMatchers("/api/admin/users/update/*").permitAll()
+            .requestMatchers("/api/admin/users/delete/*").permitAll()
+            //admin settings endpoints
+            .requestMatchers("/api/admin/settings/read").permitAll()
+            .requestMatchers("/api/admin/settings/update").permitAll()
+            //superadmin endpoints
+
+         //   .requestMatchers("/api/admins/**").permitAll()
+          //  .requestMatchers("/api/superadmin/**").permitAll()
+          /*  .requestMatchers("/api/user/profile/**").hasAuthority("USER")
             .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
             .requestMatchers("/api/admins/**").hasAuthority("ADMIN")
-            .requestMatchers("/api/superadmin/**").hasAuthority("SUPERADMIN") ;
+            .requestMatchers("/api/superadmin/**").hasAuthority("SUPERADMIN") */;
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return  http.build();
