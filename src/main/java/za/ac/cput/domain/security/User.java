@@ -5,6 +5,8 @@ package za.ac.cput.domain.security;
  *
  */
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -12,6 +14,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import za.ac.cput.domain.Rental;
+/*import za.ac.cput.utils.GrantedAuthorityDeserializer;
+import za.ac.cput.utils.GrantedAuthoritySerializer;*/
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,6 +30,8 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+/*@JsonSerialize(using = GrantedAuthoritySerializer.class)
+@JsonDeserialize(using = GrantedAuthorityDeserializer.class)*/
 public class User implements Serializable , UserDetails {
 
 

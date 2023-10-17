@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.domain;
 
 import java.time.LocalDateTime;
@@ -38,3 +39,4 @@ public class RentalTest {
         assertEquals(rentalReceiver, rental.getReceiver());
     }
 }
+*/

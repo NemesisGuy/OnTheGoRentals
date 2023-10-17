@@ -32,7 +32,8 @@ public class CorsConfig {
                         .allowedOriginPatterns(allowedOrigins) //use this for when allowing all origins
                        // .allowedOrigins("http://localhost:5173", "http://192.168.0.105:5173", "http://192.168.56.1:5173", "http://172.31.112.1:5173", "http://192.0.0.0/8:5173", "http://192.169.0.101:5173")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
-                        .allowedHeaders("*")
+                        .allowedOrigins("http://localhost:5173")
+                       // .allowedHeaders("*")
                         .allowCredentials(true)
                         .exposedHeaders("Access-Control-Allow-Origin")
                         .maxAge(3600);

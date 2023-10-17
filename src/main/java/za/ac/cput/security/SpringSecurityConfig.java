@@ -55,7 +55,7 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/admin/cars/all").permitAll()
             .requestMatchers("/api/admin/cars/create").permitAll()
             .requestMatchers("/api/admin/cars/read/*").permitAll()
-            .requestMatchers("/api/admin/cars/update/*/").permitAll()
+            .requestMatchers("/api/admin/cars/update/*").permitAll()
             .requestMatchers("/api/admin/cars/delete/*").permitAll()
             //admin users endpoints
             .requestMatchers("/api/admin/users/list/*").permitAll()
@@ -72,6 +72,9 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/admin/rentals/update/*").permitAll()
             .requestMatchers("/api/admin/rentals/delete/*").permitAll()
             //admin bookings endpoints
+
+            //admin faqs endpoints
+            .requestMatchers("/api/admin/faq/get-all").permitAll()
 
             //admin settings endpoints
             .requestMatchers("/api/admin/settings/read").permitAll()
