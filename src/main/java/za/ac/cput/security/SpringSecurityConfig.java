@@ -42,19 +42,20 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/cars/list/*").permitAll()
             .requestMatchers("/api/cars/list/available/*").permitAll()
             .requestMatchers("/api/settings/read").permitAll()
-             .requestMatchers("/api/user/profile/*").permitAll()
+            .requestMatchers("/api/user/profile/*").permitAll()
             //admin endpoints
             //admin cars endpoints
             .requestMatchers("/api/admin/cars/all").permitAll()
             .requestMatchers("/api/admin/cars/create").permitAll()
             .requestMatchers("/api/admin/cars/read/*").permitAll()
-            .requestMatchers("/api/admin/cars/update/*").permitAll()
+            .requestMatchers("/api/admin/cars/update/*/").permitAll()
             .requestMatchers("/api/admin/cars/delete/*").permitAll()
             //admin users endpoints
             .requestMatchers("/api/admin/users/list/*").permitAll()
             .requestMatchers("/api/admin/users/create").permitAll()
             .requestMatchers("/api/admin/users/read/*").permitAll()
             .requestMatchers("/api/admin/users/update/*").permitAll()
+            .requestMatchers("/api/admin/users/update/*/*").permitAll()
             .requestMatchers("/api/admin/users/delete/*").permitAll()
             //admin settings endpoints
             .requestMatchers("/api/admin/settings/read").permitAll()

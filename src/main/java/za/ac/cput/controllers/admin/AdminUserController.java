@@ -109,15 +109,6 @@ public class AdminUserController {
         }
     }
 
-   /* @PutMapping("/update/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Integer id, @RequestBody User user) {
-        User updatedUser = userService.update(id, user);
-        if (updatedUser != null) {
-            return ResponseEntity.ok(updatedUser);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }*/
 
     @DeleteMapping("delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
