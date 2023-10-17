@@ -38,12 +38,19 @@ public class SpringSecurityConfig {
             //user registration endpoints
             .requestMatchers("/api/user/register").permitAll()
             .requestMatchers("/api/user/authenticate").permitAll()
+            //user settings endpoints
+            .requestMatchers("/api/settings/read").permitAll()
+
             //user car endpoints
             .requestMatchers("/api/cars/list/*").permitAll()
             .requestMatchers("/api/cars/list/available/*").permitAll()
-            .requestMatchers("/api/settings/read").permitAll()
+
             .requestMatchers("/api/user/profile/*").permitAll()
             //admin endpoints
+            //admin settings endpoints
+            .requestMatchers("/api/admin/settings/read").permitAll()
+            .requestMatchers("/api/admin/settings/update").permitAll()
+
             //admin cars endpoints
             .requestMatchers("/api/admin/cars/all").permitAll()
             .requestMatchers("/api/admin/cars/create").permitAll()
@@ -57,6 +64,15 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/admin/users/update/*").permitAll()
             .requestMatchers("/api/admin/users/update/*/*").permitAll()
             .requestMatchers("/api/admin/users/delete/*").permitAll()
+            //admin rentals endpoints
+            .requestMatchers("/api/admin/rentals/all").permitAll()
+            .requestMatchers("/api/admin/rentals/list/all").permitAll()
+            .requestMatchers("/api/admin/rentals/create").permitAll()//issues there on front end
+            .requestMatchers("/api/admin/rentals/read/*").permitAll()
+            .requestMatchers("/api/admin/rentals/update/*").permitAll()
+            .requestMatchers("/api/admin/rentals/delete/*").permitAll()
+            //admin bookings endpoints
+
             //admin settings endpoints
             .requestMatchers("/api/admin/settings/read").permitAll()
             .requestMatchers("/api/admin/settings/update").permitAll()
