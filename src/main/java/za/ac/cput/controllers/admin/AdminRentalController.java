@@ -63,12 +63,6 @@ public class AdminRentalController {
                .setDateReturned(rentalRequest.getReturnedDate())
                .build();
 
-
-
-
-    //rentalFactory.setRentalId(rentalId);
-
-
         System.out.println("rental to update: " + rentalToUpdate);
 
 
