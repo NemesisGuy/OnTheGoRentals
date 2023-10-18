@@ -102,6 +102,34 @@ public class RentalServiceImpl implements IRentalService {
         System.out.println("Rental " + rental.getRentalId() + " not found");
         return null;
     }
+    @Transactional
+    public Rental update(int Id, Rental rental) {
+        System.out.println("RentalServiceImpl.update : ");
+        System.out.println("rental Id received : " + rental.getRentalId());
+
+        if (repository.existsById(rental.getRentalId())) {
+
+            System.out.println("Rental " + rental.getRentalId() + " found");
+            System.out.println(rental);
+            Rental updatedRental = rentalFactory.create(rental);
+            // Set car to available if the rental was returned
+            if (updatedRental.getReturnedDate() != null) {
+                Car car = updatedRental.getCar();
+                car.setAvailable(true);
+                carRepository.save(car); // Save the updated car entity
+                System.out.println("Is car available after update: " + car.isAvailable());
+            }else {
+                Car car = updatedRental.getCar();
+                car.setAvailable(false);
+                carRepository.save(car); // Save the updated car entity
+                System.out.println("Is car available after update: " + car.isAvailable());
+            }
+
+            return repository.save(updatedRental);
+        }
+        System.out.println("Rental " + rental.getRentalId() + " not found");
+        return null;
+    }
 
     @Override
     public boolean delete(Integer id) {

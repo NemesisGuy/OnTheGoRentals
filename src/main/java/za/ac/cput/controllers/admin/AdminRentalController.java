@@ -10,6 +10,7 @@ package za.ac.cput.controllers.admin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Rental;
+import za.ac.cput.factory.impl.RentalFactory;
 import za.ac.cput.service.impl.RentalServiceImpl;
 
 import java.util.ArrayList;
@@ -48,17 +49,40 @@ public class AdminRentalController {
     }
 
     @PutMapping("/update/{rentalId}")
-    public Rental updateRental(@PathVariable int rentalId, @RequestBody Rental rental) {
+    public Rental updateRental(@PathVariable Integer rentalId, @RequestBody Rental rental) {
+       Rental rentalToUpdate = rentalService.read(rentalId);
+       Rental rentalRequest = rental;
+       Rental updatedRental =Rental.builder()
+               .setId(rentalToUpdate.getId())
+               .setUser(rentalToUpdate.getUser())
+               .setCar(rentalToUpdate.getCar())
+               .setIssuer(rentalRequest.getIssuer())
+               .setReceiver(rentalRequest.getReceiver())
+               .setFine(rentalRequest.getFine())
+               .setIssuedDate(rentalRequest.getIssuedDate())
+               .setDateReturned(rentalRequest.getReturnedDate())
+               .build();
+
+
+
+
+    //rentalFactory.setRentalId(rentalId);
+
+
+        System.out.println("rental to update: " + rentalToUpdate);
+
 
         System.out.println("/api/admin/rentals/update was triggered");
-        System.out.println(rental.toString());
-        System.out.println("issued by: " + rental.getIssuer());
-        System.out.println("rental Id: " + rental.getRentalId());
+        System.out.println("");
+        System.out.println("form front end : " + rental.toString());
+        System.out.println("");
+        System.out.println("rental Id: " + rental.getId());
         System.out.println("rental user: " + rental.getUser());
         System.out.println("rental car: " + rental.getCar());
+        System.out.println("issued by: " + rental.getIssuer());
         System.out.println("rental issued date: " + rental.getIssuedDate());
         System.out.println("rental returned date: " + rental.getReturnedDate());
-        Rental updated = rentalService.update(rental);
+        Rental updated = rentalService.update(rentalId,updatedRental);
         System.out.println("updated rental: " + updated);
         return updated;
     }
