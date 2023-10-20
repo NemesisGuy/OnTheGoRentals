@@ -20,7 +20,7 @@ import za.ac.cput.repository.IRoleRepository;
 import za.ac.cput.service.impl.UserService;
 import java.util.ArrayList;
 import java.util.List;
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("api/admin/users")
 public class AdminUserController {

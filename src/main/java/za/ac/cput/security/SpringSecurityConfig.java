@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -32,6 +33,7 @@ public class SpringSecurityConfig {
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
+            .cors(Customizer.withDefaults())
             .authorizeHttpRequests()
 
             //user endpoints
@@ -45,7 +47,7 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/cars/list/*").permitAll()
             .requestMatchers("/api/cars/list/available/*").permitAll()
 
-            .requestMatchers("/api/user/profile/*").permitAll()
+            .requestMatchers("/api/user/profile/*").hasAuthority("ADMIN")
             //admin endpoints
             //admin settings endpoints
             .requestMatchers("/api/admin/settings/read").permitAll()
@@ -58,9 +60,9 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/admin/cars/update/*").permitAll()
             .requestMatchers("/api/admin/cars/delete/*").permitAll()
             //admin users endpoints
-            .requestMatchers("/api/admin/users/list/*").permitAll()
+            .requestMatchers("/api/admin/users/list/*").hasAuthority("ADMIN")
             .requestMatchers("/api/admin/users/create").permitAll()
-            .requestMatchers("/api/admin/users/read/*").permitAll()
+            .requestMatchers("/api/admin/users/read/*").hasAuthority("ADMIN")
             .requestMatchers("/api/admin/users/update/*").permitAll()
             .requestMatchers("/api/admin/users/update/*/*").permitAll()
             .requestMatchers("/api/admin/users/delete/*").permitAll()
@@ -79,6 +81,9 @@ public class SpringSecurityConfig {
             //admin settings endpoints
             .requestMatchers("/api/admin/settings/read").permitAll()
             .requestMatchers("/api/admin/settings/update").permitAll()
+
+            //admins testing
+            .requestMatchers("/api/admins/**").hasAuthority("ADMIN")
             //superadmin endpoints
 
          //   .requestMatchers("/api/admins/**").permitAll()
