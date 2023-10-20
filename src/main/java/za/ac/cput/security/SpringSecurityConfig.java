@@ -50,37 +50,37 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/user/profile/*").hasAuthority("ADMIN")
             //admin endpoints
             //admin settings endpoints
-            .requestMatchers("/api/admin/settings/read").permitAll()
-            .requestMatchers("/api/admin/settings/update").permitAll()
+            .requestMatchers("/api/admin/settings/read").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/settings/update").hasAuthority("ADMIN")
 
             //admin cars endpoints
-            .requestMatchers("/api/admin/cars/all").permitAll()
-            .requestMatchers("/api/admin/cars/create").permitAll()
-            .requestMatchers("/api/admin/cars/read/*").permitAll()
-            .requestMatchers("/api/admin/cars/update/*").permitAll()
-            .requestMatchers("/api/admin/cars/delete/*").permitAll()
+            .requestMatchers("/api/admin/cars/all").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/cars/create").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/cars/read/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/cars/update/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/cars/delete/*").hasAuthority("ADMIN")
             //admin users endpoints
             .requestMatchers("/api/admin/users/list/*").hasAuthority("ADMIN")
-            .requestMatchers("/api/admin/users/create").permitAll()
+            .requestMatchers("/api/admin/users/create").hasAuthority("ADMIN")
             .requestMatchers("/api/admin/users/read/*").hasAuthority("ADMIN")
-            .requestMatchers("/api/admin/users/update/*").permitAll()
-            .requestMatchers("/api/admin/users/update/*/*").permitAll()
-            .requestMatchers("/api/admin/users/delete/*").permitAll()
+            .requestMatchers("/api/admin/users/update/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/users/update/*/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/users/delete/*").hasAuthority("ADMIN")
             //admin rentals endpoints
-            .requestMatchers("/api/admin/rentals/all").permitAll()
-            .requestMatchers("/api/admin/rentals/list/all").permitAll()
-            .requestMatchers("/api/admin/rentals/create").permitAll()//issues there on front end
-            .requestMatchers("/api/admin/rentals/read/*").permitAll()
-            .requestMatchers("/api/admin/rentals/update/*").permitAll()
-            .requestMatchers("/api/admin/rentals/delete/*").permitAll()
+            .requestMatchers("/api/admin/rentals/all").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/rentals/list/all").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/rentals/create").hasAuthority("ADMIN")//issues there on front end
+            .requestMatchers("/api/admin/rentals/read/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/rentals/update/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/rentals/delete/*").hasAuthority("ADMIN")
             //admin bookings endpoints
 
             //admin faqs endpoints
             .requestMatchers("/api/admin/faq/get-all").permitAll()
 
             //admin settings endpoints
-            .requestMatchers("/api/admin/settings/read").permitAll()
-            .requestMatchers("/api/admin/settings/update").permitAll()
+            .requestMatchers("/api/admin/settings/read").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/settings/update").hasAuthority("ADMIN")
 
             //admins testing
             .requestMatchers("/api/admins/**").hasAuthority("ADMIN")
