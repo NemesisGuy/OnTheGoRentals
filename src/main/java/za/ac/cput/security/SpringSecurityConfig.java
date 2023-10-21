@@ -52,7 +52,7 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
 
             //admins testing
-            .requestMatchers("/api/admins/**").hasAuthority("ADMIN")
+            .requestMatchers("/api/admins/**").hasAuthority("ADMIN");
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
