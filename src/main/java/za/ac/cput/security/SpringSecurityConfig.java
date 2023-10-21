@@ -51,6 +51,11 @@ public class SpringSecurityConfig {
             //user car endpoints
             .requestMatchers("/api/cars/**").permitAll()
 
+            //help center and faq user endpoints
+            .requestMatchers("/api/faq/**").permitAll()
+            .requestMatchers("/api/help-center/**").permitAll()
+
+
             //admin endpoints
             .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
 
