@@ -120,50 +120,9 @@ public class UserService implements IUserService {
 
 /////////////////////////////////
 
-
-    /*@Autowired
-    private UserServiceImpl(UserRepository repository, UserFactory userFactory) {
-        this.repository = repository;
-        this.userFactory = userFactory;
+    public User read(String email) {
+        return iUserRepository.findByEmail(email).orElse(null);
     }
-
-
-
-    public User create(User user) {
-        User newUser = userFactory.create(user);
-        return repository.save(newUser);
-    }
-
-
-
-    public User read(Integer id) {
-        Optional<User> optionalUser = this.repository.findById(id);
-        return optionalUser.orElse(null);
-    }
-
-
-    public User update(User user) {
-        if (repository.existsById(user.getId())) {
-            User updatedUser = userFactory.create(user);
-            return repository.save(updatedUser);
-        }
-        return null;
-    }
-
-
-    @Override
-    public boolean delete(Integer id) {
-        if (this.repository.existsById(id)) {
-            this.repository.deleteById(id);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public ArrayList<User> getAll() {
-        return (ArrayList<User>) this.repository.findAll();
-    }*/
 
 }
 
