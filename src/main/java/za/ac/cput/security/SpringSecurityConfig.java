@@ -40,34 +40,20 @@ public class SpringSecurityConfig {
             //user registration endpoints
             .requestMatchers("/api/user/register").permitAll()
             .requestMatchers("/api/user/authenticate").permitAll()
+            .requestMatchers("/api/user/profile/*").hasAuthority("USER")
+
             //user settings endpoints
             .requestMatchers("/api/settings/read").permitAll()
 
             //user car endpoints
-            .requestMatchers("/api/cars/list/*").permitAll()
-            .requestMatchers("/api/cars/list/available/*").permitAll()
+            .requestMatchers("/api/cars/**").permitAll()
 
-            .requestMatchers("/api/user/profile/*").hasAuthority("USER")
 
             //admin endpoints
             .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-            //admin settings endpoints
-            .requestMatchers("/api/admin/settings/read").hasAuthority("ADMIN")
-            .requestMatchers("/api/admin/settings/update").hasAuthority("ADMIN")
-
-
-            //admin bookings endpoints
-
-            //admin faqs endpoints
-            .requestMatchers("/api/admin/faq/get-all").permitAll()
-
-            //admin settings endpoints
-            .requestMatchers("/api/admin/settings/read").hasAuthority("ADMIN")
-            .requestMatchers("/api/admin/settings/update").hasAuthority("ADMIN")
 
             //admins testing
             .requestMatchers("/api/admins/**").hasAuthority("ADMIN")
-
 
             //superadmin endpoints
 
