@@ -19,7 +19,7 @@ public class DamageReportServiceImpl implements IDamageReport {
 
     @Autowired
     private DamageReportServiceImpl(IDamageReportRepository repository){
-         this.repository = repository;
+        this.repository = repository;
     }
     @Override
     public DamageReport create(DamageReport damageReport) {

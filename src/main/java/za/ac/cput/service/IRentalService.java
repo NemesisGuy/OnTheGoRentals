@@ -19,5 +19,7 @@ public interface IRentalService extends IService<Rental, Integer> {
 
     ArrayList<Rental> getAll();
 
+    boolean existsById(Integer id);
+
 
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.security.User;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 
 
 @Entity
-public class Rental {
+public class Rental implements Serializable {
     @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

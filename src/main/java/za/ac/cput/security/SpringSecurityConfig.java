@@ -42,7 +42,10 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/user/authenticate").permitAll()
             //user settings endpoints
             .requestMatchers("/api/settings/read").permitAll()
-
+            //user contact us endpoints
+            .requestMatchers("/api/contactUs/create").permitAll()
+            //user about us endpoints
+            .requestMatchers("/api/aboutUs/read/*").permitAll()
             //user car endpoints
             .requestMatchers("/api/cars/list/*").permitAll()
             .requestMatchers("/api/cars/list/available/*").permitAll()
@@ -73,7 +76,24 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/admin/rentals/read/*").hasAuthority("ADMIN")
             .requestMatchers("/api/admin/rentals/update/*").hasAuthority("ADMIN")
             .requestMatchers("/api/admin/rentals/delete/*").hasAuthority("ADMIN")
-            //admin bookings endpoints
+            //admin damage report endpoints
+            .requestMatchers("/api/admin/damageReport/all").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/damageReport/create").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/damageReport/read/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/damageReport/update/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/damageReport/delete/*").hasAuthority("ADMIN")
+            //admin contact us endpoints
+            .requestMatchers("/api/admin/contactUs/all").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/contactUs/create").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/contactUs/read/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/contactUs/update/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/contactUs/delete/*").hasAuthority("ADMIN")
+            //admin about us endpoints
+            .requestMatchers("/api/admin/aboutUs/all").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/aboutUs/create").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/aboutUs/read/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/aboutUs/update/*").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/aboutUs/delete/*").hasAuthority("ADMIN")
 
             //admin faqs endpoints
             .requestMatchers("/api/admin/faq/get-all").permitAll()
