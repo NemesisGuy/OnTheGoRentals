@@ -48,21 +48,12 @@ public class SpringSecurityConfig {
             //user car endpoints
             .requestMatchers("/api/cars/**").permitAll()
 
-
             //admin endpoints
             .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
 
             //admins testing
             .requestMatchers("/api/admins/**").hasAuthority("ADMIN")
 
-            //superadmin endpoints
-
-         //   .requestMatchers("/api/admins/**").permitAll()
-          //  .requestMatchers("/api/superadmin/**").permitAll()
-          /*  .requestMatchers("/api/user/profile/**").hasAuthority("USER")
-            .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-            .requestMatchers("/api/admins/**").hasAuthority("ADMIN")
-            .requestMatchers("/api/superadmin/**").hasAuthority("SUPERADMIN") */;
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return  http.build();
