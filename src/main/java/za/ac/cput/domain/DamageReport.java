@@ -15,8 +15,8 @@ public class DamageReport {
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "rental", referencedColumnName = "id")
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "rental", referencedColumnName = "id", unique = true)
     private Rental rental;
     private String description;
     private LocalDateTime dateAndTime;

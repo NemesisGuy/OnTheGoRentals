@@ -3,19 +3,20 @@ package za.ac.cput.service.impl;
  * Author: Peter Buckingham (220165289)
  */
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.PriceGroup;
 import za.ac.cput.domain.Rental;
-import za.ac.cput.domain.User;
+/*import za.ac.cput.domain.User;*/
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.UserCantRentMoreThanOneCarException;
 import za.ac.cput.factory.impl.RentalFactory;
 import za.ac.cput.repository.CarRepository;
 import za.ac.cput.repository.RentalRepository;
+import za.ac.cput.domain.security.User;
 import za.ac.cput.service.IRentalService;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class RentalServiceImpl implements IRentalService {
         return carRepository.existsByIdAndIsAvailableIsTrue((int) car.getId());
     }
     @Override
+    @Transactional
     public Rental create(Rental rental) {
         if (isCarAvailable(rental)) {
             if (isCurrentlyRenting(rental.getUser())) {
@@ -52,7 +54,14 @@ public class RentalServiceImpl implements IRentalService {
                         generateUserRentingErrorMessage(rental.getUser()));
             }
             Rental newRental = rentalFactory.create(rental);
-            carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
+            if (newRental.getReturnedDate() != null) {
+                carRepository.setIsAvailableToTrue((int) newRental.getCar().getId());
+                System.out.println("Is car available after update: " + newRental.getCar().isAvailable());
+            }else {
+                carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
+                System.out.println("Is car available after update: " + newRental.getCar().isAvailable());
+            }
+           // carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
             return repository.save(newRental);
         } else {
             throw new CarNotAvailableException(generateCarNotAvailableErrorMessage(rental.getCar()));
@@ -65,6 +74,7 @@ public class RentalServiceImpl implements IRentalService {
     }
 
     @Override
+    @Transactional
     public Rental update(Rental rental) {
         System.out.println("RentalServiceImpl.update : ");
         System.out.println("rental Id received : " + rental.getRentalId());
@@ -78,8 +88,41 @@ public class RentalServiceImpl implements IRentalService {
             if (updatedRental.getReturnedDate() != null) {
                 Car car = updatedRental.getCar();
                 car.setAvailable(true);
-                carRepository.setIsAvailableToTrue((int) car.getId());
-                //  carRepository.save(car); // Save the updated car entity
+                carRepository.save(car); // Save the updated car entity
+                System.out.println("Is car available after update: " + car.isAvailable());
+            }else {
+                Car car = updatedRental.getCar();
+                car.setAvailable(false);
+                carRepository.save(car); // Save the updated car entity
+                System.out.println("Is car available after update: " + car.isAvailable());
+            }
+
+            return repository.save(updatedRental);
+        }
+        System.out.println("Rental " + rental.getRentalId() + " not found");
+        return null;
+    }
+    @Transactional
+    public Rental update(int Id, Rental rental) {
+        System.out.println("RentalServiceImpl.update : ");
+        System.out.println("rental Id received : " + rental.getRentalId());
+
+        if (repository.existsById(rental.getRentalId())) {
+
+            System.out.println("Rental " + rental.getRentalId() + " found");
+            System.out.println(rental);
+            Rental updatedRental = rentalFactory.create(rental);
+            // Set car to available if the rental was returned
+            if (updatedRental.getReturnedDate() != null) {
+                Car car = updatedRental.getCar();
+                car.setAvailable(true);
+                carRepository.save(car); // Save the updated car entity
+                System.out.println("Is car available after update: " + car.isAvailable());
+            }else {
+                Car car = updatedRental.getCar();
+                car.setAvailable(false);
+                carRepository.save(car); // Save the updated car entity
+                System.out.println("Is car available after update: " + car.isAvailable());
             }
 
             return repository.save(updatedRental);
@@ -110,7 +153,6 @@ public class RentalServiceImpl implements IRentalService {
         return filterAvailableCars(allRentals);
     }
 
-
     private ArrayList<Rental> filterAvailableCars(List<Rental> rentals) {
         ArrayList<Rental> availableCars = new ArrayList<>();
         for (Rental rental : rentals) {
@@ -120,7 +162,6 @@ public class RentalServiceImpl implements IRentalService {
         }
         return availableCars;
     }
-
 
     private String generateCarNotAvailableErrorMessage(Car car) {
         return car.getMake() + " " + car.getModel() + " " +
@@ -265,6 +306,10 @@ public class RentalServiceImpl implements IRentalService {
         return availableCars;
 
 
+    }
+    @Override //testing
+    public boolean existsById(Integer id) {
+        return repository.existsById(id);
     }
 }
 

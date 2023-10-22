@@ -1,7 +1,7 @@
 package za.ac.cput.factory.impl;
 
 import za.ac.cput.domain.Driver;
-import za.ac.cput.domain.User;
+
 import za.ac.cput.factory.IFactory;
 
 import java.util.Random;

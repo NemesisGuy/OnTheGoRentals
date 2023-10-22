@@ -1,19 +1,24 @@
+/*
 package za.ac.cput.controllers;
 
+*/
 /**
  * UserController.java
  * This is the controller for the user pages
  * Author: Peter Buckingham (220165289)
  * Date: 05 April 2023
- */
+ *//*
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+*/
 /*import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;*/
+import org.springframework.security.core.userdetails.UserDetailsService;*//*
+
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.User;
 import za.ac.cput.service.impl.UserServiceImpl;
@@ -48,7 +53,8 @@ public class UserController {
         String password = loginRequest.getPassword();
         return "User logged in successfully";
 
-    /*    // Authenticate the user
+    */
+/*    // Authenticate the user
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -60,7 +66,8 @@ public class UserController {
         } else {
             // Authentication failed
             return "Authentication failed";
-        }*/
+        }*//*
+
     }
 
 
@@ -73,3 +80,4 @@ public class UserController {
     }
 
 }
+*/

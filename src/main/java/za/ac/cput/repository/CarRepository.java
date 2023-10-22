@@ -31,6 +31,8 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
     //set car isavailable to true
 //    Car setIsAvailableToTrue(int id);
     //set car isavailable to false
+   // boolean isCarByIdAndIsAvailableIsTrue(int id);
+
     @Modifying
     @Query("UPDATE Car c SET c.isAvailable = false WHERE c.id = :id")
     void setIsAvailableToFalse(@Param("id") int id);

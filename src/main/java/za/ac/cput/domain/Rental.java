@@ -2,7 +2,9 @@ package za.ac.cput.domain;
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.Id;
+import za.ac.cput.domain.security.User;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 
 
 @Entity
-public class Rental {
+public class Rental implements Serializable {
     @jakarta.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +36,38 @@ public class Rental {
     private int fine;
     private LocalDateTime issuedDate;
     private LocalDateTime returnedDate;
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Driver getDriver() {
+        return driver;
+    }
+
+    public void setDriver(Driver driver) {
+        this.driver = driver;
+    }
+
+    public void setIssuer(int issuer) {
+        this.issuer = issuer;
+    }
+
+    public void setReceiver(int receiver) {
+        this.receiver = receiver;
+    }
+
+    public void setFine(int fine) {
+        this.fine = fine;
+    }
+
+    public void setIssuedDate(LocalDateTime issuedDate) {
+        this.issuedDate = issuedDate;
+    }
+
+    public void setReturnedDate(LocalDateTime returnedDate) {
+        this.returnedDate = returnedDate;
+    }
 
     //Initializing a parameterized constructor
     public Rental(int id, User user, Car car, int issuer, int receiver, int fine, LocalDateTime issuedDate, LocalDateTime returnedDate) {
@@ -74,7 +108,7 @@ public class Rental {
         return this.id;
     }
     public int getId() {
-        return 0;
+        return id;
     }
 
     public int getFine() {
