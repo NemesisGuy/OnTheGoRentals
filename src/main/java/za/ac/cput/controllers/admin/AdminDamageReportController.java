@@ -36,11 +36,11 @@ public class AdminDamageReportController {
     @PostMapping("/create")
     public ResponseEntity<DamageReport> create(@RequestBody DamageReport damageReport){
 
-         /**DamageReport newDamageReport = DamageReportFactory.createReport(damageReport.getId(), damageReport.getRental(), damageReport.getDescription(), damageReport.getDateAndTime(), damageReport.getLocation(), damageReport.getRepairCost());
+         DamageReport newDamageReport = DamageReportFactory.createReport(damageReport.getId(), damageReport.getRental(), damageReport.getDescription(), damageReport.getDateAndTime(), damageReport.getLocation(), damageReport.getRepairCost());
          DamageReport damageReportSaved = this.damageReportService.create(newDamageReport);
-         return ResponseEntity.ok(damageReportSaved);*/
+         return ResponseEntity.ok(damageReportSaved);
         // Check if the rental ID provided in the damage report already exists
-        if (rentalService.existsById(damageReport.getRental().getId())) {
+       /** if (rentalService.existsById(damageReport.getRental().getId())) {
             // I am getting a detached entity error. Merge the detached Rental entity
             Rental attachedRental = entityManager.merge(damageReport.getRental());
 
@@ -60,7 +60,7 @@ public class AdminDamageReportController {
             // Handle the case where the provided rental ID doesn't exist
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             //also need to handle an
-        }
+        }*/
     }
     @GetMapping("/read/{id}")
     public ResponseEntity<DamageReport> read(@PathVariable("id") int id){
