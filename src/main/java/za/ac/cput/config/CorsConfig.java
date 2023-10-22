@@ -30,12 +30,12 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                       // .allowedOrigins(allowedOrigins) //user this for when locking down the allowed origins
+                        // .allowedOrigins(allowedOrigins) //user this for when locking down the allowed origins
                         .allowedOriginPatterns(allowedOrigins) //use this for when allowing all origins
                         .allowedMethods("*")
                         .allowedOrigins("*")
                         .allowedHeaders("*")
-                       // .allowCredentials(true)
+                        // .allowCredentials(true)
                         .exposedHeaders("*")
                         .maxAge(3600);
                 System.out.println("CorsConfig was triggered");
