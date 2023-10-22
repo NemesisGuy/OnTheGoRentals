@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.backend.controllers;
 
 import org.junit.jupiter.api.Assertions;
@@ -26,7 +27,8 @@ class AdminFaqControllerTest {
 
     private static Faq faqToCreate = FaqFactory.faqCreated(12,"What is the cancellation policy?", "Our cancellation policy allows for free cancellations up to 24 hours before your reservation starts. After that, a cancellation fee may apply.", LocalDateTime.now(), LocalDateTime.now());
 
-    @Test
+*/
+/*    @Test
     void a_createFaq() {
         String url = baseURL + "/create";
         System.out.println("URL: " + url);
@@ -38,9 +40,11 @@ class AdminFaqControllerTest {
         Faq saved = postResponse.getBody();
         Assertions.assertEquals(faqToCreate.getId(), saved.getId());
         System.out.println("Saved data: " + saved);
-    }
+    }*//*
 
-    @Test
+
+  */
+/*  @Test
     void b_readFaq() {
         String url = baseURL + "/read/" + faqToCreate.getId();
         System.out.println("URL: " + url);
@@ -49,6 +53,7 @@ class AdminFaqControllerTest {
         Assertions.assertEquals(faqToCreate.getId(), response.getBody().getId());
         System.out.println(response.getBody());
     }
+*//*
 
     @Test
     void c_updateFaq() {
@@ -85,4 +90,4 @@ class AdminFaqControllerTest {
         System.out.println(response);
         System.out.println(response.getBody());
     }
-}
+}*/

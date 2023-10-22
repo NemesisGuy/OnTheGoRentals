@@ -16,6 +16,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking create(Booking booking) {
+        System.out.println("BookingServiceImpl: create");
         if (booking.getId() != 0) {
             throw new IllegalArgumentException("ID should not be set for a new entity.");
         }

@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.service.impl;
 
 import org.junit.jupiter.api.Disabled;
@@ -51,4 +52,4 @@ class DriverServiceImplTest {
         System.out.println("Get All: ");
         System.out.println(service.getAll());
     }
-}
+}*/

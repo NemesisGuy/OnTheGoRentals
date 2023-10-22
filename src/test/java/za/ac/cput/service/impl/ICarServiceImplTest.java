@@ -21,13 +21,12 @@ public class ICarServiceImplTest {
     private ICarRepositoryImpl carRepository;
 
 
-*/
-/*    @BeforeEach
+    @BeforeEach
     void setUp() {
         //  carRepository = Mockito.mock(CarRepository.class);
         MockitoAnnotations.openMocks(this);
         carService = new CarServiceImpl(carRepository);
-    }*//*
+    }
 
 
     @Test

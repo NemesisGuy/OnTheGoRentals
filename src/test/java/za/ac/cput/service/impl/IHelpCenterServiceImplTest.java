@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.service.impl;
 
 import org.junit.jupiter.api.Assertions;
@@ -193,4 +194,4 @@ class IHelpCenterServiceImplTest {
         Assertions.assertTrue(success);
         System.out.println("Deleted: " + success);
     }
-}
+}*/

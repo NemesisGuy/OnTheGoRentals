@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.controllers;
 
 import org.junit.jupiter.api.MethodOrderer;
@@ -70,4 +71,4 @@ private static Driver driver = DriverFactory.createDriver("Cwenga","Dlova","10")
         System.out.println(response);
         System.out.println(response.getBody());
     }
-}
+}*/

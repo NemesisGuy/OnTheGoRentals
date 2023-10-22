@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.backend.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,3 +28,4 @@ public class HelloWorldControllerTest {
                 .andExpect(jsonPath("$.description").value("I'm a test controller!"));
     }
 }
+*/

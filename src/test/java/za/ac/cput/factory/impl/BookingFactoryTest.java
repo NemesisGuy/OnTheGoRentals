@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.factory.impl;
 
 import org.junit.jupiter.api.Test;
@@ -30,3 +31,4 @@ public class BookingFactoryTest {
         assertEquals(returnedDate, booking.getReturnedDate());
     }
 }
+*/

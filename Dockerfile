@@ -1,14 +1,15 @@
-FROM adoptopenjdk:20-jre-hotspot
+# Use an official Maven image with OpenJDK 17
+FROM maven:3.8.4-openjdk-17
+
 WORKDIR /app
 
 # Clone the repository
 RUN git clone https://github.com/NemesisGuy/OnTheGoRentals.git .
 
 # Build the Spring Boot application
-RUN ./mvnw package
+RUN mvn package
 
 # Specify the path to the JAR file after building
 CMD ["java", "-jar", "target/OnTheGoRentals.jar"]
 
 LABEL authors="Peter Buckingham"
-

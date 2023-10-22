@@ -28,15 +28,27 @@ public class RentalController {
 
     @PostMapping("/create")
     public Rental createRental(@RequestBody Rental rental) {
- /*       System.out.println("/api/admin/rentals/create was triggered");
-        System.out.println("RentalService was created...attempting to create rental...");*/
-
         // Retrieve user and car based on their IDs
-        System.out.println(rental.getUser());
+    /*    System.out.println(rental.getUser());
         System.out.println(rental.getCar());
         System.out.println(rental.getIssuedDate());
-        System.out.println(rental.getReturnedDate());
-        return rentalService.create(rental);
+        System.out.println(rental.getReturnedDate());*/
+
+        //user + car + times == rental
+            //User
+                //1 receive the token - header
+                //2 find the user by their email from the token (extract the email from the token)//jwtutils
+                //3 find user via repository and return user object
+
+            //Car
+                //4 find the car by its id - car service -> car repo = car object
+
+            //Rental
+                //5 create a rental object with the user, car and times
+
+       /* return rentalService.create(rental);*/
+         return null;
+
     }
 
     @GetMapping("/read/{rentalId}")

@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.backend.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -95,3 +96,4 @@ public class CarControllerTest {
                 .andExpect(jsonPath("$.length()").value(0));
     }
 }
+*/

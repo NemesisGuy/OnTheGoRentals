@@ -21,6 +21,8 @@ public class AdminBookingController {
 
     @PostMapping("/create")
     public Booking createBooking(@RequestBody Booking booking) {
+        System.out.println("BookingController: createBooking");
+
         return bookingService.create(booking);
     }
 

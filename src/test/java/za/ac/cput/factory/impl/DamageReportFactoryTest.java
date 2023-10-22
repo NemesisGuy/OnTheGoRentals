@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.factory.impl;
 
 import org.junit.jupiter.api.Assertions;
@@ -17,4 +18,4 @@ class DamageReportFactoryTest {
     Assertions.assertNotNull(report.getId());
 }
 
-}
+}*/

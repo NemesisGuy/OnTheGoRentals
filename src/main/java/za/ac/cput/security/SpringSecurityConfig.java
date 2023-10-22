@@ -41,6 +41,8 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/user/register").permitAll()
             .requestMatchers("/api/user/authenticate").permitAll()
             .requestMatchers("/api/user/profile/*").hasAuthority("USER")
+            .requestMatchers("/api/user/profile/*").hasAuthority("ADMIN")
+
             //user about and contact us endpoints
             .requestMatchers("/api/aboutUs/read/*").permitAll()
             .requestMatchers("/api/contactUs/create").permitAll()
@@ -58,6 +60,7 @@ public class SpringSecurityConfig {
 
             //admin endpoints
             .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+            .requestMatchers("/api/admin/bookings/create").permitAll()
 
             //admins testing
             .requestMatchers("/api/admins/**").hasAuthority("ADMIN");

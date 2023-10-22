@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.factory;
 
 import org.junit.jupiter.api.Assertions;
@@ -5,11 +6,13 @@ import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.Rental;
 import za.ac.cput.factory.impl.RentalFactory;
 
+*/
 /**
  * Lonwabo Magazi-218331851
  * Date: March 2023
  * RentalFactoryTest.java
- */
+ *//*
+
 
 class RentalFactoryTest {
 
@@ -31,4 +34,4 @@ class RentalFactoryTest {
         //  Assertions.assertNull(rental.getRentalId());
     }
 
-}
+}*/

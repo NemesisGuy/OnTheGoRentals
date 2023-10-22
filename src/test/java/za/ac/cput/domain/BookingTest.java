@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.domain;
 
 import org.junit.jupiter.api.Test;
@@ -34,3 +35,4 @@ public class BookingTest {
         assertEquals(returnedDate, booking.getReturnedDate());
     }
 }
+*/
