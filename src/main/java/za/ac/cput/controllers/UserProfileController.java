@@ -2,9 +2,7 @@ package za.ac.cput.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.security.JwtUtilities;
 import za.ac.cput.service.impl.UserService;
@@ -32,5 +30,27 @@ public class UserProfileController {
             // You might want to return an error response or throw an exception
             return null; // Modify this to suit your needs
         }
+    }
+    @PutMapping("/update")
+    public User updateUserProfile(@RequestBody User updatedUser, HttpServletRequest request) {
+        String token = jwtUtilities.getToken(request);
+
+        if (token != null && jwtUtilities.validateToken(token)) {
+            String userEmail = jwtUtilities.extractUsername(token);
+
+            User existingUser = userService.read(userEmail);
+
+            if (existingUser != null) {
+
+                existingUser.setFirstName(updatedUser.getFirstName());
+                existingUser.setLastName(updatedUser.getLastName());
+                existingUser.setEmail(updatedUser.getEmail());
+//                existingUser.setPassword(updatedUser.getPassword());
+
+                return userService.update(existingUser);
+            }
+        }
+
+        return null;
     }
 }
