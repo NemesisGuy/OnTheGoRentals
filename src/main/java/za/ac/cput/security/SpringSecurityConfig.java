@@ -41,6 +41,8 @@ public class SpringSecurityConfig {
             .requestMatchers("/api/user/register").permitAll()
             .requestMatchers("/api/user/authenticate").permitAll()
             .requestMatchers("/api/user/profile/*").hasAuthority("USER")
+            .requestMatchers("/api/user/rentals/*").hasAuthority("USER")
+
             //user about and contact us endpoints
             .requestMatchers("/api/aboutUs/read/*").permitAll()
             .requestMatchers("/api/contactUs/create").permitAll()

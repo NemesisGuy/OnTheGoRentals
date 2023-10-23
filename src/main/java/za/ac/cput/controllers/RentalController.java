@@ -47,7 +47,17 @@ public class RentalController {
                 //5 create a rental object with the user, car and times
 
        /* return rentalService.create(rental);*/
-         return null;
+
+        System.out.println("/api/user/rentals/create was triggered");
+      //  System.out.println("RentalService was created...attempting to create rental...");
+
+        // Retrieve user and car based on their IDs
+        System.out.println(rental.getUser());
+        System.out.println(rental.getCar());
+        System.out.println(rental.getIssuedDate());
+        System.out.println(rental.getReturnedDate());
+        return rentalService.create(rental);
+
 
     }
 

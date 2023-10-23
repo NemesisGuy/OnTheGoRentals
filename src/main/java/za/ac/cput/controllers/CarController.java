@@ -9,6 +9,7 @@ package za.ac.cput.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.PriceGroup;
@@ -94,6 +95,14 @@ public class CarController {
         List<Car> specialCars = new ArrayList<>(carService.getAll());
         specialCars.removeIf(car -> car.getPriceGroup() != PriceGroup.SPECIAL || !rentalService.isCarAvailableByCarId(car));
         return specialCars;
+    }
+
+    @GetMapping("/api/cars/read/{carId}")
+    public Car readCar(@PathVariable Integer carId) {
+        System.out.println("/api/cars/read was triggered");
+        System.out.println("CarService was created...attempting to read car...");
+        Car readCar = carService.read(carId);
+        return readCar;
     }
 
 
