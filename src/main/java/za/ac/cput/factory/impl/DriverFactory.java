@@ -4,15 +4,14 @@ import za.ac.cput.domain.Driver;
 
 import za.ac.cput.factory.IFactory;
 
-import java.util.Random;
 
 public class DriverFactory implements IFactory<Driver> {
     public Driver create(){
         return new Driver.Builder().build();
     }
-    public static Driver createDriver(String firstName, String lastName, String licenseCode){
+    public static Driver createDriver(int id,String firstName, String lastName, String licenseCode){
         return new Driver.Builder()
-                .setId(new Random().nextInt(1000000))
+                .setId(id)
                 .setFirstName(firstName)
                 .setLastName(lastName)
                 .setLicenseCode(licenseCode)
