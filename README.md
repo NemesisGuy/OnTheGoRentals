@@ -18,11 +18,9 @@ UML: https://drive.google.com/file/d/1o3-qo47qb8PRckXvXkiecY7AT3EwTgCk/view?usp=
 # Contributors:
 
 - **Peter Buckingham - Team Lead**
-- **Aqeel Hanslo - Leader Assistant 219374422**
+- **Aqeel Hanslo - 219374422**
 - **Shamiso Moyo Chaka - 220365393**
-- **Name - Student Number**
-- **Name - Student Number**
-- **Name - Student Number**
+
 
 ## **Peter Buckingham Contributions:**
 

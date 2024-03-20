@@ -54,7 +54,17 @@ public class User implements Serializable , UserDetails {
     public User (String email , String password , List<Role> roles) {
       this.email= email ;
       this.password=password ;
-      this.roles=roles ;}
+      this.roles=roles ;
+    }
+
+    public User (String firstName, String email, String password, List<Role> roles) {
+        this.firstName  = firstName;
+        this.email= email ;
+        this.password=password ;
+        this.roles=roles ;
+    }
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -43,10 +43,11 @@ public class BackendApplication {
                 if (role == null) {
                     userService.saveRole(new Role(roleName));
 
+                    String userName = "Default-" +roleName.toString().toLowerCase()+"-user";
                     String email = roleName.toString().toLowerCase() + "@gmail.com";
                     String password = roleName.toString().toLowerCase() + "password";
 
-                    userService.saverUser(new User(email, passwordEncoder.encode(password), new ArrayList<>()));
+                    userService.saverUser(new User(userName,email, passwordEncoder.encode(password), new ArrayList<>()));
 
                     role = roleRepository.findByRoleName(roleName);
                     User user = (User) userRepository.findByEmail(email).orElse(null);

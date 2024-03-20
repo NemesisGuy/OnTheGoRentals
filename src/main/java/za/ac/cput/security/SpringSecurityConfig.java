@@ -25,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SpringSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter ;
-    private final CustomerUserDetailsService customerUserDetailsService ;
+  //  private final CustomerUserDetailsService customerUserDetailsService ;
 
     @Bean
     public SecurityFilterChain filterChain (HttpSecurity http) throws Exception
@@ -40,7 +40,9 @@ public class SpringSecurityConfig {
             //user registration endpoints
             .requestMatchers("/api/user/register").permitAll()
             .requestMatchers("/api/user/authenticate").permitAll()
-            .requestMatchers("/api/user/profile/*").hasAuthority("USER")
+           // .requestMatchers("/api/user/profile/*").hasAuthority("USER")
+            .requestMatchers("/api/user/profile/*").authenticated()
+
             .requestMatchers("/api/user/rentals/*").hasAuthority("USER")
 
             //user about and contact us endpoints
@@ -71,10 +73,14 @@ public class SpringSecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception
-    { return authenticationConfiguration.getAuthenticationManager();}
+    {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder()
-    { return new BCryptPasswordEncoder(); }
+    {
+        return new BCryptPasswordEncoder();
+    }
 
 }
