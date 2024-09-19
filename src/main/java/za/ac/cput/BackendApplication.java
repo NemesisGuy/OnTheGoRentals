@@ -45,7 +45,8 @@ public class BackendApplication {
 
                     String userName = "Default-" +roleName.toString().toLowerCase()+"-user";
                     String email = roleName.toString().toLowerCase() + "@gmail.com";
-                    String password = roleName.toString().toLowerCase() + "password";
+                    String password = roleName.toString().toLowerCase() + "password"; //eg. adminpassword
+
 
                     userService.saverUser(new User(userName,email, passwordEncoder.encode(password), new ArrayList<>()));
 

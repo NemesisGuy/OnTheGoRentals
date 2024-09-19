@@ -2,9 +2,6 @@ package za.ac.cput.domain;
 
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
@@ -57,7 +54,7 @@ public class Car {
         return new Builder();
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 

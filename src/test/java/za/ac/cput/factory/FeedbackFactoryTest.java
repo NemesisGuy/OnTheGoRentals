@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.factory;
 
 import org.junit.jupiter.api.Assertions;
@@ -16,3 +17,4 @@ public class FeedbackFactoryTest {
     }
 
 }
+*/

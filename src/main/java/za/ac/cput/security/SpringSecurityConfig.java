@@ -47,6 +47,9 @@ public class SpringSecurityConfig {
 
             //user about and contact us endpoints
             .requestMatchers("/api/aboutUs/read/*").permitAll()
+            .requestMatchers("/api/aboutUs/all").permitAll()
+            .requestMatchers("/api/aboutUs/latest").permitAll()
+
             .requestMatchers("/api/contactUs/create").permitAll()
 
             //user settings endpoints

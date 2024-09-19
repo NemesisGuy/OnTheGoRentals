@@ -1,15 +1,14 @@
-# Use an official Maven image with OpenJDK 17
-FROM maven:3.8.4-openjdk-17
+# Use a base image with Java installed
+FROM openjdk:17-jdk-slim
 
+# Set the working directory in the container
 WORKDIR /app
 
-# Clone the repository
-RUN git clone https://github.com/NemesisGuy/OnTheGoRentals.git .
+# Copy the JAR file into the container
+COPY target/OnTheGoRentals.jar /app/OnTheGoRentals.jar
 
-# Build the Spring Boot application
-RUN mvn package
+# Expose the port the application will run on
+EXPOSE 8080
 
-# Specify the path to the JAR file after building
-CMD ["java", "-jar", "target/OnTheGoRentals.jar"]
-
-LABEL authors="Peter Buckingham"
+# Run the application
+ENTRYPOINT ["java", "-jar", "/app/OnTheGoRentals.jar"]
