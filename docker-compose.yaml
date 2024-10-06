@@ -4,11 +4,11 @@ services:
 
   app:
     image: nemesisguy/on-the-go-rentals-backend:latest
-    container_name: spring-boot-app
+    container_name: on-the-go-rentals-backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/OnTheGoRentalsDatabase?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3307/OnTheGoRentalsDatabase?createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: my_secret_password
+      SPRING_DATASOURCE_PASSWORD: my_secret_passwords
     ports:
       - "8080:8080"
 
