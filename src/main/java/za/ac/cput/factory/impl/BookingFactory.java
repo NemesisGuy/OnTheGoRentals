@@ -8,13 +8,14 @@ import java.time.LocalDateTime;
 
 public class BookingFactory {
 
-    public static Booking createBooking(int id, User user, Car car, LocalDateTime bookingDate, LocalDateTime returnedDate) {
+    public static Booking createBooking(int id, User user, Car car, LocalDateTime bookingDate, LocalDateTime returnedDate, String status) {
         return new Booking.Builder()
                 .id(id)
                 .user(user)
                 .car(car)
                 .bookingDate(bookingDate)
                 .returnedDate(returnedDate)
+                .status(status)
                 .build();
     }
 }

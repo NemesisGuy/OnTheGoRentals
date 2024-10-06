@@ -24,14 +24,14 @@ public class AdminBookingController {
         return bookingService.create(booking);
     }
 
-    @GetMapping("/admin/read/{bookingId}") // Changed the mapping to be distinct
+    @GetMapping("/read/{bookingId}") // Changed the mapping to be distinct
     public Booking readBooking(@PathVariable Integer bookingId) {
         return bookingService.read(bookingId);
     }
 
-    @PutMapping("/admin/update/{bookingId}")
+    @PutMapping("/update/{bookingId}")
     public Booking updateBooking(@PathVariable Integer bookingId, @RequestBody Booking updatedBooking) {
-        return bookingService.updateById(bookingId, updatedBooking);
+        return bookingService.update(updatedBooking);
     }
 
 

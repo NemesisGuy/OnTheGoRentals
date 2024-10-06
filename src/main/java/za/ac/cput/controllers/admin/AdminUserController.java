@@ -12,6 +12,7 @@ package za.ac.cput.controllers.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.security.Role;
 import za.ac.cput.domain.security.User;
@@ -20,20 +21,47 @@ import za.ac.cput.repository.IRoleRepository;
 import za.ac.cput.service.impl.UserService;
 import java.util.ArrayList;
 import java.util.List;
+/*
 @CrossOrigin(origins = "http://localhost:5173")
+*/
 @RestController
 @RequestMapping("api/admin/users")
 public class AdminUserController {
+
 
     @Autowired
     private UserService userService;
     @Autowired
     private IRoleRepository roleRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
+    /*@GetMapping("/list/all")
+    public List<User> getAllUsers() {
+
+        return userService.getAll();
+    }*/
     @GetMapping("/list/all")
     public List<User> getAllUsers() {
-        return userService.getAll();
+        // Get all users from the service
+        List<User> users = userService.getAll();
+
+        // Create a copy of each user without the password
+        List<User> usersWithoutPasswords = new ArrayList<>();
+        for (User user : users) {
+            User userCopy = new User();
+            userCopy.setId(user.getId());
+            userCopy.setEmail(user.getEmail());
+            userCopy.setFirstName(user.getFirstName());
+            userCopy.setLastName(user.getLastName());
+            userCopy.setRoles(user.getRoles());
+            // Do not include the password in the copy
+            userCopy.setPassword(null);
+            usersWithoutPasswords.add(userCopy);
+        }
+
+        return usersWithoutPasswords;
     }
 
     @GetMapping("/read/{id}")
@@ -77,7 +105,7 @@ public class AdminUserController {
             existingUser.setFirstName(updatedUser.getFirstName());
             existingUser.setLastName(updatedUser.getLastName());
             existingUser.setEmail(updatedUser.getEmail());
-            existingUser.setPassword(updatedUser.getPassword());
+            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
 
             // Get all roles from the database
             List<Role> dbRoles = roleRepository.findAll();

@@ -5,7 +5,8 @@ package za.ac.cput.service;
  *
  * Author: Peter Buckingham (220165289)
  *
- *//*
+ */
+/*
 
 import za.ac.cput.domain.User;
 

@@ -19,12 +19,22 @@ public class Booking {
     @JoinColumn(name = "car_id")
     private Car car;
 
-    @ManyToOne
+ /*   @ManyToOne
     @JoinColumn(name = "driver_id")
-    private Driver driver;
+    private Driver driver;*/
 
-    private LocalDateTime bookingDate;
-    private LocalDateTime returnedDate;
+    private LocalDateTime bookingStartDate;
+    private LocalDateTime bookingEndDate;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    private String status; // PENDING, CONFIRMED, CANCELED
 
     // Constructors
 
@@ -35,9 +45,10 @@ public class Booking {
         this.id = builder.id;
         this.user = builder.user;
         this.car = builder.car;
-        this.driver = builder.driver;
-        this.bookingDate = builder.bookingDate;
-        this.returnedDate = builder.returnedDate;
+//this.driver = builder.driver;
+        this.bookingStartDate = builder.bookingDate;
+        this.bookingEndDate = builder.returnedDate;
+        this.status = builder.status;
     }
 
     // Getters
@@ -54,16 +65,16 @@ public class Booking {
         return car;
     }
 
-    public Driver getDriver() {
-        return driver;
+//    public Driver getDriver() {
+//        return driver;
+//    }
+
+    public LocalDateTime getBookingStartDate() {
+        return bookingStartDate;
     }
 
-    public LocalDateTime getBookingDate() {
-        return bookingDate;
-    }
-
-    public LocalDateTime getReturnedDate() {
-        return returnedDate;
+    public LocalDateTime getBookingEndDate() {
+        return bookingEndDate;
     }
 
     // Setters
@@ -80,17 +91,18 @@ public class Booking {
         this.car = car;
     }
 
-    public void setDriver(Driver driver) {
-        this.driver = driver;
+//    public void setDriver(Driver driver) {
+//        this.driver = driver;
+//    }
+
+    public void setBookingStartDate(LocalDateTime bookingDate) {
+        this.bookingStartDate = bookingDate;
     }
 
-    public void setBookingDate(LocalDateTime bookingDate) {
-        this.bookingDate = bookingDate;
+    public void setBookingEndDate(LocalDateTime returnedDate) {
+        this.bookingEndDate = returnedDate;
     }
 
-    public void setReturnedDate(LocalDateTime returnedDate) {
-        this.returnedDate = returnedDate;
-    }
 
     @Override
     public String toString() {
@@ -98,9 +110,10 @@ public class Booking {
                 "id=" + id +
                 ", user=" + user +
                 ", car=" + car +
-                ", driver=" + driver +
-                ", bookingDate=" + bookingDate +
-                ", returnedDate=" + returnedDate +
+//                ", driver=" + driver +
+                ", bookingDate=" + bookingStartDate +
+                ", returnedDate=" + bookingEndDate +
+                ", status='" + status +
                 '}';
     }
 
@@ -112,9 +125,10 @@ public class Booking {
         private int id;
         private User user;
         private Car car;
-        private Driver driver;
+//        private Driver driver;
         private LocalDateTime bookingDate;
         private LocalDateTime returnedDate;
+        private String status;
 
         public Builder id(int id) {
             this.id = id;
@@ -130,11 +144,11 @@ public class Booking {
             this.car = car;
             return this;
         }
-
-        public Builder driver(Driver driver) {
-            this.driver = driver;
-            return this;
-        }
+//
+//        public Builder driver(Driver driver) {
+////            this.driver = driver;
+//            return this;
+//        }
 
         public Builder bookingDate(LocalDateTime bookingDate) {
             this.bookingDate = bookingDate;
@@ -143,6 +157,10 @@ public class Booking {
 
         public Builder returnedDate(LocalDateTime returnedDate) {
             this.returnedDate = returnedDate;
+            return this;
+        }
+        public Builder status(String status) {
+            this.status = status;
             return this;
         }
 
@@ -154,9 +172,10 @@ public class Booking {
             this.id = booking.id;
             this.user = booking.user;
             this.car = booking.car;
-            this.driver = booking.driver;
-            this.bookingDate = booking.bookingDate;
-            this.returnedDate = booking.returnedDate;
+//            this.driver = booking.driver;
+            this.bookingDate = booking.bookingStartDate;
+            this.returnedDate = booking.bookingEndDate;
+            this.status = booking.status;
             return this;
         }
     }

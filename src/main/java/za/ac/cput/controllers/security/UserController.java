@@ -7,15 +7,24 @@ package za.ac.cput.controllers.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import za.ac.cput.domain.Rental;
+import za.ac.cput.service.IRentalService;
 import za.ac.cput.service.IUserService;
 import za.ac.cput.domain.dto.LoginDto;
 import za.ac.cput.domain.dto.RegisterDto;
 import za.ac.cput.domain.security.User;
+import za.ac.cput.service.impl.RentalServiceImpl;
 
+import java.util.List;
+import java.util.Optional;
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
+
+    private RentalServiceImpl rentalService;
+    private final IRentalService iRentalService;
 
 
     private final IUserService iUserService ;
@@ -38,8 +47,9 @@ public class UserController {
     }
 
     // Endpoint to get user profile
-    @GetMapping("/profile/{userId}")
+    @GetMapping("/profile/read/{userId}")
     public ResponseEntity<?> getUserProfile(@PathVariable Integer userId) {
+        System.out.println("Get user profile called, userId = " + userId);
         //get user profile
         User userProfile = iUserService.read(userId);
         // Return an appropriate response
@@ -51,12 +61,18 @@ public class UserController {
     }
 
     // Endpoint to update user profile
-    @PutMapping("/profile/{userId}")
+    @PutMapping("/profile/update/{userId}")
     public ResponseEntity<?> updateUserProfile(@PathVariable Integer userId, @RequestBody User user) {
         // Replace the following line with your logic to update user profile
         User updatedUser = iUserService.update(userId, user);
         return ResponseEntity.ok(updatedUser);
 
+    }
+    @GetMapping("/profile/{userId}/rental-history")
+    public ResponseEntity<List<Rental>> getRentalHistory(@PathVariable Integer userId) {
+        User user = iUserService.read(userId);
+                List<Rental> rentalHistory = iRentalService.getRentalHistoryByUser(user);
+        return ResponseEntity.ok(rentalHistory);
     }
 
 

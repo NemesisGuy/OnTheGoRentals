@@ -17,12 +17,14 @@ public class UserProfileController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/profile")
+    @GetMapping("/read/profile")
     public User getUserProfile(HttpServletRequest request) {
+        System.out.println("Get user profile called - UserProfileController");
         String token = jwtUtilities.getToken(request);
 
         if (token != null && jwtUtilities.validateToken(token)) {
             String userEmail = jwtUtilities.extractUsername(token);
+
 
             return userService.read(userEmail);
         } else {
@@ -46,6 +48,7 @@ public class UserProfileController {
                 existingUser.setLastName(updatedUser.getLastName());
                 existingUser.setEmail(updatedUser.getEmail());
 //                existingUser.setPassword(updatedUser.getPassword());
+              //  existingUser.setRoles(updatedUser.getRoles());
 
                 return userService.update(existingUser);
             }

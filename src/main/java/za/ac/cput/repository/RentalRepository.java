@@ -22,6 +22,8 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
 
     List<Rental> findByUserIdAndReturnedDateIsNull(int id);
 
+    // Find all rentals made by the user (returned or not)
+    List<Rental> findByUserId(int userId);
 
 }
 

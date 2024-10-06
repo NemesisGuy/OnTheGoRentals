@@ -7,6 +7,7 @@ package za.ac.cput.service;
 import za.ac.cput.domain.Car;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface ICarService extends IService<Car, Integer> {
     Car create(Car car);
@@ -18,4 +19,6 @@ public interface ICarService extends IService<Car, Integer> {
     boolean delete(Integer id);
 
     ArrayList<Car> getAll();
+
+    List<Car> getAllAvailableCars();
 }

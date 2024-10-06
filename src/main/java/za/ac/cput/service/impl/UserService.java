@@ -56,10 +56,11 @@ public class UserService implements IUserService {
 
     @Override
     public ResponseEntity<?> register(RegisterDto registerDto) {
-        if(iUserRepository.existsByEmail(registerDto.getEmail()))
-        { return  new ResponseEntity<>("email is already taken !", HttpStatus.SEE_OTHER); }
-        else
-        { User user = new User();
+        if(iUserRepository.existsByEmail(registerDto.getEmail())) {
+            return new ResponseEntity<>("email is already taken !", HttpStatus.SEE_OTHER);
+        }
+        else {
+            User user = new User();
             user.setEmail(registerDto.getEmail());
             user.setFirstName(registerDto.getFirstName());
             user.setLastName(registerDto.getLastName());
@@ -72,11 +73,11 @@ public class UserService implements IUserService {
             return new ResponseEntity<>(new BearerToken(token , "Bearer "),HttpStatus.OK);
 
         }
-        }
+    }
 
     @Override
     public String authenticate(LoginDto loginDto) {
-      Authentication authentication= authenticationManager.authenticate(
+        Authentication authentication= authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getEmail(),
                         loginDto.getPassword()
@@ -92,20 +93,33 @@ public class UserService implements IUserService {
 /////////////////////////////////
 
     public List<User> getAll() {
-        return iUserRepository.findAll();
+        List<User> users = iUserRepository.findAll();
+
+        return users;
+
     }
+
     public User create(User user) {
+
         return iUserRepository.save(user);
     }
     public User read(Integer id) {
-        return iUserRepository.findById(id).orElse(null);
+        User user = iUserRepository.findById(id).orElse(null);
+
+        return user;
     }
 
     @Override
     public User update(Integer id, User user) {
         if (iUserRepository.existsById(id)) {
-            user.setId(id);
-            return iUserRepository.save(user);
+            User existingUser = iUserRepository.findById(id).orElse(null);
+            if (existingUser != null) {
+                user.setId(id); // Set ID to match the entity being updated
+                if (user.getPassword() == null) {
+                    user.setPassword(existingUser.getPassword()); // Keep the old password if not provided
+                }
+                return iUserRepository.save(user);
+            }
         }
         return null;
     }
@@ -120,9 +134,34 @@ public class UserService implements IUserService {
 
 /////////////////////////////////
 
+ /*   public User read(String email) {
+        User user = iUserRepository.findByEmail(email).orElse(null);
+        User userWithNoPassword = user;
+        if(userWithNoPassword != null) {
+            userWithNoPassword.setPassword(null); // not sending the password to the client via json response
+        }
+        return userWithNoPassword;
+    }*/
+
     public User read(String email) {
-        return iUserRepository.findByEmail(email).orElse(null);
+        // Fetch the user from the repository
+        User user = iUserRepository.findByEmail(email).orElse(null);
+
+        if (user != null) {
+            // Create a copy of the user object to modify the password for the response only
+            User userCopy = new User();
+            userCopy.setId(user.getId());
+            userCopy.setEmail(user.getEmail());
+            userCopy.setFirstName(user.getFirstName());
+            userCopy.setLastName(user.getLastName());
+            userCopy.setRoles(user.getRoles());
+            // Don't set password to avoid exposing it, but don't modify the original user entity
+            userCopy.setPassword(null);
+            return userCopy;
+        }
+
+        return null; // If the user is not found
     }
 
-}
 
+}

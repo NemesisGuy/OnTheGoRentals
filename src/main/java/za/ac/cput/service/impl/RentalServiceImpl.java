@@ -6,6 +6,7 @@ package za.ac.cput.service.impl;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import za.ac.cput.domain.Booking;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.PriceGroup;
 import za.ac.cput.domain.Rental;
@@ -13,6 +14,7 @@ import za.ac.cput.domain.Rental;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.UserCantRentMoreThanOneCarException;
 import za.ac.cput.factory.impl.RentalFactory;
+import za.ac.cput.repository.BookingRepository;
 import za.ac.cput.repository.CarRepository;
 import za.ac.cput.repository.RentalRepository;
 import za.ac.cput.domain.security.User;
@@ -22,11 +24,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service("rentalServiceImpl")
 public class RentalServiceImpl implements IRentalService {
     @Autowired
-    private RentalRepository repository;
+    private RentalRepository rentalRepository;
 
     @Autowired
     private CarRepository carRepository;
@@ -34,6 +37,7 @@ public class RentalServiceImpl implements IRentalService {
     @Autowired
     private RentalFactory rentalFactory;
     private Car car;
+    private BookingRepository bookingRepository;
 
     //is car available
     public boolean isCarAvailable(Rental rental) {
@@ -62,7 +66,7 @@ public class RentalServiceImpl implements IRentalService {
                 System.out.println("Is car available after update: " + newRental.getCar().isAvailable());
             }
            // carRepository.setIsAvailableToFalse((int) newRental.getCar().getId());
-            return repository.save(newRental);
+            return rentalRepository.save(newRental);
         } else {
             throw new CarNotAvailableException(generateCarNotAvailableErrorMessage(rental.getCar()));
         }
@@ -70,7 +74,7 @@ public class RentalServiceImpl implements IRentalService {
 
     @Override
     public Rental read(Integer id) {
-        return this.repository.findById(id).orElse(null);
+        return this.rentalRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -79,7 +83,7 @@ public class RentalServiceImpl implements IRentalService {
         System.out.println("RentalServiceImpl.update : ");
         System.out.println("rental Id received : " + rental.getRentalId());
 
-        if (repository.existsById(rental.getRentalId())) {
+        if (rentalRepository.existsById(rental.getRentalId())) {
 
             System.out.println("Rental " + rental.getRentalId() + " found");
             System.out.println(rental);
@@ -97,7 +101,7 @@ public class RentalServiceImpl implements IRentalService {
                 System.out.println("Is car available after update: " + car.isAvailable());
             }
 
-            return repository.save(updatedRental);
+            return rentalRepository.save(updatedRental);
         }
         System.out.println("Rental " + rental.getRentalId() + " not found");
         return null;
@@ -107,7 +111,7 @@ public class RentalServiceImpl implements IRentalService {
         System.out.println("RentalServiceImpl.update : ");
         System.out.println("rental Id received : " + rental.getRentalId());
 
-        if (repository.existsById(rental.getRentalId())) {
+        if (rentalRepository.existsById(rental.getRentalId())) {
 
             System.out.println("Rental " + rental.getRentalId() + " found");
             System.out.println(rental);
@@ -125,7 +129,7 @@ public class RentalServiceImpl implements IRentalService {
                 System.out.println("Is car available after update: " + car.isAvailable());
             }
 
-            return repository.save(updatedRental);
+            return rentalRepository.save(updatedRental);
         }
         System.out.println("Rental " + rental.getRentalId() + " not found");
         return null;
@@ -133,8 +137,8 @@ public class RentalServiceImpl implements IRentalService {
 
     @Override
     public boolean delete(Integer id) {
-        if (this.repository.existsById(id)) {
-            this.repository.deleteById(id);
+        if (this.rentalRepository.existsById(id)) {
+            this.rentalRepository.deleteById(id);
             return true;
         }
         return false;
@@ -142,13 +146,13 @@ public class RentalServiceImpl implements IRentalService {
 
     @Override
     public ArrayList<Rental> getAll() {
-        return (ArrayList<Rental>) this.repository.findAll();
+        return (ArrayList<Rental>) this.rentalRepository.findAll();
     }
 
     //get all available cars
     // needs to be implemented
     public ArrayList<Rental> getAllAvailableCars() {
-        List<Rental> allRentals = repository.findAll();
+        List<Rental> allRentals = rentalRepository.findAll();
         //filter all rentals to only include available cars
         return filterAvailableCars(allRentals);
     }
@@ -176,17 +180,10 @@ public class RentalServiceImpl implements IRentalService {
                 rentedCar.getLicensePlate();
     }
 
-    //refactored isCarAvailable
-//    private boolean isCarAvailable(Rental rental) {
-//        Car carToRent = rental.getCar();
-//        Optional<Rental> rentalFromDatabaseOptional = findMostRecentRentalByCarId(carToRent.getId());
-//        Rental rentalFromDatabase = rentalFromDatabaseOptional.orElse(null);
-//        printRentalInfo(rentalFromDatabase, rental.getReturnedDate());
-//        return isCarAvailableBasedOnRental(rental);
-//    }
+
 
     private Optional<Rental> findMostRecentRentalByCarId(Long carId) {
-        return repository.findTopByCarIdOrderByReturnedDateDesc(Math.toIntExact(carId));
+        return rentalRepository.findTopByCarIdOrderByReturnedDateDesc(Math.toIntExact(carId));
     }
 
     private void printRentalInfo(Rental rentalFromDatabase, LocalDateTime returnedDate) {
@@ -200,25 +197,6 @@ public class RentalServiceImpl implements IRentalService {
         }
     }
 
-
-    //refactored isCarAvailableByCarId
-//    public boolean isCarAvailableByCarId(Car car) {
-//        Optional<Rental> rentalByCarIdOrderByReturnedDateDesc = findMostRecentRentalByCarId(car.getId());
-//
-//        if (rentalByCarIdOrderByReturnedDateDesc.isPresent()) {
-//            Rental rentalFromDatabase = rentalByCarIdOrderByReturnedDateDesc.get();
-//
-//            if (rentalFromDatabase.getReturnedDate() != null) {
-//                printRentalInfoForCarAvailability(rentalFromDatabase, "Car is available");
-//                // If the most recent rental is returned 24 hours before the new rental, then the car is available
-//                return isCarAvailableBasedOnRental(rentalFromDatabase);
-//            } else {
-//                printRentalInfoForCarAvailability(rentalFromDatabase, "Car is not available");
-//            }
-//        }
-//
-//        return false;
-//    }
 
     /// refactored
     private void printRentalInfoForCarAvailability(Rental rentalFromDatabase, String availabilityMessage) {
@@ -240,9 +218,6 @@ public class RentalServiceImpl implements IRentalService {
         System.out.println(availabilityMessage);
     }
 
-   /* private boolean isCarAvailableBasedOnRental(Rental rentalFromDatabase) {
-        return rentalFromDatabase.getReturnedDate().plusDays(1).isBefore(LocalDateTime.now());
-    }*/
 
     //refactored
 
@@ -274,7 +249,7 @@ public class RentalServiceImpl implements IRentalService {
 
     public boolean isCurrentlyRenting(User user) {
         // Find active rentals for the user
-        List<Rental> activeRentals = repository.findByUserIdAndReturnedDateIsNull(user.getId());
+        List<Rental> activeRentals = rentalRepository.findByUserIdAndReturnedDateIsNull(user.getId());
 
         // If the user has any active rentals, they are currently renting a car
         return !activeRentals.isEmpty();
@@ -282,7 +257,7 @@ public class RentalServiceImpl implements IRentalService {
 
     public Rental getCurrentRental(User user) {
         // Find active rentals for the user
-        List<Rental> activeRentals = repository.findByUserIdAndReturnedDateIsNull(user.getId());
+        List<Rental> activeRentals = rentalRepository.findByUserIdAndReturnedDateIsNull(user.getId());
 
         // If the user has any active rentals, they are currently renting a car
         if (!activeRentals.isEmpty()) {
@@ -309,8 +284,26 @@ public class RentalServiceImpl implements IRentalService {
     }
     @Override //testing
     public boolean existsById(Integer id) {
-        return repository.existsById(id);
+        return rentalRepository.existsById(id);
     }
+
+
+
+    @Override
+    // Method to get rental history for a specific user
+    public List<Rental> getRentalHistoryByUser(User user) {
+        return rentalRepository.findByUserId(user.getId());
+    }
+
+    public boolean isCarBooked(Car car, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Booking> activeBookings = bookingRepository.findByCarAndStatusAndBookingEndDateAfterAndBookingStartDateBefore(
+                car, "CONFIRMED", startDate, endDate
+        );
+        return !activeBookings.isEmpty();
+    }
+
+
+
 }
 
 

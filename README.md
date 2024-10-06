@@ -16,8 +16,9 @@ This is a car rental system.
 [Documentation](https://nemesis-wikijs.malicks.co.za/OnTheGoRentals/Peter)
 
 # Contributors:
+## 👥 Authors
 
-- **Peter Buckingham - Team Lead**
+- **Peter Buckingham - Team Lead** - [NemesisGuy](https://github.com/NemesisGuy)
 - **Aqeel Hanslo - 219374422**
 - **Shamiso Moyo Chaka - 220365393**
 
