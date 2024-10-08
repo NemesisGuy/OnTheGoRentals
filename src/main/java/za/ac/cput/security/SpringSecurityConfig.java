@@ -19,10 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.web.cors.CorsConfiguration;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -31,23 +27,12 @@ public class SpringSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // Configure CSRF protection
-        http .csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(Customizer.withDefaults())
-                /*.cors(cors -> cors.configurationSource(request -> {
-                    var corsConfig = new CorsConfiguration();
-                    corsConfig.setAllowedOrigins(List.of("*"));
-                    corsConfig.setAllowedMethods(List.of("*"));
-                    corsConfig.setAllowCredentials(true);  // This allows cookies to be sent with requests
-                    corsConfig.setAllowedHeaders(List.of("*"));
-                    return corsConfig;
-                }))  // Enable CORS*/
                 .authorizeHttpRequests(authorize -> authorize
                         // User endpoints
                         .requestMatchers("/api/user/register").permitAll()
@@ -67,17 +52,21 @@ public class SpringSecurityConfig {
                         // Help center and FAQ user endpoints
                         .requestMatchers("/api/faq/**").permitAll()
                         .requestMatchers("/api/help-center/**").permitAll()
-                        .requestMatchers("/api/bookings/**").permitAll()///for dev purposes
+                        .requestMatchers("/api/bookings/**").permitAll() // for dev purposes
                         // Admin endpoints
-                        .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN" , "SUPERADMIN")
-                        .requestMatchers("/api/admins/**").hasAnyAuthority("ADMIN" , "SUPERADMIN")
-                     //   .requestMatchers("/api/admins/bookings/**").hasAuthority( "SUPERADMIN")
-                ) .exceptionHandling(exception -> exception
-                .authenticationEntryPoint((request, response, authException) -> {
-                    System.out.println("Authentication failed: " + authException.getMessage());
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                })
-        );
+                        .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+                        .requestMatchers("/api/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            System.out.println("Authentication failed: " + authException.getMessage());
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized - Please log in again");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            System.out.println("Access denied: " + accessDeniedException.getMessage());
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden - You do not have permission to access this resource");
+                        })
+                );
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

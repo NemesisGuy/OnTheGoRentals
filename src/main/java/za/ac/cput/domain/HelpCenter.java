@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -15,15 +16,16 @@ import java.util.Objects;
  * Date: 29 August 2023
  */
 
+@Getter
 @Entity
 public class HelpCenter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String category;
     private String title;
     private String content;
+    private String category;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -41,30 +43,6 @@ public class HelpCenter {
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package za.ac.cput.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Faq;
 import za.ac.cput.repository.IFaqRepository;
@@ -10,7 +11,8 @@ import java.util.ArrayList;
 @Service("iFaqServiceImpl")
 public class IFaqServiceImpl implements IFaqService {
 
-    private static IFaqRepository repository;
+    @Autowired
+    private IFaqRepository repository;
 
     public IFaqServiceImpl(IFaqRepository repository) {
         this.repository = repository;
@@ -18,18 +20,18 @@ public class IFaqServiceImpl implements IFaqService {
 
     @Override
     public Faq create(Faq faq) {
-        return this.repository.save(faq);
+        return repository.save(faq);
     }
 
     @Override
     public Faq read(Integer integer) {
-        return this.repository.findById(integer).orElse(null);
+        return repository.findById(integer).orElse(null);
     }
 
     @Override
     public Faq update(Faq faq) {
-        if (this.repository.existsById(faq.getId()))
-            return this.repository.save(faq);
+        if (repository.existsById(faq.getId()))
+            return repository.save(faq);
         return null;
     }
 

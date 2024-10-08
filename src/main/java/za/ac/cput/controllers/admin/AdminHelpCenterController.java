@@ -21,23 +21,24 @@ public class AdminHelpCenterController {
     private IHelpCenterServiceImpl helpCenterService;
 
     @PostMapping("/create")
-    public HelpCenter createHelpCenter(@RequestBody HelpCenter helpCenter) {
+    public HelpCenter create(@RequestBody HelpCenter helpCenter) {
         return helpCenterService.create(helpCenter);
     }
 
     @GetMapping("/read/{id}")
-    public HelpCenter readHelpCenter(@PathVariable int id) {
+    public HelpCenter read(@PathVariable int id) {
         HelpCenter helpCenter = helpCenterService.read(id);
         return helpCenter;
     }
 
     @PostMapping("/update")
-    public HelpCenter updateHelpCenter(@RequestBody HelpCenter helpCenter) {
+    public HelpCenter update(@RequestBody HelpCenter helpCenter) {
         return helpCenterService.update(helpCenter);
     }
 
     @DeleteMapping("/delete/{id}")
     public boolean delete(@PathVariable Integer id) {
+
         return helpCenterService.delete(id);
     }
 
