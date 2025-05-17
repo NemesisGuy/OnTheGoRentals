@@ -9,9 +9,13 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findByUserId(int userId);
+
     List<Booking> findByCarIdAndStatus(int carId, String status);
-    List<Booking>   findByCarAndStatusAndBookingEndDateAfterAndBookingStartDateBefore(Car car, String status, LocalDateTime bookingEndDate, LocalDateTime bookingStartDate);
+
+    List<Booking> findByCarAndStatusAndBookingEndDateAfterAndBookingStartDateBefore(Car car, String status, LocalDateTime bookingEndDate, LocalDateTime bookingStartDate);
 
 
+    //Booking findByCarId(int carId, String status);
+    List<Booking> findBookingByUserId(int userId);
 }
 

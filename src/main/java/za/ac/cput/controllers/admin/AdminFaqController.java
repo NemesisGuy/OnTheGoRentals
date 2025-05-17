@@ -1,6 +1,7 @@
 package za.ac.cput.controllers.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Faq;
 import za.ac.cput.service.impl.IFaqServiceImpl;
@@ -21,28 +22,41 @@ public class AdminFaqController {
     private IFaqServiceImpl faqService;
 
     @PostMapping("/create")
-    public Faq createFaq(@RequestBody Faq faq) {
-        return faqService.create(faq);
+    public ResponseEntity<Faq> createFaq(@RequestBody Faq faq) {
+        Faq created = faqService.create(faq);
+        return ResponseEntity.status(201).body(created);
     }
 
     @GetMapping("/read/{id}")
-    public Faq readFaq(@PathVariable int id) {
-        return faqService.read(id);
+    public ResponseEntity<Faq> readFaq(@PathVariable int id) {
+        Faq faq = faqService.read(id);
+        if (faq == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(faq);
     }
 
     @PostMapping("/update")
-    public Faq updateFaq(@RequestBody Faq faq) {
-        return faqService.update(faq);
+    public ResponseEntity<Faq> updateFaq(@RequestBody Faq faq) {
+        Faq updated = faqService.update(faq);
+        if (updated == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/delete/{id}")
-    public boolean delete(@PathVariable Integer id) {
-        return faqService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        boolean deleted = faqService.delete(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/get-all")
-    public ArrayList<Faq> getAll() {
+    public ResponseEntity<ArrayList<Faq>> getAll() {
         ArrayList<Faq> allFaq = new ArrayList<>(faqService.getAll());
-        return allFaq;
+        return ResponseEntity.ok(allFaq);
     }
 }

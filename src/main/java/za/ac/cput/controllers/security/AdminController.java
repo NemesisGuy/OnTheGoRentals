@@ -1,8 +1,6 @@
 package za.ac.cput.controllers.security;
 /**
- *
  * Author: Peter Buckingham (220165289)
- *
  */
 
 import lombok.RequiredArgsConstructor;
@@ -18,9 +16,8 @@ public class AdminController {
 
     //RessourceEndPoint:http://localhost:8080/api/admin/hello
     @GetMapping("/hello")
-    public String sayHello ()
-    {
-        return "Hello" ;
+    public String sayHello() {
+        return "Hello";
     }
 
 

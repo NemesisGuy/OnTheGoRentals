@@ -1,6 +1,7 @@
 package za.ac.cput.controllers.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.HelpCenter;
 import za.ac.cput.service.impl.IHelpCenterServiceImpl;
@@ -21,30 +22,41 @@ public class AdminHelpCenterController {
     private IHelpCenterServiceImpl helpCenterService;
 
     @PostMapping("/create")
-    public HelpCenter create(@RequestBody HelpCenter helpCenter) {
-        return helpCenterService.create(helpCenter);
+    public ResponseEntity<HelpCenter> create(@RequestBody HelpCenter helpCenter) {
+        HelpCenter created = helpCenterService.create(helpCenter);
+        return ResponseEntity.status(201).body(created);
     }
 
     @GetMapping("/read/{id}")
-    public HelpCenter read(@PathVariable int id) {
+    public ResponseEntity<HelpCenter> read(@PathVariable int id) {
         HelpCenter helpCenter = helpCenterService.read(id);
-        return helpCenter;
+        if (helpCenter == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(helpCenter);
     }
 
     @PostMapping("/update")
-    public HelpCenter update(@RequestBody HelpCenter helpCenter) {
-        return helpCenterService.update(helpCenter);
+    public ResponseEntity<HelpCenter> update(@RequestBody HelpCenter helpCenter) {
+        HelpCenter updated = helpCenterService.update(helpCenter);
+        if (updated == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/delete/{id}")
-    public boolean delete(@PathVariable Integer id) {
-
-        return helpCenterService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        boolean deleted = helpCenterService.delete(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/get-all")
-    public ArrayList<HelpCenter> getAll() {
+    public ResponseEntity<ArrayList<HelpCenter>> getAll() {
         ArrayList<HelpCenter> helpCenterList = new ArrayList<>(helpCenterService.getAll());
-        return helpCenterList;
+        return ResponseEntity.ok(helpCenterList);
     }
 }

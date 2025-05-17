@@ -1,9 +1,10 @@
 package za.ac.cput.controllers;
-/**AboutUsController.java
+/**
+ * AboutUsController.java
  * Controller class for About Us page
  * Author: Cwenga Dlova (214310671)
  * Date: 24/09/2023
- * */
+ */
 
 
 import org.springframework.beans.factory.annotation.Autowired;

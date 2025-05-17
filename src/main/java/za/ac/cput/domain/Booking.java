@@ -125,7 +125,7 @@ public class Booking {
         private int id;
         private User user;
         private Car car;
-//        private Driver driver;
+        //        private Driver driver;
         private LocalDateTime bookingDate;
         private LocalDateTime returnedDate;
         private String status;
@@ -146,10 +146,10 @@ public class Booking {
         }
 //
 //        public Builder driver(Driver driver) {
-////            this.driver = driver;
+
+        /// /            this.driver = driver;
 //            return this;
 //        }
-
         public Builder bookingDate(LocalDateTime bookingDate) {
             this.bookingDate = bookingDate;
             return this;
@@ -159,6 +159,7 @@ public class Booking {
             this.returnedDate = returnedDate;
             return this;
         }
+
         public Builder status(String status) {
             this.status = status;
             return this;

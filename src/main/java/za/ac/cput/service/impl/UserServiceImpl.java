@@ -2,9 +2,7 @@
 package za.ac.cput.service.impl;
 */
 /**
- *
  * Author: Peter Buckingham (220165289)
- *
  *//*
 
 import org.springframework.beans.factory.annotation.Autowired;

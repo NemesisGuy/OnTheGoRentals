@@ -8,82 +8,75 @@ package za.ac.cput.controllers.admin;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Rental;
-import za.ac.cput.factory.impl.RentalFactory;
+import za.ac.cput.domain.dto.RentalDTO;
+import za.ac.cput.domain.mapper.RentalMapper;
 import za.ac.cput.service.impl.RentalServiceImpl;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/rentals")
 public class AdminRentalController {
+
     @Autowired
     private RentalServiceImpl rentalService;
 
     @GetMapping("/list/all")
-    public ArrayList<Rental> getAll() {
-        ArrayList<Rental> rentals = new ArrayList<>(rentalService.getAll());
-        return rentals;
+    public ResponseEntity<List<RentalDTO>> getAll() {
+        List<Rental> rentals = rentalService.getAll();
+        List<RentalDTO> rentalDTOs = rentals.stream()
+                .map(RentalMapper::toDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(rentalDTOs);
     }
 
     @PostMapping("/create")
-    public Rental createRental(@RequestBody Rental rental) {
-        System.out.println("/api/admin/rentals/create was triggered");
-        System.out.println("RentalService was created...attempting to create rental...");
-
-        // Retrieve user and car based on their IDs
-        System.out.println(rental.getUser());
-        System.out.println(rental.getCar());
-        System.out.println(rental.getIssuedDate());
-        System.out.println(rental.getReturnedDate());
-        return rentalService.create(rental);
+    public ResponseEntity<RentalDTO> createRental(@RequestBody Rental rental) {
+        Rental created = rentalService.create(rental);
+        if (created == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(RentalMapper.toDto(created));
     }
 
     @GetMapping("/read/{rentalId}")
-    public Rental readRental(@PathVariable Integer rentalId) {
-        System.out.println("/api/admin/rentals/read was triggered");
-        System.out.println("RentalService was created...attempting to read rental...");
+    public ResponseEntity<RentalDTO> readRental(@PathVariable Integer rentalId) {
         Rental readRental = rentalService.read(rentalId);
-        return readRental;
+        if (readRental == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(RentalMapper.toDto(readRental));
     }
 
     @PutMapping("/update/{rentalId}")
-    public Rental updateRental(@PathVariable Integer rentalId, @RequestBody Rental rental) {
-       Rental rentalToUpdate = rentalService.read(rentalId);
-       Rental rentalRequest = rental;
-       Rental updatedRental =Rental.builder()
-               .setId(rentalToUpdate.getId())
-               .setUser(rentalToUpdate.getUser())
-               .setCar(rentalToUpdate.getCar())
-               .setIssuer(rentalRequest.getIssuer())
-               .setReceiver(rentalRequest.getReceiver())
-               .setFine(rentalRequest.getFine())
-               .setIssuedDate(rentalRequest.getIssuedDate())
-               .setDateReturned(rentalRequest.getReturnedDate())
-               .build();
+    public ResponseEntity<RentalDTO> updateRental(@PathVariable Integer rentalId, @RequestBody Rental rental) {
+        Rental existing = rentalService.read(rentalId);
+        if (existing == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-        System.out.println("rental to update: " + rentalToUpdate);
+        Rental updatedRental = Rental.builder()
+                .setId(existing.getId())
+                .setUser(existing.getUser())
+                .setCar(existing.getCar())
+                .setIssuer(rental.getIssuer())
+                .setReceiver(rental.getReceiver())
+                .setFine(rental.getFine())
+                .setIssuedDate(rental.getIssuedDate())
+                .setReturnedDate(rental.getReturnedDate())
+                .build();
 
-
-        System.out.println("/api/admin/rentals/update was triggered");
-        System.out.println("");
-        System.out.println("form front end : " + rental.toString());
-        System.out.println("");
-        System.out.println("rental Id: " + rental.getId());
-        System.out.println("rental user: " + rental.getUser());
-        System.out.println("rental car: " + rental.getCar());
-        System.out.println("issued by: " + rental.getIssuer());
-        System.out.println("rental issued date: " + rental.getIssuedDate());
-        System.out.println("rental returned date: " + rental.getReturnedDate());
-        Rental updated = rentalService.update(rentalId,updatedRental);
-        System.out.println("updated rental: " + updated);
-        return updated;
+        Rental result = rentalService.update(rentalId, updatedRental);
+        return ResponseEntity.ok(RentalMapper.toDto(result));
     }
+
     @DeleteMapping("/delete/{rentalId}")
-    public boolean deleteRental(@PathVariable Integer rentalId) {
-        System.out.println("/api/admin/rentals/delete was triggered");
-        System.out.println("RentalService was created...attempting to delete rental...");
-        return rentalService.delete(rentalId);
+    public ResponseEntity<Void> deleteRental(@PathVariable Integer rentalId) {
+        rentalService.delete(rentalId);
+        return ResponseEntity.ok().build();
     }
 }

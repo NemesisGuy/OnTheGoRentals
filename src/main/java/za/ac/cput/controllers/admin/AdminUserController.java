@@ -1,236 +1,123 @@
 package za.ac.cput.controllers.admin;
+
 /**
- *
  * AdminUserController.java
- * This is the controller for the user entity
+ * Controller for user entity management
  * Author: Peter Buckingham (220165289)
  * Date: 05 April 2023
  */
-
-
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import za.ac.cput.domain.dto.UserDTO;
+import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.domain.security.Role;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.exception.RoleNotFoundException;
 import za.ac.cput.repository.IRoleRepository;
-import za.ac.cput.service.impl.UserService;
+import za.ac.cput.service.impl.UserServiceorig;
+
 import java.util.ArrayList;
 import java.util.List;
-/*
-@CrossOrigin(origins = "http://localhost:5173")
-*/
+import java.util.stream.Collectors;
+
 @RestController
-@RequestMapping("api/admin/users")
+@RequestMapping("/api/admin/users")
 public class AdminUserController {
 
+    @Autowired
+    private UserServiceorig userService;
 
     @Autowired
-    private UserService userService;
-    @Autowired
     private IRoleRepository roleRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
-    /*@GetMapping("/list/all")
-    public List<User> getAllUsers() {
-
-        return userService.getAll();
-    }*/
+    // Get all users as UserDTO (no passwords exposed)
     @GetMapping("/list/all")
-    public List<User> getAllUsers() {
-        // Get all users from the service
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userService.getAll();
-
-        // Create a copy of each user without the password
-        List<User> usersWithoutPasswords = new ArrayList<>();
+        List<UserDTO> userDTOs = new ArrayList<>();
         for (User user : users) {
-            User userCopy = new User();
-            userCopy.setId(user.getId());
-            userCopy.setEmail(user.getEmail());
-            userCopy.setFirstName(user.getFirstName());
-            userCopy.setLastName(user.getLastName());
-            userCopy.setRoles(user.getRoles());
-            // Do not include the password in the copy
-            userCopy.setPassword(null);
-            usersWithoutPasswords.add(userCopy);
+            userDTOs.add(UserMapper.toDto(user));
         }
-
-        return usersWithoutPasswords;
+        return ResponseEntity.ok(userDTOs);
     }
 
+    // Get user by id, returns UserDTO or 404
     @GetMapping("/read/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
         User user = userService.read(id);
-        if (user != null) {
-            return ResponseEntity.ok(user);
-        } else {
+        if (user == null) {
             return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok(UserMapper.toDto(user));
     }
 
-
+    // Create new user with role validation
     @PostMapping("/create")
-    public User createUser(@RequestBody User user) {
-        List<Role> roles = roleRepository.findAll();
-        List<Role> matchingRoles = new ArrayList<>();
-
-        for (Role userRole : user.getRoles()) {
-            for (Role dbRole : roles) {
-                if (dbRole.getRoleName().equals(userRole.getRoleName())) {
-                    matchingRoles.add(dbRole);
-                    break;
-                }
-            }
-        }
-        if (matchingRoles.isEmpty()) {
-            throw new RoleNotFoundException("Desired role(s) not found");
-        }
-
+    public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
+        List<Role> matchingRoles = validateAndGetRoles(user.getRoles());
         user.setRoles(matchingRoles);
-        return userService.create(user);
+        User createdUser = userService.create(user);
+        return ResponseEntity.ok(UserMapper.toDto(createdUser));
     }
 
+    // Update existing user by ID with role validation
     @PutMapping("/update/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Integer id, @RequestBody User updatedUser) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Integer id, @RequestBody User updatedUser) {
         User existingUser = userService.read(id);
-
-        if (existingUser != null) {
-            // Update the user fields
-            existingUser.setFirstName(updatedUser.getFirstName());
-            existingUser.setLastName(updatedUser.getLastName());
-            existingUser.setEmail(updatedUser.getEmail());
-            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-
-            // Get all roles from the database
-            List<Role> dbRoles = roleRepository.findAll();
-
-            List<Role> matchingRoles = new ArrayList<>();
-
-            for (Role userRole : updatedUser.getRoles()) {
-                for (Role dbRole : dbRoles) {
-                    if (dbRole.getRoleName().equals(userRole.getRoleName())) {
-                        matchingRoles.add(dbRole);
-                        break;
-                    }
-                }
-            }
-
-            // If there are any matching roles, update the user's roles
-            if (!matchingRoles.isEmpty()) {
-                existingUser.setRoles(matchingRoles);
-            } else {
-                throw new RoleNotFoundException("Desired role(s) not found");
-            }
-
-            // Save the updated user
-            existingUser = userService.update(existingUser);
-            return ResponseEntity.ok(existingUser);
-        } else {
-            // User not found
+        if (existingUser == null) {
             return ResponseEntity.notFound().build();
         }
+        existingUser.setFirstName(updatedUser.getFirstName());
+        existingUser.setLastName(updatedUser.getLastName());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setPassword(updatedUser.getPassword());
+
+        List<Role> matchingRoles = validateAndGetRoles(updatedUser.getRoles());
+        existingUser.setRoles(matchingRoles);
+
+        User savedUser = userService.update(existingUser);
+        return ResponseEntity.ok(UserMapper.toDto(savedUser));
     }
 
-
-    @DeleteMapping("delete/{id}")
+    // Delete user by ID
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
         boolean deleted = userService.delete(id);
         if (deleted) {
             return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.notFound().build();
     }
+
+    // List all roles available in the system
     @GetMapping("/roles")
-    public List<Role> getAllRoles() {
-        return roleRepository.findAll();
+    public ResponseEntity<List<Role>> getAllRoles() {
+        return ResponseEntity.ok(roleRepository.findAll());
+    }
+
+
+
+    // Helper to validate requested roles against DB roles, throws exception if none found
+    private List<Role> validateAndGetRoles(List<Role> requestedRoles) {
+        List<Role> allRoles = roleRepository.findAll();
+        List<Role> matchingRoles = new ArrayList<>();
+
+        for (Role reqRole : requestedRoles) {
+            allRoles.stream()
+                    .filter(dbRole -> dbRole.getRoleName().equals(reqRole.getRoleName()))
+                    .findFirst()
+                    .ifPresent(matchingRoles::add);
+        }
+
+        if (matchingRoles.isEmpty()) {
+            throw new RoleNotFoundException("Desired role(s) not found");
+        }
+        return matchingRoles;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*@RestController
-@RequestMapping("/api/admin/users")
-public class AdminUserController {
-
-    *//* @Autowired
-     private UserServiceImpl userService;*//*
-    @Autowired
-    private UserService userService;
-
-    @GetMapping("/list/all")
-    public ArrayList<User> getAll() {
-        ArrayList<User> users = new ArrayList<>(userService.getAll());
-        return users;
-    }
-
-    @RequestMapping("/list/{argument}")
-    public ArrayList<User> getAllByArgument(@PathVariable String argument) {
-        ArrayList<User> users = new ArrayList<>(userService.getAll());
-        users.removeIf(user -> !user.toString().toLowerCase().contains(argument.toLowerCase()));
-        return users;
-    }
-
-    @PostMapping("/create")
-    public User createUser(@RequestBody User user) {
-        User createdUser = userService.create(user);
-        return createdUser;
-    }
-    @GetMapping("/read/{userId}")
-    public User readUser(@PathVariable Integer userId) {
-        System.out.println("/api/admin/users/read was triggered");
-        System.out.println("UserService was created...attempting to read user...");
-        User readUser = userService.read(userId);
-        return readUser;
-    }
-    @PutMapping("/update/{userId}")
-    public User updateUser(@PathVariable int userId, @RequestBody User updatedUser) {
-        System.out.println("/api/admin/users/update was triggered");
-        System.out.println("UserService was created...attempting to update user...");
-        User userToUpdate = userService.update(updatedUser);
-        return userToUpdate;
-    }
-    @DeleteMapping("/delete/{userId}")
-    public boolean deleteUser(@PathVariable Integer userId) {
-        System.out.println("/api/admin/users/delete was triggered");
-        System.out.println("UserService was created...attempting to delete user...");
-        return userService.delete(userId);
-    }
-}*/

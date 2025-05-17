@@ -1,18 +1,19 @@
 package za.ac.cput.controllers.admin;
+
 /**
  * AdminCarController.java
- * This is the controller for the Car entity
+ * Controller for the Car entity (admin only)
  * Author: Peter Buckingham (220165289)
  * Date: 05 April 2023
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Car;
-import za.ac.cput.domain.PriceGroup;
+import za.ac.cput.domain.enums.PriceGroup;
 import za.ac.cput.service.impl.CarServiceImpl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,48 +24,48 @@ public class AdminCarController {
     private CarServiceImpl carService;
 
     @GetMapping("/all")
-    public List<Car> getCars() {
-        List<Car> allCars = new ArrayList<>(carService.getAll());
-        return allCars;
+    public ResponseEntity<List<Car>> getCars() {
+        List<Car> cars = carService.getAll();
+        if (cars.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(cars);
     }
+
     @PostMapping("/create")
-    public Car createCar(@RequestBody Car car) {
-        System.out.println("/api/admin/cars/create was triggered");
+    public ResponseEntity<Car> createCar(@RequestBody Car car) {
         car.setPriceGroup(mapPriceGroup(car.getPriceGroupString()));
-        System.out.println("PriceGroup was set to: " + car.getPriceGroup());
-        System.out.println("CarService was created...attempting to create car...");
         Car createdCar = carService.create(car);
-        return createdCar;
+        return ResponseEntity.status(201).body(createdCar);
     }
 
     @GetMapping("/read/{carId}")
-    public Car readCar(@PathVariable Integer carId) {
-        System.out.println("/api/admin/cars/read was triggered");
-        System.out.println("CarService was created...attempting to read car...");
-        Car readCar = carService.read(carId);
-        return readCar;
+    public ResponseEntity<Car> readCar(@PathVariable Integer carId) {
+        Car car = carService.read(carId);
+        if (car == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(car);
     }
 
     @PutMapping("/update/{carId}")
-    public Car updateCar(@PathVariable int carId, @RequestBody Car updatedCar) {
-        Car updated = carService.update(updatedCar);
-        return updated;
+    public ResponseEntity<Car> updateCar(@PathVariable int carId, @RequestBody Car updatedCar) {
+       // updatedCar.setId(carId);
+        Car car = carService.update(updatedCar);
+        return ResponseEntity.ok(car);
     }
 
     @DeleteMapping("/delete/{carId}")
-    public boolean deleteCar(@PathVariable Integer carId) {
-        System.out.println("/api/admin/cars/delete was triggered");
-        System.out.println("CarService was created...attempting to delete car...");
-        return carService.delete(carId);
+    public ResponseEntity<Void> deleteCar(@PathVariable Integer carId) {
+        boolean deleted = carService.delete(carId);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     private PriceGroup mapPriceGroup(String priceGroupString) {
         try {
-            return PriceGroup.valueOf(priceGroupString);
-        } catch (IllegalArgumentException e) {
+            return PriceGroup.valueOf(priceGroupString.toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
             return PriceGroup.NONE;
         }
     }
-
 }
-//.delete(`http://localhost:8080/api/admin/cars/delete/${carId}`)

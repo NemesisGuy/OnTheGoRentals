@@ -35,7 +35,7 @@ public class BackendApplication {
     @Bean
     CommandLineRunner run(IUserService userService, IRoleRepository roleRepository, IUserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            List<RoleName> roleNames = Arrays.asList( RoleName.USER, RoleName.ADMIN, RoleName.SUPERADMIN);
+            List<RoleName> roleNames = Arrays.asList(RoleName.USER, RoleName.ADMIN, RoleName.SUPERADMIN);
 
             for (RoleName roleName : roleNames) {
                 Role role = roleRepository.findByRoleName(roleName);
@@ -43,15 +43,15 @@ public class BackendApplication {
                 if (role == null) {
                     userService.saveRole(new Role(roleName));
 
-                    String userName = "Default-" +roleName.toString().toLowerCase()+"-user";
+                    String userName = "Default-" + roleName.toString().toLowerCase() + "-user";
                     String email = roleName.toString().toLowerCase() + "@gmail.com";
                     String password = roleName.toString().toLowerCase() + "password"; //eg. adminpassword
 
 
-                    userService.saverUser(new User(userName,email, passwordEncoder.encode(password), new ArrayList<>()));
+                    userService.saverUser(new User(userName, email, passwordEncoder.encode(password), new ArrayList<>()));
 
                     role = roleRepository.findByRoleName(roleName);
-                    User user = (User) userRepository.findByEmail(email).orElse(null);
+                    User user = userRepository.findByEmail(email).orElse(null);
 
                     if (user != null) {
                         user.getRoles().add(role);

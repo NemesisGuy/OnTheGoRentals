@@ -1,8 +1,6 @@
 package za.ac.cput.metrics;
 
 
-
-
 public class Main {
     public static void main(String[] args) {
         CodeLineCounter counter = new CodeLineCounter();

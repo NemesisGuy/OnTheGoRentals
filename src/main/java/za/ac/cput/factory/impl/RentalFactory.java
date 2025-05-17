@@ -3,9 +3,9 @@ package za.ac.cput.factory.impl;
 import org.springframework.stereotype.Component;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.Rental;
-/*import za.ac.cput.domain.User;*/
-import za.ac.cput.factory.IFactory;
+import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.domain.security.User;
+import za.ac.cput.factory.IFactory;
 
 import java.time.LocalDateTime;
 import java.util.Random;
@@ -17,7 +17,11 @@ import java.util.Random;
  */
 @Component
 public class RentalFactory implements IFactory<Rental> {
-    public Rental create(int id, User user, Car car, int issuer, int receiver, int fine, LocalDateTime issuedDate, LocalDateTime returnedDate) {
+
+    public Rental create(int id, User user, Car car, int issuer, int receiver, int fine,
+                         LocalDateTime issuedDate, LocalDateTime returnedDate) {
+
+        RentalStatus status = determineStatus(issuedDate, returnedDate);
 
         return new Rental.Builder()
                 .setId(id)
@@ -27,20 +31,46 @@ public class RentalFactory implements IFactory<Rental> {
                 .setReceiver(receiver)
                 .setFine(fine)
                 .setIssuedDate(issuedDate)
-                .setDateReturned(returnedDate)
+                .setReturnedDate(returnedDate)
+                .setStatus(status)
                 .build();
     }
+
     public Rental create() {
         return new Rental.Builder()
-                .setId(new Random().nextInt(1000000))
+                //.setId(new Random().nextInt(1000000))
+                .setStatus(RentalStatus.ACTIVE)
                 .build();
     }
 
+    /*    public Rental create(Rental rental) {
+            RentalStatus status = determineStatus(rental.getIssuedDate(), rental.getReturnedDate());
+
+            return new Rental.Builder()
+                    .copy(rental)
+                    .setStatus(status)
+                    .build();
+        }*/
     public Rental create(Rental rental) {
-        return new Rental.Builder()
+        Rental newRental = new Rental.Builder()
                 .copy(rental)
                 .build();
+
+        if (rental.getReturnedDate() != null) {
+            newRental.setStatus(RentalStatus.COMPLETED);
+        } else {
+            newRental.setStatus(RentalStatus.ACTIVE);
+        }
+
+        return newRental;
+    }
+
+
+    private RentalStatus determineStatus(LocalDateTime issued, LocalDateTime returned) {
+        if (returned == null || returned.isAfter(LocalDateTime.now())) {
+            return RentalStatus.ACTIVE;
+        } else {
+            return RentalStatus.COMPLETED;
+        }
     }
 }
-
-

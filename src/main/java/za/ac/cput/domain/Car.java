@@ -3,6 +3,7 @@ package za.ac.cput.domain;
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.Id;
+import za.ac.cput.domain.enums.PriceGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,6 @@ import java.util.Objects;
  */
 
 
-
 @Entity
 
 public class Car {
@@ -25,7 +25,7 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @OneToMany(mappedBy = "car") //one car to many rentals
-    private List<Rental> rentals = new ArrayList<>();
+    private final List<Rental> rentals = new ArrayList<>();
     private String make;
     private String model;
     private int year;
@@ -97,8 +97,7 @@ public class Car {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Car)) return false;
-        Car car = (Car) o;
+        if (!(o instanceof Car car)) return false;
         return getId() == car.getId() && getYear() == car.getYear() && Objects.equals(getMake(), car.getMake()) && Objects.equals(getModel(), car.getModel()) && Objects.equals(getCategory(), car.getCategory()) && Objects.equals(getLicensePlate(), car.getLicensePlate());
     }
 

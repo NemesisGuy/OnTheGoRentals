@@ -1,8 +1,6 @@
 package za.ac.cput.service.impl;
 /**
- *
  * Author: Peter Buckingham (220165289)
- *
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,7 @@ public class SettingsServiceImpl implements SettingsService {
 
     @Override
     public Settings create(Settings settings) {
-        Settings newSettings = settingsFactory.createSettings(settings);
+        Settings newSettings = SettingsFactory.createSettings(settings);
         return settingsRepository.save(settings);
     }
 
@@ -34,10 +32,9 @@ public class SettingsServiceImpl implements SettingsService {
 
     @Override
     public Settings update(Settings settings) {
-        if (settingsRepository.existsById(settings.getId()))
-        {
+        if (settingsRepository.existsById(settings.getId())) {
             System.out.println("Settings exists : " + settings.getId() + " " + settings.getCurrencyName() + " " + settings.getCurrencySymbol());
-           // Settings updatedSettings = settingsFactory.createSettings(settings);
+            // Settings updatedSettings = settingsFactory.createSettings(settings);
             return settingsRepository.save(settings);
         }
         return null;

@@ -2,7 +2,8 @@ package za.ac.cput.service.impl;
 /**
  * Author: Cwenga Dlova (214310671)
  * Date: 23/09/2023
- * */
+ */
+
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.ContactUs;
 import za.ac.cput.repository.ContactUsRepository;
@@ -13,11 +14,12 @@ import java.util.ArrayList;
 @Service("ContactUsServiceImpl")
 public class ContactUsServiceImpl implements IContactUsService {
 
-    private ContactUsRepository repository;
+    private final ContactUsRepository repository;
 
-    public ContactUsServiceImpl(ContactUsRepository repository){
+    public ContactUsServiceImpl(ContactUsRepository repository) {
         this.repository = repository;
     }
+
     @Override
     public ContactUs create(ContactUs contactUs) {
         return this.repository.save(contactUs);
@@ -30,7 +32,7 @@ public class ContactUsServiceImpl implements IContactUsService {
 
     @Override
     public ContactUs update(ContactUs contactUs) {
-        if (this.repository.existsById(contactUs.getId())){
+        if (this.repository.existsById(contactUs.getId())) {
             return this.repository.save(contactUs);
         }
         return null;
@@ -38,7 +40,7 @@ public class ContactUsServiceImpl implements IContactUsService {
 
     @Override
     public boolean deleteById(int id) {
-        if (this.repository.existsById(id)){
+        if (this.repository.existsById(id)) {
             this.repository.deleteById(id);
             return true;
         }

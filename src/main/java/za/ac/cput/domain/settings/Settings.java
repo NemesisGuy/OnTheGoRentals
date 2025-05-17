@@ -1,8 +1,6 @@
 package za.ac.cput.domain.settings;
 /**
- *
  * Author: Peter Buckingham (220165289)
- *
  */
 
 import jakarta.persistence.Entity;
@@ -20,6 +18,7 @@ public class Settings {
     public Settings() {
 
     }
+
     public Settings(Builder builder) {
     }
 

@@ -15,5 +15,5 @@ import java.util.ArrayList;
 
 @Repository
 public interface IHelpCenterRepository extends JpaRepository<HelpCenter, Integer> {
-    public ArrayList<HelpCenter> findAllByCategory(String category);
+    ArrayList<HelpCenter> findAllByCategory(String category);
 }

@@ -9,6 +9,6 @@ import lombok.experimental.FieldDefaults;
 public class LoginDto {
 
     //it's a Data Trasfer Object for Login
-    private String email ;
-    private String password ;
+    private String email;
+    private String password;
 }

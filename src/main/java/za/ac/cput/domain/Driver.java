@@ -13,7 +13,8 @@ public class Driver {
     private String lastName;
     private String licenseCode;
 
-    public Driver(){}
+    public Driver() {
+    }
 
     private Driver(Builder builder) {
         this.id = builder.id;
@@ -30,14 +31,14 @@ public class Driver {
         return firstName;
     }
 
-    public String getLastName()
-    {
+    public String getLastName() {
         return lastName;
     }
 
     public String getLicenseCode() {
         return licenseCode;
     }
+
     public static Driver.Builder builder() {
         return new Driver.Builder();
     }

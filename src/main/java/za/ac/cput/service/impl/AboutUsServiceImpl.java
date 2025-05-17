@@ -1,23 +1,27 @@
 package za.ac.cput.service.impl;
-/**AboutUsServiceImpl.java
+/**
+ * AboutUsServiceImpl.java
  * Service class for About Us page
  * Author: Cwenga Dlova (214310671)
  * Date: 24/09/2023
- * */
+ */
+
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.AboutUs;
 import za.ac.cput.repository.AboutUsRepository;
 import za.ac.cput.service.IAboutUsService;
 
 import java.util.List;
+
 @Service
 public class AboutUsServiceImpl implements IAboutUsService {
 
-    private AboutUsRepository repository;
+    private final AboutUsRepository repository;
 
-    private AboutUsServiceImpl(AboutUsRepository repository){
+    private AboutUsServiceImpl(AboutUsRepository repository) {
         this.repository = repository;
     }
+
     @Override
     public AboutUs create(AboutUs aboutUs) {
         return this.repository.save(aboutUs);
@@ -30,7 +34,7 @@ public class AboutUsServiceImpl implements IAboutUsService {
 
     @Override
     public AboutUs update(AboutUs aboutUs) {
-        if (this.repository.existsById(aboutUs.getId())){
+        if (this.repository.existsById(aboutUs.getId())) {
             return this.repository.save(aboutUs);
         }
         return null;
@@ -38,7 +42,7 @@ public class AboutUsServiceImpl implements IAboutUsService {
 
     @Override
     public boolean delete(int id) {
-        if (this.repository.existsById(id)){
+        if (this.repository.existsById(id)) {
             this.repository.deleteById(id);
             return true;
         }

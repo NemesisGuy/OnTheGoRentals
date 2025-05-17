@@ -1,8 +1,6 @@
 package za.ac.cput.service;
 /**
- *
  * Author: Peter Buckingham (220165289)
- *
  */
 
 
@@ -18,12 +16,17 @@ import java.util.List;
 public interface IUserService {
 
 
-   String authenticate(LoginDto loginDto);
-   ResponseEntity<?> register (RegisterDto registerDto);
-   Role saveRole(Role role);
+    String authenticate(LoginDto loginDto);
 
-   User saverUser (User user) ;
-   List<User> getAll();
+    ResponseEntity<?> register(RegisterDto registerDto);
+
+    Role saveRole(Role role);
+
+    User saverUser(User user);
+
+    List<User> getAll();
+
     User read(Integer id);
+
     User update(Integer id, User user);
 }

@@ -16,7 +16,7 @@ public class CodeLineCounter {
     private int totalFunctions = 0;
     private int totalClasses = 0; // Total classes counter
     private int totalInterfaces = 0; // Total interfaces counter
-    private StringBuilder markdownContent = new StringBuilder();
+    private final StringBuilder markdownContent = new StringBuilder();
     private int fileCount = 0; // Keep track of the number of files
     private String baseDirectoryPath; // Base directory to use for relative paths
 

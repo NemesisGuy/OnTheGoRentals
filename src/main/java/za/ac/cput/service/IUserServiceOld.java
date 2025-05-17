@@ -2,9 +2,7 @@
 package za.ac.cput.service;
 */
 /**
- *
  * Author: Peter Buckingham (220165289)
- *
  */
 /*
 

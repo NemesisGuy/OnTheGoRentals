@@ -18,6 +18,8 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
     Optional<User> findById(Integer integer);
 
     List<User> findAll();
+    Optional<User> findByGoogleId(String googleId);
+
 }
 
 

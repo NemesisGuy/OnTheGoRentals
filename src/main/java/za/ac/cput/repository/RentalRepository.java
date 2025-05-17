@@ -18,6 +18,7 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
 
 
     Optional<Rental> findAllByCarId(int id);
+
     Optional<Rental> findTopByCarIdOrderByReturnedDateDesc(int id);
 
     List<Rental> findByUserIdAndReturnedDateIsNull(int id);

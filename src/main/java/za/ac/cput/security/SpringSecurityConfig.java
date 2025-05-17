@@ -1,10 +1,9 @@
 package za.ac.cput.security;
 
 /**
- *
  * Author: Peter Buckingham (220165289)
- *
  */
+
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +36,9 @@ public class SpringSecurityConfig {
                         // User endpoints
                         .requestMatchers("/api/user/register").permitAll()
                         .requestMatchers("/api/user/authenticate").permitAll()
+                        .requestMatchers("/api/user/refresh").permitAll() // <<< ADD THIS
+                        .requestMatchers("/api/user/logout").authenticated() // <<< ADD THIS (needs auth to identify user for logout)
+                        .requestMatchers("/api/oauth2/google/login").permitAll() // Or /api/oauth2/google/code
                         .requestMatchers("/api/user/profile/*").authenticated()
                         .requestMatchers("/api/user/profile/*/*").authenticated()
                         .requestMatchers("/api/user/rentals/*").authenticated()
@@ -53,6 +55,13 @@ public class SpringSecurityConfig {
                         .requestMatchers("/api/faq/**").permitAll()
                         .requestMatchers("/api/help-center/**").permitAll()
                         .requestMatchers("/api/bookings/**").permitAll() // for dev purposes
+                        ///actuator/prometheus
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/actuator/prometheus").permitAll()
+                        ///actuator/prometheus
+                        .requestMatchers("/metrics").permitAll()
+                        .requestMatchers("/metrics/**").permitAll()
+
                         // Admin endpoints
                         .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
                         .requestMatchers("/api/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")

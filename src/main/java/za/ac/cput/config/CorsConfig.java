@@ -23,6 +23,7 @@ public class CorsConfig {
 
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {

@@ -1,8 +1,6 @@
 package za.ac.cput.repository;
 /**
- *
  * Author: Peter Buckingham (220165289)
- *
  */
 
 import org.springframework.data.jpa.repository.JpaRepository;

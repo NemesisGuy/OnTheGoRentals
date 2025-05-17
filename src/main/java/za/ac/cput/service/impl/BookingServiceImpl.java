@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Booking;
 import za.ac.cput.domain.Car;
+import za.ac.cput.domain.dto.BookingDTO;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.ResourceNotFoundException;
@@ -11,6 +12,7 @@ import za.ac.cput.repository.BookingRepository;
 import za.ac.cput.repository.CarRepository;
 import za.ac.cput.service.BookingService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,7 +23,7 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     private CarRepository carRepository;
     @Autowired
-    private UserService userService;
+    private UserServiceorig userService;
     @Autowired
     private CarServiceImpl carService;
 
@@ -71,10 +73,35 @@ public class BookingServiceImpl implements BookingService {
     public List<Booking> getUserBookings(int userId) {
         return bookingRepository.findByUserId(userId);
     }
+/*
+*
+* public class BookingDTO {
+    private int id;
+    private UserDTO user;
+    private Car car;
+    private LocalDateTime bookingStartDate;
+    private LocalDateTime bookingEndDate;
+    private String status;
+}
 
+* */
     @Override
     public Booking read(int id) {
         return bookingRepository.findById(id).orElse(null);
+    }
+    public BookingDTO readDTO(int id) {
+        Booking booking = bookingRepository.findById(id).orElse(null);
+        if (booking != null) {
+            BookingDTO bookingDTO = new BookingDTO();
+            bookingDTO.setId(booking.getId());
+            bookingDTO.setUser(userService.readDTO(booking.getUser().getId()));
+            bookingDTO.setCar(booking.getCar());
+            bookingDTO.setBookingStartDate(booking.getBookingStartDate());
+            bookingDTO.setBookingEndDate(booking.getBookingEndDate());
+            bookingDTO.setStatus(booking.getStatus());
+            return bookingDTO;
+        }
+        return null;
     }
 
     //@Override
@@ -104,21 +131,36 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findAll();
     }
 
+    public List<BookingDTO> getAllDTO() {
+        List<Booking> bookings = bookingRepository.findAll();
+        List<BookingDTO> bookingDTOs = new ArrayList<>();
+        for (Booking booking : bookings) {
+            BookingDTO bookingDTO = new BookingDTO();
+            bookingDTO.setId(booking.getId());
+            bookingDTO.setUser(userService.readDTO(booking.getUser().getId()));
+            bookingDTO.setCar(booking.getCar());
+            bookingDTO.setBookingStartDate(booking.getBookingStartDate());
+            bookingDTO.setBookingEndDate(booking.getBookingEndDate());
+            bookingDTO.setStatus(booking.getStatus());
+            bookingDTOs.add(bookingDTO);
+        }
+
+        return bookingDTOs;
+    }
+
     @Override
     public Booking getBookingById(int bookingId) {
         return bookingRepository.findById(bookingId).orElse(null);
     }
 
     @Override
-    public Booking update(Booking booking)
-    {
+    public Booking update(Booking booking) {
         if (booking.getId() != 0) {
             return bookingRepository.save(booking);
         }
 
         throw new ResourceNotFoundException("Booking not found");
     }
-
 
 
 }

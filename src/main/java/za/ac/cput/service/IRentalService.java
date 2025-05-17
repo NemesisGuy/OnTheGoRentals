@@ -3,6 +3,7 @@ package za.ac.cput.service;
 /**
  * Author: Peter Buckingham (220165289)
  */
+
 import za.ac.cput.domain.Rental;
 import za.ac.cput.domain.security.User;
 
@@ -22,5 +23,5 @@ public interface IRentalService extends IService<Rental, Integer> {
 
     boolean existsById(Integer id);
 
-    List<Rental> getRentalHistoryByUser(User user);  // Returns a list of rentals
+   //s List<Rental> getRentalHistoryByUser(User user);  // Returns a list of rentals
 }

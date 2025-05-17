@@ -1,15 +1,18 @@
 package za.ac.cput.domain;
-/**AboutUs.java
+/**
+ * AboutUs.java
  * Domain Class for About Us page
  * Author: Cwenga Dlova (214310671)
  * Date: 24/09/2023
- * */
+ */
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
 import java.util.Objects;
+
 @Entity
 public class AboutUs {
     @Id
@@ -121,7 +124,7 @@ public class AboutUs {
             return this;
         }
 
-        public Builder copy(AboutUs aboutUs){
+        public Builder copy(AboutUs aboutUs) {
             this.id = aboutUs.id;
             this.address = aboutUs.address;
             this.officeHours = aboutUs.officeHours;

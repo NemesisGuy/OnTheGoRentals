@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.Objects;
 */
 /**
- *
  * Author: Peter Buckingham (220165289)
- *
  *//*
 
 @Entity

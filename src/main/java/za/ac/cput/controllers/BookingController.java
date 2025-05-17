@@ -2,21 +2,25 @@ package za.ac.cput.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Booking;
 import za.ac.cput.domain.Car;
+import za.ac.cput.domain.dto.BookingDTO;
+import za.ac.cput.domain.dto.UserDTO;
+import za.ac.cput.domain.mapper.BookingMapper;
+import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.exception.UnauthorisedException;
 import za.ac.cput.security.JwtUtilities;
 import za.ac.cput.service.ICarService;
-import za.ac.cput.service.IUserService;
 import za.ac.cput.service.impl.BookingServiceImpl;
-import za.ac.cput.service.impl.RentalServiceImpl;
-import za.ac.cput.service.impl.UserService;
+import za.ac.cput.service.impl.UserServiceorig;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -32,102 +36,70 @@ public class BookingController {
     private JwtUtilities jwtUtilities;
 
     @Autowired
-    private UserService userService;
-    @Autowired
-    private RentalServiceImpl rentalServiceImpl;
-    @Autowired
-    private RentalServiceImpl rentalService;
+    private UserServiceorig userService;
 
-    // Method to create a booking (using the Booking object)
     @PostMapping("/create")
-    public ResponseEntity<Booking> createUserBooking(@RequestBody Booking booking) {
-                Booking newBooking = bookingService.createBooking(booking);
-                return ResponseEntity.ok(newBooking);
-
+    public ResponseEntity<BookingDTO> createUserBooking(@RequestBody Booking booking) {
+        Booking newBooking = bookingService.createBooking(booking);
+        return ResponseEntity.status(HttpStatus.CREATED).body(BookingMapper.toDto(newBooking));
     }
 
-    // Method to confirm a booking
     @PostMapping("/confirm")
-    public ResponseEntity<Booking> confirmBooking(@RequestBody Booking booking) {
-        // Here, we assume booking contains the ID and necessary data for confirmation
+    public ResponseEntity<BookingDTO> confirmBooking(@RequestBody Booking booking) {
         Booking confirmedBooking = bookingService.confirmBooking(booking.getId());
-        return ResponseEntity.ok(confirmedBooking);
+        return ResponseEntity.ok(BookingMapper.toDto(confirmedBooking));
     }
 
-    // Method to cancel a booking
     @PostMapping("/cancel")
-    public ResponseEntity<Booking> cancelBooking(@RequestBody Booking booking) {
-        // Here, we assume booking contains the ID for cancellation
+    public ResponseEntity<BookingDTO> cancelBooking(@RequestBody Booking booking) {
         Booking canceledBooking = bookingService.cancelBooking(booking.getId());
-        return ResponseEntity.ok(canceledBooking);
+        return ResponseEntity.ok(BookingMapper.toDto(canceledBooking));
     }
 
-    // Get all bookings by user ID
+    @PutMapping("/update")
+    public ResponseEntity<BookingDTO> updateBooking(@RequestBody Booking booking) {
+        Booking updatedBooking = bookingService.updateById(booking);
+        return ResponseEntity.ok(BookingMapper.toDto(updatedBooking));
+    }
+
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Booking>> getUserBookings(@PathVariable int userId) {
+    public ResponseEntity<List<BookingDTO>> getUserBookings(@PathVariable int userId) {
         List<Booking> bookings = bookingService.getUserBookings(userId);
-        return ResponseEntity.ok(bookings);
+        if (bookings == null || bookings.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        List<BookingDTO> bookingDTOs = bookings.stream()
+                .map(BookingMapper::toDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(bookingDTOs);
     }
 
-    // Get all cars (for selecting in booking)
     @GetMapping("/cars/all")
-    public List<Car> getAllCars() {
-        //return rentalService.getAllAvailableCars();
-        return carService.getAllAvailableCars();
+    public ResponseEntity<List<Car>> getAllCars() {
+        List<Car> cars = carService.getAllAvailableCars();
+        if (cars == null || cars.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(cars);
     }
-    // Get user profile
 
     @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile(HttpServletRequest request) {
+    public ResponseEntity<UserDTO> getUserProfile(HttpServletRequest request) {
         String token = jwtUtilities.getToken(request);
 
-        if (token != null && jwtUtilities.validateToken(token)) {
-            String userEmail = jwtUtilities.extractUsername(token);
-            User user = userService.read(userEmail);
-            if (user != null) {
-                return ResponseEntity.ok(user);
-            } else {
-                throw new ResourceNotFoundException("User not found");
-            }
-        } else {
+        if (token == null || !jwtUtilities.validateToken(token)) {
             throw new UnauthorisedException("Invalid or missing token");
         }
-    }
 
-    // Get user profile
-   /* @GetMapping("/profile")
-    public User getUserProfile(HttpServletRequest request) {
-        String token = jwtUtilities.getToken(request);
+        String userEmail = jwtUtilities.extractUserEmail(token);
+        User user = userService.read(userEmail);
 
-        if (token != null && jwtUtilities.validateToken(token)) {
-            String userEmail = jwtUtilities.extractUsername(token);
-           // return userService.read(Integer.valueOf(userEmail));
-            return userService.read(userEmail);
-        } else {
-            throw new UnauthorisedException("Invalid or missing token");
-          //  return null; // Unauthorized or invalid token
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found");
         }
-    }*/
-//    @GetMapping("/profile")
-//    public User getUserProfile(HttpServletRequest request) {
-//        String token = jwtUtilities.getToken(request);
-//
-//        if (token != null && jwtUtilities.validateToken(token)) {
-//            String userEmail = jwtUtilities.extractUsername(token);
-//
-//
-//            return userService.read(userEmail);
-//        } else {
-//            // Handle case where token is invalid or not present
-//            // You might want to return an error response or throw an exception
-//            return null; // Modify this to suit your needs
-//        }
-//    }
 
-    // Method to update a booking
-    @PutMapping("/update")
-    public ResponseEntity<Booking> updateBooking(@RequestBody Booking booking) {
-        Booking updatedBooking = bookingService.updateById(booking);
-        return ResponseEntity.ok(updatedBooking);
+        return ResponseEntity.ok(UserMapper.toDto(user));
     }
 }

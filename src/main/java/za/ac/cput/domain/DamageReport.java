@@ -1,18 +1,21 @@
 package za.ac.cput.domain;
 
-/**DamageReport.java
+/**
+ * DamageReport.java
  * Domain Class for the Damage Report
  * Author: Cwenga Dlova (214310671)
  * Date: 08/09/2023
- * */
+ */
+
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+
 @Entity
 public class DamageReport {
     @Id
-    @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
@@ -95,7 +98,7 @@ public class DamageReport {
 
         public Builder setId(int id) {
             this.id = id;
-            return  this;
+            return this;
         }
 
         public Builder setRental(Rental rental) {

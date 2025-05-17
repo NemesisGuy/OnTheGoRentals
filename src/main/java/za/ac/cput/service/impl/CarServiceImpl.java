@@ -1,12 +1,12 @@
 package za.ac.cput.service.impl;
 /**
- *
  * Author: Peter Buckingham (220165289)
- *
  */
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Car;
+import za.ac.cput.domain.enums.PriceGroup;
 import za.ac.cput.factory.impl.CarFactory;
 import za.ac.cput.repository.CarRepository;
 import za.ac.cput.service.ICarService;
@@ -46,7 +46,7 @@ public class CarServiceImpl implements ICarService {
 
     @Override
     public Car update(Car car) {
-        if (this.repository.existsById((int) car.getId())) {
+        if (this.repository.existsById(car.getId())) {
             Car updatedCar = carFactory.create(car);
             return this.repository.save(updatedCar);
         }
@@ -90,6 +90,26 @@ public class CarServiceImpl implements ICarService {
         return car.isAvailable();
     }
 
+    //TODO: This is to be used to replace filtering currently done in the controller layer
+    public List<Car> getAvailableCarsByPrice(PriceGroup priceGroup) {
+        // Join to rentals table and check availability
+        // check if car is available
+        ArrayList<Car> availableCars = new ArrayList<>(repository.findByPriceGroupAndRentalsReturnedDateIsNotNullAndIsAvailableIsTrue(priceGroup));
+        for (Car car : availableCars)   //for each car in available cars
+        {
+            if (!car.isAvailable()) //if car is not available
+            {
+                availableCars.remove(car); //remove car from available cars
+            }
+        }
+        return availableCars;
+
+
+    }
+
+    public List<Car> getCarsByPriceGroup(PriceGroup priceGroup) {
+        return repository.findByPriceGroup(priceGroup);
+    }
 
 
 }

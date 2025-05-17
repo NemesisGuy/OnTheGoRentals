@@ -1,4 +1,5 @@
 package za.ac.cput.service.impl;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Feedback;
@@ -11,7 +12,7 @@ import java.util.Optional;
 
 @Service
 public class FeedbackServiceImpl implements IFeedbackService {
-    private FeedbackRepository repository;
+    private final FeedbackRepository repository;
 
     @Autowired
     public FeedbackServiceImpl(FeedbackRepository repository) {
@@ -19,6 +20,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
         this.repository = repository;
 
     }
+
     @Override
     public Feedback create(Feedback feedback) {
         return repository.save(feedback);
@@ -53,7 +55,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
     @Override
     public List<Feedback> getAll() {
 
-        List<Feedback> all = (ArrayList<Feedback>) this.repository.findAll();
+        List<Feedback> all = this.repository.findAll();
         return all;
     }
 }

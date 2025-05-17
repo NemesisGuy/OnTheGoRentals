@@ -10,7 +10,8 @@ import java.util.List;
 
 @Service
 public class DriverServiceImpl implements IDriverService {
-    private IDriverRepository repository;
+    private final IDriverRepository repository;
+
     @Autowired
     private DriverServiceImpl(IDriverRepository repository) {
         this.repository = repository;

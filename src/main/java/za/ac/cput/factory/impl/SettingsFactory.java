@@ -1,8 +1,6 @@
 package za.ac.cput.factory.impl;
 /**
- *
  * Author: Peter Buckingham (220165289)
- *
  */
 
 import za.ac.cput.domain.settings.Settings;
@@ -24,6 +22,7 @@ public class SettingsFactory {
                 .currencySymbol(settings.getCurrencySymbol())
                 .build();
     }
+
     //takes a Settings object and returns a copy of it
     public static Settings copy(Settings settings) {
         return new Settings.Builder()

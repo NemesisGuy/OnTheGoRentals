@@ -1,4 +1,4 @@
-package za.ac.cput.domain;
+package za.ac.cput.domain.enums;
 /**
  * FileName: PriceGroup.java
  * Author: Peter Buckingham (220165289)
@@ -20,7 +20,7 @@ public enum PriceGroup implements Serializable {
     OTHER(700.00),
     NONE(0.00);
 
-    private double rentalPrice;
+    private final double rentalPrice;
 
     PriceGroup(double rentalPrice) {
         this.rentalPrice = rentalPrice;

@@ -1,15 +1,18 @@
 package za.ac.cput.domain;
-/**ContactUs.java
+/**
+ * ContactUs.java
  * Domain Class for the Contact Us
  * Author: Cwenga Dlova (214310671)
  * Date: 23/09/2023
- * */
+ */
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.util.Objects;
+
 @Entity
 public class ContactUs {
     @Id
@@ -25,7 +28,7 @@ public class ContactUs {
     protected ContactUs() {
     }
 
-    public ContactUs(Builder builder){
+    public ContactUs(Builder builder) {
 
         this.id = builder.id;
         this.title = builder.title;
@@ -135,11 +138,11 @@ public class ContactUs {
             return this;
         }
 
-        public Builder copy(ContactUs contactUs){
+        public Builder copy(ContactUs contactUs) {
 
             this.id = contactUs.id;
             this.title = contactUs.title;
-            this.firstName = contactUs.firstName;;
+            this.firstName = contactUs.firstName;
             this.lastName = contactUs.lastName;
             this.email = contactUs.email;
             this.subject = contactUs.subject;
@@ -148,7 +151,7 @@ public class ContactUs {
             return this;
         }
 
-        public ContactUs build(){
+        public ContactUs build() {
             return new ContactUs(this);
         }
     }

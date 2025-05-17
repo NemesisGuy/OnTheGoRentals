@@ -54,6 +54,7 @@ mysql-db.properties
 application.properties
 application-api.properties
 HELP.md
+application-secrets.properties
 
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -61,5 +62,5 @@ HELP.md
 !src/main/resources/mysql-db.properties
 /OnTheGoRentals.drawio
 /src/main/resources/mysql-db.properties
-/src/main/resources/application.properties
+/src/main/resources/old-application.properties
 /dev/

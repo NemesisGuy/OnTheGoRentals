@@ -22,7 +22,7 @@ public class ServiceProvider {
 
     // Ratings and Reviews
     private double averageRating;
-   // private List<String> reviews; //optional can remove if not needed
+    // private List<String> reviews; //optional can remove if not needed
 
     // Additional Details
     private String contactPerson;
