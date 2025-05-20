@@ -44,35 +44,36 @@ public class RentalServiceImpl implements IRentalService {
     @Autowired
     private RentalFactory rentalFactory;
     @Autowired
-    private UserServiceorig userService;
+    private UserService userService;
     @Autowired
     private BookingService bookingService;
 
-    //convert Booking to Rental
+    /*//convert Booking to Rental
     public RentalDTO convertBookingToRental(Booking booking) {
         RentalDTO rental = new RentalDTO();
         rental.setUser(userService.readDTO(booking.getUser().getId()));
         rental.setCar(booking.getCar());
- /*     rental.setIssuer(booking.getIssuer());
-        rental.setReceiver(booking.getReceiver());*/
+ *//*     rental.setIssuer(booking.getIssuer());
+        rental.setReceiver(booking.getReceiver());*//*
         rental.setFine(0.0);
         rental.setIssuedDate(booking.getBookingStartDate());
         rental.setReturnedDate(booking.getBookingEndDate());
         rental.setStatus(RentalStatus.ACTIVE);
         return rental;
-    }
+    }*/
 
 
     // Check if car is available using Rental
     public boolean isCarAvailable(Rental rental) {
         Car carToRent = rental.getCar();
-        return carRepository.existsByIdAndIsAvailableIsTrue(carToRent.getId());
+        return carRepository.existsByIdAndAvailableTrueAndDeletedFalse(carToRent.getId());
     }
 
     // Check if car is available using Car
     public boolean isCarAvailableByCarId(Car car) {
-        return carRepository.existsByIdAndIsAvailableIsTrue(car.getId());
+        return carRepository.existsByIdAndAvailableTrueAndDeletedFalse(car.getId());
     }
+
 
     @Override
     @Transactional
@@ -82,11 +83,6 @@ public class RentalServiceImpl implements IRentalService {
                 throw new UserCantRentMoreThanOneCarException(generateUserRentingErrorMessage(rental.getUser()));
             }
             Rental newRental = rentalFactory.create(rental);
-            if (newRental.getReturnedDate() != null) {
-                carRepository.setIsAvailableToTrue(newRental.getCar().getId());
-            } else {
-                carRepository.setIsAvailableToFalse(newRental.getCar().getId());
-            }
             return rentalRepository.save(newRental);
         } else {
             throw new CarNotAvailableException(generateCarNotAvailableErrorMessage(rental.getCar()));
@@ -96,52 +92,6 @@ public class RentalServiceImpl implements IRentalService {
     @Override
     public Rental read(Integer id) {
         return this.rentalRepository.findById(id).orElse(null);
-    }
-
-    /*
-    *
-    *   private Integer id;
-    private UserDTO user;      // Already excludes password
-    private Integer carId;     // or a CarDTO if you want car details
-    private Integer issuer;
-    private Integer receiver;
-    private double fine;
-    private String issuedDate;
-    private String returnedDate;
-    private String status;
-    * */
-    public RentalDTO readDTO(Integer id) {
-        Rental rental = this.rentalRepository.findById(id).orElse(null);
-        if (rental != null) {
-            // Convert User to UserDTO
-            UserDTO userDTO = userService.readDTO(rental.getUser().getId());
-            // Convert Rental to RentalDTO
-            RentalDTO rentalDTO = RentalDTO.builder()
-                    .id(rental.getId())
-                    .user(userDTO)
-                    .car(rental.getCar())
-                    .issuer(rental.getIssuer())
-                    .receiver(rental.getReceiver())
-                    .fine(rental.getFine())
-                    .issuedDate(rental.getIssuedDate())
-                    .returnedDate(rental.getReturnedDate())
-                    .status(rental.getStatus())
-                    .build();
-            return rentalDTO;
-
-//            return new RentalDTO(
-//                    rental.getId(),
-//                    userService.readDTO(rental.getUser().getId()),
-//                        rental.getCar(),
-//                        rental.getIssuer(),
-//                        rental.getReceiver(),
-//                        rental.getFine(),
-//                        rental.getIssuedDate(),
-//                        rental.getReturnedDate(),
-//                        rental.getStatus()
-//            );
-        }
-        return null;
     }
 
     @Override
@@ -164,8 +114,13 @@ public class RentalServiceImpl implements IRentalService {
 
     @Override
     public boolean delete(Integer id) {
-        if (this.rentalRepository.existsById(id)) {
-            this.rentalRepository.deleteById(id);
+        Rental rental = this.rentalRepository.findById(id).orElse(null);
+        if (rental != null && !rental.isDeleted()) {
+            Rental updatedRental = new Rental.Builder()
+                    .copy(rental)
+                    .setDeleted(true)
+                    .build();
+            this.rentalRepository.save(updatedRental);
             return true;
         }
         return false;
@@ -173,33 +128,12 @@ public class RentalServiceImpl implements IRentalService {
 
     @Override
     public ArrayList<Rental> getAll() {
-        return (ArrayList<Rental>) this.rentalRepository.findAll();
+        return (ArrayList<Rental>) this.rentalRepository.findAllByDeletedFalse();
     }
 
-    public List<RentalDTO> getAllDTO() {
-        List<Rental> rentals = this.rentalRepository.findAll();
-        List<RentalDTO> rentalDTOs = new ArrayList<>();
-        for (Rental rental : rentals) {
-            // Convert User to UserDTO
-            UserDTO userDTO = userService.readDTO(rental.getUser().getId());
-            RentalDTO rentalDTO = new RentalDTO(
-                    rental.getId(),
-                    userDTO,
-                    rental.getCar(),
-                    rental.getIssuer(),
-                    rental.getReceiver(),
-                    rental.getFine(),
-                    rental.getIssuedDate(),
-                    rental.getReturnedDate(),
-                    rental.getStatus()
-            );
-            rentalDTOs.add(rentalDTO);
-        }
-        return rentalDTOs;
-    }
 
     public ArrayList<Rental> getAllAvailableCars() {
-        List<Rental> allRentals = rentalRepository.findAll();
+        List<Rental> allRentals = rentalRepository.findAllByDeletedFalse();
         return filterAvailableCars(allRentals);
     }
 
@@ -226,22 +160,20 @@ public class RentalServiceImpl implements IRentalService {
                 " " + rentedCar.getLicensePlate();
     }
 
-    private Optional<Rental> findMostRecentRentalByCarId(Long carId) {
-        return rentalRepository.findTopByCarIdOrderByReturnedDateDesc(Math.toIntExact(carId));
-    }
+
 
     public boolean isCurrentlyRenting(User user) {
-        List<Rental> activeRentals = rentalRepository.findByUserIdAndReturnedDateIsNull(user.getId());
+        List<Rental> activeRentals = rentalRepository.findByUserIdAndReturnedDateIsNullAndDeletedFalse(user.getId());
         return !activeRentals.isEmpty();
     }
 
     public Rental getCurrentRental(User user) {
-        List<Rental> activeRentals = rentalRepository.findByUserIdAndReturnedDateIsNull(user.getId());
+        List<Rental> activeRentals = rentalRepository.findByUserIdAndReturnedDateIsNullAndDeletedFalse(user.getId());
         return !activeRentals.isEmpty() ? activeRentals.get(0) : null;
     }
 
     public List<Car> getAvailableCarsByPrice(PriceGroup priceGroup) {
-        ArrayList<Car> availableCars = new ArrayList<>(carRepository.findByPriceGroupAndRentalsReturnedDateIsNotNull(priceGroup));
+        ArrayList<Car> availableCars = new ArrayList<>(carRepository.findByPriceGroupAndRentalsReturnedDateIsNotNullAndDeletedFalse(priceGroup));
         availableCars.removeIf(car -> !isCarAvailableByCarId(car));
         return availableCars;
     }
@@ -262,28 +194,10 @@ public class RentalServiceImpl implements IRentalService {
         );
         return !activeBookings.isEmpty();
     }
-    public List<RentalDTO> getRentalHistoryByUser(User user) {
+    public List<Rental> getRentalHistoryByUser(User user) {
 
-
-        List <Rental> rentals= rentalRepository.findByUserId(user.getId());
-        List<RentalDTO> rentalDTOs = new ArrayList<>();
-        for (Rental rental : rentals) {
-            // Convert User to UserDTO
-            UserDTO userDTO = userService.readDTO(rental.getUser().getId());
-            RentalDTO rentalDTO = new RentalDTO(
-                    rental.getId(),
-                    userDTO,
-                    rental.getCar(),
-                    rental.getIssuer(),
-                    rental.getReceiver(),
-                    rental.getFine(),
-                    rental.getIssuedDate(),
-                    rental.getReturnedDate(),
-                    rental.getStatus()
-            );
-            rentalDTOs.add(rentalDTO);
-        }
-        return rentalDTOs;
+        List <Rental> rentals= rentalRepository.findByUserIdAndDeletedFalse(user.getId());
+        return rentals;
     }
 
 

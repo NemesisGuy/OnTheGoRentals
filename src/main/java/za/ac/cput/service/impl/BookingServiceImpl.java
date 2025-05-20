@@ -23,7 +23,7 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     private CarRepository carRepository;
     @Autowired
-    private UserServiceorig userService;
+    private UserService userService;
     @Autowired
     private CarServiceImpl carService;
 

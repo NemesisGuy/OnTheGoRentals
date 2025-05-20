@@ -33,7 +33,8 @@ public class Car {
     @Enumerated(EnumType.STRING)
     private PriceGroup priceGroup;
     private String licensePlate;
-    private boolean isAvailable;
+    private boolean available;
+    private boolean deleted = false;
 
     public Car() {
         // Default constructor
@@ -47,7 +48,8 @@ public class Car {
         this.category = builder.category;
         this.priceGroup = builder.priceGroup;
         this.licensePlate = builder.licensePlate;
-        this.isAvailable = builder.isAvailable;
+        this.available = builder.available;
+        this.deleted= builder.deleted;
     }
 
     public static Builder builder() {
@@ -79,11 +81,17 @@ public class Car {
     }
 
     public boolean isAvailable() {
-        return isAvailable;
+        return available;
     }
 
     public void setAvailable(boolean available) {
-        isAvailable = available;
+        this.available = available;
+    }
+    public boolean isDeleted() {
+        return deleted;
+    }
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public void setPriceGroup(PriceGroup priceGroupEnum) {
@@ -121,7 +129,8 @@ public class Car {
                 ", category='" + category + '\'' +
                 ", priceGroup=" + priceGroup +
                 ", licensePlate='" + licensePlate + '\'' +
-                ", isAvailable=" + isAvailable +
+                ", available=" + available +
+                ", deleted=" + deleted +
                 '}';
     }
 
@@ -136,7 +145,8 @@ public class Car {
         private PriceGroup priceGroup;
 
         private String licensePlate;
-        private boolean isAvailable;
+        private boolean available;
+        private boolean deleted = false;
 
         public Builder id(int id) {
             this.id = id;
@@ -174,8 +184,12 @@ public class Car {
 
         }
 
-        public Builder isAvailable(boolean isAvailable) {
-            this.isAvailable = isAvailable;
+        public Builder available(boolean available) {
+            this.available = available;
+            return this;
+        }
+        public Builder isDeleted(boolean deleted) {
+            this.deleted = deleted;
             return this;
         }
 
@@ -187,7 +201,8 @@ public class Car {
             this.category = car.category;
             this.priceGroup = car.priceGroup;
             this.licensePlate = car.licensePlate;
-            this.isAvailable = car.isAvailable;
+            this.available = car.available;
+            this.deleted = car.deleted;
             return this;
         }
 

@@ -14,39 +14,30 @@ import za.ac.cput.domain.Car;
 import za.ac.cput.domain.enums.PriceGroup;
 
 import java.util.List;
+import java.util.Optional;
 //O R M
 
 public interface CarRepository extends JpaRepository<Car, Integer> {
 
 
     List<Car> findByPriceGroupAndRentalsReturnedDateIsNotNull(PriceGroup priceGroup);
+    List<Car> findByPriceGroupAndRentalsReturnedDateIsNotNullAndDeletedFalse(PriceGroup priceGroup);
 
-    List<Car> findByPriceGroupAndRentalsReturnedDateIsNotNullAndIsAvailableIsTrue(PriceGroup priceGroup);
+    List<Car> findByPriceGroupAndRentalsReturnedDateIsNotNullAndAvailableTrue(PriceGroup priceGroup);
+    List<Car> findByPriceGroupAndRentalsReturnedDateIsNotNullAndAvailableTrueAndDeletedFalse(PriceGroup priceGroup);
 
     List<Car> findByPriceGroup(PriceGroup priceGroup);
+    List<Car> findByPriceGroupAndDeletedFalse(PriceGroup priceGroup);
 
 
     //List<Car> findAvailableCars();
 
     /// is car by id available
-    boolean existsByIdAndIsAvailableIsTrue(int id);
+    boolean existsByIdAndAvailableTrue(int id);
+    boolean existsByIdAndAvailableTrueAndDeletedFalse(int id);
+    List<Car> findByDeletedFalse();
+    List<Car> findByDeletedTrue();
 
-    //set car isavailable to false
-    // void setCarToNotAvailable(int id);
-//    Car setIsAvailableToFalse(int id);
-    //set car isavailable to true
-//    Car setIsAvailableToTrue(int id);
-    //set car isavailable to false
-    // boolean isCarByIdAndIsAvailableIsTrue(int id);
 
-    @Modifying
-    @Query("UPDATE Car c SET c.isAvailable = false WHERE c.id = :id")
-    void setIsAvailableToFalse(@Param("id") int id);
 
-    //set car isavailable to true
-    @Modifying
-    @Query("UPDATE Car c SET c.isAvailable = true WHERE c.id = :id")
-    void setIsAvailableToTrue(@Param("id") int id);
-
-    // List<Car> findByPriceGroupAndRentalsReturnedDateIsNotNullAndAvailableIsTrue(PriceGroup priceGroup);
 }

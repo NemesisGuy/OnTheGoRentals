@@ -17,18 +17,17 @@ import za.ac.cput.domain.security.Role;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.exception.RoleNotFoundException;
 import za.ac.cput.repository.IRoleRepository;
-import za.ac.cput.service.impl.UserServiceorig;
+import za.ac.cput.service.impl.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/users")
 public class AdminUserController {
 
     @Autowired
-    private UserServiceorig userService;
+    private UserService userService;
 
     @Autowired
     private IRoleRepository roleRepository;

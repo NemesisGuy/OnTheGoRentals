@@ -20,6 +20,7 @@ import za.ac.cput.factory.impl.DamageReportFactory;
 import za.ac.cput.service.impl.DamageReportServiceImpl;
 import za.ac.cput.service.impl.RentalServiceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -55,7 +56,15 @@ public class AdminDamageReportController {
 
     @GetMapping("/all")
     public ResponseEntity<List<DamageReportDTO>> getAll() {
-        List<DamageReportDTO> dtoList = damageReportService.getAllDTO();
+        List<DamageReportDTO> dtoList = new ArrayList<>();
+        List<DamageReport> reportList = damageReportService.getAll();
+        if (reportList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No reports found");
+        }else {
+            for (DamageReport report : reportList) {
+                dtoList.add(DamageReportMapper.toDto(report));
+            }
+        }
         return ResponseEntity.ok(dtoList);
     }
 

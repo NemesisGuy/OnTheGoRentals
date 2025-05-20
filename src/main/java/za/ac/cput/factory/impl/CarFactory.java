@@ -15,7 +15,7 @@ import za.ac.cput.factory.IFactory;
 public class CarFactory implements IFactory<Car> {
 
 
-    public Car createCar(int id, String make, String model, int year, String category, PriceGroup priceGroup, String licensePlate, boolean isAvailable) {
+    public Car createCar(int id, String make, String model, int year, String category, PriceGroup priceGroup, String licensePlate, boolean available) {
         return Car.builder()
 
                 .id(id)
@@ -25,7 +25,7 @@ public class CarFactory implements IFactory<Car> {
                 .category(category)
                 .priceGroup(priceGroup)
                 .licensePlate(licensePlate)
-                .isAvailable(isAvailable)
+                .available(available)
                 .build();
     }
 

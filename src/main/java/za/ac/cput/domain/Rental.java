@@ -38,6 +38,8 @@ public class Rental implements Serializable {
     private int fine;
     private LocalDateTime issuedDate;
     private LocalDateTime returnedDate;
+    private boolean deleted = false;
+
 
     @Enumerated(EnumType.STRING)
     private RentalStatus status;
@@ -54,6 +56,7 @@ public class Rental implements Serializable {
         this.fine = fine;
         this.issuedDate = issuedDate;
         this.returnedDate = returnedDate;
+        this.deleted = false;
         this.status = status;
     }
 
@@ -67,6 +70,7 @@ public class Rental implements Serializable {
         this.fine = builder.fine;
         this.issuedDate = builder.issuedDate;
         this.returnedDate = builder.returnedDate;
+        this.deleted = builder.deleted;
         this.status = builder.status;
     }
 
@@ -141,6 +145,12 @@ public class Rental implements Serializable {
     public void setReturnedDate(LocalDateTime returnedDate) {
         this.returnedDate = returnedDate;
     }
+    public boolean isDeleted() {
+        return deleted;
+    }
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
     public RentalStatus getStatus() {
         return status;
@@ -166,6 +176,7 @@ public class Rental implements Serializable {
                 ", fine=" + fine +
                 ", issuedDate=" + issuedDate +
                 ", returnedDate=" + returnedDate +
+                ", deleted=" + deleted +
                 ", status=" + status +
                 '}';
     }
@@ -184,6 +195,7 @@ public class Rental implements Serializable {
         private int fine;
         private LocalDateTime issuedDate;
         private LocalDateTime returnedDate;
+        private boolean deleted;
         private RentalStatus status;
 
         public Builder setId(int id) {
@@ -230,6 +242,10 @@ public class Rental implements Serializable {
             this.returnedDate = returnedDate;
             return this;
         }
+        public Builder setDeleted(boolean deleted) {
+            this.deleted = deleted;
+            return this;
+        }
 
         public Builder setStatus(RentalStatus status) {
             this.status = status;
@@ -246,6 +262,7 @@ public class Rental implements Serializable {
             this.fine = rental.fine;
             this.issuedDate = rental.issuedDate;
             this.returnedDate = rental.returnedDate;
+            this.deleted = rental.deleted;
             this.status = rental.status;
             return this;
         }

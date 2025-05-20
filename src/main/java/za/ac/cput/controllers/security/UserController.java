@@ -8,17 +8,21 @@ import org.springframework.security.core.Authentication; // For logout
 import org.springframework.security.core.context.SecurityContextHolder; // For logout
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import za.ac.cput.domain.Rental;
 import za.ac.cput.domain.dto.RentalDTO;
 import za.ac.cput.domain.dto.LoginDto;
 import za.ac.cput.domain.dto.RegisterDto;
 import za.ac.cput.domain.dto.AuthResponseDto; // Import
 import za.ac.cput.domain.dto.TokenRefreshRequestDto; // Import
 import za.ac.cput.domain.dto.TokenRefreshResponseDto; // Import
+import za.ac.cput.domain.mapper.RentalMapper;
+import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.service.IRentalService; // Keep this
 import za.ac.cput.service.impl.RentalServiceImpl; // Keep this
 import za.ac.cput.service.impl.UserService; // Change to concrete type or keep interface if preferred
 
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -91,7 +95,7 @@ public class UserController {
         if (userProfile != null) {
             // Optionally, use a DTO to avoid sending sensitive info like password hash
             // UserDTO userDto = userService.readDTO(userId);
-            return ResponseEntity.ok(userProfile); // or userDto
+            return ResponseEntity.ok(UserMapper.toDto(userProfile)); // or userDto
         } else {
             return ResponseEntity.status(404).body("User profile not found");
         }
@@ -102,7 +106,7 @@ public class UserController {
     public ResponseEntity<?> updateUserProfile(@PathVariable Integer userId, @RequestBody User user) {
         User updatedUser = userService.update(userId, user);
         if (updatedUser != null) {
-            return ResponseEntity.ok(updatedUser);
+            return ResponseEntity.ok(UserMapper.toDto(updatedUser));
         }
         return ResponseEntity.status(404).body("User not found or update failed.");
     }
@@ -113,7 +117,16 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(404).body(null); // Or an empty list with appropriate message
         }
-        List<RentalDTO> rentalHistory = rentalService.getRentalHistoryByUser(user);
-        return ResponseEntity.ok(rentalHistory);
+        List<Rental> rentalHistory = rentalService.getRentalHistoryByUser(user);
+        if (rentalHistory.isEmpty()) {
+            return ResponseEntity.status(404).body(null); // Or an empty list with appropriate message
+        }
+        // Convert Rental to RentalDTO if needed
+        List <RentalDTO> rentalHistoryDTO = new ArrayList<RentalDTO>();
+        for (Rental rental : rentalHistory) {
+            rentalHistoryDTO.add(RentalMapper.toDto(rental));
+        }
+
+        return ResponseEntity.ok(rentalHistoryDTO);
     }
 }

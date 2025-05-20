@@ -56,21 +56,7 @@ public class DamageReportDTO {
     public Optional<DamageReport> read(int id) {
         return this.repository.findById(id);
     }
-    public Optional<DamageReportDTO> readDTO(int id) {
-        Optional<DamageReport> damageReport = this.repository.findById(id);
-        if (damageReport.isPresent()) {
-            DamageReportDTO damageReportDTO = DamageReportDTO.builder()
-                    .id(damageReport.get().getId())
-                    .rental(this.rentalService.readDTO(damageReport.get().getRental().getId()))
-                    .description(damageReport.get().getDescription())
-                    .dateAndTime(damageReport.get().getDateAndTime())
-                    .location(damageReport.get().getLocation())
-                    .repairCost(damageReport.get().getRepairCost())
-                    .build();
-            return Optional.of(damageReportDTO);
-        }
-        return Optional.empty();
-    }
+
 
 
     @Override
@@ -106,22 +92,7 @@ public class DamageReportDTO {
     public List<DamageReport> getAll() {
         return this.repository.findAll();
     }
-    public List<DamageReportDTO> getAllDTO() {
-        List<DamageReport> damageReports = this.repository.findAll();
-        List<DamageReportDTO> damageReportDTOs = new ArrayList<>();
-        for (DamageReport damageReport : damageReports) {
-            DamageReportDTO damageReportDTO = DamageReportDTO.builder()
-                    .id(damageReport.getId())
-                    .rental(this.rentalService.readDTO(damageReport.getRental().getId()))
-                    .description(damageReport.getDescription())
-                    .dateAndTime(damageReport.getDateAndTime())
-                    .location(damageReport.getLocation())
-                    .repairCost(damageReport.getRepairCost())
-                    .build();
-            damageReportDTOs.add(damageReportDTO);
-        }
-        return damageReportDTOs;
-    }
+
 
 
 }

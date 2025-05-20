@@ -55,8 +55,10 @@ public class CarServiceImpl implements ICarService {
 
     @Override
     public boolean delete(Integer id) {
-        if (this.repository.existsById(id)) {
-            this.repository.deleteById(id);
+        Car car = this.repository.findById(id).orElse(null);
+        if (car != null && !car.isDeleted()) {
+            car = Car.builder().copy(car).isDeleted(true).build();
+            this.repository.save(car);
             return true;
         }
 
@@ -67,7 +69,7 @@ public class CarServiceImpl implements ICarService {
     @Override
     public ArrayList<Car> getAll() {
 
-        ArrayList<Car> all = (ArrayList<Car>) this.repository.findAll();
+        ArrayList<Car> all = (ArrayList<Car>) this.repository.findByDeletedFalse();
         return all;
 
 
@@ -94,7 +96,7 @@ public class CarServiceImpl implements ICarService {
     public List<Car> getAvailableCarsByPrice(PriceGroup priceGroup) {
         // Join to rentals table and check availability
         // check if car is available
-        ArrayList<Car> availableCars = new ArrayList<>(repository.findByPriceGroupAndRentalsReturnedDateIsNotNullAndIsAvailableIsTrue(priceGroup));
+        ArrayList<Car> availableCars = new ArrayList<>(repository.findByPriceGroupAndRentalsReturnedDateIsNotNullAndAvailableTrueAndDeletedFalse(priceGroup));
         for (Car car : availableCars)   //for each car in available cars
         {
             if (!car.isAvailable()) //if car is not available
@@ -108,7 +110,7 @@ public class CarServiceImpl implements ICarService {
     }
 
     public List<Car> getCarsByPriceGroup(PriceGroup priceGroup) {
-        return repository.findByPriceGroup(priceGroup);
+        return repository.findByPriceGroupAndDeletedFalse(priceGroup);
     }
 
 

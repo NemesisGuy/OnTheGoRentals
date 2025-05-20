@@ -10,7 +10,6 @@ import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.security.JwtUtilities;
 import za.ac.cput.service.impl.UserService;
-import za.ac.cput.service.impl.UserServiceorig;
 
 @RestController
 @RequestMapping("/api/user/profile")

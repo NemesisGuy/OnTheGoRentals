@@ -17,7 +17,7 @@ import za.ac.cput.exception.UnauthorisedException;
 import za.ac.cput.security.JwtUtilities;
 import za.ac.cput.service.ICarService;
 import za.ac.cput.service.impl.BookingServiceImpl;
-import za.ac.cput.service.impl.UserServiceorig;
+import za.ac.cput.service.impl.UserService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +36,7 @@ public class BookingController {
     private JwtUtilities jwtUtilities;
 
     @Autowired
-    private UserServiceorig userService;
+    private UserService userService;
 
     @PostMapping("/create")
     public ResponseEntity<BookingDTO> createUserBooking(@RequestBody Booking booking) {
