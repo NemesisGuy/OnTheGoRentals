@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,11 +22,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 /*@ToString*/
 @NoArgsConstructor
@@ -38,6 +41,9 @@ public class User implements Serializable, UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
+
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid;
     String firstName;
     String lastName;
     String email;
@@ -51,11 +57,11 @@ public class User implements Serializable, UserDetails {
     List<Role> roles;
     private String googleId; // To store the unique Google User ID (the 'sub' claim)
     private String profileImageUrl; // To store the profile picture URL from Google
-
     @Enumerated(EnumType.STRING)
     private AuthProvider authProvider; // Enum: LOCAL, GOOGLE, etc.
     @Column(nullable = false)
     private boolean deleted = false;
+
 
 
     public User(String email, String password, List<Role> roles) {
@@ -65,6 +71,7 @@ public class User implements Serializable, UserDetails {
     }
 
     public User(String firstName, String email, String password, List<Role> roles) {
+
         this.firstName = firstName;
         this.email = email;
         this.password = password;
@@ -77,6 +84,13 @@ public class User implements Serializable, UserDetails {
         List<GrantedAuthority> authorities = new ArrayList<>();
         this.roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getRoleName())));
         return authorities;
+    }
+
+    public Integer getId() {
+        return this.id;
+    }
+    public UUID getUuid() {
+        return this.uuid;
     }
 
     @Override
@@ -118,6 +132,19 @@ public class User implements Serializable, UserDetails {
                 ", authProvider=" + authProvider +
                 ", deleted=" + deleted +
                 '}';
+    }
+    // Inside za.ac.cput.domain.security.User.java
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+            System.out.println("User Entity @PrePersist: Generated UUID: " + this.uuid); // For debugging
+        }
+        if (this.authProvider == null) { // Good place to set defaults
+            this.authProvider = AuthProvider.LOCAL;
+        }
+        // this.deleted is already defaulted to false by its declaration, which is fine.
     }
 }
 

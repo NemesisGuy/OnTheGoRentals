@@ -1,81 +1,69 @@
 package za.ac.cput.controllers;
-/**
- * CarController.java
- * This is the controller for the Car class
- * Author: Peter Buckingham (220165289)
- * Date: 05 April 2023
- */
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Car;
+import za.ac.cput.domain.dto.request.CarRequestDTO;
+import za.ac.cput.domain.dto.response.CarResponseDTO;
 import za.ac.cput.domain.enums.PriceGroup;
+import za.ac.cput.domain.mapper.CarMapper;
 import za.ac.cput.service.impl.CarServiceImpl;
 import za.ac.cput.service.impl.RentalServiceImpl;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/cars")
-//@CrossOrigin(origins = "http://localhost:5173")
+@RequestMapping("/api/v1/cars")
 public class CarController {
 
-    @Autowired
-    private CarServiceImpl carService;
+    private final CarServiceImpl carService;
+    private final RentalServiceImpl rentalService;
 
     @Autowired
-    private RentalServiceImpl rentalService;
+    public CarController(CarServiceImpl carService, RentalServiceImpl rentalService) {
+        this.carService = carService;
+        this.rentalService = rentalService;
+    }
 
-    @GetMapping("/list/all")
-    public ResponseEntity<List<Car>> getAllCars() {
+    @GetMapping
+    public ResponseEntity<List<CarResponseDTO>> getAllCars() {
         List<Car> cars = carService.getAll();
-        return ResponseEntity.ok(cars);
+        List<CarResponseDTO> carDTOs = cars.stream().map(CarMapper::toDto).collect(Collectors.toList());
+        return ResponseEntity.ok(carDTOs);
     }
 
-    @GetMapping("/list/economy")
-    public ResponseEntity<List<Car>> getEconomyCars() {
-        return ResponseEntity.ok(carService.getCarsByPriceGroup(PriceGroup.ECONOMY));
+    @GetMapping("/price-group/{group}")
+    public ResponseEntity<List<CarResponseDTO>> getCarsByPriceGroup(@PathVariable PriceGroup group) {
+        List<Car> cars = carService.getCarsByPriceGroup(group);
+        List<CarResponseDTO> carDTOs = cars.stream().map(CarMapper::toDto).collect(Collectors.toList());
+        return ResponseEntity.ok(carDTOs);
     }
 
-    @GetMapping("/list/luxury")
-    public ResponseEntity<List<Car>> getLuxuryCars() {
-        return ResponseEntity.ok(carService.getCarsByPriceGroup(PriceGroup.LUXURY));
+    @GetMapping("/available")
+    public ResponseEntity<List<CarResponseDTO>> getAvailableCars() {
+        List<Car> availableCars = carService.getAll().stream()
+                .filter(car -> car.isAvailable() && !car.isDeleted())
+                .collect(Collectors.toList());
+        List<CarResponseDTO> carDTOs = availableCars.stream().map(CarMapper::toDto).collect(Collectors.toList());
+        return ResponseEntity.ok(carDTOs);
     }
 
-    @GetMapping("/list/special")
-    public ResponseEntity<List<Car>> getSpecialCars() {
-        return ResponseEntity.ok(carService.getCarsByPriceGroup(PriceGroup.SPECIAL));
+    @GetMapping("/available/price-group/{group}")
+    public ResponseEntity<List<CarResponseDTO>> getAvailableCarsByPriceGroup(@PathVariable PriceGroup group) {
+        List<Car> cars = carService.getAvailableCarsByPrice(group);
+        List<CarResponseDTO> carDTOs = cars.stream().map(CarMapper::toDto).collect(Collectors.toList());
+        return ResponseEntity.ok(carDTOs);
     }
 
-    @GetMapping("/list/available/all")
-    public ResponseEntity<List<Car>> getAvailableCars() {
-        List<Car> cars = carService.getAll();
-        cars.removeIf(car -> !rentalService.isCarAvailableByCarId(car));
-        return ResponseEntity.ok(cars);
-    }
-
-    @GetMapping("/list/available/economy")
-    public ResponseEntity<List<Car>> getAvailableEconomyCars() {
-        return ResponseEntity.ok(carService.getAvailableCarsByPrice(PriceGroup.ECONOMY));
-    }
-
-    @GetMapping("/list/available/luxury")
-    public ResponseEntity<List<Car>> getAvailableLuxuryCars() {
-        return ResponseEntity.ok(rentalService.getAvailableCarsByPrice(PriceGroup.LUXURY));
-    }
-
-    @GetMapping("/list/available/special")
-    public ResponseEntity<List<Car>> getAvailableSpecialCars() {
-        return ResponseEntity.ok(carService.getAvailableCarsByPrice(PriceGroup.SPECIAL));
-    }
-
-    @GetMapping("/read/{carId}")
-    public ResponseEntity<Car> readCar(@PathVariable Integer carId) {
-        Car car = carService.read(carId);
+    @GetMapping("/{carId}")
+    public ResponseEntity<CarResponseDTO> getCarById(@PathVariable UUID carId) {
+        Car car = carService.readByUuid(carId);
         if (car == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(car);
+        return ResponseEntity.ok(CarMapper.toDto(car));
     }
 }

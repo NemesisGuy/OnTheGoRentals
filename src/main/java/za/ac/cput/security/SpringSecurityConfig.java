@@ -18,6 +18,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -26,12 +31,16 @@ public class SpringSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Apply CORS configuration
+
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(Customizer.withDefaults())
+               // .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
                         // User endpoints
                         .requestMatchers("/api/user/register").permitAll()
@@ -43,6 +52,8 @@ public class SpringSecurityConfig {
                         .requestMatchers("/api/user/profile/*/*").authenticated()
                         .requestMatchers("/api/user/rentals/*").authenticated()
                         // User about and contact us endpoints
+                        .requestMatchers("/api/v1/about-us").permitAll()
+                        .requestMatchers("/api/v1/about-us/*").permitAll()
                         .requestMatchers("/api/aboutUs/read/*").permitAll()
                         .requestMatchers("/api/aboutUs/all").permitAll()
                         .requestMatchers("/api/aboutUs/latest").permitAll()
@@ -50,11 +61,15 @@ public class SpringSecurityConfig {
                         // User settings endpoints
                         .requestMatchers("/api/settings/read").permitAll()
                         // User car endpoints
-                        .requestMatchers("/api/cars/**").permitAll()
+                        .requestMatchers("/api/v1/cars").permitAll()
+                        .requestMatchers("/api/v1/cars/**").permitAll()
                         // Help center and FAQ user endpoints
                         .requestMatchers("/api/faq/**").permitAll()
                         .requestMatchers("/api/help-center/**").permitAll()
+                        // User booking endpoints
                         .requestMatchers("/api/bookings/**").permitAll() // for dev purposes
+                        .requestMatchers("/api/v1/bookings").permitAll() // for dev purposes
+                        .requestMatchers("/api/v1/bookings/**").permitAll() // for dev purposes
                         ///actuator/prometheus
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/actuator/prometheus").permitAll()
@@ -90,5 +105,37 @@ public class SpringSecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Define your allowed origins EXPLICITLY
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",          // For local Vue dev (if this is your port)
+                "https://otgr.nemesisnet.co.za"   // Your production frontend
+                // Add other origins if needed (e.g., staging)
+        ));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"
+        ));
+        configuration.setExposedHeaders(Arrays.asList( // If you have custom headers client needs to read
+                "Origin", "Content-Type", "Accept", "Authorization",
+                "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"
+                // "Set-Cookie" might not need to be explicitly exposed if handled by browser correctly
+        ));
+        configuration.setAllowCredentials(true); // Crucial for cookies
+        configuration.setMaxAge(3600L); // How long the results of a preflight request can be cached
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Apply this configuration to all paths
+        return source;
     }
 }

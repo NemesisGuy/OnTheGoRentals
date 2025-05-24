@@ -19,7 +19,7 @@ public interface IRentalService extends IService<Rental, Integer> {
 
     boolean delete(Integer id);
 
-    ArrayList<Rental> getAll();
+    List<Rental> getAll();
 
     boolean existsById(Integer id);
 

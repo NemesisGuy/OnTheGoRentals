@@ -6,5 +6,10 @@ package za.ac.cput.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import za.ac.cput.domain.settings.Settings;
 
+import java.util.Optional;
+
 public interface SettingsRepository extends JpaRepository<Settings, Integer> {
+    Iterable<Settings> findByDeletedFalse();
+
+    Optional <Settings> findByIdAndDeletedFalse(Integer id);
 }

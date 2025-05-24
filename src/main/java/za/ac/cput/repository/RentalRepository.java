@@ -7,6 +7,7 @@ import za.ac.cput.domain.Rental;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Author: Peter Buckingham (220165289)
@@ -42,5 +43,9 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
 
     List<Rental> findAllByDeletedFalse();
     List<Rental> findAllByDeletedTrue();
+
+    Optional<Rental> findByIdAndDeletedFalse(Integer id);
+
+    Optional<Rental> findByUuidAndDeletedFalse(UUID rentalId);
 }
 

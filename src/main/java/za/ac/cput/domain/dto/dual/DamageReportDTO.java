@@ -1,4 +1,4 @@
-package za.ac.cput.domain.dto;
+package za.ac.cput.domain.dto.dual;
 
 
 import lombok.AllArgsConstructor;

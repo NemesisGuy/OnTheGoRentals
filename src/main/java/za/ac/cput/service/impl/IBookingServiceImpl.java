@@ -4,19 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Booking;
 import za.ac.cput.domain.Car;
-import za.ac.cput.domain.dto.BookingDTO;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.BookingRepository;
 import za.ac.cput.repository.CarRepository;
-import za.ac.cput.service.BookingService;
+import za.ac.cput.service.IBookingService;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
-public class BookingServiceImpl implements BookingService {
+public class IBookingServiceImpl implements IBookingService {
 
     @Autowired
     private BookingRepository bookingRepository;
@@ -36,13 +35,18 @@ public class BookingServiceImpl implements BookingService {
         /*if(booking.getCar().getId() )*/
         return bookingRepository.save(booking);
     }
-
+/// /////////////////////////////////////////////////////////////////////////////////////////
     public Booking createBooking(Booking booking) {
         // Check if car is available
-        int carId = booking.getCar().getId();
-        Car car = carService.read(carId);
-        User user = userService.read(booking.getUser().getId());
-        List<Booking> activeBookings = bookingRepository.findByCarIdAndStatus(carId, "CONFIRMED");
+        //get car from its uuid
+        Car car = carRepository.findByUuid(booking.getCar().getUuid()).orElse(null);
+        if (car == null) {
+            throw new ResourceNotFoundException("Car not found");
+        }//get user from its uuid
+        User user = userService.readByUuid(booking.getUser().getUuid());
+
+        //User user = userService.read(booking.getUser().getId());
+        List<Booking> activeBookings = bookingRepository.findByCarIdAndStatusAndDeletedFalse(car.getId(), "CONFIRMED");
         if (!activeBookings.isEmpty()) {
             throw new CarNotAvailableException("Car is already booked for the selected period.");
         }
@@ -53,7 +57,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     public Booking confirmBooking(int bookingId) {
-        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        Booking booking = bookingRepository.findByIdAndDeletedFalse(bookingId).orElse(null);
         if (booking != null) {
             booking.setStatus("CONFIRMED");
             return bookingRepository.save(booking);
@@ -62,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     public Booking cancelBooking(int bookingId) {
-        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        Booking booking = bookingRepository.findByIdAndDeletedFalse(bookingId).orElse(null);
         if (booking != null) {
             booking.setStatus("CANCELED");
             return bookingRepository.save(booking);
@@ -71,7 +75,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     public List<Booking> getUserBookings(int userId) {
-        return bookingRepository.findByUserId(userId);
+        return bookingRepository.findByUserIdAndDeletedFalse(userId);
     }
 /*
 *
@@ -87,22 +91,12 @@ public class BookingServiceImpl implements BookingService {
 * */
     @Override
     public Booking read(int id) {
-        return bookingRepository.findById(id).orElse(null);
+        return bookingRepository.findByIdAndDeletedFalse(id).orElse(null);
     }
-    public BookingDTO readDTO(int id) {
-        Booking booking = bookingRepository.findById(id).orElse(null);
-        if (booking != null) {
-            BookingDTO bookingDTO = new BookingDTO();
-            bookingDTO.setId(booking.getId());
-            bookingDTO.setUser(userService.readDTO(booking.getUser().getId()));
-            bookingDTO.setCar(booking.getCar());
-            bookingDTO.setBookingStartDate(booking.getBookingStartDate());
-            bookingDTO.setBookingEndDate(booking.getBookingEndDate());
-            bookingDTO.setStatus(booking.getStatus());
-            return bookingDTO;
-        }
-        return null;
+    public Booking readByUuid(UUID id) {
+        return bookingRepository.findByUuidAndDeletedFalse(id).orElse(null);
     }
+
 
     //@Override
     public Booking updateById(Booking updatedBooking) {
@@ -122,40 +116,31 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public boolean delete(int id) {
-        bookingRepository.deleteById(id);
+        Booking booking = bookingRepository.findById(id).orElse(null);
+        if (booking == null) {
+            //throw new ResourceNotFoundException("Booking not found")
+            return false;
+        }
+        booking = new Booking.Builder().copy(booking).deleted(true).build();
+        bookingRepository.save(booking);
         return true;
+
     }
 
     @Override
     public List<Booking> getAll() {
-        return bookingRepository.findAll();
+        return bookingRepository.findByDeletedFalse();
     }
 
-    public List<BookingDTO> getAllDTO() {
-        List<Booking> bookings = bookingRepository.findAll();
-        List<BookingDTO> bookingDTOs = new ArrayList<>();
-        for (Booking booking : bookings) {
-            BookingDTO bookingDTO = new BookingDTO();
-            bookingDTO.setId(booking.getId());
-            bookingDTO.setUser(userService.readDTO(booking.getUser().getId()));
-            bookingDTO.setCar(booking.getCar());
-            bookingDTO.setBookingStartDate(booking.getBookingStartDate());
-            bookingDTO.setBookingEndDate(booking.getBookingEndDate());
-            bookingDTO.setStatus(booking.getStatus());
-            bookingDTOs.add(bookingDTO);
-        }
-
-        return bookingDTOs;
-    }
 
     @Override
     public Booking getBookingById(int bookingId) {
-        return bookingRepository.findById(bookingId).orElse(null);
+        return bookingRepository.findByIdAndDeletedFalse(bookingId).orElse(null);
     }
 
     @Override
     public Booking update(Booking booking) {
-        if (booking.getId() != 0) {
+        if (booking.getId() != 0 && bookingRepository.existsById(booking.getId())) {
             return bookingRepository.save(booking);
         }
 

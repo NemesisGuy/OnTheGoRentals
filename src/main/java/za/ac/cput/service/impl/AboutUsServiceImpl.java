@@ -29,7 +29,7 @@ public class AboutUsServiceImpl implements IAboutUsService {
 
     @Override
     public AboutUs read(int id) {
-        return this.repository.findById(id).orElse(null);
+        return this.repository.findByIdAndDeletedFalse(id).orElse(null);
     }
 
     @Override
@@ -42,8 +42,10 @@ public class AboutUsServiceImpl implements IAboutUsService {
 
     @Override
     public boolean delete(int id) {
-        if (this.repository.existsById(id)) {
-            this.repository.deleteById(id);
+        AboutUs aboutUs = this.repository.findById(id).orElse(null);
+        if (aboutUs != null) {
+            aboutUs = new AboutUs.Builder().copy(aboutUs).setDeleted(true).build();
+            this.repository.save(aboutUs);
             return true;
         }
         return false;
@@ -51,7 +53,7 @@ public class AboutUsServiceImpl implements IAboutUsService {
 
     @Override
     public List<AboutUs> getAll() {
-        List<AboutUs> all = this.repository.findAll();
+        List<AboutUs> all = this.repository.findByDeletedFalse() ;
         return all;
     }
 }

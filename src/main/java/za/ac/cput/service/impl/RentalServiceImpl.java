@@ -9,11 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Booking;
 import za.ac.cput.domain.Car;
-import za.ac.cput.domain.dto.RentalDTO;
-import za.ac.cput.domain.dto.UserDTO;
-import za.ac.cput.domain.enums.PriceGroup;
 import za.ac.cput.domain.Rental;
-import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.UserCantRentMoreThanOneCarException;
@@ -21,13 +17,14 @@ import za.ac.cput.factory.impl.RentalFactory;
 import za.ac.cput.repository.BookingRepository;
 import za.ac.cput.repository.CarRepository;
 import za.ac.cput.repository.RentalRepository;
-import za.ac.cput.service.BookingService;
+import za.ac.cput.service.IBookingService;
 import za.ac.cput.service.IRentalService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service("rentalServiceImpl")
 public class RentalServiceImpl implements IRentalService {
@@ -46,7 +43,7 @@ public class RentalServiceImpl implements IRentalService {
     @Autowired
     private UserService userService;
     @Autowired
-    private BookingService bookingService;
+    private IBookingService IBookingService;
 
     /*//convert Booking to Rental
     public RentalDTO convertBookingToRental(Booking booking) {
@@ -71,6 +68,7 @@ public class RentalServiceImpl implements IRentalService {
 
     // Check if car is available using Car
     public boolean isCarAvailableByCarId(Car car) {
+
         return carRepository.existsByIdAndAvailableTrueAndDeletedFalse(car.getId());
     }
 
@@ -91,16 +89,17 @@ public class RentalServiceImpl implements IRentalService {
 
     @Override
     public Rental read(Integer id) {
-        return this.rentalRepository.findById(id).orElse(null);
+        return this.rentalRepository.findByIdAndDeletedFalse(id).orElse(null);
     }
 
     @Override
     @Transactional
     public Rental update(Rental rental) {
-        if (rentalRepository.existsById(rental.getId())) {
+        if (rentalRepository.existsByIdAndDeletedFalse(rental.getId())) {
             Rental updatedRental = rentalFactory.create(rental);
             Car car = updatedRental.getCar();
-            car.setAvailable(updatedRental.getReturnedDate() != null);
+            car = Car.builder().copy(car).available(updatedRental.getReturnedDate() != null).build();
+            /*car.setAvailable(updatedRental.getReturnedDate() != null);*/
             carRepository.save(car);
             return rentalRepository.save(updatedRental);
         }
@@ -127,17 +126,17 @@ public class RentalServiceImpl implements IRentalService {
     }
 
     @Override
-    public ArrayList<Rental> getAll() {
-        return (ArrayList<Rental>) this.rentalRepository.findAllByDeletedFalse();
+    public List<Rental> getAll() {
+        return this.rentalRepository.findAllByDeletedFalse();
     }
 
 
-    public ArrayList<Rental> getAllAvailableCars() {
+    public List<Rental> getAllAvailableCars() {
         List<Rental> allRentals = rentalRepository.findAllByDeletedFalse();
         return filterAvailableCars(allRentals);
     }
 
-    private ArrayList<Rental> filterAvailableCars(List<Rental> rentals) {
+    private List<Rental> filterAvailableCars(List<Rental> rentals) {
         ArrayList<Rental> availableCars = new ArrayList<>();
         for (Rental rental : rentals) {
             if (isCarAvailable(rental)) {
@@ -172,15 +171,11 @@ public class RentalServiceImpl implements IRentalService {
         return !activeRentals.isEmpty() ? activeRentals.get(0) : null;
     }
 
-    public List<Car> getAvailableCarsByPrice(PriceGroup priceGroup) {
-        ArrayList<Car> availableCars = new ArrayList<>(carRepository.findByPriceGroupAndRentalsReturnedDateIsNotNullAndDeletedFalse(priceGroup));
-        availableCars.removeIf(car -> !isCarAvailableByCarId(car));
-        return availableCars;
-    }
+
 
     @Override
     public boolean existsById(Integer id) {
-        return rentalRepository.existsById(id);
+        return rentalRepository.existsByIdAndDeletedFalse(id);
     }
 
     //@Override
@@ -189,7 +184,7 @@ public class RentalServiceImpl implements IRentalService {
     //}
 
     public boolean isCarBooked(Car car, LocalDateTime startDate, LocalDateTime endDate) {
-        List<Booking> activeBookings = bookingRepository.findByCarAndStatusAndBookingEndDateAfterAndBookingStartDateBefore(
+        List<Booking> activeBookings = bookingRepository.findByCarAndStatusAndBookingEndDateAfterAndBookingStartDateBeforeAndDeletedFalse(
                 car, "CONFIRMED", startDate, endDate
         );
         return !activeBookings.isEmpty();
@@ -203,7 +198,12 @@ public class RentalServiceImpl implements IRentalService {
 
 
     public boolean isCarBooked(Car car) {
-        List<Booking> activeBookings = bookingRepository.findByCarIdAndStatus(car.getId(), "CONFIRMED");
+        List<Booking> activeBookings = bookingRepository.findByCarIdAndStatusAndDeletedFalse(car.getId(), "CONFIRMED");
         return !activeBookings.isEmpty();
+    }
+
+    public Rental findByUuid(UUID rentalId) {
+        Optional<Rental> rental = rentalRepository.findByUuidAndDeletedFalse(rentalId);
+        return rental.orElse(null);
     }
 }

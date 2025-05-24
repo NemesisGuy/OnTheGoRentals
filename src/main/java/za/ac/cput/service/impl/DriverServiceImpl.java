@@ -24,7 +24,7 @@ public class DriverServiceImpl implements IDriverService {
 
     @Override
     public Driver read(Integer id) {
-        return this.repository.findById(id).orElse(null);
+        return this.repository.findByIdAndDeletedFalse(id).orElse(null);
     }
 
     @Override
@@ -37,15 +37,18 @@ public class DriverServiceImpl implements IDriverService {
 
     @Override
     public boolean delete(Integer id) {
-        if (this.repository.existsById(id)) {
-            this.repository.deleteById(id);
+        Driver driver = this.repository.findById(id).orElse(null);
+        if (driver != null && !driver.isDeleted()) {
+            driver = new Driver.Builder().copy(driver).setDeleted(true).build();
+            this.repository.save(driver);
             return true;
         }
+
         return false;
     }
 
     @Override
     public List<Driver> getAll() {
-        return this.repository.findAll();
+        return this.repository.findByDeletedFalse();
     }
 }

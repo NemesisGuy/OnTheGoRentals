@@ -8,14 +8,11 @@ package za.ac.cput.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.Car;
 import za.ac.cput.domain.DamageReport;
-import za.ac.cput.domain.dto.DamageReportDTO;
 import za.ac.cput.repository.IDamageReportRepository;
 import za.ac.cput.repository.RentalRepository;
 import za.ac.cput.service.IDamageReport;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +51,7 @@ public class DamageReportDTO {
 * */
     @Override
     public Optional<DamageReport> read(int id) {
-        return this.repository.findById(id);
+        return this.repository.findByIdAndDeletedFalse(id);
     }
 
 
@@ -62,7 +59,7 @@ public class DamageReportDTO {
     @Override
     public DamageReport read(Integer integer) {
         //optional
-        Optional<DamageReport> optionalDamageReport = this.repository.findById(integer);
+        Optional<DamageReport> optionalDamageReport = this.repository.findByIdAndDeletedFalse(integer);
         return optionalDamageReport.orElse(null);
 
     }
@@ -76,21 +73,30 @@ public class DamageReportDTO {
 
     @Override
     public Boolean deleteById(int id) {
-        if (this.repository.existsById(id)) {
-            this.repository.deleteById(id);
+        DamageReport damageReport = this.repository.findById(id).orElse(null);
+        if (damageReport != null && !damageReport.isDeleted()) {
+            damageReport = new DamageReport.Builder().copy(damageReport).setDeleted(true).build();
+            this.repository.save(damageReport);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean delete(Integer integer) {
+        DamageReport damageReport = this.repository.findById(integer).orElse(null);
+        if (damageReport != null && !damageReport.isDeleted()) {
+            damageReport = new DamageReport.Builder().copy(damageReport).setDeleted(true).build();
+            this.repository.save(damageReport);
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean delete(Integer integer) {
-        return false;
-    }
-
-    @Override
     public List<DamageReport> getAll() {
-        return this.repository.findAll();
+        return this.repository.findByDeletedFalse();
     }
 
 

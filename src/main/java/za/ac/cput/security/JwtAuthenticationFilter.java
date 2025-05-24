@@ -15,6 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import za.ac.cput.domain.security.User;
+import za.ac.cput.service.IUserService;
 
 import java.io.IOException;
 
@@ -27,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtilities jwtUtilities;
     private final CustomerUserDetailsService customerUserDetailsService;
 
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
@@ -37,8 +40,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null && jwtUtilities.validateToken(token)) {
             String email = jwtUtilities.extractUserEmail(token);
-
-            UserDetails userDetails = customerUserDetailsService.loadUserByUsername(email);
+/// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            UserDetails userDetails = customerUserDetailsService.loadUserByUsername(email);/////////////////////////////////
+          //  /User user = userService.readByEmail(email);/////////////////////////////////
             if (userDetails != null) {
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());

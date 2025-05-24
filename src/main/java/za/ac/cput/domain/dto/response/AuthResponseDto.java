@@ -1,4 +1,4 @@
-package za.ac.cput.domain.dto;
+package za.ac.cput.domain.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class AuthResponseDto {
     private String accessToken;
-    private String refreshToken;
+    // private String refreshToken; // REMOVED - now in HttpOnly cookie
     private String tokenType = "Bearer";
     private Long accessTokenExpiresIn; // Optional: inform client about access token expiry
     private String email; // Or username

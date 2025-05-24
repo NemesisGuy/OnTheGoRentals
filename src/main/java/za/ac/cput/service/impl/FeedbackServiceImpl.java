@@ -28,7 +28,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
 
     @Override
     public Feedback read(Integer id) {
-        Optional<Feedback> optionalFeedback = repository.findById(id);
+        Optional<Feedback> optionalFeedback = repository.findByIdAndDeletedFalse(id);
         return optionalFeedback.orElse(null);
     }
 
@@ -44,8 +44,10 @@ public class FeedbackServiceImpl implements IFeedbackService {
 
     @Override
     public boolean delete(Integer id) {
-        if (this.repository.existsById(id)) {
-            this.repository.deleteById(id);
+        Feedback feedback = this.repository.findById(id).orElse(null);
+        if (feedback != null && !feedback.isDeleted()) {
+            feedback = new Feedback.Builder().copy(feedback).setDeleted(true).build();
+            this.repository.save(feedback);
             return true;
         }
 
@@ -54,8 +56,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
 
     @Override
     public List<Feedback> getAll() {
-
-        List<Feedback> all = this.repository.findAll();
-        return all;
+        List<Feedback> feedbackList = this.repository.findByDeletedFalse();
+        return feedbackList;
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.ac.cput.domain.dto.AuthResponseDto;
+import za.ac.cput.domain.dto.response.AuthResponseDto;
 
 import za.ac.cput.domain.enums.AuthProvider;
 import za.ac.cput.domain.security.Role;
@@ -16,7 +16,7 @@ import za.ac.cput.domain.security.RoleName;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.domain.security.RefreshToken;
 import za.ac.cput.repository.IRoleRepository;
-import za.ac.cput.repository.IUserRepository;
+import za.ac.cput.repository.UserRepository;
 import za.ac.cput.security.JwtUtilities;
 import za.ac.cput.service.IRefreshTokenService;
 
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 public class GoogleOAuth2UserService {
 
-    private final IUserRepository userRepository;
+    private final UserRepository userRepository;
     private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder; // For generating a dummy password for OAuth users
     private final JwtUtilities jwtUtilities;
@@ -43,7 +43,7 @@ public class GoogleOAuth2UserService {
 
     // The google.oauth2.audience should be your Google Client ID
     public GoogleOAuth2UserService(@Value("${spring.security.oauth2.client.registration.google.client-id}") String googleClientId,
-                                   IUserRepository userRepository, IRoleRepository roleRepository,
+                                   UserRepository userRepository, IRoleRepository roleRepository,
                                    PasswordEncoder passwordEncoder, JwtUtilities jwtUtilities,
                                    IRefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
@@ -119,12 +119,12 @@ public class GoogleOAuth2UserService {
 
             // Generate your application's tokens
             List<String> rolesNames = user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toList());
-            String appAccessToken = jwtUtilities.generateToken(user.getEmail(), rolesNames);
+            String appAccessToken = jwtUtilities.generateToken(user, rolesNames);
             RefreshToken appRefreshToken = refreshTokenService.createRefreshToken(user.getId());
 
             return new AuthResponseDto(
                     appAccessToken,
-                    appRefreshToken.getToken(),
+                //    appRefreshToken.getToken(),
                     "Bearer",
                     accessTokenExpirationMs,
                     user.getEmail(),

@@ -7,6 +7,7 @@ import za.ac.cput.repository.IHelpCenterRepository;
 import za.ac.cput.service.IHelpCenterService;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service("iHelpCenterServiceImpl")
@@ -26,7 +27,7 @@ public class IHelpCenterServiceImpl implements IHelpCenterService {
 
     @Override
     public HelpCenter read(Integer integer) {
-        Optional<HelpCenter> helpCenter = repository.findById(integer);
+        Optional<HelpCenter> helpCenter = repository.findByIdAndDeletedFalse(integer);
         return helpCenter.orElse(null);
     }
 
@@ -40,20 +41,22 @@ public class IHelpCenterServiceImpl implements IHelpCenterService {
 
     @Override
     public boolean delete(Integer id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
+        HelpCenter helpCenter = repository.findById(id).orElse(null);
+        if (helpCenter != null && !helpCenter.isDeleted()) {
+            helpCenter = new HelpCenter.Builder().copy(helpCenter).setDeleted(true).build();
+            repository.save(helpCenter);
             return true;
         }
         return false;
     }
 
     @Override
-    public ArrayList<HelpCenter> getAll() {
-        ArrayList<HelpCenter> allHelpCenter = (ArrayList<HelpCenter>) repository.findAll();
-        return allHelpCenter;
+    public List<HelpCenter> getAll() {
+        ArrayList<HelpCenter> allHelpCenters = (ArrayList<HelpCenter>) repository.findByDeletedFalse();
+        return allHelpCenters;
     }
 
     public ArrayList<HelpCenter> getAllByCategory(String category) {
-        return repository.findAllByCategory(category);
+        return repository.findAllByCategoryAndDeletedFalse(category);
     }
 }

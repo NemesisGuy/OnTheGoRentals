@@ -1,4 +1,4 @@
-package za.ac.cput.domain.dto;
+package za.ac.cput.domain.dto.response;
 
 /**
  * Author: Peter Buckingham (220165289)

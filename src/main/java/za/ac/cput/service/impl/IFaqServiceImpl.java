@@ -7,6 +7,7 @@ import za.ac.cput.repository.IFaqRepository;
 import za.ac.cput.service.IFaqService;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service("iFaqServiceImpl")
 public class IFaqServiceImpl implements IFaqService {
@@ -25,7 +26,7 @@ public class IFaqServiceImpl implements IFaqService {
 
     @Override
     public Faq read(Integer integer) {
-        return repository.findById(integer).orElse(null);
+        return repository.findByIdAndDeletedFalse(integer).orElse(null);
     }
 
     @Override
@@ -37,16 +38,18 @@ public class IFaqServiceImpl implements IFaqService {
 
     @Override
     public boolean delete(Integer integer) {
-        if (this.repository.existsById(integer)) {
-            this.repository.deleteById(integer);
+        Faq faq = repository.findById(integer).orElse(null);
+        if (faq != null && !faq.isDeleted()) {
+            faq = new Faq.Builder().copy(faq).setDeleted(true).build();
+            repository.save(faq);
             return true;
         }
         return false;
     }
 
     @Override
-    public ArrayList<Faq> getAll() {
-        ArrayList<Faq> allFaq = (ArrayList<Faq>) this.repository.findAll();
-        return allFaq;
+    public List<Faq> getAll() {
+        List<Faq> allFaqs =  this.repository.findByDeletedFalse();
+        return allFaqs;
     }
 }

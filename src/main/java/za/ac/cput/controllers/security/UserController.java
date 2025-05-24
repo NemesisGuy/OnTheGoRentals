@@ -1,132 +1,159 @@
 package za.ac.cput.controllers.security;
 
-import jakarta.validation.Valid; // For validating request body
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.http.HttpServletResponse; // Import for setting cookies
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication; // For logout
-import org.springframework.security.core.context.SecurityContextHolder; // For logout
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Rental;
-import za.ac.cput.domain.dto.RentalDTO;
-import za.ac.cput.domain.dto.LoginDto;
-import za.ac.cput.domain.dto.RegisterDto;
-import za.ac.cput.domain.dto.AuthResponseDto; // Import
-import za.ac.cput.domain.dto.TokenRefreshRequestDto; // Import
-import za.ac.cput.domain.dto.TokenRefreshResponseDto; // Import
+import za.ac.cput.domain.dto.dual.RentalDTO;
+import za.ac.cput.domain.dto.dual.UserDTO;
+import za.ac.cput.domain.dto.request.LoginDto;
+import za.ac.cput.domain.dto.request.RegisterDto;
+import za.ac.cput.domain.dto.request.UserRequestDTO;
+import za.ac.cput.domain.dto.response.AuthResponseDto;
+import za.ac.cput.domain.dto.response.RentalResponseDTO;
+import za.ac.cput.domain.dto.response.TokenRefreshResponseDto;
+import za.ac.cput.domain.dto.response.UserResponseDTO;
 import za.ac.cput.domain.mapper.RentalMapper;
 import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.domain.security.User;
-import za.ac.cput.service.IRentalService; // Keep this
-import za.ac.cput.service.impl.RentalServiceImpl; // Keep this
-import za.ac.cput.service.impl.UserService; // Change to concrete type or keep interface if preferred
+import za.ac.cput.service.impl.RentalServiceImpl;
+import za.ac.cput.service.impl.UserService;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*", allowCredentials = "true") // allowCredentials needed for cookies across origins
+//@CrossOrigin(origins = {"http://localhost:5173", "https://otgr.nemesisnet.co.za"}, allowCredentials = "true")
+
 @RestController
 @RequestMapping("/api/user")
-// @RequiredArgsConstructor // If using this, ensure all final fields are in constructor
 public class UserController {
 
-    private final RentalServiceImpl rentalService; // Assuming direct injection
-    // private final IRentalService iRentalService; // You have both, choose one or clarify
-    private final UserService userService; // Use concrete type to access new methods directly
+    private final RentalServiceImpl rentalService;
+    private final UserService userService;
 
-    @Autowired // If not using @RequiredArgsConstructor for all
+    @Value("${app.security.refresh-cookie.name}") // Get cookie name from properties
+    private String refreshTokenCookieName;
+
     public UserController(RentalServiceImpl rentalService, UserService userService) {
         this.rentalService = rentalService;
         this.userService = userService;
     }
 
-    //RessourceEndPoint:http://localhost:8080/api/user/register
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterDto registerDto) {
-        System.out.println("Register called, registerDto = " + registerDto);
-        // UserService.register now returns ResponseEntity<AuthResponseDto> or ResponseEntity<String>
-        return userService.register(registerDto); // This should now return the ResponseEntity with AuthResponseDto
+    public ResponseEntity<AuthResponseDto> register(@Valid @RequestBody RegisterDto registerDto, HttpServletResponse response) {
+        // The service method now directly returns ResponseEntity with cookie logic inside
+        // For better separation, controller could build ResponseEntity and call service for DTO only.
+        // But for simplicity, let's assume service handles the ResponseEntity construction with cookie.
+        // We'd need to modify service.register to accept HttpServletResponse or return headers.
+        // Simpler: Call the new service method that returns ResponseEntity<AuthResponseDto>
+        return userService.registerAndReturnAuthResponse(registerDto); // Assuming this method handles cookie
+        // OR you set cookie here based on service response
     }
 
-
-    //RessourceEndPoint:http://localhost:8080/api/user/authenticate
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthResponseDto> authenticate(@Valid @RequestBody LoginDto loginDto) {
+    public ResponseEntity<AuthResponseDto> authenticate(@Valid @RequestBody LoginDto loginDto, HttpServletResponse httpServletResponse) {
         System.out.println("Authenticate called, loginDto = " + loginDto);
-        AuthResponseDto authResponse = userService.authenticateAndGenerateTokens(loginDto);
+        AuthResponseDto authResponse = userService.authenticateAndGenerateTokens(loginDto, httpServletResponse); // Pass response to set cookie
+        // Cookie is set by the service method. We just return the DTO in the body.
         return ResponseEntity.ok(authResponse);
     }
 
-    // NEW ENDPOINT for refreshing token
-    //RessourceEndPoint:http://localhost:8080/api/user/refresh
     @PostMapping("/refresh")
-    public ResponseEntity<TokenRefreshResponseDto> refreshToken(@Valid @RequestBody TokenRefreshRequestDto request) {
-        String requestRefreshToken = request.getRefreshToken();
-        TokenRefreshResponseDto response = userService.refreshToken(requestRefreshToken);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<TokenRefreshResponseDto> refreshToken(
+            @CookieValue(name = "${app.security.refresh-cookie.name}") String refreshTokenFromCookie, // Read from cookie
+            HttpServletResponse httpServletResponse) {
+
+        if (refreshTokenFromCookie == null || refreshTokenFromCookie.isEmpty()) {
+            // Handle missing refresh token cookie appropriately
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Or a specific error DTO
+        }
+        System.out.println("Controller: Refresh token from cookie received (first 5 chars): " + refreshTokenFromCookie.substring(0, Math.min(5, refreshTokenFromCookie.length())) + "...");
+        TokenRefreshResponseDto responseDto = userService.refreshToken(refreshTokenFromCookie, httpServletResponse); // Pass response to set new cookie
+        return ResponseEntity.ok(responseDto);
     }
 
-    // OPTIONAL LOGOUT ENDPOINT
-    //RessourceEndPoint:http://localhost:8080/api/user/logout
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser() {
+    public ResponseEntity<String> logoutUser(HttpServletResponse httpServletResponse) { // Pass response to clear cookie
         System.out.println("Logout called");
-        // Get current user (principal) to invalidate their refresh token
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName(); // usually the email or username
-            User user = userService.read(username);
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String && authentication.getPrincipal().equals("anonymousUser"))) {
+            String username = authentication.getName();
+            User user = userService.read(username); // Read by email
             if (user != null) {
-                userService.logoutUser(user.getId());
-                return ResponseEntity.ok("User logged out successfully and refresh token invalidated.");
+                return userService.logoutUserAndClearCookie(user.getId(), httpServletResponse);
+            } else {
+                // User not found, but still try to clear context and potentially cookie if one exists
+                SecurityContextHolder.clearContext();
+                // Consider sending a cookie-clearing header even if user not found, just in case
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found for logout, context cleared.");
             }
         }
-
-        return ResponseEntity.badRequest().body("Could not logout user.");
+        // If no authenticated user, just return OK or a message indicating no active session
+        return ResponseEntity.ok("No active user session to logout or already logged out.");
     }
 
-
-    // Endpoint to get user profile
-    @GetMapping("/profile/read/{userId}")
-    public ResponseEntity<?> getUserProfile(@PathVariable Integer userId) {
-        System.out.println("Get user profile called, userId = " + userId);
-        User userProfile = userService.read(userId);
+    // User profile methods don't need direct cookie handling, as JWT access token is used
+    @GetMapping("/profile/read/profile") // Changed from /read/{userId} to get current user's profile
+    public ResponseEntity<UserResponseDTO> getCurrentUserProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String userEmail = authentication.getName();
+        System.out.println("Get current user profile called for email = " + userEmail);
+        User userProfile = userService.read(userEmail);
         if (userProfile != null) {
-            // Optionally, use a DTO to avoid sending sensitive info like password hash
-            // UserDTO userDto = userService.readDTO(userId);
-            return ResponseEntity.ok(UserMapper.toDto(userProfile)); // or userDto
+            return ResponseEntity.ok(UserMapper.toDto(userProfile));
         } else {
-            return ResponseEntity.status(404).body("User profile not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // UserDTO is null
         }
     }
 
-    // Endpoint to update user profile
-    @PutMapping("/profile/update/{userId}")
-    public ResponseEntity<?> updateUserProfile(@PathVariable Integer userId, @RequestBody User user) {
-        User updatedUser = userService.update(userId, user);
-        if (updatedUser != null) {
-            return ResponseEntity.ok(UserMapper.toDto(updatedUser));
+    @PutMapping("/profile/update") // Update current user's profile
+    public ResponseEntity<UserResponseDTO> updateUserProfile(@Valid @RequestBody UserRequestDTO userUpdateDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.status(404).body("User not found or update failed.");
+        String userEmail = authentication.getName();
+        User currentUser = userService.read(userEmail);
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        // Map DTO to entity, applying updates to currentUser
+        // This mapping should only touch fields allowed to be updated via this DTO
+        // Example:
+        currentUser.setFirstName(userUpdateDTO.getFirstName());
+        currentUser.setLastName(userUpdateDTO.getLastName());
+        // Handle password update separately or via a specific DTO/endpoint.
+        // If userUpdateDTO contains password and it's not empty:
+        // if (userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
+        //     currentUser.setPassword(userUpdateDTO.getPassword()); // UserService.update will encode it
+        // }
+
+        User updatedUser = userService.update(currentUser.getId(), currentUser); // Pass the modified entity
+        return ResponseEntity.ok(UserMapper.toDto(updatedUser));
     }
 
-    @GetMapping("/profile/{userId}/rental-history")
-    public ResponseEntity<List<RentalDTO>> getRentalHistory(@PathVariable Integer userId) {
-        User user = userService.read(userId);
+    @GetMapping("/profile/rental-history")
+    public ResponseEntity<List<RentalResponseDTO>> getRentalHistory() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.read(email);
         if (user == null) {
-            return ResponseEntity.status(404).body(null); // Or an empty list with appropriate message
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
         List<Rental> rentalHistory = rentalService.getRentalHistoryByUser(user);
-        if (rentalHistory.isEmpty()) {
-            return ResponseEntity.status(404).body(null); // Or an empty list with appropriate message
-        }
-        // Convert Rental to RentalDTO if needed
-        List <RentalDTO> rentalHistoryDTO = new ArrayList<RentalDTO>();
-        for (Rental rental : rentalHistory) {
-            rentalHistoryDTO.add(RentalMapper.toDto(rental));
-        }
-
+        List<RentalResponseDTO> rentalHistoryDTO = rentalHistory.stream()
+                .map(RentalMapper::toDto)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(rentalHistoryDTO);
     }
 }

@@ -26,7 +26,7 @@ public class SettingsServiceImpl implements SettingsService {
 
     @Override
     public Settings read(Integer id) {
-        Settings settings = settingsRepository.findById(id).orElse(null);
+        Settings settings = settingsRepository.findByIdAndDeletedFalse(id).orElse(null);
         return settings;
     }
 
@@ -42,8 +42,10 @@ public class SettingsServiceImpl implements SettingsService {
 
     @Override
     public boolean delete(Integer id) {
-        if (settingsRepository.existsById(id)) {
-            settingsRepository.deleteById(id);
+        Settings settings = settingsRepository.findById(id).orElse(null);
+        if (settings != null && !settings.isDeleted()) {
+            settings = new Settings.Builder().copy(settings).deleted(true).build();
+            settingsRepository.save(settings);
             return true;
         }
         return false;
@@ -51,6 +53,6 @@ public class SettingsServiceImpl implements SettingsService {
 
     @Override
     public Iterable<Settings> getAll() {
-        return settingsRepository.findAll();
+        return settingsRepository.findByDeletedFalse();
     }
 }

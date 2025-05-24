@@ -1,12 +1,15 @@
 package za.ac.cput.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.domain.security.User;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Peter Buckingham - 220165289
@@ -21,15 +24,19 @@ public class Rental implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid;
+
+    @ManyToOne(fetch = FetchType.LAZY) // Good to keep LAZY
+
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY) // Good to keep LAZY
     @JoinColumn(name = "car_id")
     private Car car;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY) // Good to keep LAZY
     @JoinColumn(name = "driver_id")
     private Driver driver;
 
@@ -38,12 +45,15 @@ public class Rental implements Serializable {
     private int fine;
     private LocalDateTime issuedDate;
     private LocalDateTime returnedDate;
-    private boolean deleted = false;
-
-
     @Enumerated(EnumType.STRING)
     private RentalStatus status;
-
+    private boolean deleted = false;
+    @PrePersist
+    protected  void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
+    }
     public Rental() {
     }
 
@@ -62,6 +72,7 @@ public class Rental implements Serializable {
 
     private Rental(Builder builder) {
         this.id = builder.id;
+        this.uuid = builder.uuid;
         this.user = builder.user;
         this.car = builder.car;
         this.driver = builder.driver;
@@ -77,6 +88,9 @@ public class Rental implements Serializable {
     public int getId() {
         return id;
     }
+    public UUID getUuid() {
+        return uuid;
+    }
 
     public void setId(int id) {
         this.id = id;
@@ -88,6 +102,9 @@ public class Rental implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public Car getCar() {
@@ -165,9 +182,22 @@ public class Rental implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Rental rental = (Rental) o;
+        return id == rental.id && issuer == rental.issuer && receiver == rental.receiver && fine == rental.fine && deleted == rental.deleted && Objects.equals(uuid, rental.uuid) && Objects.equals(user, rental.user) && Objects.equals(car, rental.car) && Objects.equals(driver, rental.driver) && Objects.equals(issuedDate, rental.issuedDate) && Objects.equals(returnedDate, rental.returnedDate) && status == rental.status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, uuid, user, car, driver, issuer, receiver, fine, issuedDate, returnedDate, status, deleted);
+    }
+
+    @Override
     public String toString() {
         return "Rental{" +
-                "rentalId=" + id +
+                "id=" + id +
+                ", uuid=" + uuid +
                 ", user=" + user +
                 ", car=" + car +
                 ", driver=" + driver +
@@ -176,17 +206,14 @@ public class Rental implements Serializable {
                 ", fine=" + fine +
                 ", issuedDate=" + issuedDate +
                 ", returnedDate=" + returnedDate +
-                ", deleted=" + deleted +
                 ", status=" + status +
+                ", deleted=" + deleted +
                 '}';
     }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
+    // Builder pattern
     public static class Builder {
         private int id;
+        private UUID uuid;
         private User user;
         private Car car;
         private Driver driver;
@@ -195,11 +222,17 @@ public class Rental implements Serializable {
         private int fine;
         private LocalDateTime issuedDate;
         private LocalDateTime returnedDate;
-        private boolean deleted;
         private RentalStatus status;
+        private boolean deleted;
+
+
 
         public Builder setId(int id) {
             this.id = id;
+            return this;
+        }
+        public Builder setUuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 
@@ -242,13 +275,14 @@ public class Rental implements Serializable {
             this.returnedDate = returnedDate;
             return this;
         }
-        public Builder setDeleted(boolean deleted) {
-            this.deleted = deleted;
-            return this;
-        }
 
         public Builder setStatus(RentalStatus status) {
             this.status = status;
+            return this;
+        }
+
+        public Builder setDeleted(boolean deleted) {
+            this.deleted = deleted;
             return this;
         }
 
@@ -262,8 +296,8 @@ public class Rental implements Serializable {
             this.fine = rental.fine;
             this.issuedDate = rental.issuedDate;
             this.returnedDate = rental.returnedDate;
-            this.deleted = rental.deleted;
             this.status = rental.status;
+            this.deleted = rental.deleted;
             return this;
         }
 
@@ -271,4 +305,5 @@ public class Rental implements Serializable {
             return new Rental(this);
         }
     }
+
 }

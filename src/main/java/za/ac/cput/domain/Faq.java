@@ -1,12 +1,10 @@
 package za.ac.cput.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Faq.java
@@ -20,20 +18,31 @@ public class Faq {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid = UUID.randomUUID();
     private String question;
     private String answer;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean deleted = false;
+    @PrePersist
+    protected  void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
+    }
 
     public Faq() {
     }
 
     public Faq(Builder builder) {
         this.id = builder.id;
+        this.uuid = builder.uuid;
         this.question = builder.question;
         this.answer = builder.answer;
         this.createdAt = builder.createdAt;
         this.updatedAt = builder.updatedAt;
+        this.deleted = builder.deleted;
     }
 
     public static Builder builder() {
@@ -42,6 +51,9 @@ public class Faq {
 
     public int getId() {
         return id;
+    }
+    public UUID getUuid() {
+        return uuid;
     }
 
     public String getQuestion() {
@@ -59,40 +71,50 @@ public class Faq {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+    public boolean isDeleted() {
+        return deleted;
+    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Faq faq = (Faq) o;
-        return id == faq.id && Objects.equals(question, faq.question) && Objects.equals(answer, faq.answer) && Objects.equals(createdAt, faq.createdAt) && Objects.equals(updatedAt, faq.updatedAt);
+        return id == faq.id && deleted == faq.deleted && Objects.equals(uuid, faq.uuid) && Objects.equals(question, faq.question) && Objects.equals(answer, faq.answer) && Objects.equals(createdAt, faq.createdAt) && Objects.equals(updatedAt, faq.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, question, answer, createdAt, updatedAt);
+        return Objects.hash(id, uuid, question, answer, createdAt, updatedAt, deleted);
     }
 
     @Override
     public String toString() {
         return "Faq{" +
                 "id=" + id +
+                ", uuid=" + uuid +
                 ", question='" + question + '\'' +
                 ", answer='" + answer + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
+                ", deleted=" + deleted +
                 '}';
     }
 
     public static class Builder {
         private int id;
+        private UUID uuid;
         private String question;
         private String answer;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
+        private boolean deleted;
 
         public Builder setId(int id) {
             this.id = id;
+            return this;
+        }
+        public Builder setUuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 
@@ -115,18 +137,26 @@ public class Faq {
             this.updatedAt = updatedAt;
             return this;
         }
+        public Builder setDeleted(boolean deleted) {
+            this.deleted = deleted;
+            return this;
+        }
 
         public Builder copy(Faq faq) {
             this.id = faq.id;
+            this.uuid = faq.uuid;
             this.question = faq.question;
             this.answer = faq.answer;
             this.createdAt = faq.createdAt;
             this.updatedAt = faq.updatedAt;
+            this.deleted = faq.deleted;
             return this;
         }
 
         public Faq build() {
             return new Faq(this);
         }
+
+
     }
 }

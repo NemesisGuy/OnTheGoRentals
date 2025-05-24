@@ -1,13 +1,11 @@
 package za.ac.cput.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * HelpCenter.java
@@ -23,63 +21,78 @@ public class HelpCenter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid = UUID.randomUUID();
     private String title;
     private String content;
     private String category;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean deleted = false;
 
+    @PrePersist
+    protected  void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
+    }
     public HelpCenter() {
     }
 
     public HelpCenter(Builder builder) {
         this.id = builder.id;
+        this.uuid = builder.uuid;
         this.category = builder.category;
         this.title = builder.title;
         this.content = builder.content;
         this.createdAt = builder.createdAt;
         this.updatedAt = builder.updatedAt;
+        this.deleted = builder.deleted;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HelpCenter that = (HelpCenter) o;
-        return id == that.id && Objects.equals(category, that.category) && Objects.equals(title, that.title) && Objects.equals(content, that.content) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+        return id == that.id && deleted == that.deleted && Objects.equals(uuid, that.uuid) && Objects.equals(title, that.title) && Objects.equals(content, that.content) && Objects.equals(category, that.category) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, category, title, content, createdAt, updatedAt);
+        return Objects.hash(id, uuid, title, content, category, createdAt, updatedAt, deleted);
     }
 
     @Override
     public String toString() {
         return "HelpCenter{" +
                 "id=" + id +
-                ", category='" + category + '\'' +
+                ", uuid=" + uuid +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
+                ", category='" + category + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
+                ", deleted=" + deleted +
                 '}';
     }
 
     public static class Builder {
         private int id;
+        private UUID uuid;
         private String category;
         private String title;
         private String content;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
+        private boolean deleted ;
 
         public Builder setId(int id) {
             this.id = id;
+            return this;
+        }
+        public Builder setUuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 
@@ -107,14 +120,20 @@ public class HelpCenter {
             this.updatedAt = updatedAt;
             return this;
         }
+        public Builder setDeleted(boolean deleted) {
+            this.deleted = deleted;
+            return this;
+        }
 
         public Builder copy(HelpCenter helpCenter) {
             this.id = helpCenter.id;
+            this.uuid = helpCenter.uuid;
             this.category = helpCenter.category;
             this.title = helpCenter.title;
             this.content = helpCenter.content;
             this.createdAt = helpCenter.createdAt;
             this.updatedAt = helpCenter.updatedAt;
+            this.deleted = helpCenter.deleted;
             return this;
         }
 

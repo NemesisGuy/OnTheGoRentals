@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import za.ac.cput.domain.HelpCenter;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  * IHelpCenterRepository.java
@@ -16,4 +17,10 @@ import java.util.ArrayList;
 @Repository
 public interface IHelpCenterRepository extends JpaRepository<HelpCenter, Integer> {
     ArrayList<HelpCenter> findAllByCategory(String category);
+
+    ArrayList<HelpCenter> findAllByCategoryAndDeletedFalse(String category);
+
+    Optional<HelpCenter> findByIdAndDeletedFalse(Integer integer);
+
+    Object findByDeletedFalse();
 }

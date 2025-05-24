@@ -37,10 +37,16 @@ public class HelpCenterFactory implements IFactory<HelpCenter> {
 
     @Override
     public HelpCenter create() {
-        return HelpCenter.builder().build();
+        return new HelpCenter.Builder()
+                .setCategory("")
+                .setTitle("")
+                .setContent("")
+                .setCreatedAt(LocalDateTime.now())
+                .setUpdatedAt(LocalDateTime.now())
+                .build();
     }
 
     public HelpCenter create(HelpCenter helpCenter) {
-        return HelpCenter.builder().copy(helpCenter).build();
+        return new HelpCenter.Builder().copy(helpCenter).build();
     }
 }

@@ -16,7 +16,7 @@ import za.ac.cput.domain.security.Role;
 import za.ac.cput.domain.security.RoleName;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.repository.IRoleRepository;
-import za.ac.cput.repository.IUserRepository;
+import za.ac.cput.repository.UserRepository;
 /*import za.ac.cput.domain.User;
 import za.ac.cput.repository.UserRepository;
 import za.ac.cput.service.impl.UserServiceImpl;*/
@@ -33,7 +33,7 @@ public class BackendApplication {
     }
 
     @Bean
-    CommandLineRunner run(IUserService userService, IRoleRepository roleRepository, IUserRepository userRepository, PasswordEncoder passwordEncoder) {
+    CommandLineRunner run(IUserService userService, IRoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             List<RoleName> roleNames = Arrays.asList(RoleName.USER, RoleName.ADMIN, RoleName.SUPERADMIN);
 

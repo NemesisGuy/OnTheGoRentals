@@ -7,7 +7,7 @@ import za.ac.cput.domain.security.RefreshToken;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.exception.TokenRefreshException; // You'll need to create this custom exception
 import za.ac.cput.repository.IRefreshTokenRepository;
-import za.ac.cput.repository.IUserRepository;
+import za.ac.cput.repository.UserRepository;
 import za.ac.cput.service.IRefreshTokenService;
 
 import java.time.Instant;
@@ -21,9 +21,9 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     private Long refreshTokenDurationMs;
 
     private final IRefreshTokenRepository refreshTokenRepository;
-    private final IUserRepository userRepository;
+    private final UserRepository userRepository;
 
-    public RefreshTokenServiceImpl(IRefreshTokenRepository refreshTokenRepository, IUserRepository userRepository) {
+    public RefreshTokenServiceImpl(IRefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
     }

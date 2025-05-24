@@ -27,7 +27,7 @@ public class ContactUsServiceImpl implements IContactUsService {
 
     @Override
     public ContactUs read(int id) {
-        return this.repository.findById(id).orElse(null);
+        return this.repository.findByIdAndDeletedFalse(id).orElse(null);
     }
 
     @Override
@@ -40,8 +40,10 @@ public class ContactUsServiceImpl implements IContactUsService {
 
     @Override
     public boolean deleteById(int id) {
-        if (this.repository.existsById(id)) {
-            this.repository.deleteById(id);
+        ContactUs contactUs = this.repository.findById(id).orElse(null);
+        if (contactUs != null && !contactUs.isDeleted()) {
+            contactUs = new ContactUs.Builder().copy(contactUs).setDeleted(true).build();
+            repository.save(contactUs);
             return true;
         }
         return false;
@@ -49,7 +51,7 @@ public class ContactUsServiceImpl implements IContactUsService {
 
     @Override
     public ArrayList<ContactUs> findAll() {
-        ArrayList<ContactUs> all = (ArrayList<ContactUs>) this.repository.findAll();
+        ArrayList<ContactUs> all = (ArrayList<ContactUs>) this.repository.findByDeletedFalse();
         return all;
     }
 

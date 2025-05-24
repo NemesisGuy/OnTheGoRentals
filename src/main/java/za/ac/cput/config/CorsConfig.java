@@ -1,10 +1,13 @@
+/*
 package za.ac.cput.config;
+*/
 /**
  * CorsConfig.java
  * This is the configuration class for CORS, allowing the frontend to access the backend, and vice versa, without any issues.
  * Author: Peter Buckingham (220165289)
  * Date: 05 April 2023
- */
+ *//*
+
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -49,3 +52,4 @@ public class CorsConfig {
 
 
 
+*/

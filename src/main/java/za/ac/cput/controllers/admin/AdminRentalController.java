@@ -11,11 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Rental;
-import za.ac.cput.domain.dto.RentalDTO;
+import za.ac.cput.domain.dto.dual.RentalDTO;
+import za.ac.cput.domain.dto.response.RentalResponseDTO;
 import za.ac.cput.domain.mapper.RentalMapper;
 import za.ac.cput.service.impl.RentalServiceImpl;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,16 +28,16 @@ public class AdminRentalController {
     private RentalServiceImpl rentalService;
 
     @GetMapping("/list/all")
-    public ResponseEntity<List<RentalDTO>> getAll() {
+    public ResponseEntity<List<RentalResponseDTO>> getAll() {
         List<Rental> rentals = rentalService.getAll();
-        List<RentalDTO> rentalDTOs = rentals.stream()
+        List<RentalResponseDTO> rentalDTOs = rentals.stream()
                 .map(RentalMapper::toDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(rentalDTOs);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<RentalDTO> createRental(@RequestBody Rental rental) {
+    public ResponseEntity<RentalResponseDTO> createRental(@RequestBody Rental rental) {
         Rental created = rentalService.create(rental);
         if (created == null) {
             return ResponseEntity.badRequest().build();
@@ -44,8 +46,12 @@ public class AdminRentalController {
     }
 
     @GetMapping("/read/{rentalId}")
-    public ResponseEntity<RentalDTO> readRental(@PathVariable Integer rentalId) {
-        Rental readRental = rentalService.read(rentalId);
+    public ResponseEntity<RentalResponseDTO> readRental(@PathVariable UUID rentalId) {
+        if (rentalId == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        Rental rental = rentalService.findByUuid(rentalId);
+        Rental readRental = rentalService.read(rental.getId());
         if (readRental == null) {
             return ResponseEntity.notFound().build();
         }
@@ -53,13 +59,13 @@ public class AdminRentalController {
     }
 
     @PutMapping("/update/{rentalId}")
-    public ResponseEntity<RentalDTO> updateRental(@PathVariable Integer rentalId, @RequestBody Rental rental) {
+    public ResponseEntity<RentalResponseDTO> updateRental(@PathVariable Integer rentalId, @RequestBody Rental rental) {
         Rental existing = rentalService.read(rentalId);
         if (existing == null) {
             return ResponseEntity.notFound().build();
         }
 
-        Rental updatedRental = Rental.builder()
+        Rental updatedRental = new Rental.Builder()
                 .setId(existing.getId())
                 .setUser(existing.getUser())
                 .setCar(existing.getCar())

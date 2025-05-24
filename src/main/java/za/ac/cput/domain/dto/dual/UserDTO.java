@@ -1,4 +1,4 @@
-package za.ac.cput.domain.dto;
+package za.ac.cput.domain.dto.dual;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import lombok.AllArgsConstructor;
@@ -9,13 +9,15 @@ import za.ac.cput.domain.security.Role;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class UserDTO {
-    private Integer id;
+    private UUID uuid;
+//    private Integer id;
     private String email;
     private String firstName;
     private String lastName;

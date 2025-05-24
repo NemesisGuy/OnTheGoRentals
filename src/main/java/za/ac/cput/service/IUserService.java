@@ -5,8 +5,8 @@ package za.ac.cput.service;
 
 
 import org.springframework.http.ResponseEntity;
-import za.ac.cput.domain.dto.LoginDto;
-import za.ac.cput.domain.dto.RegisterDto;
+import za.ac.cput.domain.dto.request.LoginDto;
+import za.ac.cput.domain.dto.request.RegisterDto;
 import za.ac.cput.domain.security.Role;
 import za.ac.cput.domain.security.User;
 
@@ -29,4 +29,8 @@ public interface IUserService {
     User read(Integer id);
 
     User update(Integer id, User user);
+
+    User read(String userEmail);
+
+    /*   User readByEmail(String email);*/
 }

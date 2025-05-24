@@ -1,6 +1,7 @@
 package za.ac.cput.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.enums.PriceGroup;
@@ -8,6 +9,7 @@ import za.ac.cput.domain.enums.PriceGroup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Car.java
@@ -24,8 +26,11 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid ;
+  /*  @JsonIgnore
     @OneToMany(mappedBy = "car") //one car to many rentals
-    private final List<Rental> rentals = new ArrayList<>();
+    private final List<Rental> rentals = new ArrayList<>();*/
     private String make;
     private String model;
     private int year;
@@ -36,12 +41,20 @@ public class Car {
     private boolean available;
     private boolean deleted = false;
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+            System.out.println("Car Entity @PrePersist: Generated UUID: " + this.uuid); // For debugging
+        }
+    }
     public Car() {
         // Default constructor
     }
 
     private Car(Builder builder) {
         this.id = builder.id;
+        this.uuid = builder.uuid;
         this.make = builder.make;
         this.model = builder.model;
         this.year = builder.year;
@@ -60,6 +73,14 @@ public class Car {
         return id;
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
+
+  /*  public List<Rental> getRentals() {
+        return rentals;
+    }
+*/
     public String getMake() {
         return make;
     }
@@ -80,49 +101,32 @@ public class Car {
         return priceGroup;
     }
 
-    public boolean isAvailable() {
-        return available;
-    }
-
-    public void setAvailable(boolean available) {
-        this.available = available;
-    }
-    public boolean isDeleted() {
-        return deleted;
-    }
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    public void setPriceGroup(PriceGroup priceGroupEnum) {
-        this.priceGroup = priceGroupEnum;
-    }
-
     public String getLicensePlate() {
         return licensePlate;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Car car)) return false;
-        return getId() == car.getId() && getYear() == car.getYear() && Objects.equals(getMake(), car.getMake()) && Objects.equals(getModel(), car.getModel()) && Objects.equals(getCategory(), car.getCategory()) && Objects.equals(getLicensePlate(), car.getLicensePlate());
+    public boolean isAvailable() {
+        return available;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getMake(), getModel(), getYear(), getCategory(), getLicensePlate());
+    public boolean isDeleted() {
+        return deleted;
     }
-
 
     public String getPriceGroupString() {
         return priceGroup != null ? priceGroup.toString() : "NONE";
     }
 
+
+
     @Override
     public String toString() {
         return "Car{" +
                 "id=" + id +
+                ", uuid=" + uuid +
+/*
+                ", rentals=" + rentals +
+*/
                 ", make='" + make + '\'' +
                 ", model='" + model + '\'' +
                 ", year=" + year +
@@ -135,21 +139,25 @@ public class Car {
     }
 
 
+
     public static class Builder {
         private int id;
+        private UUID uuid;
         private String make;
         private String model;
         private int year;
         private String category;
-
         private PriceGroup priceGroup;
-
         private String licensePlate;
         private boolean available;
         private boolean deleted = false;
 
         public Builder id(int id) {
             this.id = id;
+            return this;
+        }
+        public Builder uuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 
@@ -188,13 +196,14 @@ public class Car {
             this.available = available;
             return this;
         }
-        public Builder isDeleted(boolean deleted) {
+        public Builder deleted(boolean deleted) {
             this.deleted = deleted;
             return this;
         }
 
         public Builder copy(Car car) {
             this.id = car.id;
+            this.uuid = car.uuid;
             this.make = car.make;
             this.model = car.model;
             this.year = car.year;

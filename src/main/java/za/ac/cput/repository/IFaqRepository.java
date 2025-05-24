@@ -4,6 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import za.ac.cput.domain.Faq;
 
+
+import java.util.List;
+import java.util.Optional;
+
 /**
  * IFaqRepository.java
  * Interface for the IFaqRepository
@@ -13,4 +17,7 @@ import za.ac.cput.domain.Faq;
 
 @Repository
 public interface IFaqRepository extends JpaRepository<Faq, Integer> {
+    List<Faq> findByDeletedFalse();
+
+   Optional <Faq> findByIdAndDeletedFalse(Integer integer);
 }

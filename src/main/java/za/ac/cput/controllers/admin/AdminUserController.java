@@ -11,7 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.dto.UserDTO;
+import za.ac.cput.domain.dto.dual.UserDTO;
+import za.ac.cput.domain.dto.response.UserResponseDTO;
 import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.domain.security.Role;
 import za.ac.cput.domain.security.User;
@@ -21,6 +22,7 @@ import za.ac.cput.service.impl.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -37,9 +39,9 @@ public class AdminUserController {
 
     // Get all users as UserDTO (no passwords exposed)
     @GetMapping("/list/all")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         List<User> users = userService.getAll();
-        List<UserDTO> userDTOs = new ArrayList<>();
+        List<UserResponseDTO> userDTOs = new ArrayList<>();
         for (User user : users) {
             userDTOs.add(UserMapper.toDto(user));
         }
@@ -48,8 +50,9 @@ public class AdminUserController {
 
     // Get user by id, returns UserDTO or 404
     @GetMapping("/read/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
-        User user = userService.read(id);
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable UUID id) {
+
+        User user = userService.readByUuid (id);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -58,7 +61,7 @@ public class AdminUserController {
 
     // Create new user with role validation
     @PostMapping("/create")
-    public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
+    public ResponseEntity<UserResponseDTO> createUser(@RequestBody User user) {
         List<Role> matchingRoles = validateAndGetRoles(user.getRoles());
         user.setRoles(matchingRoles);
         User createdUser = userService.create(user);
@@ -67,7 +70,7 @@ public class AdminUserController {
 
     // Update existing user by ID with role validation
     @PutMapping("/update/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Integer id, @RequestBody User updatedUser) {
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody User updatedUser) {
         User existingUser = userService.read(id);
         if (existingUser == null) {
             return ResponseEntity.notFound().build();

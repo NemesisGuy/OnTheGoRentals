@@ -6,41 +6,55 @@ package za.ac.cput.domain;
  * Date: 23/09/2023
  */
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 public class ContactUs {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid ;
     private String title;
     private String firstName;
     private String lastName;
     private String email;
     private String subject;
     private String message;
+    private boolean deleted = false;
 
+
+    @PrePersist
+    protected  void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
+    }
     protected ContactUs() {
     }
 
     public ContactUs(Builder builder) {
 
         this.id = builder.id;
+        this.uuid = builder.uuid;
         this.title = builder.title;
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
         this.email = builder.email;
         this.subject = builder.subject;
         this.message = builder.message;
+        this.deleted = builder.deleted;
+
     }
 
     public int getId() {
         return id;
+    }
+    public UUID getUuid() {
+        return uuid;
     }
 
     public String getTitle() {
@@ -66,45 +80,55 @@ public class ContactUs {
     public String getMessage() {
         return message;
     }
+    public boolean isDeleted() {
+        return deleted;
+    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ContactUs contactUs = (ContactUs) o;
-        return id == contactUs.id && Objects.equals(title, contactUs.title) && Objects.equals(firstName, contactUs.firstName) && Objects.equals(lastName, contactUs.lastName) && Objects.equals(email, contactUs.email) && Objects.equals(subject, contactUs.subject) && Objects.equals(message, contactUs.message);
+        return id == contactUs.id && deleted == contactUs.deleted && Objects.equals(uuid, contactUs.uuid) && Objects.equals(title, contactUs.title) && Objects.equals(firstName, contactUs.firstName) && Objects.equals(lastName, contactUs.lastName) && Objects.equals(email, contactUs.email) && Objects.equals(subject, contactUs.subject) && Objects.equals(message, contactUs.message);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, firstName, lastName, email, subject, message);
+        return Objects.hash(id, uuid, title, firstName, lastName, email, subject, message, deleted);
     }
 
     @Override
     public String toString() {
         return "ContactUs{" +
                 "id=" + id +
+                ", uuid=" + uuid +
                 ", title='" + title + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", subject='" + subject + '\'' +
                 ", message='" + message + '\'' +
+                ", deleted=" + deleted +
                 '}';
     }
 
     public static class Builder {
 
         private int id;
+        private UUID uuid;
         private String title;
         private String firstName;
         private String lastName;
         private String email;
         private String subject;
         private String message;
+        private boolean deleted;
 
         public Builder setId(int id) {
             this.id = id;
+            return this;
+        }
+        public Builder setUuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 
@@ -137,16 +161,22 @@ public class ContactUs {
             this.message = message;
             return this;
         }
+        public Builder setDeleted(boolean deleted) {
+            this.deleted = deleted;
+            return this;
+        }
 
         public Builder copy(ContactUs contactUs) {
 
             this.id = contactUs.id;
+            this.uuid = contactUs.uuid;
             this.title = contactUs.title;
             this.firstName = contactUs.firstName;
             this.lastName = contactUs.lastName;
             this.email = contactUs.email;
             this.subject = contactUs.subject;
             this.message = contactUs.message;
+            this.deleted = contactUs.deleted;
 
             return this;
         }

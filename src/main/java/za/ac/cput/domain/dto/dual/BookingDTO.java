@@ -1,13 +1,13 @@
-package za.ac.cput.domain.dto;
+package za.ac.cput.domain.dto.dual;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import za.ac.cput.domain.Car;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class BookingDTO {
-    private int id;
+    private UUID uuid;
     private UserDTO user;
-    private Car car;
+    private CarDTO car;
     private LocalDateTime bookingStartDate;
     private LocalDateTime bookingEndDate;
     private String status;

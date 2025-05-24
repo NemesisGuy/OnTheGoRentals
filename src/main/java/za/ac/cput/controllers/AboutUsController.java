@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import za.ac.cput.domain.AboutUs;
+import za.ac.cput.domain.dto.response.AboutUsResponseDTO;
+import za.ac.cput.domain.mapper.AboutUsMapper;
 import za.ac.cput.service.impl.AboutUsServiceImpl;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -28,34 +31,43 @@ import java.util.Optional;
  * Date: 05 April 2023
  * 220165289@mycput.ac.za
  */
-
 @RestController
-@RequestMapping("/api/aboutUs")
-// @CrossOrigin(origins = "http://localhost:5173") // Uncomment if needed for CORS
+@RequestMapping("/api/v1/about-us")
 public class AboutUsController {
 
-    @Autowired
-    private AboutUsServiceImpl service;
+    private final AboutUsServiceImpl service;
 
-    @GetMapping("/read/01")
-    public ResponseEntity<AboutUs> read(@PathVariable("id") int id) {
-        id = 01;
-        AboutUs readAbout = this.service.read(id);
-        return ResponseEntity.ok(readAbout);
+    @Autowired
+    public AboutUsController(AboutUsServiceImpl service) {
+        this.service = service;
     }
 
-    @GetMapping("/list/all")
-    public List<AboutUs> getAll() {
+    @GetMapping("/{id}")
+    public ResponseEntity<AboutUsResponseDTO> read(@PathVariable int id) {
+        AboutUs readAbout = this.service.read(id);
+        if (readAbout == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(AboutUsMapper.toDto(readAbout));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AboutUsResponseDTO>> getAll() {
         List<AboutUs> allAboutUs = service.getAll();
-        return allAboutUs;
+        List<AboutUsResponseDTO> aboutUsResponseDTOList = new ArrayList<>();
+        for (AboutUs aboutUs : allAboutUs) {
+            aboutUsResponseDTOList.add(AboutUsMapper.toDto(aboutUs));
+        }
+
+        return ResponseEntity.ok((aboutUsResponseDTOList));
     }
 
     @GetMapping("/latest")
-    public ResponseEntity<AboutUs> getLatest() {
+    public ResponseEntity<AboutUsResponseDTO> getLatest() {
         List<AboutUs> allAboutUs = service.getAll();
-        // Fetch the AboutUs entry with the highest id (most recent)
-        Optional<AboutUs> newestAboutUs = allAboutUs.stream()
-                .max(Comparator.comparingInt(AboutUs::getId));
+        Optional<AboutUsResponseDTO> newestAboutUs = Optional.ofNullable(AboutUsMapper.toDto(allAboutUs.get(allAboutUs.size()-1)));
+        //get the latest about us
+
 
         return newestAboutUs.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

@@ -14,9 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import za.ac.cput.domain.DamageReport;
-import za.ac.cput.domain.dto.DamageReportDTO;
+import za.ac.cput.domain.dto.dual.DamageReportDTO;
+import za.ac.cput.domain.dto.response.DamageReportResponseDTO;
 import za.ac.cput.domain.mapper.DamageReportMapper;
-import za.ac.cput.factory.impl.DamageReportFactory;
 import za.ac.cput.service.impl.DamageReportServiceImpl;
 import za.ac.cput.service.impl.RentalServiceImpl;
 
@@ -42,21 +42,21 @@ public class AdminDamageReportController {
     }
 
     @GetMapping("/read/{id}")
-    public ResponseEntity<DamageReportDTO> read(@PathVariable int id) {
+    public ResponseEntity<DamageReportResponseDTO> read(@PathVariable int id) {
         DamageReport report = damageReportService.read(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Report not found"));
         return ResponseEntity.ok(DamageReportMapper.toDto(report));
     }
 
     @PutMapping("/update/{damageReportId}")
-    public ResponseEntity<DamageReportDTO> update(@PathVariable int damageReportId, @RequestBody DamageReport updatedReport) {
+    public ResponseEntity<DamageReportResponseDTO> update(@PathVariable int damageReportId, @RequestBody DamageReport updatedReport) {
         DamageReport updated = damageReportService.update(updatedReport);
         return ResponseEntity.ok(DamageReportMapper.toDto(updated));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<DamageReportDTO>> getAll() {
-        List<DamageReportDTO> dtoList = new ArrayList<>();
+    public ResponseEntity<List<DamageReportResponseDTO>> getAll() {
+        List<DamageReportResponseDTO> dtoList = new ArrayList<>();
         List<DamageReport> reportList = damageReportService.getAll();
         if (reportList.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No reports found");

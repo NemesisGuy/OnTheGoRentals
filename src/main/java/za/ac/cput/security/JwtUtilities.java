@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import za.ac.cput.domain.security.User;
+
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -39,6 +41,8 @@ public class JwtUtilities {
     private Long jwtExpiration;
 
 
+
+
     public String extractUsername(String token) {
 
         return extractClaim(token, Claims::getSubject);
@@ -46,7 +50,14 @@ public class JwtUtilities {
 
     public String extractUserEmail(String token) {
 
-        return extractClaim(token, Claims::getSubject);
+//        return extractClaim(token, Claims::getSubject);
+        System.out.println("Extracting email from token: " + token);
+        System.out.println((String) extractClaim(token, claims -> claims.get("email", String.class)));
+        return extractClaim(token, claims -> claims.get("email", String.class));
+
+    }
+    public String extractUserUuid(String token) {
+        return extractClaim(token, claims -> claims.get("uuid", String.class));
     }
 
 //    public Claims extractAllClaims(String token) {
@@ -93,7 +104,7 @@ public class JwtUtilities {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String email, List<String> roles) {
+    /* public String generateToken(String email, List<String> roles) {
         // Generate a JWT token with the given email and roles
         System.out.println("Generating token for user: " + email);
         return Jwts.builder()
@@ -103,7 +114,22 @@ public class JwtUtilities {
                 .expiration(Date.from(Instant.now().plus(jwtExpiration, ChronoUnit.MILLIS)))
                 .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)))
                 .compact();
+    }*/
+    public String generateToken(User user, List<String> roles) {
+        // Generate a JWT token with UUID, email, and roles
+        System.out.println("Generating token for user: " + user.getEmail());
+
+        return Jwts.builder()
+                .subject("user") // Optional - could be user.getUuid() if preferred
+                .claim("uuid", user.getUuid())
+                .claim("email", user.getEmail())
+                .claim("role", roles)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(Date.from(Instant.now().plus(jwtExpiration, ChronoUnit.MILLIS)))
+                .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)))
+                .compact();
     }
+
 
     public boolean validateToken(String token) {
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
