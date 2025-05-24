@@ -52,9 +52,8 @@ public class RentalFactory implements IFactory<Rental> {
                     .build();
         }*/
     public Rental create(Rental rental) {
-        Rental newRental = new Rental.Builder()
-                .copy(rental)
-                .build();
+        Rental.Builder newRental = new Rental.Builder()
+                .copy(rental);
 
         if (rental.getReturnedDate() != null) {
             newRental.setStatus(RentalStatus.COMPLETED);
@@ -62,7 +61,7 @@ public class RentalFactory implements IFactory<Rental> {
             newRental.setStatus(RentalStatus.ACTIVE);
         }
 
-        return newRental;
+        return newRental.build();
     }
 
 

@@ -16,10 +16,11 @@ public class RentalResponseDTO {
     private UUID uuid;
     private UserResponseDTO user;
     private CarResponseDTO car;
+    private DriverResponseDTO driver; // Assuming you have DriverResponseDTO
     private Integer issuer;
     private Integer receiver;
     private double fine;
     private LocalDateTime issuedDate;
-    private LocalDateTime returnedDate;
+    private LocalDateTime returnedDate; // Will be null until car is returned
     private String status;
 }

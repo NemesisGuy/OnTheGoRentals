@@ -1,95 +1,67 @@
-package za.ac.cput.domain;
+package za.ac.cput.domain; // Or your actual entity package
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
+import jakarta.persistence.*;
+import lombok.Getter; // Only getters
 
-import java.util.Objects;
+import java.time.LocalDateTime; // Assuming feedback might have a timestamp
 import java.util.UUID;
 
 @Entity
-
+@Getter
 public class Feedback {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     @Column(nullable = false, unique = true, updatable = false)
-    private UUID uuid = UUID.randomUUID();
-    private String name;
+    private UUID uuid;
+
+    private String name; // Name of the person giving feedback
+
+    @Column(columnDefinition = "TEXT")
     private String comment;
-    private boolean deleted = false;
-    @PrePersist
-    protected  void onCreate() {
-        if (this.uuid == null) {
-            this.uuid = UUID.randomUUID();
-        }
-    }
-    protected Feedback() {
 
-    }
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private boolean deleted;
+
+    // Protected no-arg constructor for JPA
+    protected Feedback() {}
+
+    // Private constructor to force use of builder
     private Feedback(Builder builder) {
         this.id = builder.id;
         this.uuid = builder.uuid;
         this.name = builder.name;
         this.comment = builder.comment;
+        this.createdAt = builder.createdAt;
         this.deleted = builder.deleted;
-
     }
 
-
-    public int getId() {
-        return id;
-    }
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public String getName() {
-        return name;
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
+        this.createdAt = LocalDateTime.now(); // Set createdAt only on persist
     }
 
-    public String getComment() {
-        return comment;
-    }
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Feedback feedback = (Feedback) o;
-        return id == feedback.id && deleted == feedback.deleted && Objects.equals(uuid, feedback.uuid) && Objects.equals(name, feedback.name) && Objects.equals(comment, feedback.comment);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, uuid, name, comment, deleted);
-    }
-
-    @Override
-    public String toString() {
-        return "Feedback{" +
-                "id=" + id +
-                ", uuid=" + uuid +
-                ", name='" + name + '\'' +
-                ", comment='" + comment + '\'' +
-                ", deleted=" + deleted +
-                '}';
-    }
-
+    // Static Builder class
     public static class Builder {
         private int id;
         private UUID uuid;
         private String name;
         private String comment;
-        private boolean deleted;
+        private LocalDateTime createdAt;
+        private boolean deleted = false; // Default
 
         public Builder setId(int id) {
             this.id = id;
             return this;
         }
+
         public Builder setUuid(UUID uuid) {
             this.uuid = uuid;
             return this;
@@ -104,24 +76,35 @@ public class Feedback {
             this.comment = comment;
             return this;
         }
+
+        public Builder setCreatedAt(LocalDateTime createdAt) { // Usually set by @PrePersist
+            this.createdAt = createdAt;
+            return this;
+        }
+
         public Builder setDeleted(boolean deleted) {
             this.deleted = deleted;
             return this;
         }
 
         public Builder copy(Feedback feedback) {
-            this.name = feedback.name;
-            this.comment = feedback.comment;
-            this.id = feedback.id;
-            this.deleted = feedback.deleted;
+            this.id = feedback.getId();
+            this.uuid = feedback.getUuid();
+            this.name = feedback.getName();
+            this.comment = feedback.getComment();
+            this.createdAt = feedback.getCreatedAt();
+            this.deleted = feedback.isDeleted();
             return this;
         }
 
         public Feedback build() {
-
-
+            if (name == null || name.trim().isEmpty()) {
+                // throw new IllegalStateException("Name cannot be empty for feedback");
+            }
+            if (comment == null || comment.trim().isEmpty()) {
+                // throw new IllegalStateException("Comment cannot be empty for feedback");
+            }
             return new Feedback(this);
         }
-
     }
 }

@@ -17,64 +17,50 @@ import java.util.UUID;
 @Getter
 @Entity
 public class HelpCenter {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     @Column(nullable = false, unique = true, updatable = false)
-    private UUID uuid = UUID.randomUUID();
+    private UUID uuid;
+
     private String title;
+    @Column(columnDefinition = "TEXT")
     private String content;
     private String category;
+
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
-    private boolean deleted = false;
+    @Column(nullable = false)
+    private boolean deleted;
 
-    @PrePersist
-    protected  void onCreate() {
-        if (this.uuid == null) {
-            this.uuid = UUID.randomUUID();
-        }
-    }
-    public HelpCenter() {
-    }
+    protected HelpCenter() {} // For JPA
 
-    public HelpCenter(Builder builder) {
+    private HelpCenter(Builder builder) {
         this.id = builder.id;
         this.uuid = builder.uuid;
-        this.category = builder.category;
         this.title = builder.title;
         this.content = builder.content;
+        this.category = builder.category;
         this.createdAt = builder.createdAt;
         this.updatedAt = builder.updatedAt;
         this.deleted = builder.deleted;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        HelpCenter that = (HelpCenter) o;
-        return id == that.id && deleted == that.deleted && Objects.equals(uuid, that.uuid) && Objects.equals(title, that.title) && Objects.equals(content, that.content) && Objects.equals(category, that.category) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) this.uuid = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+        this.deleted = false; // Default
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, uuid, title, content, category, createdAt, updatedAt, deleted);
-    }
-
-    @Override
-    public String toString() {
-        return "HelpCenter{" +
-                "id=" + id +
-                ", uuid=" + uuid +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", category='" + category + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", deleted=" + deleted +
-                '}';
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
     public static class Builder {

@@ -5,7 +5,9 @@ import org.springframework.stereotype.Repository;
 import za.ac.cput.domain.HelpCenter;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * IHelpCenterRepository.java
@@ -22,5 +24,9 @@ public interface IHelpCenterRepository extends JpaRepository<HelpCenter, Integer
 
     Optional<HelpCenter> findByIdAndDeletedFalse(Integer integer);
 
-    Object findByDeletedFalse();
+    List<HelpCenter>  findByDeletedFalse();
+
+    List<HelpCenter> findByCategoryAndDeletedFalse(String category);
+
+    Optional<HelpCenter> findByUuidAndDeletedFalse(UUID uuid);
 }

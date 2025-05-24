@@ -9,6 +9,7 @@ import za.ac.cput.service.IHelpCenterService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service("iHelpCenterServiceImpl")
 public class IHelpCenterServiceImpl implements IHelpCenterService {
@@ -52,8 +53,23 @@ public class IHelpCenterServiceImpl implements IHelpCenterService {
 
     @Override
     public List<HelpCenter> getAll() {
-        ArrayList<HelpCenter> allHelpCenters = (ArrayList<HelpCenter>) repository.findByDeletedFalse();
+        List<HelpCenter> allHelpCenters =  repository.findByDeletedFalse();
         return allHelpCenters;
+    }
+
+    @Override
+    public List<HelpCenter> findByCategory(String category) {
+        return repository.findByCategoryAndDeletedFalse(category);
+    }
+
+    @Override
+    public List<HelpCenter> read(String category) {
+        return repository.findByCategoryAndDeletedFalse(category);
+    }
+
+    @Override
+    public HelpCenter read(UUID uuid) {
+        return repository.findByUuidAndDeletedFalse(uuid).orElse(null);
     }
 
     public ArrayList<HelpCenter> getAllByCategory(String category) {

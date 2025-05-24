@@ -4,8 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import za.ac.cput.domain.Driver;
 
+
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface IDriverRepository extends JpaRepository<Driver, Integer> {
@@ -13,4 +15,6 @@ public interface IDriverRepository extends JpaRepository<Driver, Integer> {
 
 
     Optional<Driver> findByIdAndDeletedFalse(Integer id);
+
+    Optional<Driver> findByUuidAndDeletedFalse(UUID driverUuid);
 }

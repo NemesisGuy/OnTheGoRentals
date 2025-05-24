@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Rental;
-import za.ac.cput.domain.dto.dual.RentalDTO;
+
 import za.ac.cput.domain.dto.response.RentalResponseDTO;
 import za.ac.cput.domain.mapper.RentalMapper;
 import za.ac.cput.service.impl.RentalServiceImpl;

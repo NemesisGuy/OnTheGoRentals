@@ -12,7 +12,7 @@ public class FeedbackFactory implements IFactory<Feedback> {
         return new Feedback.Builder().setId(newId).build();
     }
 
-    public static Feedback createFeedback(String name, String comment) {
+/*    public static Feedback createFeedback(String name, String comment) {
         int newId = lastGeneratedId + 1;
         lastGeneratedId = newId;
         return new Feedback.Builder()
@@ -20,5 +20,5 @@ public class FeedbackFactory implements IFactory<Feedback> {
                 .setName(name)
                 .setComment(comment)
                 .build();
-    }
+    }*/
 }

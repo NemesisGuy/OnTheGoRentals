@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Booking;
 import za.ac.cput.domain.Car;
 import za.ac.cput.domain.Rental;
+import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.domain.security.User;
+import za.ac.cput.exception.BadRequestException;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.UserCantRentMoreThanOneCarException;
 import za.ac.cput.factory.impl.RentalFactory;
@@ -91,6 +93,13 @@ public class RentalServiceImpl implements IRentalService {
     public Rental read(Integer id) {
         return this.rentalRepository.findByIdAndDeletedFalse(id).orElse(null);
     }
+
+    @Override
+    public Rental read(UUID uuid) {
+        Optional<Rental> rental = this.rentalRepository.findByUuidAndDeletedFalse(uuid);
+        return rental.orElse(null);
+    }
+
 
     @Override
     @Transactional
@@ -206,4 +215,68 @@ public class RentalServiceImpl implements IRentalService {
         Optional<Rental> rental = rentalRepository.findByUuidAndDeletedFalse(rentalId);
         return rental.orElse(null);
     }
+    @Override
+    public Rental confirmRentalByUuid(UUID rentalUuid) {
+        Rental rental = read(rentalUuid);
+        if (rental.getStatus() != RentalStatus.PENDING_CONFIRMATION) {
+            System.out.println("Only PENDING_CONFIRMATION rentals can be confirmed. Current status: " + rental.getStatus());
+        }
+        Car car = rental.getCar();
+        if (!car.isAvailable() && (rental.getStatus() == RentalStatus.PENDING_CONFIRMATION || rental.getStatus() == RentalStatus.BOOKED) ) {
+            // If car became unavailable after initial booking but before confirmation.
+            // This check might be more complex if availability is nuanced.
+            // throw new BadRequestException("Car is no longer available for this rental period.");
+        }
+        Rental updatedRental = new Rental.Builder().copy(rental)
+                .setStatus(RentalStatus.CONFIRMED)
+                .setIssuedDate(LocalDateTime.now())
+                .build();
+        Car updatedCar = Car.builder().copy(car).available(false).build(); // Mark car as unavailable
+
+        carRepository.save(updatedCar); // Assuming Car entity is mutable for this flag
+        return rentalRepository.save(updatedRental);
+    }
+
+    @Override
+    public Rental cancelRentalByUuid(UUID rentalUuid) {
+        Rental rental = read(rentalUuid);
+        // Add business rules: e.g., cannot cancel if IN_PROGRESS or COMPLETED
+        if (rental.getStatus() == RentalStatus.IN_PROGRESS || rental.getStatus() == RentalStatus.COMPLETED) {
+            System.out.println("Cannot cancel a rental that is in progress or already completed.");
+        }
+        Rental updatedRental = new Rental.Builder().copy(rental).setStatus(RentalStatus.CANCELLED).build();
+        Car car = rental.getCar();
+        if (car == null) {
+            System.out.println("Cannot cancel rental: Car not found.");
+        }
+        Car updatedCar = Car.builder().copy(car).available(true).build(); // Make car available again
+
+            carRepository.save(updatedCar); // Save updated car status
+
+        return rentalRepository.save(updatedRental);
+    }
+
+    @Override
+    public Rental completeRentalByUuid(UUID rentalUuid, double fineAmount) {
+        Rental rental = read(rentalUuid);
+        if (rental.getStatus() != RentalStatus.IN_PROGRESS && rental.getStatus() != RentalStatus.CONFIRMED) { // Or only IN_PROGRESS
+            System.out.println("Rental cannot be completed from its current state: " + rental.getStatus());
+        }
+        Rental updatedRental = new Rental.Builder().copy(rental)
+                .setStatus(RentalStatus.COMPLETED)
+                .setReturnedDate(LocalDateTime.now())
+                .setFine((int) fineAmount)
+                .build();
+
+        // Make car available again
+        Car car = rental.getCar();
+        Car updatedCar = Car.builder().copy(car).available(true).build();
+
+
+            carRepository.save(updatedCar); // Save updated car status
+
+        return rentalRepository.save(updatedRental);
+    }
+
+
 }

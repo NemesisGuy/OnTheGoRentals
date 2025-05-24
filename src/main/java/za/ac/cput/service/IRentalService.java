@@ -9,11 +9,13 @@ import za.ac.cput.domain.security.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public interface IRentalService extends IService<Rental, Integer> {
     Rental create(Rental rental);
 
     Rental read(Integer id);
+    Rental read(UUID uuid);
 
     Rental update(Rental rental);
 
@@ -24,6 +26,12 @@ public interface IRentalService extends IService<Rental, Integer> {
     boolean existsById(Integer id);
 
     List<Rental> getRentalHistoryByUser(User currentUserEntity);
+
+    Rental confirmRentalByUuid(UUID rentalUuid);
+
+    Rental cancelRentalByUuid(UUID rentalUuid);
+
+    Rental completeRentalByUuid(UUID rentalUuid, double fineAmount);
 
     //s List<Rental> getRentalHistoryByUser(User user);  // Returns a list of rentals
 }

@@ -1,7 +1,7 @@
 package za.ac.cput.domain.mapper;
 
 import za.ac.cput.domain.Booking;
-import za.ac.cput.domain.dto.dual.BookingDTO;
+
 import za.ac.cput.domain.dto.response.BookingResponseDTO;
 
 

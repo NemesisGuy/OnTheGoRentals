@@ -2,6 +2,7 @@ package za.ac.cput.domain;
 
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.domain.security.User;
@@ -16,6 +17,7 @@ import java.util.UUID;
  * Date: April 2023
  * Rental Class.java
  */
+@Getter
 
 @Entity
 public class Rental implements Serializable {
@@ -29,11 +31,11 @@ public class Rental implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY) // Good to keep LAZY
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY) // Good to keep LAZY
-    @JoinColumn(name = "car_id")
+    @JoinColumn(name = "car_id", nullable = false)
     private Car car;
 
     @ManyToOne(fetch = FetchType.LAZY) // Good to keep LAZY
@@ -43,21 +45,39 @@ public class Rental implements Serializable {
     private int issuer;
     private int receiver;
     private int fine;
+    @Column(nullable = false)
+
     private LocalDateTime issuedDate;
     private LocalDateTime returnedDate;
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RentalStatus status;
+    @Column(nullable = false)
     private boolean deleted = false;
+
+    @Column(updatable = false, nullable = false)
+    private LocalDateTime createdAt; // Added for tracking
+    @Column(nullable = false)
+    private LocalDateTime updatedAt; // Added for tracking
+
     @PrePersist
-    protected  void onCreate() {
-        if (this.uuid == null) {
-            this.uuid = UUID.randomUUID();
-        }
+    protected void onCreate() {
+        if (this.uuid == null) this.uuid = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+        this.deleted = false; // Default
+        if (this.status == null) this.status = RentalStatus.PENDING_CONFIRMATION; // Default status
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
     public Rental() {
     }
 
-    public Rental(int id, User user, Car car, int issuer, int receiver, int fine, LocalDateTime issuedDate, LocalDateTime returnedDate, RentalStatus status) {
+    public Rental(int id, User user, Car car, int issuer, int receiver, int fine, LocalDateTime issuedDate, LocalDateTime returnedDate, RentalStatus status , LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.user = user;
         this.car = car;
@@ -68,6 +88,8 @@ public class Rental implements Serializable {
         this.returnedDate = returnedDate;
         this.deleted = false;
         this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     private Rental(Builder builder) {
@@ -83,114 +105,21 @@ public class Rental implements Serializable {
         this.returnedDate = builder.returnedDate;
         this.deleted = builder.deleted;
         this.status = builder.status;
+        this.createdAt = builder.createdAt;
+        this.updatedAt = builder.updatedAt;
     }
 
-    public int getId() {
-        return id;
-    }
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
-
-    public Car getCar() {
-        return car;
-    }
-
-    public void setCar(Car car) {
-        this.car = car;
-    }
-
-    public Driver getDriver() {
-        return driver;
-    }
-
-    public void setDriver(Driver driver) {
-        this.driver = driver;
-    }
-
-    public int getIssuer() {
-        return issuer;
-    }
-
-    public void setIssuer(int issuer) {
-        this.issuer = issuer;
-    }
-
-    public int getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(int receiver) {
-        this.receiver = receiver;
-    }
-
-    public int getFine() {
-        return fine;
-    }
-
-    public void setFine(int fine) {
-        this.fine = fine;
-    }
-
-    public LocalDateTime getIssuedDate() {
-        return issuedDate;
-    }
-
-    public void setIssuedDate(LocalDateTime issuedDate) {
-        this.issuedDate = issuedDate;
-    }
-
-    public LocalDateTime getReturnedDate() {
-        return returnedDate;
-    }
-
-    public void setReturnedDate(LocalDateTime returnedDate) {
-        this.returnedDate = returnedDate;
-    }
-    public boolean isDeleted() {
-        return deleted;
-    }
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    public RentalStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(RentalStatus status) {
-        this.status = status;
-    }
-
-    public boolean finePaid() {
-        return false; // Placeholder logic
-    }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Rental rental = (Rental) o;
-        return id == rental.id && issuer == rental.issuer && receiver == rental.receiver && fine == rental.fine && deleted == rental.deleted && Objects.equals(uuid, rental.uuid) && Objects.equals(user, rental.user) && Objects.equals(car, rental.car) && Objects.equals(driver, rental.driver) && Objects.equals(issuedDate, rental.issuedDate) && Objects.equals(returnedDate, rental.returnedDate) && status == rental.status;
+        return id == rental.id && issuer == rental.issuer && receiver == rental.receiver && fine == rental.fine && deleted == rental.deleted && Objects.equals(uuid, rental.uuid) && Objects.equals(user, rental.user) && Objects.equals(car, rental.car) && Objects.equals(driver, rental.driver) && Objects.equals(issuedDate, rental.issuedDate) && Objects.equals(returnedDate, rental.returnedDate) && status == rental.status && Objects.equals(createdAt, rental.createdAt) && Objects.equals(updatedAt, rental.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, uuid, user, car, driver, issuer, receiver, fine, issuedDate, returnedDate, status, deleted);
+        return Objects.hash(id, uuid, user, car, driver, issuer, receiver, fine, issuedDate, returnedDate, status, deleted, createdAt, updatedAt);
     }
 
     @Override
@@ -208,6 +137,8 @@ public class Rental implements Serializable {
                 ", returnedDate=" + returnedDate +
                 ", status=" + status +
                 ", deleted=" + deleted +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
     // Builder pattern
@@ -224,6 +155,8 @@ public class Rental implements Serializable {
         private LocalDateTime returnedDate;
         private RentalStatus status;
         private boolean deleted;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
 
 
 
@@ -283,6 +216,14 @@ public class Rental implements Serializable {
 
         public Builder setDeleted(boolean deleted) {
             this.deleted = deleted;
+            return this;
+        }
+        public Builder setCreatedAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+        public Builder setUpdatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
             return this;
         }
 

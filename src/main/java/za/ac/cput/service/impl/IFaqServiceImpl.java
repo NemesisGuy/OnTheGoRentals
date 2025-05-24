@@ -6,8 +6,8 @@ import za.ac.cput.domain.Faq;
 import za.ac.cput.repository.IFaqRepository;
 import za.ac.cput.service.IFaqService;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service("iFaqServiceImpl")
 public class IFaqServiceImpl implements IFaqService {
@@ -27,6 +27,11 @@ public class IFaqServiceImpl implements IFaqService {
     @Override
     public Faq read(Integer integer) {
         return repository.findByIdAndDeletedFalse(integer).orElse(null);
+    }
+
+    @Override
+    public Faq read(UUID uuid) {
+        return repository.findByUuidAndDeletedFalse(uuid).orElse(null);
     }
 
     @Override

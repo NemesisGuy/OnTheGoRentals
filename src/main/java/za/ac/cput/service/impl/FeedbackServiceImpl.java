@@ -9,6 +9,7 @@ import za.ac.cput.service.IFeedbackService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class FeedbackServiceImpl implements IFeedbackService {
@@ -30,6 +31,11 @@ public class FeedbackServiceImpl implements IFeedbackService {
     public Feedback read(Integer id) {
         Optional<Feedback> optionalFeedback = repository.findByIdAndDeletedFalse(id);
         return optionalFeedback.orElse(null);
+    }
+
+    @Override
+    public Feedback read(UUID uuid) {
+        return repository.findByUuidAndDeletedFalse(uuid).orElse(null);
     }
 
     @Override

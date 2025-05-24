@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.dto.dual.UserDTO;
+
 import za.ac.cput.domain.dto.response.UserResponseDTO;
 import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.domain.security.Role;

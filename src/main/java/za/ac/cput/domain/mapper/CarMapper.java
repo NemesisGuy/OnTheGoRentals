@@ -1,7 +1,6 @@
 package za.ac.cput.domain.mapper;
 
 import za.ac.cput.domain.Car;
-import za.ac.cput.domain.dto.dual.CarDTO;
 import za.ac.cput.domain.dto.request.CarRequestDTO;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
 
@@ -11,7 +10,7 @@ import java.util.stream.Collectors;
 
 
 import za.ac.cput.domain.Car; // Your Car Entity
-import za.ac.cput.domain.dto.response.CarResponseDTO;
+
 // Import CarCreateDTO, CarUpdateDTO if you have them
 
 import java.util.List;

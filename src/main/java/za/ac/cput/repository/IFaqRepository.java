@@ -5,8 +5,10 @@ import org.springframework.stereotype.Repository;
 import za.ac.cput.domain.Faq;
 
 
+
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * IFaqRepository.java
@@ -20,4 +22,6 @@ public interface IFaqRepository extends JpaRepository<Faq, Integer> {
     List<Faq> findByDeletedFalse();
 
    Optional <Faq> findByIdAndDeletedFalse(Integer integer);
+
+    Optional <Faq> findByUuidAndDeletedFalse(UUID uuid);
 }

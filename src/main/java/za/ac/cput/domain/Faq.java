@@ -1,6 +1,7 @@
 package za.ac.cput.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -12,7 +13,7 @@ import java.util.UUID;
  * Author: Aqeel Hanslo (219374422)
  * Date: 29 August 2023
  */
-
+@Getter
 @Entity
 public class Faq {
     @Id
@@ -20,17 +21,34 @@ public class Faq {
     private int id;
     @Column(nullable = false, unique = true, updatable = false)
     private UUID uuid = UUID.randomUUID();
+    @Column(columnDefinition = "TEXT")
+
     private String question;
+    @Column(columnDefinition = "TEXT")
+
     private String answer;
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
+    @Column(nullable = false)
     private boolean deleted = false;
+
     @PrePersist
-    protected  void onCreate() {
+    protected void onCreate() {
         if (this.uuid == null) {
             this.uuid = UUID.randomUUID();
         }
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now; // Set createdAt only on persist
+        this.updatedAt = now; // Set updatedAt on persist as well
     }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now(); // Update updatedAt on any update
+    }
+
 
     public Faq() {
     }
@@ -47,32 +65,6 @@ public class Faq {
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    public int getId() {
-        return id;
-    }
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public String getQuestion() {
-        return question;
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-    public boolean isDeleted() {
-        return deleted;
     }
 
     @Override

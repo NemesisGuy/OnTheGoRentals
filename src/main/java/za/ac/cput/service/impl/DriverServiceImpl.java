@@ -7,6 +7,7 @@ import za.ac.cput.repository.IDriverRepository;
 import za.ac.cput.service.IDriverService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DriverServiceImpl implements IDriverService {
@@ -48,7 +49,24 @@ public class DriverServiceImpl implements IDriverService {
     }
 
     @Override
+    public boolean delete(UUID uuid) {
+        Driver driver = this.repository.findByUuidAndDeletedFalse(uuid).orElse(null);
+        if (driver != null) {
+            driver = new Driver.Builder().copy(driver).setDeleted(true).build();
+            this.repository.save(driver);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public List<Driver> getAll() {
         return this.repository.findByDeletedFalse();
     }
+
+    @Override
+    public Driver read(UUID uuid) {
+        return this.repository.findByUuidAndDeletedFalse(uuid).orElse(null);
+    }
+
 }

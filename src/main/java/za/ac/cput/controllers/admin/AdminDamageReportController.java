@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import za.ac.cput.domain.DamageReport;
-import za.ac.cput.domain.dto.dual.DamageReportDTO;
+
 import za.ac.cput.domain.dto.response.DamageReportResponseDTO;
 import za.ac.cput.domain.mapper.DamageReportMapper;
 import za.ac.cput.service.impl.DamageReportServiceImpl;
