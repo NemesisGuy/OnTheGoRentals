@@ -23,5 +23,7 @@ public interface IRentalService extends IService<Rental, Integer> {
 
     boolean existsById(Integer id);
 
-   //s List<Rental> getRentalHistoryByUser(User user);  // Returns a list of rentals
+    List<Rental> getRentalHistoryByUser(User currentUserEntity);
+
+    //s List<Rental> getRentalHistoryByUser(User user);  // Returns a list of rentals
 }

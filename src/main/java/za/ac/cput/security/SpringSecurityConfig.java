@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -40,46 +41,69 @@ public class SpringSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-               // .cors(Customizer.withDefaults())
+                // .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
-                        // User endpoints
-                        .requestMatchers("/api/user/register").permitAll()
-                        .requestMatchers("/api/user/authenticate").permitAll()
-                        .requestMatchers("/api/user/refresh").permitAll() // <<< ADD THIS
-                        .requestMatchers("/api/user/logout").authenticated() // <<< ADD THIS (needs auth to identify user for logout)
-                        .requestMatchers("/api/oauth2/google/login").permitAll() // Or /api/oauth2/google/code
-                        .requestMatchers("/api/user/profile/*").authenticated()
-                        .requestMatchers("/api/user/profile/*/*").authenticated()
-                        .requestMatchers("/api/user/rentals/*").authenticated()
-                        // User about and contact us endpoints
-                        .requestMatchers("/api/v1/about-us").permitAll()
-                        .requestMatchers("/api/v1/about-us/*").permitAll()
-                        .requestMatchers("/api/aboutUs/read/*").permitAll()
-                        .requestMatchers("/api/aboutUs/all").permitAll()
-                        .requestMatchers("/api/aboutUs/latest").permitAll()
-                        .requestMatchers("/api/contactUs/create").permitAll()
-                        // User settings endpoints
-                        .requestMatchers("/api/settings/read").permitAll()
-                        // User car endpoints
-                        .requestMatchers("/api/v1/cars").permitAll()
-                        .requestMatchers("/api/v1/cars/**").permitAll()
-                        // Help center and FAQ user endpoints
-                        .requestMatchers("/api/faq/**").permitAll()
-                        .requestMatchers("/api/help-center/**").permitAll()
-                        // User booking endpoints
-                        .requestMatchers("/api/bookings/**").permitAll() // for dev purposes
-                        .requestMatchers("/api/v1/bookings").permitAll() // for dev purposes
-                        .requestMatchers("/api/v1/bookings/**").permitAll() // for dev purposes
-                        ///actuator/prometheus
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/actuator/prometheus").permitAll()
-                        ///actuator/prometheus
-                        .requestMatchers("/metrics").permitAll()
-                        .requestMatchers("/metrics/**").permitAll()
+                                // Permit OPTIONS requests globally for preflight
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                // User endpoints
+                                .requestMatchers("/api/user/register").permitAll()
+                                .requestMatchers("/api/user/authenticate").permitAll()
+                                .requestMatchers("/api/user/refresh").permitAll() // <<< ADD THIS
+                                .requestMatchers("/api/user/logout").authenticated() // <<< ADD THIS (needs auth to identify user for logout)
+                                .requestMatchers("/api/oauth2/google/login").permitAll() // Or /api/oauth2/google/code
+                                .requestMatchers("/api/user/profile/*").authenticated()
+                                .requestMatchers("/api/user/profile/*/*").authenticated()
+                                .requestMatchers("/api/user/rentals/*").authenticated()
 
-                        // Admin endpoints
-                        .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
-                        .requestMatchers("/api/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+
+                                // User about and contact us endpoints
+                                .requestMatchers("/api/v1/about-us").permitAll()
+                                .requestMatchers("/api/v1/about-us/*").permitAll()
+                                .requestMatchers("/api/aboutUs/read/*").permitAll()
+                                .requestMatchers("/api/aboutUs/all").permitAll()
+                                .requestMatchers("/api/aboutUs/latest").permitAll()
+                                .requestMatchers("/api/contactUs/create").permitAll()
+                                // User settings endpoints
+                                .requestMatchers("/api/settings/read").permitAll()
+                                // User car endpoints
+                                .requestMatchers("/api/v1/cars").permitAll()
+                                .requestMatchers("/api/v1/cars/**").permitAll()
+                                // Help center and FAQ user endpoints
+                                .requestMatchers("/api/faq/**").permitAll()
+                                .requestMatchers("/api/help-center/**").permitAll()
+                                // User booking endpoints
+                                .requestMatchers("/api/bookings/**").permitAll() // for dev purposes
+                                .requestMatchers("/api/v1/bookings").permitAll() // for dev purposes
+                                .requestMatchers("/api/v1/bookings/**").permitAll() // for dev purposes
+                                ///actuator/prometheus
+                                .requestMatchers("/actuator/**").permitAll()
+                                .requestMatchers("/actuator/prometheus").permitAll()
+                                ///actuator/prometheus
+                                .requestMatchers("/metrics").permitAll()
+                                .requestMatchers("/metrics/**").permitAll()
+
+                                // Admin endpoints
+                                .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+                                .requestMatchers("/api/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                // User endpoints V1
+                                // Authentication Endpoints (Public)
+                                .requestMatchers("/api/v1/auth/register").permitAll()
+                                .requestMatchers("/api/v1/auth/login").permitAll()
+                                .requestMatchers("/api/v1/auth/refresh").permitAll()
+
+                                // Authentication Endpoints (Authenticated)
+                                .requestMatchers("/api/v1/auth/logout").authenticated()
+
+                                // Current User's Profile & Data (Authenticated)
+                                .requestMatchers("/api/v1/users/me/**").authenticated()
+
+
+                                // Deny all other requests by default if not explicitly permitted
+                                .anyRequest().authenticated()
+
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
