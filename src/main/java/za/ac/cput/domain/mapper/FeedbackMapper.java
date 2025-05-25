@@ -1,6 +1,6 @@
 package za.ac.cput.domain.mapper;
 
-import za.ac.cput.domain.Feedback; // Your Feedback Entity
+import za.ac.cput.domain.entity.Feedback; // Your Feedback Entity
 import za.ac.cput.domain.dto.request.FeedbackCreateDTO;
 // import za.ac.cput.domain.dto.request.FeedbackUpdateDTO; // If you add an update DTO
 import za.ac.cput.domain.dto.response.FeedbackResponseDTO;

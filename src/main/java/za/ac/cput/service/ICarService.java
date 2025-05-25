@@ -4,7 +4,7 @@ package za.ac.cput.service;
  */
 
 import jakarta.validation.constraints.NotNull;
-import za.ac.cput.domain.Car;
+import za.ac.cput.domain.entity.Car;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,7 +22,7 @@ public interface ICarService extends IService<Car, Integer> {
 
     List<Car> getAllAvailableCars();
 
-    Car read(@NotNull(message = "Car UUID cannot be null") UUID carUuid);
+    Car read(UUID uuid);
 
     List<Car> findAllAvailableAndNonDeleted();
 }

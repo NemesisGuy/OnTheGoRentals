@@ -1,8 +1,9 @@
 package za.ac.cput.domain.mapper;
 
-import za.ac.cput.domain.Car;
-import za.ac.cput.domain.Driver;
-import za.ac.cput.domain.Rental;
+import za.ac.cput.domain.entity.Car;
+import za.ac.cput.domain.entity.Driver;
+import za.ac.cput.domain.entity.Rental;
+import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.domain.dto.request.RentalRequestDTO;
 import za.ac.cput.domain.dto.request.RentalUpdateDTO; // Assuming you create this
@@ -10,7 +11,6 @@ import za.ac.cput.domain.dto.response.CarResponseDTO;
 import za.ac.cput.domain.dto.response.DriverResponseDTO;
 import za.ac.cput.domain.dto.response.RentalResponseDTO;
 import za.ac.cput.domain.dto.response.UserResponseDTO;
-import za.ac.cput.domain.enums.RentalStatus; // Ensure correct import
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,6 +60,35 @@ public class RentalMapper {
                 // uuid, id, createdAt, updatedAt, deleted handled by entity/JPA
                 .build();
     }
+    /*// For Creating a Rental (used by Admin or User flow if DTO is same)
+    // Service layer will fetch User, Car, Driver entities based on UUIDs in createDto
+    public static Rental toEntity(RentalRequestDTO createDto, User userEntity, Car carEntity, Driver driverEntity) {
+        if (createDto == null) throw new IllegalArgumentException("RentalRequestDTO cannot be null.");
+        if (userEntity == null) throw new IllegalArgumentException("User entity is required.");
+        if (carEntity == null) throw new IllegalArgumentException("Car entity is required.");
+
+        Rental.Builder builder = new Rental.Builder()
+                .setUser(userEntity)
+                .setCar(carEntity)
+                .setDriver(driverEntity) // driverEntity can be null
+                .setIssuedDate(createDto.getIssuedDate())
+                .setReturnedDate(createDto.getReturnedDate());
+
+        if (createDto.getStatus() != null) {
+            builder.setStatus(createDto.getStatus());
+        } else {
+            // Default status for a new rental, could be different if admin creates vs user
+            builder.setStatus(RentalStatus.PENDING_CONFIRMATION);
+        }
+        if (createDto.getIssuer() != null) {
+            builder.setIssuer(createDto.getIssuer());
+        }
+        // uuid, id, createdAt, updatedAt, deleted handled by entity/JPA @PrePersist or defaults
+        // fine, receiverId usually not set on initial creation by user/basic admin.
+
+        return builder.build();
+    }*/
+
 
     public static Rental applyUpdateDtoToEntity(RentalUpdateDTO updateDto, Rental existingRental, Car newCarEntity, Driver newDriverEntity) {
         if (updateDto == null || existingRental == null) {

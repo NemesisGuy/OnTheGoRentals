@@ -2,8 +2,8 @@ package za.ac.cput.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.Booking;
-import za.ac.cput.domain.Car;
+import za.ac.cput.domain.entity.Booking;
+import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.ResourceNotFoundException;
@@ -50,16 +50,19 @@ public class IBookingServiceImpl implements IBookingService {
         if (!activeBookings.isEmpty()) {
             throw new CarNotAvailableException("Car is already booked for the selected period.");
         }
-        booking.setStatus("PENDING");
-        booking.setCar(car);
-        booking.setUser(user);
+        Booking.Builder builder = new Booking.Builder().copy(booking);
+
+        builder.setStatus("PENDING");
+        builder.setCar(car);
+        builder.setUser(user);
         return bookingRepository.save(booking);
     }
 
     public Booking confirmBooking(int bookingId) {
         Booking booking = bookingRepository.findByIdAndDeletedFalse(bookingId).orElse(null);
         if (booking != null) {
-            booking.setStatus("CONFIRMED");
+            Booking updatedBooking = new Booking.Builder().copy(booking).setStatus("CONFIRMED").build();
+            booking = updatedBooking;
             return bookingRepository.save(booking);
         }
         return null;
@@ -68,7 +71,8 @@ public class IBookingServiceImpl implements IBookingService {
     public Booking cancelBooking(int bookingId) {
         Booking booking = bookingRepository.findByIdAndDeletedFalse(bookingId).orElse(null);
         if (booking != null) {
-            booking.setStatus("CANCELED");
+            Booking updatedBooking = new Booking.Builder().copy(booking).setStatus("CANCELED").build();
+            booking = updatedBooking;
             return bookingRepository.save(booking);
         }
         return null;
@@ -93,6 +97,12 @@ public class IBookingServiceImpl implements IBookingService {
     public Booking read(int id) {
         return bookingRepository.findByIdAndDeletedFalse(id).orElse(null);
     }
+
+    @Override
+    public Booking read(UUID uuid) {
+        return bookingRepository.findByUuidAndDeletedFalse(uuid).orElse(null);
+    }
+
     public Booking readByUuid(UUID id) {
         return bookingRepository.findByUuidAndDeletedFalse(id).orElse(null);
     }
@@ -103,9 +113,11 @@ public class IBookingServiceImpl implements IBookingService {
         Booking existingBooking = bookingRepository.findById(updatedBooking.getId()).orElse(null);
 
         if (existingBooking != null) {
+            Booking.Builder builder = new Booking.Builder().copy(existingBooking);
             System.out.println("BookingServiceImpl: updateById, updating booking with ID: " + updatedBooking.getId());
-            existingBooking.setBookingStartDate(updatedBooking.getBookingStartDate());
-            existingBooking.setBookingEndDate(updatedBooking.getBookingEndDate());
+
+            builder.setStartDate(updatedBooking.getStartDate());
+            builder.setEndDate(updatedBooking.getEndDate());
             // Update other properties as needed
 
             return bookingRepository.save(existingBooking);
@@ -121,7 +133,7 @@ public class IBookingServiceImpl implements IBookingService {
             //throw new ResourceNotFoundException("Booking not found")
             return false;
         }
-        booking = new Booking.Builder().copy(booking).deleted(true).build();
+        booking = new Booking.Builder().copy(booking).setDeleted(true).build();
         bookingRepository.save(booking);
         return true;
 
@@ -133,10 +145,7 @@ public class IBookingServiceImpl implements IBookingService {
     }
 
 
-    @Override
-    public Booking getBookingById(int bookingId) {
-        return bookingRepository.findByIdAndDeletedFalse(bookingId).orElse(null);
-    }
+
 
     @Override
     public Booking update(Booking booking) {

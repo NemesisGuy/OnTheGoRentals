@@ -1,10 +1,9 @@
-package za.ac.cput.domain;
+package za.ac.cput.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.UUID;
 
 /**

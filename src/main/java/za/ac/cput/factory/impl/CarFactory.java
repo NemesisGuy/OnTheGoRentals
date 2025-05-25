@@ -6,7 +6,7 @@ package za.ac.cput.factory.impl;
  */
 
 import org.springframework.stereotype.Component;
-import za.ac.cput.domain.Car;
+import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.enums.PriceGroup;
 import za.ac.cput.factory.IFactory;
 

@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.Faq; // Service layer works with this
+import za.ac.cput.domain.entity.Faq; // Service layer works with this
 import za.ac.cput.domain.dto.request.FaqCreateDTO;
 import za.ac.cput.domain.dto.request.FaqUpdateDTO;
 import za.ac.cput.domain.dto.response.FaqResponseDTO;

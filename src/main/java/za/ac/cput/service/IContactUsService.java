@@ -4,20 +4,23 @@ package za.ac.cput.service;
  * Date: 23/09/2023
  */
 
-import za.ac.cput.domain.ContactUs;
+import za.ac.cput.domain.entity.ContactUs;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 public interface IContactUsService {
 
     ContactUs create(ContactUs contactUs);
 
     ContactUs read(int id);
+    ContactUs read(UUID uuid);
 
     ContactUs update(ContactUs contactUs);
 
-    boolean deleteById(int id);
+    boolean delete(int id);
 
-    ArrayList<ContactUs> findAll();
+    ArrayList<ContactUs> getAll();
+
+
 }

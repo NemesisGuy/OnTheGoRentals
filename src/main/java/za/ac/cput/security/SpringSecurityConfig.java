@@ -99,7 +99,9 @@ public class SpringSecurityConfig {
 
                                 // Current User's Profile & Data (Authenticated)
                                 .requestMatchers("/api/v1/users/me/**").authenticated()
-
+                                // Admin endpoints
+                                .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+                                .requestMatchers("/api/v1/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
 
                                 // Deny all other requests by default if not explicitly permitted
                                 .anyRequest().authenticated()

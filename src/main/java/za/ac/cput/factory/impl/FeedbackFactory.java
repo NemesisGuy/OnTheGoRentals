@@ -1,6 +1,6 @@
 package za.ac.cput.factory.impl;
 
-import za.ac.cput.domain.Feedback;
+import za.ac.cput.domain.entity.Feedback;
 import za.ac.cput.factory.IFactory;
 
 public class FeedbackFactory implements IFactory<Feedback> {

@@ -5,11 +5,12 @@ package za.ac.cput.service.impl;
  */
 
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.ContactUs;
+import za.ac.cput.domain.entity.ContactUs;
 import za.ac.cput.repository.ContactUsRepository;
 import za.ac.cput.service.IContactUsService;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Service("ContactUsServiceImpl")
 public class ContactUsServiceImpl implements IContactUsService {
@@ -31,6 +32,11 @@ public class ContactUsServiceImpl implements IContactUsService {
     }
 
     @Override
+    public ContactUs read(UUID uuid) {
+        return this.repository.findByUuidAndDeletedFalse(uuid).orElse(null);
+    }
+
+    @Override
     public ContactUs update(ContactUs contactUs) {
         if (this.repository.existsById(contactUs.getId())) {
             return this.repository.save(contactUs);
@@ -39,8 +45,8 @@ public class ContactUsServiceImpl implements IContactUsService {
     }
 
     @Override
-    public boolean deleteById(int id) {
-        ContactUs contactUs = this.repository.findById(id).orElse(null);
+    public boolean delete(int id) {
+        ContactUs contactUs = this.repository.findByIdAndDeletedFalse(id).orElse(null);
         if (contactUs != null && !contactUs.isDeleted()) {
             contactUs = new ContactUs.Builder().copy(contactUs).setDeleted(true).build();
             repository.save(contactUs);
@@ -50,7 +56,7 @@ public class ContactUsServiceImpl implements IContactUsService {
     }
 
     @Override
-    public ArrayList<ContactUs> findAll() {
+    public ArrayList<ContactUs> getAll() {
         ArrayList<ContactUs> all = (ArrayList<ContactUs>) this.repository.findByDeletedFalse();
         return all;
     }

@@ -1,6 +1,6 @@
 package za.ac.cput.service;
 
-import za.ac.cput.domain.Driver;
+import za.ac.cput.domain.entity.Driver;
 
 import java.util.List;
 import java.util.UUID;

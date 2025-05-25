@@ -1,14 +1,10 @@
-package za.ac.cput.domain;
+package za.ac.cput.domain.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.enums.PriceGroup;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 /**

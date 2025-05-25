@@ -11,13 +11,14 @@ import org.springframework.stereotype.Service;
 import za.ac.cput.domain.entity.DamageReport;
 import za.ac.cput.repository.IDamageReportRepository;
 import za.ac.cput.repository.RentalRepository;
-import za.ac.cput.service.IDamageReport;
+import za.ac.cput.service.IDamageReportService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
-public class DamageReportServiceImpl implements IDamageReport {
+public class DamageReportServiceServiceImpl implements IDamageReportService {
     @Autowired
     private IDamageReportRepository repository;
     //rental repository
@@ -28,7 +29,7 @@ public class DamageReportServiceImpl implements IDamageReport {
     private RentalServiceImpl rentalService;
 
     @Autowired
-    private DamageReportServiceImpl(IDamageReportRepository repository) {
+    private DamageReportServiceServiceImpl(IDamageReportRepository repository) {
         this.repository = repository;
     }
 
@@ -54,6 +55,11 @@ public class DamageReportDTO {
         return this.repository.findByIdAndDeletedFalse(id);
     }
 
+    @Override
+    public DamageReport read(UUID uuid) {
+        //optional
+        return this.repository.findByUuidAndDeletedFalse(uuid);
+    }
 
 
     @Override

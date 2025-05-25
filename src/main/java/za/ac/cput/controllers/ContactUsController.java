@@ -5,9 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.ContactUs; // Service will work with this
-import za.ac.cput.domain.dto.request.ContactUsRequestDTO; // Request DTO
-import za.ac.cput.domain.dto.request.ContactUsRequestDTO;
+import za.ac.cput.domain.entity.ContactUs; // Service will work with this
+import za.ac.cput.domain.dto.request.ContactUsCreateDTO;
 import za.ac.cput.domain.dto.response.ContactUsResponseDTO; // Response DTO
 import za.ac.cput.domain.mapper.ContactUsMapper;
 import za.ac.cput.service.IContactUsService; // Inject interface
@@ -32,7 +31,7 @@ public class ContactUsController {
      */
     @PostMapping // POST to the collection URI /api/v1/contact-us
     public ResponseEntity<ContactUsResponseDTO> createContactSubmission(
-            @Valid @RequestBody ContactUsRequestDTO contactUsCreateDTO
+            @Valid @RequestBody ContactUsCreateDTO contactUsCreateDTO
     ) {
         // 1. Controller receives the DTO
         // 2. Map DTO to Entity (or pass DTO to service if service handles mapping)

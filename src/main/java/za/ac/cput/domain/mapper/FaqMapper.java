@@ -1,6 +1,6 @@
 package za.ac.cput.domain.mapper;
 
-import za.ac.cput.domain.Faq; // Your Faq Entity
+import za.ac.cput.domain.entity.Faq; // Your Faq Entity
 import za.ac.cput.domain.dto.request.FaqCreateDTO;
 import za.ac.cput.domain.dto.request.FaqUpdateDTO;
 import za.ac.cput.domain.dto.response.FaqResponseDTO;

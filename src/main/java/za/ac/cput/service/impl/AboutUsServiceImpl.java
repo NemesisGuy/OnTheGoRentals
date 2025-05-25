@@ -7,11 +7,12 @@ package za.ac.cput.service.impl;
  */
 
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.AboutUs;
+import za.ac.cput.domain.entity.AboutUs;
 import za.ac.cput.repository.AboutUsRepository;
 import za.ac.cput.service.IAboutUsService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AboutUsServiceImpl implements IAboutUsService {
@@ -31,6 +32,11 @@ public class AboutUsServiceImpl implements IAboutUsService {
     public AboutUs read(int id) {
         return this.repository.findByIdAndDeletedFalse(id).orElse(null);
     }
+    @Override
+    public AboutUs read(UUID uuid) {
+        return this.repository.findByUuidAndDeletedFalse(uuid).orElse(null);
+    }
+
 
     @Override
     public AboutUs update(AboutUs aboutUs) {

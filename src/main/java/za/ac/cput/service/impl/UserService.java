@@ -262,6 +262,12 @@ public class UserService implements IUserService {
     public User read(Integer id) {
         return iUserRepository.findByIdAndDeletedFalse(id).orElse(null);
     }
+
+    @Override
+    public User read(UUID uuid) {
+        return iUserRepository.findByUuidAndDeletedFalse(uuid).orElse(null);
+    }
+
     public User readByUuid(UUID uuid) {
         return iUserRepository.findByUuidAndDeletedFalse(uuid).orElse(null);
     }

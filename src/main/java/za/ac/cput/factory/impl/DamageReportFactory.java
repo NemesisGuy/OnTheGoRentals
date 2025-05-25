@@ -6,8 +6,8 @@ package za.ac.cput.factory.impl;
  * Date: 08/09/2023
  */
 
-import za.ac.cput.domain.DamageReport;
-import za.ac.cput.domain.Rental;
+import za.ac.cput.domain.entity.DamageReport;
+import za.ac.cput.domain.entity.Rental;
 
 import java.time.LocalDateTime;
 

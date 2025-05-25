@@ -1,4 +1,4 @@
-package za.ac.cput.domain.supplier;
+package za.ac.cput.domain.entity.supplier;
 
 import java.util.List;
 import java.util.Map;

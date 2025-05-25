@@ -1,4 +1,4 @@
-package za.ac.cput.domain;
+package za.ac.cput.domain.entity;
 
 /**
  * DamageReport.java
@@ -8,31 +8,42 @@ package za.ac.cput.domain;
  */
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
-
+@Getter
 @Entity
 public class DamageReport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(nullable = false, unique = true, updatable = false)
-    private UUID uuid = UUID.randomUUID();
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    private UUID uuid;
+   /* @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "rental", referencedColumnName = "id", unique = true)
-    private Rental rental;
+    private Rental rental;*/
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "rental", nullable = false)
+   private Rental rental;
+    @Column(columnDefinition = "TEXT")
     private String description;
+    @Column(updatable = false)
     private LocalDateTime dateAndTime;
     private String location;
     private double repairCost;
+    @Column(updatable = false)
+    private LocalDateTime createdAt; // When the report was created in the system
+    @Column(nullable = false)
     private boolean deleted = false;
+
     @PrePersist
-    protected  void onCreate() {
-        if (this.uuid == null) {
-            this.uuid = UUID.randomUUID();
-        }
+    protected void onCreate() { // Renamed to avoid clash with entity field if any
+        if (this.uuid == null) this.uuid = UUID.randomUUID();
+        this.createdAt = LocalDateTime.now(); // Set report creation time
+        this.deleted = false;
+        if (this.dateAndTime == null) this.dateAndTime = this.createdAt; // Default damage time to report time if not specified
     }
 
     public DamageReport() {
@@ -46,49 +57,20 @@ public class DamageReport {
         this.dateAndTime = builder.dateAndTime;
         this.location = builder.location;
         this.repairCost = builder.repairCost;
+        this.createdAt = builder.createdAt;
         this.deleted = builder.deleted;
-    }
-
-    public int getId() {
-        return id;
-    }
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public Rental getRental() {
-        return rental;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDateTime getDateAndTime() {
-        return dateAndTime;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public double getRepairCost() {
-        return repairCost;
-    }
-    public boolean isDeleted() {
-        return deleted;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         DamageReport that = (DamageReport) o;
-        return id == that.id && Double.compare(repairCost, that.repairCost) == 0 && deleted == that.deleted && Objects.equals(uuid, that.uuid) && Objects.equals(rental, that.rental) && Objects.equals(description, that.description) && Objects.equals(dateAndTime, that.dateAndTime) && Objects.equals(location, that.location);
+        return id == that.id && Double.compare(repairCost, that.repairCost) == 0 && deleted == that.deleted && Objects.equals(uuid, that.uuid) && Objects.equals(rental, that.rental) && Objects.equals(description, that.description) && Objects.equals(dateAndTime, that.dateAndTime) && Objects.equals(location, that.location) && Objects.equals(createdAt, that.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, uuid, rental, description, dateAndTime, location, repairCost, deleted);
+        return Objects.hash(id, uuid, rental, description, dateAndTime, location, repairCost, createdAt, deleted);
     }
 
     @Override
@@ -101,6 +83,7 @@ public class DamageReport {
                 ", dateAndTime=" + dateAndTime +
                 ", location='" + location + '\'' +
                 ", repairCost=" + repairCost +
+                ", createdAt=" + createdAt +
                 ", deleted=" + deleted +
                 '}';
     }
@@ -113,6 +96,7 @@ public class DamageReport {
         private LocalDateTime dateAndTime;
         private String location;
         private double repairCost;
+        private LocalDateTime createdAt;
         private boolean deleted = false;
 
         public Builder setId(int id) {
@@ -148,6 +132,10 @@ public class DamageReport {
             this.repairCost = repairCost;
             return this;
         }
+        public Builder setCreatedAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
         public Builder setDeleted(boolean deleted) {
             this.deleted = deleted;
             return this;
@@ -161,6 +149,7 @@ public class DamageReport {
             this.dateAndTime = report.dateAndTime;
             this.location = report.location;
             this.repairCost = report.repairCost;
+            this.createdAt = report.createdAt;
             this.deleted = report.deleted;
             return this;
         }

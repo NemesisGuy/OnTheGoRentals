@@ -1,22 +1,22 @@
 package za.ac.cput.service;
 
-import za.ac.cput.domain.Booking;
+import za.ac.cput.domain.entity.Booking;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IBookingService {
     Booking create(Booking booking);
 
     Booking read(int bookingId);
+    Booking read(UUID uuid);
 
-    Booking updateById(Booking updatedBooking);
+    Booking update(Booking booking);
 
     boolean delete(int bookingId);
 
     List<Booking> getAll();
 
-    Booking getBookingById(int bookingId);
 
-    Booking update(Booking booking);
 
 }

@@ -1,125 +1,83 @@
 package za.ac.cput.controllers.admin;
 
-/**
- * AdminUserController.java
- * Controller for user entity management
- * Author: Peter Buckingham (220165289)
- * Date: 05 April 2023
- */
-
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
+import za.ac.cput.domain.dto.request.UserCreateDTO; // Using generic Create DTO
+import za.ac.cput.domain.dto.request.UserUpdateDTO; // Using generic Update DTO
 import za.ac.cput.domain.dto.response.UserResponseDTO;
 import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.domain.security.Role;
 import za.ac.cput.domain.security.User;
-import za.ac.cput.exception.RoleNotFoundException;
-import za.ac.cput.repository.IRoleRepository;
-import za.ac.cput.service.impl.UserService;
+import za.ac.cput.repository.IRoleRepository; // For /roles endpoint
+import za.ac.cput.service.IUserService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admin/users")
+@RequestMapping("/api/v1/admin/users")
+// @CrossOrigin(...)
+// @PreAuthorize("hasRole('ADMIN') or hasRole('SUPERADMIN')")
 public class AdminUserController {
 
-    @Autowired
-    private UserService userService;
+    private final IUserService userService;
+    private final IRoleRepository roleRepository; // For listing all roles
 
     @Autowired
-    private IRoleRepository roleRepository;
+    public AdminUserController(IUserService userService, IRoleRepository roleRepository) {
+        this.userService = userService;
+        this.roleRepository = roleRepository;
+    }
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    // Get all users as UserDTO (no passwords exposed)
-    @GetMapping("/list/all")
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+    @GetMapping
+    public ResponseEntity<List<UserResponseDTO>> getAllUsersAdmin() {
         List<User> users = userService.getAll();
-        List<UserResponseDTO> userDTOs = new ArrayList<>();
-        for (User user : users) {
-            userDTOs.add(UserMapper.toDto(user));
-        }
-        return ResponseEntity.ok(userDTOs);
+        return ResponseEntity.ok(UserMapper.toDtoList(users));
     }
 
-    // Get user by id, returns UserDTO or 404
-    @GetMapping("/read/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable UUID id) {
+    @GetMapping("/{userUuid}")
+    public ResponseEntity<UserResponseDTO> getUserByUuidAdmin(@PathVariable UUID userUuid) {
+        User userEntity = userService.read(userUuid);
+        return ResponseEntity.ok(UserMapper.toDto(userEntity));
+    }
 
-        User user = userService.readByUuid (id);
-        if (user == null) {
+    @PostMapping
+    public ResponseEntity<UserResponseDTO> createUserByAdmin(@Valid @RequestBody UserCreateDTO userCreateDto) {
+        User userToCreate = UserMapper.toEntity(userCreateDto); // Password is plain here
+        // Service handles password encoding and role entity fetching
+        User createdUserEntity = userService.create(userToCreate);
+        return new ResponseEntity<>(UserMapper.toDto(createdUserEntity), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{userUuid}")
+    public ResponseEntity<UserResponseDTO> updateUserByAdmin(
+            @PathVariable UUID userUuid,
+            @Valid @RequestBody UserUpdateDTO userUpdateDto // Using generic UserUpdateDTO
+    ) {
+        User existingUser = userService.read(userUuid); // Fetch current state
+        User userWithUpdates = UserMapper.applyUpdateDtoToEntity(userUpdateDto, existingUser); // Create new state
+
+        // Service handles actual update logic, including password encoding if changed, role updates
+        User persistedUser = userService.update(userWithUpdates.getId(),userWithUpdates);
+        return ResponseEntity.ok(UserMapper.toDto(persistedUser));
+    }
+
+    @DeleteMapping("/{userUuid}")
+    public ResponseEntity<Void> deleteUserByAdmin(@PathVariable UUID userUuid) {
+        User user = userService.read(userUuid); // Fetch current state, throws ResourceNotFoundException if not found
+        boolean deleted = userService.delete(user.getId());
+        if (!deleted) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(UserMapper.toDto(user));
+        return ResponseEntity.noContent().build();
     }
 
-    // Create new user with role validation
-    @PostMapping("/create")
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody User user) {
-        List<Role> matchingRoles = validateAndGetRoles(user.getRoles());
-        user.setRoles(matchingRoles);
-        User createdUser = userService.create(user);
-        return ResponseEntity.ok(UserMapper.toDto(createdUser));
-    }
-
-    // Update existing user by ID with role validation
-    @PutMapping("/update/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody User updatedUser) {
-        User existingUser = userService.read(id);
-        if (existingUser == null) {
-            return ResponseEntity.notFound().build();
-        }
-        existingUser.setFirstName(updatedUser.getFirstName());
-        existingUser.setLastName(updatedUser.getLastName());
-        existingUser.setEmail(updatedUser.getEmail());
-        existingUser.setPassword(updatedUser.getPassword());
-
-        List<Role> matchingRoles = validateAndGetRoles(updatedUser.getRoles());
-        existingUser.setRoles(matchingRoles);
-
-        User savedUser = userService.update(existingUser);
-        return ResponseEntity.ok(UserMapper.toDto(savedUser));
-    }
-
-    // Delete user by ID
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
-        boolean deleted = userService.delete(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    // List all roles available in the system
     @GetMapping("/roles")
     public ResponseEntity<List<Role>> getAllRoles() {
+        // This returns Role ENTITIES. Consider RoleResponseDTO and RoleMapper for consistency.
         return ResponseEntity.ok(roleRepository.findAll());
-    }
-
-
-
-    // Helper to validate requested roles against DB roles, throws exception if none found
-    private List<Role> validateAndGetRoles(List<Role> requestedRoles) {
-        List<Role> allRoles = roleRepository.findAll();
-        List<Role> matchingRoles = new ArrayList<>();
-
-        for (Role reqRole : requestedRoles) {
-            allRoles.stream()
-                    .filter(dbRole -> dbRole.getRoleName().equals(reqRole.getRoleName()))
-                    .findFirst()
-                    .ifPresent(matchingRoles::add);
-        }
-
-        if (matchingRoles.isEmpty()) {
-            throw new RoleNotFoundException("Desired role(s) not found");
-        }
-        return matchingRoles;
     }
 }

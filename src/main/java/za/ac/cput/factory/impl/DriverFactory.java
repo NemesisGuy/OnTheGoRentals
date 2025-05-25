@@ -1,6 +1,6 @@
 package za.ac.cput.factory.impl;
 
-import za.ac.cput.domain.Driver;
+import za.ac.cput.domain.entity.Driver;
 
 import za.ac.cput.factory.IFactory;
 

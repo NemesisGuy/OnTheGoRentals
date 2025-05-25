@@ -4,16 +4,13 @@ package za.ac.cput.domain.security;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import za.ac.cput.domain.Rental;
+import za.ac.cput.domain.entity.Rental;
 import za.ac.cput.domain.enums.AuthProvider;
 /*import za.ac.cput.utils.GrantedAuthorityDeserializer;
 import za.ac.cput.utils.GrantedAuthoritySerializer;*/
@@ -146,5 +143,6 @@ public class User implements Serializable, UserDetails {
         }
         // this.deleted is already defaulted to false by its declaration, which is fine.
     }
+
 }
 

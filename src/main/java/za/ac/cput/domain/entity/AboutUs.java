@@ -1,4 +1,4 @@
-package za.ac.cput.domain;
+package za.ac.cput.domain.entity;
 /**
  * AboutUs.java
  * Domain Class for About Us page

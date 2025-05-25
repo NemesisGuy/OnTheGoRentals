@@ -1,4 +1,4 @@
-package za.ac.cput.domain; // Or your actual entity package
+package za.ac.cput.domain.entity; // Or your actual entity package
 
 import jakarta.persistence.*;
 import lombok.Getter; // Only getters

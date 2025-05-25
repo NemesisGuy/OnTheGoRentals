@@ -10,10 +10,12 @@ import za.ac.cput.domain.entity.DamageReport;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface IDamageReport extends IService<DamageReport, Integer> {
+public interface IDamageReportService extends IService<DamageReport, Integer> {
 
     Optional<DamageReport> read(int id);
+    DamageReport read(UUID uuid);
 
     Boolean deleteById(int id);
 

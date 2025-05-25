@@ -2,12 +2,11 @@ package za.ac.cput.controllers.security;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.Rental; // For RentalServiceImpl return type
+import za.ac.cput.domain.entity.Rental; // For RentalServiceImpl return type
 import za.ac.cput.domain.dto.request.UserUpdateRequestDTO; // Using the new DTO
 import za.ac.cput.domain.dto.response.RentalResponseDTO;
 import za.ac.cput.domain.dto.response.UserResponseDTO;
@@ -18,9 +17,7 @@ import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.IRentalService; // Using interface
 import za.ac.cput.service.IUserService;   // Using interface
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /*

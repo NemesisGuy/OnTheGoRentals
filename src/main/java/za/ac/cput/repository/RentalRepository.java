@@ -2,8 +2,7 @@ package za.ac.cput.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import za.ac.cput.domain.Car;
-import za.ac.cput.domain.Rental;
+import za.ac.cput.domain.entity.Rental;
 
 import java.util.List;
 import java.util.Optional;

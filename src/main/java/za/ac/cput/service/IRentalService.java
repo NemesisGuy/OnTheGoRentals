@@ -4,10 +4,9 @@ package za.ac.cput.service;
  * Author: Peter Buckingham (220165289)
  */
 
-import za.ac.cput.domain.Rental;
+import za.ac.cput.domain.entity.Rental;
 import za.ac.cput.domain.security.User;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

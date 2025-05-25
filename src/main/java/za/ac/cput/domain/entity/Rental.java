@@ -1,7 +1,6 @@
-package za.ac.cput.domain;
+package za.ac.cput.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.enums.RentalStatus;
@@ -55,9 +54,9 @@ public class Rental implements Serializable {
     @Column(nullable = false)
     private boolean deleted = false;
 
-    @Column(updatable = false, nullable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt; // Added for tracking
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private LocalDateTime updatedAt; // Added for tracking
 
     @PrePersist

@@ -1,8 +1,7 @@
 package za.ac.cput.service;
 
-import za.ac.cput.domain.HelpCenter;
+import za.ac.cput.domain.entity.HelpCenter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

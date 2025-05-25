@@ -1,6 +1,6 @@
 package za.ac.cput.service;
 
-import za.ac.cput.domain.Feedback;
+import za.ac.cput.domain.entity.Feedback;
 
 import java.util.List;
 import java.util.UUID;

@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.Booking;
-import za.ac.cput.domain.Car;
+import za.ac.cput.domain.entity.Booking;
+import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.dto.request.BookingRequestDTO;
 import za.ac.cput.domain.dto.response.BookingResponseDTO;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
@@ -125,7 +125,7 @@ public class BookingController {
             @PathVariable UUID bookingUuid,
             @Valid @RequestBody BookingRequestDTO bookingRequestDTO // Or a more specific BookingUpdateDTO
     ) {
-        Booking existingBooking = bookingService.readByUuid(bookingUuid); // Fetch by UUID
+        Booking existingBooking = bookingService.read(bookingUuid); // Fetch by UUID
         if (existingBooking == null) {
             return ResponseEntity.notFound().build();
         }
@@ -145,16 +145,22 @@ public class BookingController {
         // Apply changes from DTO to the existingBooking entity
         // BookingMapper.updateEntityFromDto(bookingRequestDTO, existingBooking, carForUpdate);
         // Or manually:
+
+        // Start building a new Booking entity based on existing one
+
+        Booking.Builder builder = new Booking.Builder().copy(existingBooking);
+
+
         if (bookingRequestDTO.getBookingStartDate() != null) {
-            existingBooking.setBookingStartDate(bookingRequestDTO.getBookingStartDate());
+            builder.setStartDate(bookingRequestDTO.getBookingStartDate());
         }
         if (bookingRequestDTO.getBookingEndDate() != null) {
-            existingBooking.setBookingEndDate(bookingRequestDTO.getBookingEndDate());
+            builder.setEndDate(bookingRequestDTO.getBookingEndDate());
         }
-        existingBooking.setCar(carForUpdate); // Set the potentially updated car
+        builder.setCar(carForUpdate); // Set the potentially updated car
         // existingBooking.setStatus(...); // If status can be updated via this DTO
-
-        Booking updatedBookingEntity = bookingService.updateById(existingBooking); // Call existing service method
+        existingBooking = builder.build(); // Build the updated Booking entity
+        Booking updatedBookingEntity = bookingService.update(existingBooking); // Call existing service method
         return ResponseEntity.ok(BookingMapper.toDto(updatedBookingEntity));
     }
 

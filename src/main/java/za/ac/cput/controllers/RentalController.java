@@ -7,15 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.Car;
-import za.ac.cput.domain.Driver; // Assuming driver can be part of a rental
-import za.ac.cput.domain.Rental;
+import za.ac.cput.domain.entity.Car;
+import za.ac.cput.domain.entity.Driver; // Assuming driver can be part of a rental
+import za.ac.cput.domain.entity.Rental;
 import za.ac.cput.domain.dto.request.RentalRequestDTO;
 import za.ac.cput.domain.dto.request.RentalUpdateDTO; // For PUT
 import za.ac.cput.domain.dto.response.RentalResponseDTO;
 import za.ac.cput.domain.mapper.RentalMapper;
 import za.ac.cput.domain.security.User;
-import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.ICarService;
 import za.ac.cput.service.IDriverService; // If driver is involved
 import za.ac.cput.service.IRentalService;

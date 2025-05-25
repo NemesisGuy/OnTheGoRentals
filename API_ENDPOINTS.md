@@ -6,9 +6,7 @@ Base URL for all v1 APIs: `/api/v1`
 
 ## Authentication (`/auth`)
 *(This section remains the same as previously defined)*
-
-*   **`POST /auth/register`**
-    *   Request: `RegisterDto
+*   `POST /auth/register` (Public) - Req: `RegisterDto`, Resp: `AuthResponseDto` & `rtk` cookie
 *   `POST /auth/login` (Public) - Req: `LoginDto`, Resp: `AuthResponseDto` & `rtk` cookie
 *   `POST /auth/refresh` (Public, needs `rtk` cookie) - Resp: `TokenRefreshResponseDto` & new `rtk` cookie
 *   `POST /auth/logout` (Authenticated) - Resp: Success message & clears `rtk` cookie
@@ -16,318 +14,144 @@ Base URL for all v1 APIs: `/api/v1`
 ---
 
 ## Current User (`/users/me`)
-*(All endpoints require authentication)*
+*(This section remains the same as previously defined - All endpoints require authentication)*
 *   `GET /users/me/profile` - Resp: `UserResponseDTO`
-*   `PUT /users/me/profile` - Req: `UserUpdateRequest` | Response: `AuthResponseDto` (Access Token in body, Refresh Token in HttpOnly cookie)
-*   **`POST /auth/login`**
-    *   Request: `LoginDto` | Response: `AuthResponseDto` (Access Token in body, Refresh Token in HttpOnly cookie)
-*   **`POST /auth/refresh`**
-    *   Request Cookie: `rtk` | Response: `TokenRefreshResponseDto` (New Access Token in body, New Refresh Token in HttpOnly cookie)
-*   **`POST /auth/logout`**
-    DTO`, Resp: `UserResponseDTO`
+*   `PUT /users/me/profile` - Req: `UserUpdateRequestDTO`, Resp: `UserResponseDTO`
 *   `GET /users/me/rental-history` - Resp: `List<RentalResponseDTO>` or `204 No Content`
 
 ---
 
-## Rentals (`/rent    *   Response: `200 OK` (Clears HttpOnly refresh token cookie)
-    *   Authentication: Required.
-
----
-
-## Current User (`/users/me`)
-*(This section remains the same as previously defined)*
-
-*   **`GET /users/me/profile`**
-    *   Response: `UserResponseDTO`
-    *   Authentication: Required.
-*   **`PUT /users/me/profile`**
-    als`)
-    *(Most endpoints require authentication, specific public helpers noted)*
-
-*   **`POST /rentals`**
-    *   Description: Creates a new rental for the currently authenticated user.
-    *   Request Body: `RentalRequestDTO` (`carUuid`, `driverUuid` (optional), `issuedDate`, `expectedReturnedDate`)
-    *   Response: `201 Created` with `RentalResponseDTO`.
-    *   Authentication: Required.
-
-*   **`GET /rentals/my-rentals`**
-    *   Description: Retrieves all rentals for the currently authenticated user.
-    *   Response: `200 OK` with `List<RentalResponseDTO>`. `204 No Content` if none.
-    *   Authentication: Required.
-
-*    *   Request: `UserUpdateRequestDTO` | Response: `UserResponseDTO`
-         *   Authentication: Required.
-*   **`GET /users/me/rental-history`**
-    *   Response: `List<RentalResponseDTO>`
-    *   Authentication: Required.
-
----
-
-## Bookings (`/bookings`)
-*(Updated   **`GET /rentals/{rentalUuid}`**
-*   Description: Retrieves a specific rental by its UUID.
-*   Path Variable: `{rentalUuid}` (UUID of the rental).
-*   Response: `200 OK` with `RentalResponseDTO`. `404 Not Found`.
-*   Authentication: Required (user should only see their own, or admin all - requires service-level authorization).
-
-*   **`PUT /rentals/{rentalUuid}`**
-    *   Description: Updates an existing rental (e.g., `expectedReturnedDate`).
-    *   Path Variable: `{rentalUuid}` (UUID of the rental).
-    *   Request Body: based on latest refactor)*
-
-*   **`POST /bookings`**
-    *   Description: Creates a new booking for the currently authenticated user.
-    *   Request Body: `BookingRequestDTO` (`carUuid`, `driverUuid` (optional), `issuedDate`, `expectedReturnedDate`). User is inferred from auth.
-    *   Response: `201 Created` with `BookingResponseDTO`.
-    *   Authentication: Required.
-
-*   **`GET /bookings/my-bookings`**
-    *   Description: Retrieves all bookings for the currently authenticated user.
-    *   Response: `200 OK` with `List<BookingResponseDTO>`. `204 No Content` if none.
-    *   Authentication: Required.
-
-*   **`GET /bookings/{bookingUuid}`**
-    *   Description: Retrieves a specific booking by its UUID.
-    *   Path Variable: `{bookingUuid}` (UUID of the booking).
-    *   Response: `200 OK` with `BookingResponseDTO `RentalUpdateDTO` (contains fields that can be updated).
-    *   Response: `200 OK` with `RentalResponseDTO`. `404 Not Found`.
-    *   Authentication: Required (user for own, or admin).
-
-*   **`POST /rentals/{rentalUuid}/confirm`**
-    *   Description: Confirms a pending rental.
-    *   Path Variable: `{rentalUuid}`.
-    *   Response: `200 OK` with `RentalResponseDTO`. `404 Not Found`.
-    *   Authentication: Required (typically user for own, or admin).
-
-*   **`POST /rentals/{rentalUuid}/cancel`**
-    *   Description: Cancels a rental.
-    *   Path Variable: `{rentalUuid}`.
-    *   Response: `200 OK` with `RentalResponseDTO`. `404`. `404 Not Found`.
-    *   Authentication: Required (Authorization logic in service should ensure user owns it or is admin).
-
-*   **`PUT /bookings/{bookingUuid}`**
-    *   Description: Updates an existing booking (e.g., dates, if rules allow).
-    *   Path Variable: `{bookingUuid}` (UUID of the booking).
-    *   Request Body: `RentalUpdateDTO` (or a more specific `BookingUpdateDTO`).
-    *   Response: `200 OK` with `BookingResponseDTO`. `404 Not Found`.
-    * Not Found`.
-    *   Authentication: Required (user for own, or admin).
-
-*   **`POST /rentals/{rentalUuid}/complete`**
-    *   Description: Marks a rental as completed and records any fines. (Typically Admin/Staff)
-    *   Path Variable: `{rentalUuid}`.
-    *   Query Parameter: `fineAmount` (double, optional, defaults to 0.0).
-    *   Response: `200 OK` with `RentalResponseDTO`. `404 Not Found`.
-    *   Authentication: Required (Admin/Staff).
-
-*   **`GET /rentals/available-cars`** (Helper Endpoint)
-    *   Description: Retrieves a list of cars currently available for booking.
-    *   Response: `2   Authentication: Required (Authorization logic for ownership/admin).
-
-*   **`POST /bookings/{bookingUuid}/confirm`**
-    *   Description: Confirms a pending booking.
-    *   Path Variable: `{bookingUuid}`.
-    *   Response: `200 OK` with `BookingResponseDTO`. `404 Not Found`.
-    *   Authentication: Required (Admin or specific user states).
-
-*   **`POST /bookings/{bookingUuid}/cancel`**
-    *   Description: Cancels a booking.
-    *   Path Variable: `{bookingUuid}`.
-    *   Response: `200 OK` with `BookingResponseDTO`. `404 Not Found00 OK` with `List<CarResponseDTO>`. `204 No Content` if none.
-    *   Authentication: Public (or Authenticated, as per your `SpringSecurityConfig`).
-
----
-
 ## Public Car Information (`/cars`)
-*(All endpoints are Public)*
-*   `GET /cars` (or `/cars/list/all`) - Resp: `List<CarResponseDTO>`
+*(This section remains the same as previously defined - All endpoints are Public)*
+*   `GET /cars` - Resp: `List<CarResponseDTO>`
 *   `GET /cars/price-group/{group}` - Path Var: `group` (PriceGroup enum), Resp: `List<CarResponseDTO>`
-*   `GET /cars/available` (or `/cars/list/available/all`) - Resp: `List<CarResponseDTO>`
-*   `GET /cars/available/price-group/{group}` - Path Var: `group`.
-    *   Authentication: Required (User for own, or Admin).
-
-*   **`POST /bookings/{bookingUuid}/complete`**
-    *   Description: Marks a rental as completed (e.g., car returned).
-    *   Path Variable: `{bookingUuid}`.
-    *   Query Parameter: `fineAmount` (optional `double`, defaults to 0.0).
-    *   Response: `200 OK` with `BookingResponseDTO`.
-    *   Authentication: Required (Typically Admin/Staff).
-
-*   **`GET /bookings/available-cars`** (Helper Endpoint)
-    *   Description: Retrieves a list of cars currently available for booking.
-    *   Response: `200 OK`, Resp: `List<CarResponseDTO>`
-*   `GET /cars/{carId}` - Path Var: `carId` (UUID), Resp: `CarResponseDTO` or `404`
+*   `GET /cars/available` - Resp: `List<CarResponseDTO>`
+*   `GET /cars/available/price-group/{group}` - Path Var: `group`, Resp: `List<CarResponseDTO>`
+*   `GET /cars/{carUuid}` - Path Var: `carUuid` (UUID), Resp: `CarResponseDTO` or `404`
 
 ---
 
-## Help Topics (`/help-topics`)
-*(GET endpoints are Public, others typically Admin)*
-
-*   **`GET /help-topics`**
-    *   Description: Retrieves all non-deleted help topics. Can be filtered by category.
-    *   Query Parameter: `category` (String, optional).
-    *   Response: `200 OK` with `List<HelpCenterResponseDTO>`. `204 No Content` if none.
-    *   Authentication` with `List<CarResponseDTO>`. `204 No Content` if none.
-    *   Authentication: Public or Required (Your config has it as `permitAll()`).
-
----
-
-## Public Car Information (`/cars`)
-*(This section remains the same as previously defined)*
-
-*   **`GET /cars`** (Replaces `/cars/list/all`)
-    *   Response: `List<CarResponseDTO>`.
-*   **`GET /cars/price-group/{group}`**
-    *   Response: `List<CarResponseDTO>`.
-*   **`GET /cars/available`** (Replaces `/cars/list/available/all`)
-    *   Response: `List<CarResponseDTO>`.
-*   **`GET /cars/available/: Public.
-
-*   **`GET /help-topics/{topicUuid}`**
-    *   Description: Retrieves a specific help topic by its UUID.
-    *   Path Variable: `{topicUuid}` (UUID).
-    *   Response: `200 OK` with `HelpCenterResponseDTO`. `404 Not Found`.
-    *   Authentication: Public.
-
-*   **`POST /help-topics`** (Admin)
-    *   Description: Creates a new help topic.
-    *   Request Body: `HelpCenterCreateDTO` (`title`, `content`, `category`).
-    *   Response: `201 Created` with `HelpCenterResponseDTO`.
-    *   Authentication: Admin.
-
-*   **`PUT /help-topics/{topicUuid}`** (Admin)
-    *   Description: Updates an existing help topic.
-    *   Path Variable: `{topicUuidprice-group/{group}`**
-    *   Response: `List<CarResponseDTO>`.
-*   **`GET /cars/{carUuid}`** (Path variable changed from `carId` for consistency if not already)
-    *   Response: `CarResponseDTO`.
+## Public Booking Operations (`/bookings`)
+*(This section reflects the refactored user-facing BookingController - Most endpoints require authentication)*
+*   `POST /bookings` - Req: `BookingRequestDTO`, Resp: `201` with `BookingResponseDTO`
+*   `GET /bookings/my-bookings` - Resp: `List<BookingResponseDTO>` or `204`
+*   `GET /bookings/{bookingUuid}` - Resp: `BookingResponseDTO` or `404`
+*   `PUT /bookings/{bookingUuid}` - Req: `BookingUpdateDTO` (or `BookingRequestDTO` if reused), Resp: `BookingResponseDTO` or `404`
+*   `POST /bookings/{bookingUuid}/confirm` - Resp: `BookingResponseDTO` or `404`
+*   `POST /bookings/{bookingUuid}/cancel` - Resp: `BookingResponseDTO` or `404`
+*   `GET /bookings/available-cars` (Helper) - Resp: `List<CarResponseDTO>` (Public or Authenticated)
 
 ---
 
-## Admin Car Management (`/admin/cars`)
-*(This section remains the same as previously defined, ensuring UUIDs are used in paths)*
+## Public FAQs (`/faqs`)
+*(All GET endpoints are Public)*
+*   `GET /faqs` - Query Param: `category` (optional String), Resp: `List<FaqResponseDTO>` or `204`
+*   `GET /faqs/{faqUuid}` - Resp: `FaqResponseDTO` or `404`
 
-*   **`GET /admin/cars`** (Replaces `/admin/cars/all`)
-    *   Response: `List<CarResponseDTO>`.
-*   **`POST /admin/cars`** (Replaces `/admin/cars/create`)
-    *   Request: `CarCreateDTO` | Response: `CarResponseDTO` (`201 Created`).
-*   **`GET /admin/cars/{carUuid}`** (Replaces `/admin/cars/read/{carUuid}`)
-    *   Response: `CarResponseDTO`.
-*   **`PUT /admin/cars/{carUuid}`** (Replaces `/admin/cars/update/{carUuid}`)
-    *   Request: `CarUpdateDTO` | Response: `CarResponseDTO`.
-*   **`DELETE /admin/cars/{}` (UUID).
-    *   Request Body: `HelpCenterUpdateDTO` (optional `title`, `content`, `category`).
-    *   Response: `200 OK` with `HelpCenterResponseDTO`. `404 Not Found`.
-    *   Authentication: Admin.
+---
 
-*   **`DELETE /help-topics/{topicUuid}`** (Admin)
-    *   Description: Soft-deletes a help topic.
-    *   Path Variable: `{topicUuid}` (UUID).
+## Public Help Topics (`/help-topics`)
+*(All GET endpoints are Public)*
+*   `GET /help-topics` - Query Param: `category` (optional String), Resp: `List<HelpCenterResponseDTO>` or `204`
+*   `GET /help-topics/{topicUuid}` - Resp: `HelpCenterResponseDTO` or `404`
+
+---
+
+## Public Feedback Submission (`/feedback`)
+*   `POST /feedback` - Req: `FeedbackCreateDTO`, Resp: `201` with `FeedbackResponseDTO` (Public)
+
+---
+
+## Public Contact Us Submission (`/contact-us`)
+*   `POST /contact-us` - Req: `ContactUsCreateDTO`, Resp: `201` with `ContactUsResponseDTO` (Public)
+
+---
+---
+
+## Administrative Endpoints (`/admin`)
+
+All endpoints under `/api/v1/admin` require ADMIN or SUPERADMIN authentication.
+
+### Admin - User Management (`/admin/users`)
+*   **`GET /admin/users`**
+    *   Description: Retrieves a list of all users (admin view, may include soft-deleted).
+    *   Response: `200 OK` with `List<UserResponseDTO>`. `204 No Content` if empty.
+*   **`POST /admin/users`**
+    *   Description: Creates a new user with specified roles and password.
+    *   Request Body: `UserCreateDTO` (`firstName`, `lastName`, `email`, `password` (plain), `roleNames` (list of strings), optional `authProvider`, `googleId`, `profileImageUrl`).
+    *   Response: `201 Created` with `UserResponseDTO`.
+*   **`GET /admin/users/{userUuid}`**
+    *   Description: Retrieves a specific user by their UUID.
+    *   Path Variable: `{userUuid}` (UUID).
+    *   Response: `200 OK` with `UserResponseDTO`. `404 Not Found`.
+*   **`PUT /admin/users/{userUuid}`**
+    *   Description: Updates an existing user's details, password, and/or roles.
+    *   Path Variable: `{userUuid}` (UUID).
+    *   Request Body: `UserUpdateDTO` (optional fields: `firstName`, `lastName`, `email`, `password` (plain), `roleNames`, `authProvider`, `googleId`, `profileImageUrl`, `deleted` flag).
+    *   Response: `200 OK` with `UserResponseDTO`. `404 Not Found`.
+*   **`DELETE /admin/users/{userUuid}`**
+    *   Description: Soft-deletes a user by their UUID.
+    *   Path Variable: `{userUuid}` (UUID).
     *   Response: `204 No Content`. `404 Not Found`.
-    *   Authentication: Admin.
+*   **`GET /admin/users/roles`**
+    *   Description: Lists all available roles in the system.
+    *   Response: `200 OK` with `List<Role>` (entity). *Consider `RoleResponseDTO` for consistency.*
+
+### Admin - Car Management (`/admin/cars`)
+*   **`GET /admin/cars`** - Resp: `List<CarResponseDTO>` or `204`.
+*   **`POST /admin/cars`** - Req: `CarCreateDTO`, Resp: `201` with `CarResponseDTO`.
+*   **`GET /admin/cars/{carUuid}`** - Resp: `CarResponseDTO` or `404`.
+*   **`PUT /admin/cars/{carUuid}`** - Req: `CarUpdateDTO`, Resp: `CarResponseDTO` or `404`.
+*   **`DELETE /admin/cars/{carUuid}`** - Resp: `204 No Content` or `404`.
+
+### Admin - Rental/Booking Management (`/admin/rentals`)
+*   **`GET /admin/rentals`** - Resp: `List<RentalResponseDTO>` or `204`.
+*   **`POST /admin/rentals`** - Req: `BookingRequestDTO` (or `AdminRentalCreateDTO`), Resp: `201` with `RentalResponseDTO`.
+*   **`GET /admin/rentals/{rentalUuid}`** - Resp: `RentalResponseDTO` or `404`.
+*   **`PUT /admin/rentals/{rentalUuid}`** - Req: `BookingUpdateDTO` (or `AdminRentalUpdateDTO`), Resp: `RentalResponseDTO` or `404`.
+*   **`DELETE /admin/rentals/{rentalUuid}`** - Resp: `204 No Content` or `404`.
+*   **`POST /admin/rentals/{rentalUuid}/confirm`** - Resp: `RentalResponseDTO` or `404`.
+*   **`POST /admin/rentals/{rentalUuid}/cancel`** - Resp: `RentalResponseDTO` or `404`.
+*   **`POST /admin/rentals/{rentalUuid}/complete`** - Query Param: `fineAmount` (double, optional), Resp: `RentalResponseDTO` or `404`.
+
+### Admin - FAQ Management (`/admin/faqs`)
+*   **`POST /admin/faqs`** (was `POST /faqs` in public, assuming admin now) - Req: `FaqCreateDTO`, Resp: `201` with `FaqResponseDTO`.
+*   **`PUT /admin/faqs/{faqUuid}`** (was `PUT /faqs/{uuid}` in public) - Req: `FaqUpdateDTO`, Resp: `FaqResponseDTO` or `404`.
+*   **`DELETE /admin/faqs/{faqUuid}`** (was `DELETE /faqs/{uuid}` in public) - Resp: `204 No Content` or `404`.
+*   **Note:** Public GETs for FAQs are at `/api/v1/faqs`. Admin might have a separate GET `/api/v1/admin/faqs` if it shows different data (e.g., including deleted). If it's the same data, admin just uses the public one. For simplicity, I've assumed admin CRUD is distinct.
+
+### Admin - Help Topic Management (`/admin/help-topics`)
+*   **`POST /admin/help-topics`** - Req: `HelpCenterCreateDTO`, Resp: `201` with `HelpCenterResponseDTO`.
+*   **`PUT /admin/help-topics/{topicUuid}`** - Req: `HelpCenterUpdateDTO`, Resp: `HelpCenterResponseDTO` or `404`.
+*   **`DELETE /admin/help-topics/{topicUuid}`** - Resp: `204 No Content` or `404`.
+*   **Note:** Public GETs for Help Topics are at `/api/v1/help-topics`.
+
+### Admin - Feedback Management (`/admin/feedback`)
+*   **`GET /admin/feedback`** (was public `GET /feedback`) - Resp: `List<FeedbackResponseDTO>` or `204`.
+*   **`GET /admin/feedback/{feedbackUuid}`** (was public `GET /feedback/{uuid}`) - Resp: `FeedbackResponseDTO` or `404`.
+*   **`DELETE /admin/feedback/{feedbackUuid}`** (was public `DELETE /feedback/{uuid}`) - Resp: `204 No Content` or `404`.
+*   **Note:** Public POST for Feedback is at `/api/v1/feedback`.
+
+### Admin - Contact Us Submissions Management (`/admin/contact-us-submissions`)
+*   **`GET /admin/contact-us-submissions`** - Resp: `List<ContactUsResponseDTO>` or `204`.
+*   **`GET /admin/contact-us-submissions/{submissionUuid}`** - Resp: `ContactUsResponseDTO` or `404`.
+*   **`PUT /admin/contact-us-submissions/{submissionUuid}`** - Req: `AdminContactUsUpdateDTO`, Resp: `ContactUsResponseDTO` or `404`.
+*   **`DELETE /admin/contact-us-submissions/{submissionUuid}`** - Resp: `204 No Content` or `404`.
+*   **Note:** Public POST for Contact Us is at `/api/v1/contact-us`.
+
+### Admin - About Us Content Management (`/admin/about-us`)
+*   **`POST /admin/about-us`** - Req: `AboutUsCreateDTO`, Resp: `201` with `AboutUsResponseDTO`. (If you allow multiple, otherwise PUT to a singleton resource).
+*   **`GET /admin/about-us/{aboutUsUuid}`** - Resp: `AboutUsResponseDTO` or `404`.
+*   **`PUT /admin/about-us/{aboutUsUuid}`** - Req: `AboutUsUpdateDTO`, Resp: `AboutUsResponseDTO` or `404`.
+*   **`GET /admin/about-us`** - Resp: `List<AboutUsResponseDTO>` or `204`.
+*   **`DELETE /admin/about-us/{aboutUsUuid}`** - Resp: `204 No Content` or `404`.
+*   **Note:** Public GET for About Us might be `/api/v1/about-us/latest` or similar.
 
 ---
 
-## Feedback (`/feedback`)
-*(POST is Public, GET/DELETE typically Admin)*
+This documentation provides a good overview. You'll want to:
+*   Fill in the details for any controllers we didn't explicitly refactor in the last few steps (e.g., `AboutUs` for public view if it exists).
+*   Ensure the "Authentication" column is accurate based on your `SpringSecurityConfig`.
+*   Add more details to the "Description" for each endpoint as needed.
+*   Double-check that all request/response DTO names match what's in your code.
 
-*   **`POST /feedback`**
-    *   Description: Submits new feedback.
-    *   Request Body: `FeedbackCreateDTO` (`name`, `comment`).
-    *   Response: `201 Created` with `FeedbackResponseDTO`.
-    *   Authentication: Public.
-
-*   **`GET /feedback`** (Admin)
-    *   Description: Retrieves all non-deleted feedback submissions.
-    *   Response: `200 OK` with `List<FeedbackResponseDTO>`. `2carUuid}`** (Replaces `/admin/cars/delete/{carUuid}`)
-    *   Response: `204 No Content`.
-
----
-
-## Contact Us Submissions (`/contact-us`)
-
-*   **`POST /contact-us`**
-    *   Description: Submits a new contact form entry.
-    *   Request Body: `ContactUsCreateDTO` (`title` (optional), `firstName`, `lastName`, `email`, `subject`, `message`).
-    *   Response: `201 Created` with `ContactUsResponseDTO`.
-    *   Authentication: Public.
-    *   *(Admin endpoints for viewing/managing these would be under `/admin/contact-us`)*
-
----
-
-## FAQs (`/faqs`) - Frequently Asked Questions
-
-*   **`GET04 No Content` if none.
-    *   Authentication: Admin.
-
-*   **`GET /feedback/{feedbackUuid}`** (Admin)
-    *   Description: Retrieves a specific feedback entry by UUID.
-    *   Path Variable: `{feedbackUuid}` (UUID).
-    *   Response: `200 OK` with `FeedbackResponseDTO`. `404 Not Found`.
-    *   Authentication: Admin.
-
-*   **`DELETE /feedback/{feedbackUuid}`** (Admin)
-    *   Description: Soft-deletes a feedback entry.
-    *   Path Variable: `{feedbackUuid}` (UUID).
-    *   Response: `204 No Content`. `404 Not Found`.
-    *   Authentication: Admin.
-
----
-
-## Admin Car Management (`/admin/cars`)
-*(All endpoints require ADMIN/SUPERADMIN role)*
-*   `GET /admin/cars/all` - Resp: `List<CarResponseDTO>`
-*   `POST /admin/cars/create` - Req: `CarCreateDTO`, Resp: `201` with `CarResponseDTO`
-*   `GET /admin/cars/ /faqs`**
-    *   Description: Retrieves all non-deleted FAQs. Can be filtered by category.
-    *   Query Parameter: `category` (optional string).
-    *   Response: `200 OK` with `List<FaqResponseDTO>`. `204 No Content` if none.
-    *   Authentication: Public.
-
-*   **`GET /faqs/{faqUuid}`**
-    *   Description: Retrieves a specific FAQ by its UUID.
-    *   Path Variable: `{faqUuid}` (UUID of the FAQ).
-    *   Response: `200 OK` with `FaqResponseDTO`. `404 Not Found`.
-    *   Authentication: Public.
-
-*   **Admin FAQ Management (Typically under `/admin/faqs` but shown here if combined for simplicity):**
-    *   **`POST /faqs`** (Needs to be differentiatedread/{carUuid}` - Path Var: `carUuid`, Resp: `CarResponseDTO` or `404`
-*   `PUT /admin/cars/update/{carUuid}` - Path Var: `carUuid`, Req: `CarUpdateDTO`, Resp: `CarResponseDTO` or `404`
-*   `DELETE /admin/cars/delete/{carUuid}` - Path Var: `carUuid`, Resp: `204` or `404`
-
----
-
-## Admin User Management (`/admin/users`) - Assuming this exists
-*(All endpoints require ADMIN/SUPERADMIN role)*
-*   `GET /admin/users/list/all` - Resp: `List<UserResponseDTO>`
-*   `POST /admin/users/create` - Req: `UserCreateDTO` (needs password, roles), Resp: `UserResponseDTO`
-*   `GET /admin/users/read/{userUuid}` - Resp: `UserResponseDTO`
-*   `PUT /admin/users/update/{userUuid}` - Req: `UserUpdateDTO` (might include roles, ability to change password if admin), Resp: `UserResponseDTO from public GET if not an admin path, or move to `/admin/faqs`)
-        *   Description: Creates a new FAQ.
-        *   Request Body: `FaqCreateDTO`.
-        *   Response: `201 Created` with `FaqResponseDTO`.
-    *   Authentication: Admin.
-    *   **`PUT /faqs/{faqUuid}`**
-        *   Description: Updates an existing FAQ.
-        *   Path Variable: `{faqUuid}`.
-        *   Request Body: `FaqUpdateDTO`.
-        *   Response: `200 OK` with `FaqResponseDTO`.
-        *   Authentication: Admin.
-    *   **`DELETE /faqs/{faqUuid}`**
-        *   Description: Soft-deletes an FAQ.
-        *   Path Variable: `{faqUuid}`.
-        *   Response: `204 No Content`.
-        *   Authentication: Admin.
-
----
-
-## Feedback Submissions (`/feedback`)
-
-*   **`POST /feedback`**
-    *   Description: Submits new feedback.
-    *   Request Body: `FeedbackCreateDTO` (`name`, `comment`).
-    *   Response: `201 Created` with `FeedbackResponseDTO`.`
-*   `DELETE /admin/users/delete/{userUuid}` - Resp: `204 No Content`
-
----
-*(Continue for other controllers like `AboutUsController`, `ContactUsController` if they were also refactored, following the same pattern: clear resource path, standard HTTP methods, DTOs for request/response, UUIDs for external IDs.)*

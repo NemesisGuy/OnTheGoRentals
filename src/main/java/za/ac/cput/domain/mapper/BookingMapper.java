@@ -1,16 +1,15 @@
 package za.ac.cput.domain.mapper;
 
-import za.ac.cput.domain.Booking;
+import za.ac.cput.domain.entity.Booking;
 
+import za.ac.cput.domain.entity.Driver;
+import za.ac.cput.domain.dto.request.BookingUpdateDTO;
 import za.ac.cput.domain.dto.response.BookingResponseDTO;
 
 
-
-import za.ac.cput.domain.Booking;
-import za.ac.cput.domain.Car;     // Entity
+import za.ac.cput.domain.entity.Car;     // Entity
 import za.ac.cput.domain.security.User; // Entity
 import za.ac.cput.domain.dto.request.BookingRequestDTO;
-import za.ac.cput.domain.dto.response.BookingResponseDTO;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
 import za.ac.cput.domain.dto.response.UserResponseDTO;
 import za.ac.cput.domain.enums.RentalStatus; // Make sure this enum is correctly imported
@@ -45,8 +44,8 @@ public class BookingMapper {
                 .uuid(booking.getUuid()) // UUID of the Booking itself
                 .user(userDto)
                 .car(carDto)
-                .bookingStartDate(booking.getBookingStartDate())
-                .bookingEndDate(booking.getBookingEndDate())
+                .bookingStartDate(booking.getStartDate())
+                .bookingEndDate(booking.getEndDate())
                 .status(RentalStatus.valueOf(booking.getStatus())) // Assuming Booking entity has RentalStatus enum
                 .build();
     }
@@ -65,14 +64,14 @@ public class BookingMapper {
             return null;
         }
 
-        Booking booking = new Booking();
+       return new Booking.Builder()
         // UUID for the new Booking will be set by @PrePersist in the Booking entity itself.
 
-        booking.setUser(userEntity); // Assign the fully fetched User entity
-        booking.setCar(carEntity);   // Assign the fully fetched Car entity
+        .setUser(userEntity)
+        .setCar(carEntity)
 
-        booking.setBookingStartDate(requestDto.getBookingStartDate());
-        booking.setBookingEndDate(requestDto.getBookingEndDate());
+        .setStartDate(requestDto.getBookingStartDate())
+        .setEndDate(requestDto.getBookingEndDate())
 
         // Status for a new booking is typically set by backend business logic.
         // If the DTO *can* specify an initial status, you'd map it here, converting String to Enum.
@@ -85,14 +84,49 @@ public class BookingMapper {
         //         booking.setStatus(RentalStatus.PENDING); // Default status
         //     }
         // } else {
-        booking.setStatus(String.valueOf(RentalStatus.ACTIVE)); // Default status for a new booking
+        .setStatus(String.valueOf(RentalStatus.ACTIVE))
         // }
 
-        booking.setDeleted(false); // Default for new bookings
+        .setDeleted(false) // Default for new bookings
 
         // Other fields like fine, issuerId, receiverId would be set by business logic
         // in the service layer, not directly from a simple create DTO.
-        return booking;
+        .build();
+    }
+    public static Booking toEntity(BookingRequestDTO requestDto, User userEntity, Car carEntity, Driver driverEntity) {
+        if (requestDto == null) {
+            return null;
+        }
+
+        return new Booking.Builder()
+                // UUID for the new Booking will be set by @PrePersist in the Booking entity itself.
+
+                .setUser(userEntity)
+                .setCar(carEntity)
+                .setDriver(driverEntity) // Optional, can be null if not provided
+
+                .setStartDate(requestDto.getBookingStartDate())
+                .setEndDate(requestDto.getBookingEndDate())
+
+                // Status for a new booking is typically set by backend business logic.
+                // If the DTO *can* specify an initial status, you'd map it here, converting String to Enum.
+                // For example, if BookingRequestDTO had a 'statusString' field:
+                // if (requestDto.getStatusString() != null) {
+                //     try {
+                //         booking.setStatus(RentalStatus.valueOf(requestDto.getStatusString().toUpperCase()));
+                //     } catch (IllegalArgumentException e) {
+                //         // Handle invalid status, e.g., throw exception or set a default
+                //         booking.setStatus(RentalStatus.PENDING); // Default status
+                //     }
+                // } else {
+                .setStatus(String.valueOf(RentalStatus.ACTIVE))
+                // }
+
+                .setDeleted(false) // Default for new bookings
+
+                // Other fields like fine, issuerId, receiverId would be set by business logic
+                // in the service layer, not directly from a simple create DTO.
+                .build();
     }
 
     /**
@@ -110,15 +144,16 @@ public class BookingMapper {
 
         // Typically, user is not changed for an existing booking.
         // If car can be changed:
+        Booking.Builder builder = new Booking.Builder().copy(existingBooking);
         if (updatedCarEntity != null) {
-            existingBooking.setCar(updatedCarEntity);
+            builder.setCar(updatedCarEntity);
         }
 
         if (updateDto.getBookingStartDate() != null) {
-            existingBooking.setBookingStartDate(updateDto.getBookingStartDate());
+            builder.setStartDate(updateDto.getBookingStartDate());
         }
         if (updateDto.getBookingEndDate() != null) {
-            existingBooking.setBookingEndDate(updateDto.getBookingEndDate());
+            builder.setEndDate(updateDto.getBookingEndDate());
         }
 
         // If status can be updated via this DTO
@@ -148,4 +183,41 @@ public class BookingMapper {
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
     }
+    // For Admin Updating a Booking
+    public static Booking applyUpdateDtoToEntity(
+            BookingUpdateDTO updateDto,
+            Booking existingBooking,
+            User newUserEntity, // Pass if user can be changed by admin
+            Car newCarEntity,     // Pass if car can be changed by admin
+            Driver newDriverEntity // Pass if driver can be changed by admin
+    ) {
+        if (updateDto == null || existingBooking == null) {
+            throw new IllegalArgumentException("Update DTO and existing Booking entity must not be null.");
+        }
+
+        Booking.Builder builder = new Booking.Builder().copy(existingBooking);
+
+        // Only update if DTO field is provided (for partial updates)
+        if (newUserEntity != null) builder.setUser(newUserEntity); // Admin changed user
+        if (newCarEntity != null) builder.setCar(newCarEntity);     // Admin changed car
+        if (newDriverEntity != null || (updateDto.getDriverUuid() == null && existingBooking.getDriver() != null) ) {
+            // Handle explicit setting to null if DTO driverUuid is null but existing had one
+            builder.setDriver(newDriverEntity);
+        }
+
+
+        if (updateDto.getBookingStartDate() != null) builder.setStartDate(updateDto.getBookingStartDate());
+        if (updateDto.getBookingEndDate() != null) builder.setEndDate(updateDto.getBookingEndDate());
+        if (updateDto.getStatus() != null) builder.setStatus(String.valueOf(updateDto.getStatus()));
+/*
+        if (updateDto.getIssuerId() != null) builder.(updateDto.getIssuerId());
+*/
+       /* if (updateDto.getReceiverId() != null) builder.receiverId(updateDto.getReceiverId());
+        if (updateDto.getFine() != null) builder.fine(updateDto.getFine());
+        if (updateDto.getActualReturnedDate() != null) builder.setEndDate(updateDto.getActualReturnedDate());*/
+
+        // id, uuid, createdAt are preserved. updatedAt handled by @PreUpdate.
+        return builder.build();
+    }
+
 }

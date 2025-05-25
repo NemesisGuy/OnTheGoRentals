@@ -6,7 +6,7 @@ package za.ac.cput.factory.impl;
  * Date: 24/09/2023
  */
 
-import za.ac.cput.domain.AboutUs;
+import za.ac.cput.domain.entity.AboutUs;
 
 public class AboutUsFactory {
 

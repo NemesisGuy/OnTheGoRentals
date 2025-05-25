@@ -6,6 +6,6 @@ package za.ac.cput.domain.enums;
 public enum BookingStatus {
     PENDING,    // before confirmation/payment
     CONFIRMED,  // reservation is locked in
-    CANCELLED   // user or system cancelled the booking
+    CANCELED, CANCELLED   // user or system cancelled the booking
 }
 

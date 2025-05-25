@@ -8,10 +8,11 @@ package za.ac.cput.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import za.ac.cput.domain.DamageReport;
+import za.ac.cput.domain.entity.DamageReport;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface IDamageReportRepository extends JpaRepository<DamageReport, Integer> {
@@ -19,4 +20,6 @@ public interface IDamageReportRepository extends JpaRepository<DamageReport, Int
     List<DamageReport> findByDeletedFalse();
 
     Optional<DamageReport> findByIdAndDeletedFalse(Integer integer);
+
+    DamageReport findByUuidAndDeletedFalse(UUID uuid);
 }

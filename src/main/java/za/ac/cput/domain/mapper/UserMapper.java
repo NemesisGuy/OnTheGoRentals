@@ -1,33 +1,22 @@
 package za.ac.cput.domain.mapper;
 
-import za.ac.cput.domain.security.User; // Your User Entity
+import za.ac.cput.domain.security.Role;
+import za.ac.cput.domain.security.User;
+import za.ac.cput.domain.dto.request.UserCreateDTO; // Using generic create DTO
+import za.ac.cput.domain.dto.request.UserUpdateDTO; // Using generic update DTO
 import za.ac.cput.domain.dto.response.UserResponseDTO;
-// Import UserCreateDTO, UserUpdateDTO if you have them and need toEntity methods for them
 
 import java.util.Collections;
-import java.util.stream.Collectors;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserMapper {
 
-    /**
-     * Converts a User entity to a UserResponseDTO.
-     *
-     * @param user The User entity.
-     * @return The corresponding UserResponseDTO, or null if the user entity is null.
-     */
     public static UserResponseDTO toDto(User user) {
-        if (user == null) {
-            return null;
-        }
-
-        List<String> roleNames = Collections.emptyList();
-        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-            roleNames = user.getRoles().stream()
-                    .map(role -> role.getRoleName()) // Assuming Role has getRoleName() returning an enum
-                    .collect(Collectors.toList());
-        }
-
+        if (user == null) return null;
+        List<String> roleNames = (user.getRoles() != null) ?
+                user.getRoles().stream().map(role -> role.getRoleName()).collect(Collectors.toList()) :
+                Collections.emptyList();
         return UserResponseDTO.builder()
                 .uuid(user.getUuid())
                 .email(user.getEmail())
@@ -37,52 +26,66 @@ public class UserMapper {
                 .build();
     }
 
-    /**
-     * Converts a list of User entities to a list of UserResponseDTOs.
-     *
-     * @param users List of User entities.
-     * @return List of UserResponseDTOs.
-     */
     public static List<UserResponseDTO> toDtoList(List<User> users) {
-        if (users == null) {
-            return null;
-        }
-        return users.stream()
-                .map(UserMapper::toDto)
-                .collect(Collectors.toList());
+        if (users == null) return null;
+        return users.stream().map(UserMapper::toDto).collect(Collectors.toList());
     }
 
-    // Add toEntity methods if you need to map UserCreateDTO or UserUpdateDTO to User entity
-    // Example for a hypothetical UserCreateDTO:
-    /*
+    // For Admin Creating a User, using UserCreateDTO
     public static User toEntity(UserCreateDTO createDto) {
         if (createDto == null) return null;
-        User user = new User();
-        // UUID will be set by @PrePersist
-        user.setEmail(createDto.getEmail());
-        user.setFirstName(createDto.getFirstName());
-        user.setLastName(createDto.getLastName());
-        // Password would be handled and encoded in the service layer
-        // Roles would be fetched and assigned in the service layer
-        return user;
-    }
-    */
+        User.UserBuilder builder =  User.builder()
+                .firstName(createDto.getFirstName())
+                .lastName(createDto.getLastName())
+                .email(createDto.getEmail())
+                .password(createDto.getPassword()); // Pass plain password; service will encode
 
-    // Example for updating an existing user from a hypothetical UserUpdateDTO:
-    /*
-    public static void updateEntityFromDto(UserUpdateDTO updateDto, User existingUser) {
-        if (updateDto == null || existingUser == null) return;
-
-        if (updateDto.getFirstName() != null) {
-            existingUser.setFirstName(updateDto.getFirstName());
+        if (createDto.getAuthProvider() != null) {
+            builder.authProvider(createDto.getAuthProvider());
         }
-        if (updateDto.getLastName() != null) {
-            existingUser.setLastName(updateDto.getLastName());
+        if (createDto.getGoogleId() != null) {
+            builder.googleId(createDto.getGoogleId());
         }
-        if (updateDto.getEmail() != null) {
-            existingUser.setEmail(updateDto.getEmail()); // Handle email uniqueness in service
+        if (createDto.getProfileImageUrl() != null) {
+            builder.profileImageUrl(createDto.getProfileImageUrl());
         }
-        // Password & roles updates are typically handled more explicitly in the service layer
+        // UUID is set by @PrePersist. Roles set by service. Deleted defaults to false.
+        return builder.build();
     }
-    */
+
+    // For Admin Updating a User, using UserUpdateDTO
+    public static User applyUpdateDtoToEntity(UserUpdateDTO updateDto, User existingUser) {
+        if (updateDto == null || existingUser == null) {
+            throw new IllegalArgumentException("Update DTO and existing User entity must not be null.");
+        }
+
+        User.UserBuilder builder =  User.builder()
+                .id(existingUser.getId())
+                .firstName(existingUser.getFirstName())
+                .lastName(existingUser.getLastName())
+                .email(existingUser.getEmail())
+                .password(existingUser.getPassword());// Keep existing password unless updated
+
+
+
+
+        if (updateDto.getFirstName() != null) builder.firstName(updateDto.getFirstName());
+        if (updateDto.getLastName() != null) builder.lastName(updateDto.getLastName());
+        if (updateDto.getEmail() != null) builder.email(updateDto.getEmail());
+
+        // Password from DTO is plain text for update, service will encode it if it's a new password.
+        // The builder will just take the value; service needs to compare with old hashed password.
+        if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
+            builder.password(updateDto.getPassword());
+        }
+
+        if (updateDto.getAuthProvider() != null) builder.authProvider(updateDto.getAuthProvider());
+        if (updateDto.getGoogleId() != null) builder.googleId(updateDto.getGoogleId());
+        if (updateDto.getProfileImageUrl() != null) builder.profileImageUrl(updateDto.getProfileImageUrl());
+        if (updateDto.getDeleted() != null) builder.deleted(updateDto.getDeleted());
+
+        // Roles are handled by the service based on updateDto.getRoleNames()
+        // AccountLocked, Enabled flags would also be applied here if present in DTO & builder
+        return builder.build();
+    }
 }

@@ -1,7 +1,7 @@
 package za.ac.cput.factory.impl;
 
 import org.springframework.stereotype.Component;
-import za.ac.cput.domain.HelpCenter;
+import za.ac.cput.domain.entity.HelpCenter;
 import za.ac.cput.factory.IFactory;
 
 import java.time.LocalDateTime;

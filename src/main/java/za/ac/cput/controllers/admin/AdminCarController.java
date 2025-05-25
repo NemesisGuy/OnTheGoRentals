@@ -7,114 +7,104 @@ package za.ac.cput.controllers.admin;
  * Date: 05 April 2023 // Updated: [Your Current Date]
  */
 
-import jakarta.validation.Valid; // For validating DTOs
+
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-// import za.ac.cput.domain.Car; // Service layer still uses Car entity
-import za.ac.cput.domain.Car;
+import za.ac.cput.domain.entity.Car; // For service layer interaction
+import za.ac.cput.domain.dto.request.CarCreateDTO;
+import za.ac.cput.domain.dto.request.CarUpdateDTO;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
-import za.ac.cput.domain.mapper.CarMapper; // Your mapper
-import za.ac.cput.service.impl.CarServiceImpl; // Or ICarService
+import za.ac.cput.domain.mapper.CarMapper;
+import za.ac.cput.service.ICarService; // Inject interface
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admin/cars")
-// @CrossOrigin(...) // Consider global CORS configuration
+@RequestMapping("/api/v1/admin/cars") // Standardized base path with version
+// @CrossOrigin(...) // Prefer global CORS configuration
+// @PreAuthorize("hasRole('ADMIN') or hasRole('SUPERADMIN')") // Class-level security
 public class AdminCarController {
 
-    private final CarServiceImpl carService; // Or ICarService
+    private final ICarService carService;
 
     @Autowired
-    public AdminCarController(CarServiceImpl carService) {
+    public AdminCarController(ICarService carService) {
         this.carService = carService;
     }
 
-    // Get all cars (including potentially soft-deleted ones if service method allows, or only non-deleted)
-    // Returns List<CarDTO>
-    @GetMapping("/all")
-    public ResponseEntity<List<CarResponseDTO>> getAllCars() {
-        // Assuming carService.getAllAdminView() or similar fetches all cars relevant for admin
-        // If carService.getAll() only returns non-deleted, that's fine too.
-        List<za.ac.cput.domain.Car> cars = carService.getAll(); // Service returns entities
+    /**
+     * Retrieves all cars for administrative view.
+     * This might include soft-deleted cars if the service method `getAll()` is configured to do so.
+     */
+    @GetMapping // GET /api/v1/admin/cars (replaces /all)
+    public ResponseEntity<List<CarResponseDTO>> getAllCarsForAdmin() {
+        List<Car> cars = carService.getAll(); // Service returns entities
         if (cars.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        List<CarResponseDTO> carDTOs = CarMapper.toDtoList(cars); // Map to DTOs
-        return ResponseEntity.ok(carDTOs);
+        return ResponseEntity.ok(CarMapper.toDtoList(cars));
     }
 
-    // Create new car using CarDTO
-    @PostMapping("/create")
-    public ResponseEntity<CarResponseDTO> createCar(@Valid @RequestBody Car car) {
-        // The carService.createCar method should now accept a CarDTO
-        // and handle the mapping to a Car entity internally before saving.
-        // Its return type should also be CarDTO.
-        Car createdCar = carService.create(car); // Assuming service handles DTO
-        if (createdCar == null) { // If service returns null on failure
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Or handle as needed
-        }
-        // If the service returns a Car entity, map it to DTO here
-        CarResponseDTO createdCarDto = CarMapper.toDto(createdCar); // Assuming service returns entity
-        return new ResponseEntity<>(createdCarDto, HttpStatus.CREATED);
+    /**
+     * Creates a new car.
+     */
+    @PostMapping // POST /api/v1/admin/cars (replaces /create)
+    public ResponseEntity<CarResponseDTO> createCar(@Valid @RequestBody CarCreateDTO carCreateDTO) {
+        Car carToCreate = CarMapper.toEntity(carCreateDTO); // Map DTO to entity
+        Car createdCarEntity = carService.create(carToCreate); // Service takes entity
+        CarResponseDTO responseDto = CarMapper.toDto(createdCarEntity); // Map result to DTO
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
-    // Get car by UUID, returns CarDTO or 404
-    @GetMapping("/read/{carUuid}") // Changed path variable to carUuid for clarity
-    public ResponseEntity<CarResponseDTO> readCarByUuid(@PathVariable UUID carUuid) {
-        // carService.getCarByUuid should return CarDTO directly, or service returns entity and controller maps
-        // Following the pattern where service returns DTO:
-
-         Car carEntity = carService.read(carUuid);
-         if (carEntity == null) return ResponseEntity.notFound().build();
-        CarResponseDTO carDto = CarMapper.toDto(carEntity);
-
-
-        return ResponseEntity.ok(carDto);
+    /**
+     * Retrieves a specific car by its UUID for administrative view.
+     */
+    @GetMapping("/{carUuid}") // GET /api/v1/admin/cars/{uuid_value} (replaces /read/{carId})
+    public ResponseEntity<CarResponseDTO> getCarByUuidAdmin(@PathVariable UUID carUuid) {
+        // Service's readByUuid might fetch including soft-deleted for admin.
+        // If not, use a specific adminReadByUuid or similar.
+        Car carEntity = carService.read(carUuid); // Service returns entity
+        // readByUuid should throw ResourceNotFoundException if not found.
+        return ResponseEntity.ok(CarMapper.toDto(carEntity));
     }
 
-    // Update existing car by UUID using CarDTO
-    @PutMapping("/update/{carUuid}") // Changed path variable
-    public ResponseEntity<CarResponseDTO> updateCar(@PathVariable UUID carUuid, @Valid @RequestBody Car car) {
-        // carService.updateCar should accept UUID and CarDTO
-        // and return the updated CarDTO.
-       /// Car car = carService.findByUuid(carUuid);
-        Car updatedCar = carService.update(car);
+    /**
+     * Updates an existing car identified by its UUID.
+     */
+    @PutMapping("/{carUuid}") // PUT /api/v1/admin/cars/{uuid_value} (replaces /update/{carId})
+    public ResponseEntity<CarResponseDTO> updateCar(
+            @PathVariable UUID carUuid,
+            @Valid @RequestBody CarUpdateDTO carUpdateDTO
+    ) {
+        Car existingCar = carService.read(carUuid); // Fetch current entity state
+        // readByUuid should throw ResourceNotFoundException if not found.
 
-        if (updatedCar == null) { // If service returns null on not found
-            return ResponseEntity.notFound().build();
-        }
+        // Mapper creates a new entity instance with updates applied
+        Car carWithUpdates = CarMapper.applyUpdateDtoToEntity(carUpdateDTO, existingCar);
 
-        return ResponseEntity.ok(CarMapper.toDto(updatedCar));
+        // Service's update method receives this new instance with the same ID.
+        // JPA will treat save() on this as an update to the existing record.
+        Car persistedUpdatedCar = carService.update(carWithUpdates);
+
+        return ResponseEntity.ok(CarMapper.toDto(persistedUpdatedCar));
     }
 
-    // Soft delete car by UUID
-    @DeleteMapping("/delete/{carUuid}") // Changed path variable
+    /**
+     * Soft-deletes a car by its UUID.
+     */
+    @DeleteMapping("/{carUuid}") // DELETE /api/v1/admin/cars/{uuid_value} (replaces /delete/{carId})
     public ResponseEntity<Void> deleteCar(@PathVariable UUID carUuid) {
-        // carService.deleteCarByUuid should handle the soft delete logic
-        boolean deleted = carService.delete(carUuid); // Assuming a dedicated soft delete method
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
-
-
-    // The mapPriceGroup helper is likely no longer needed in the controller
-    // if CarDTO uses the PriceGroup enum directly and validation/mapping occurs
-    // earlier (e.g., during JSON deserialization into CarDTO, or in the service layer
-    // when mapping CarDTO to Car entity if the DTO took a string).
-    // If CarDTO takes a String for priceGroup, then the service layer (or mapper) would handle this.
-    /*
-    private PriceGroup mapPriceGroup(String priceGroupString) {
-        if (priceGroupString == null) return PriceGroup.NONE; // Or throw error
-        try {
-            return PriceGroup.valueOf(priceGroupString.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            // Log error or handle as invalid input, perhaps returning a default or throwing an exception
-            System.err.println("Invalid priceGroupString provided: " + priceGroupString);
-            return PriceGroup.NONE; // Or throw new BadRequestException("Invalid price group: " + priceGroupString);
+        Car car  = carService.read(carUuid); // Fetch current entity state
+        boolean deleted = carService.delete(car.getId()); // Service handles logic
+        // softDeleteByUuid should throw ResourceNotFoundException if not found for more consistent error handling,
+        // or controller checks the boolean return value.
+        if (!deleted) {
+            return ResponseEntity.notFound().build(); // If service returns false for not found
         }
+        return ResponseEntity.noContent().build();
     }
-    */
 }

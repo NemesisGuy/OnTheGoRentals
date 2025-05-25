@@ -1,14 +1,13 @@
 package za.ac.cput.factory.impl;
 
 import org.springframework.stereotype.Component;
-import za.ac.cput.domain.Car;
-import za.ac.cput.domain.Rental;
+import za.ac.cput.domain.entity.Car;
+import za.ac.cput.domain.entity.Rental;
 import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.domain.security.User;
 import za.ac.cput.factory.IFactory;
 
 import java.time.LocalDateTime;
-import java.util.Random;
 
 /**
  * Pete Buckingham - 220165289
