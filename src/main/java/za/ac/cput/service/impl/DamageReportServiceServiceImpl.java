@@ -8,7 +8,7 @@ package za.ac.cput.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.DamageReport;
+import za.ac.cput.domain.entity.DamageReport;
 import za.ac.cput.repository.IDamageReportRepository;
 import za.ac.cput.repository.RentalRepository;
 import za.ac.cput.service.IDamageReport;

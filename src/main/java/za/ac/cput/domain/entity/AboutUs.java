@@ -7,30 +7,35 @@ package za.ac.cput.domain;
  */
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.Objects;
 import java.util.UUID;
-
+@Getter
 @Entity
 public class AboutUs {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(nullable = false, unique = true, updatable = false)
-    private UUID uuid ;
+    private UUID uuid;
     private String address;
     private String officeHours;
+    @Column(unique = true) // Assuming email should be unique for AboutUs if it represents a single contact point
     private String email;
     private String telephone;
     private String whatsApp;
+    @Column(nullable = false)
     private boolean deleted;
 
     @PrePersist
-    protected  void onCreate() {
+    protected void onCreate() {
         if (this.uuid == null) {
             this.uuid = UUID.randomUUID();
         }
+        this.deleted = false; // Default
     }
+
     protected AboutUs() {
     }
 
@@ -45,35 +50,7 @@ public class AboutUs {
         this.deleted = false;
     }
 
-    public int getId() {
-        return id;
-    }
-    public UUID getUuid() {
-        return uuid;
-    }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public String getOfficeHours() {
-        return officeHours;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getTelephone() {
-        return telephone;
-    }
-
-    public String getWhatsApp() {
-        return whatsApp;
-    }
-    public boolean isDeleted() {
-        return deleted;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -116,6 +93,7 @@ public class AboutUs {
             this.id = id;
             return this;
         }
+
         public Builder setUuid(UUID uuid) {
             this.uuid = uuid;
             return this;
@@ -145,6 +123,7 @@ public class AboutUs {
             this.whatsApp = whatsApp;
             return this;
         }
+
         public Builder setDeleted(boolean deleted) {
             this.deleted = deleted;
             return this;

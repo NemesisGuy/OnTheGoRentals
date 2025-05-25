@@ -7,10 +7,12 @@ package za.ac.cput.domain;
  */
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
-
+@Getter
 @Entity
 public class ContactUs {
     @Id
@@ -23,16 +25,21 @@ public class ContactUs {
     private String lastName;
     private String email;
     private String subject;
+    @Column(columnDefinition = "TEXT")
     private String message;
+
+    @Column(updatable = false, nullable = false)
+    private LocalDateTime createdAt; // Added for tracking submission time
+    @Column(nullable = false)
+
     private boolean deleted = false;
-
-
     @PrePersist
-    protected  void onCreate() {
-        if (this.uuid == null) {
-            this.uuid = UUID.randomUUID();
-        }
+    protected void onCreate() {
+        if (this.uuid == null) this.uuid = UUID.randomUUID();
+        this.createdAt = LocalDateTime.now();
+        this.deleted = false; // Default
     }
+
     protected ContactUs() {
     }
 
@@ -46,43 +53,12 @@ public class ContactUs {
         this.email = builder.email;
         this.subject = builder.subject;
         this.message = builder.message;
+        this.createdAt = LocalDateTime.now(); // Set createdAt to current time
         this.deleted = builder.deleted;
 
     }
 
-    public int getId() {
-        return id;
-    }
-    public UUID getUuid() {
-        return uuid;
-    }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-    public boolean isDeleted() {
-        return deleted;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -107,6 +83,7 @@ public class ContactUs {
                 ", email='" + email + '\'' +
                 ", subject='" + subject + '\'' +
                 ", message='" + message + '\'' +
+                ", createdAt=" + createdAt +
                 ", deleted=" + deleted +
                 '}';
     }
@@ -121,6 +98,7 @@ public class ContactUs {
         private String email;
         private String subject;
         private String message;
+        private LocalDateTime createdAt; // Added for tracking submission time
         private boolean deleted;
 
         public Builder setId(int id) {
@@ -165,6 +143,10 @@ public class ContactUs {
             this.deleted = deleted;
             return this;
         }
+        public Builder setCreatedAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
 
         public Builder copy(ContactUs contactUs) {
 
@@ -176,6 +158,7 @@ public class ContactUs {
             this.email = contactUs.email;
             this.subject = contactUs.subject;
             this.message = contactUs.message;
+            this.createdAt = contactUs.createdAt;
             this.deleted = contactUs.deleted;
 
             return this;
