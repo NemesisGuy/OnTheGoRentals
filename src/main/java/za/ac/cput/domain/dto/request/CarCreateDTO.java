@@ -39,5 +39,5 @@ public class CarCreateDTO {
     private String licensePlate;
 
     // Admin might set initial availability. Defaults to true if not provided by DTO.
-    private Boolean available; // Default to true in the entity or service if not provided
+    private Boolean available = true; // Default to true in the entity or service if not provided
 }

@@ -45,7 +45,7 @@ public class AdminContactUsController {
     public ResponseEntity<List<ContactUsResponseDTO>> getAllContactSubmissions() {
         List<ContactUs> submissions = contactUsService.getAll(); // Service returns entities
         if (submissions.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build(); // Return 204 if no submissions found
         }
         return ResponseEntity.ok(ContactUsMapper.toDtoList(submissions));
     }
@@ -96,4 +96,15 @@ public class AdminContactUsController {
     // Admins usually manage/view/delete existing submissions rather than creating new ones "as an admin".
     // If an admin *does* need to create one, it would look similar to other admin create methods,
     // taking an AdminContactUsCreateDTO (if different from public one) and mapping to entity.
+    /**
+     * Admin creates a new contact submission (if needed, typically public users do this).
+     * This is usually not required for admin controllers.
+     * If needed, you can implement it similarly to other create methods.
+     */
+    @PostMapping()
+    public ResponseEntity<ContactUsResponseDTO> createContactSubmission(@Valid @RequestBody ContactUs submission) {
+        // This is typically not an admin action, but if needed:
+        ContactUs createdSubmission = contactUsService.create(submission);
+        return ResponseEntity.status(201).body(ContactUsMapper.toDto(createdSubmission));
+    }
 }

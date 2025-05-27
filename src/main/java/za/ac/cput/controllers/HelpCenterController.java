@@ -116,10 +116,10 @@ public class HelpCenterController {
     public ResponseEntity<Void> deleteHelpTopic(@PathVariable UUID topicUuid) {
         // Service's delete method should handle soft deletion logic
         HelpCenter helpCenter = helpCenterService.read(topicUuid);
-        boolean deleted = helpCenterService.delete(helpCenter.getId());
+        boolean success  = helpCenterService.delete(helpCenter.getId());
         // Service's softDeleteByUuid should throw ResourceNotFoundException if not found for more consistent error handling,
         // or controller checks boolean as done here.
-        if (!deleted) {
+        if (!success ) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.noContent().build();

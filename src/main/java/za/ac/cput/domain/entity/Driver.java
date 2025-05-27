@@ -1,25 +1,32 @@
 package za.ac.cput.domain.entity;
 
 import jakarta.persistence.*;
+import org.springframework.boot.context.properties.bind.DefaultValue;
+import org.springframework.data.annotation.Id;
 
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 public class Driver {
+    @jakarta.persistence.Id
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(nullable = false, unique = true, updatable = false)
-    private UUID uuid = UUID.randomUUID();
+    private UUID uuid ;
     private String firstName;
     private String lastName;
     private String licenseCode;
-    private boolean deleted = false;
+    @Column(nullable = false )
+    private boolean deleted ;
     @PrePersist
     protected  void onCreate() {
         if (this.uuid == null) {
             this.uuid = UUID.randomUUID();
+
         }
+        this.deleted = false; // Default value for deleted
     }
 
     public Driver() {

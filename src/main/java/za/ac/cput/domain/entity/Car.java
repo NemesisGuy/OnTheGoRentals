@@ -2,6 +2,8 @@ package za.ac.cput.domain.entity;
 
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.enums.PriceGroup;
 
@@ -14,7 +16,7 @@ import java.util.UUID;
  * Date: 29 March 2021
  */
 
-
+@Getter
 @Entity
 
 public class Car {
@@ -34,7 +36,14 @@ public class Car {
     @Enumerated(EnumType.STRING)
     private PriceGroup priceGroup;
     private String licensePlate;
-    private boolean available;
+
+    @Column(name = "available", nullable = false)
+    @ColumnDefault("true")
+    // Explicitly mark as NOT NULL in JPA if DB requires it
+    private boolean available = true; // <<< SET A DEFAULT VALUE HERE
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
     private boolean deleted = false;
 
     @PrePersist
@@ -43,6 +52,8 @@ public class Car {
             this.uuid = UUID.randomUUID();
             System.out.println("Car Entity @PrePersist: Generated UUID: " + this.uuid); // For debugging
         }
+            this.available = true; // Default to available if not set
+
     }
     public Car() {
         // Default constructor
@@ -63,54 +74,6 @@ public class Car {
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-  /*  public List<Rental> getRentals() {
-        return rentals;
-    }
-*/
-    public String getMake() {
-        return make;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public PriceGroup getPriceGroup() {
-        return priceGroup;
-    }
-
-    public String getLicensePlate() {
-        return licensePlate;
-    }
-
-    public boolean isAvailable() {
-        return available;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public String getPriceGroupString() {
-        return priceGroup != null ? priceGroup.toString() : "NONE";
     }
 
 
@@ -145,7 +108,7 @@ public class Car {
         private String category;
         private PriceGroup priceGroup;
         private String licensePlate;
-        private boolean available;
+        private boolean available= true; // Default to available
         private boolean deleted = false;
 
         public Builder id(int id) {

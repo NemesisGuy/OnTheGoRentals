@@ -59,3 +59,47 @@ This file contains tracked bugs, planned improvements, and technical notes for i
 
 ---
 
+
+
+## 🛠️ Refactoring Summary
+### Admin Controllers and Vue.js Components Refactor
+(2025-05-27)
+
+
+Completed a comprehensive refactoring of all administrative controllers
+(AboutUs, Car, ContactUs, Driver, Faq, HelpCenter, Rental, User)
+and their corresponding Vue.js management components.
+
+This effort establishes consistent patterns across the admin interface:
+
+Backend (Admin Controllers):
+- Standardized base API paths to `/api/v1/admin/{resource_plural}`.
+- Implemented RESTful CRUD operations using standard HTTP methods.
+- External resource identification now consistently uses UUIDs in path
+  variables. Integer IDs are for internal database relations.
+- Request DTOs (`...CreateDTO`, `...UpdateDTO`) are used for request
+  bodies, incorporating Jakarta Bean Validation.
+- Response DTOs (`...ResponseDTO`) are used for all API responses,
+  ensuring a controlled data contract, wrapped in a standard
+  `ApiResponse` object.
+- Controllers handle mapping between DTOs and Entities using static
+  Mapper classes.
+- Service layers maintain focus on working with Entities and business logic.
+- Entities now consistently use an immutable builder pattern, and
+  mappers leverage these builders.
+- Removed direct factory usage from controllers.
+
+Frontend (Admin Vue Components - e.g., RentalManagement, UsersManagement):
+- Updated to consume the `ApiResponse` wrapper for all API calls.
+- Adapted to use UUIDs when interacting with specific resources via API.
+- Data fetching, inline editing, creation, and deletion logic now use
+  the appropriate Request/Response DTOs.
+- Implemented robust loading states (including shimmer effects) and
+  error handling using modals.
+- Standardized on Promise-based .then().catch().finally() for async
+  operations, removing direct token management (delegated to api.js).
+- Corrected template bindings and data flow issues for display and editing.
+
+This refactoring significantly improves API clarity, consistency,
+maintainability, and the separation of concerns for all administrative
+functions of the application.

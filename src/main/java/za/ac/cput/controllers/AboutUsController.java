@@ -27,7 +27,7 @@ import java.util.Optional;
  * This is the controller for the AboutUs class
  * Author: Peter Buckingham (220165289)
  * Date: 05 April 2023
- * 220165289@mycput.ac.za
+ * 220165289
  */
 @RestController
 @RequestMapping("/api/v1/about-us")

@@ -155,3 +155,193 @@ This documentation provides a good overview. You'll want to:
 *   Add more details to the "Description" for each endpoint as needed.
 *   Double-check that all request/response DTO names match what's in your code.
 
+# API Endpoints Documentation
+
+Base URL for all v1 APIs: `/api/v1`
+
+---
+*(Sections for `/auth`, `/users/me`, `/cars`, `/bookings` (user-facing), `/faqs` (public), `/help-topics` (public), `/feedback` (public POST), `/contact-us` (public POST) would remain as previously detailed, ensuring they return `ApiResponse<YourDTO>`)*
+---
+
+## Administrative Endpoints (`/admin`)
+
+All endpoints under `/api/v1/admin` require appropriate ADMIN or SUPERADMIN authentication.
+All successful data responses are wrapped in `ApiResponse<DataDTO>`. Error responses also use `ApiResponse` with an `errors` array.
+
+### Admin - User Management (`/admin/users`)
+*   **`GET /admin/users`**
+    *   Description: Retrieves a list of all users (admin view).
+    *   Response: `ApiResponse<List<UserResponseDTO>>`.
+*   **`POST /admin/users`**
+    *   Description: Creates a new user.
+    *   Request Body: `UserCreateDTO`.
+    *   Response: `201 Created` with `ApiResponse<UserResponseDTO>`.
+*   **`GET /admin/users/{userUuid}`**
+    *   Description: Retrieves a specific user by UUID.
+    *   Response: `ApiResponse<UserResponseDTO>`. `404 Not Found`.
+*   **`PUT /admin/users/{userUuid}`**
+    *   Description: Updates an existing user.
+    *   Request Body: `UserUpdateDTO`.
+    *   Response: `ApiResponse<UserResponseDTO>`. `404 Not Found`.
+*   **`DELETE /admin/users/{userUuid}`**
+    *   Description: Soft-deletes a user.
+    *   Response: `204 No Content`. `404 Not Found`.
+*   **`GET /admin/users/roles`**
+    *   Description: Lists all available `Role` entities.
+    *   Response: `ApiResponse<List<Role>>`. *(Consider RoleResponseDTO)*
+
+### Admin - Car Management (`/admin/cars`)
+*   **`GET /admin/cars`**
+    *   Description: Retrieves a list of all cars (admin view).
+    *   Response: `ApiResponse<List<CarResponseDTO>>`.
+*   **`POST /admin/cars`**
+    *   Description: Creates a new car.
+    *   Request Body: `CarCreateDTO`.
+    *   Response: `201 Created` with `ApiResponse<CarResponseDTO>`.
+*   **`GET /admin/cars/{carUuid}`**
+    *   Description: Retrieves a specific car by UUID.
+    *   Response: `ApiResponse<CarResponseDTO>`. `404 Not Found`.
+*   **`PUT /admin/cars/{carUuid}`**
+    *   Description: Updates an existing car.
+    *   Request Body: `CarUpdateDTO`.
+    *   Response: `ApiResponse<CarResponseDTO>`. `404 Not Found`.
+*   **`DELETE /admin/cars/{carUuid}`**
+    *   Description: Soft-deletes a car.
+    *   Response: `204 No Content`. `404 Not Found`.
+
+### Admin - Rental Management (`/admin/rentals`)
+*   **`GET /admin/rentals`**
+    *   Description: Retrieves a list of all rentals (admin view).
+    *   Response: `ApiResponse<List<RentalResponseDTO>>`.
+*   **`POST /admin/rentals`**
+    *   Description: Creates a new rental (admin can specify user, car, etc.).
+    *   Request Body: `BookingRequestDTO` (or `AdminRentalCreateDTO`).
+    *   Response: `201 Created` with `ApiResponse<RentalResponseDTO>`.
+*   **`GET /admin/rentals/{rentalUuid}`**
+    *   Description: Retrieves a specific rental by UUID.
+    *   Response: `ApiResponse<RentalResponseDTO>`. `404 Not Found`.
+*   **`PUT /admin/rentals/{rentalUuid}`**
+    *   Description: Updates an existing rental.
+    *   Request Body: `BookingUpdateDTO` (or `AdminRentalUpdateDTO`).
+    *   Response: `ApiResponse<RentalResponseDTO>`. `404 Not Found`.
+*   **`DELETE /admin/rentals/{rentalUuid}`**
+    *   Description: Soft-deletes a rental.
+    *   Response: `204 No Content`. `404 Not Found`.
+*   **`POST /admin/rentals/{rentalUuid}/confirm`**
+    *   Description: Admin confirms a rental.
+    *   Response: `ApiResponse<RentalResponseDTO>`.
+*   **`POST /admin/rentals/{rentalUuid}/cancel`**
+    *   Description: Admin cancels a rental.
+    *   Response: `ApiResponse<RentalResponseDTO>`.
+*   **`POST /admin/rentals/{rentalUuid}/complete`**
+    *   Description: Admin completes a rental.
+    *   Query Parameter: `fineAmount` (double, optional).
+    *   Response: `ApiResponse<RentalResponseDTO>`.
+
+### Admin - FAQ Management (`/admin/faqs`)
+*   **`GET /admin/faqs`** (If admin view is different from public `GET /faqs`)
+    *   Description: Retrieves all FAQs for admin view.
+    *   Response: `ApiResponse<List<FaqResponseDTO>>`.
+*   **`POST /admin/faqs`**
+    *   Description: Creates a new FAQ.
+    *   Request Body: `FaqCreateDTO`.
+    *   Response: `201 Created` with `ApiResponse<FaqResponseDTO>`.
+*   **`GET /admin/faqs/{faqUuid}`**
+    *   Description: Retrieves a specific FAQ by UUID.
+    *   Response: `ApiResponse<FaqResponseDTO>`. `404 Not Found`.
+*   **`PUT /admin/faqs/{faqUuid}`**
+    *   Description: Updates an existing FAQ.
+    *   Request Body: `FaqUpdateDTO`.
+    *   Response: `ApiResponse<FaqResponseDTO>`. `404 Not Found`.
+*   **`DELETE /admin/faqs/{faqUuid}`**
+    *   Description: Soft-deletes an FAQ.
+    *   Response: `204 No Content`. `404 Not Found`.
+
+### Admin - Help Topic Management (`/admin/help-topics`)
+*   **`GET /admin/help-topics`** (If admin view is different from public `GET /help-topics`)
+    *   Response: `ApiResponse<List<HelpCenterResponseDTO>>`.
+*   **`POST /admin/help-topics`**
+    *   Request Body: `HelpCenterCreateDTO`.
+    *   Response: `201 Created` with `ApiResponse<HelpCenterResponseDTO>`.
+*   **`GET /admin/help-topics/{topicUuid}`**
+    *   Response: `ApiResponse<HelpCenterResponseDTO>`. `404 Not Found`.
+*   **`PUT /admin/help-topics/{topicUuid}`**
+    *   Request Body: `HelpCenterUpdateDTO`.
+    *   Response: `ApiResponse<HelpCenterResponseDTO>`. `404 Not Found`.
+*   **`DELETE /admin/help-topics/{topicUuid}`**
+    *   Response: `204 No Content`. `404 Not Found`.
+
+### Admin - Feedback Management (`/admin/feedback`)
+*   **`GET /admin/feedback`**
+    *   Response: `ApiResponse<List<FeedbackResponseDTO>>`.
+*   **`GET /admin/feedback/{feedbackUuid}`**
+    *   Response: `ApiResponse<FeedbackResponseDTO>`. `404 Not Found`.
+*   **`DELETE /admin/feedback/{feedbackUuid}`** (Soft delete)
+    *   Response: `204 No Content`. `404 Not Found`.
+    *   *(Note: Public POST for Feedback is at `/api/v1/feedback`)*
+
+### Admin - Contact Us Submissions Management (`/admin/contact-us-submissions`)
+*   **`GET /admin/contact-us-submissions`**
+    *   Response: `ApiResponse<List<ContactUsResponseDTO>>`.
+*   **`GET /admin/contact-us-submissions/{submissionUuid}`**
+    *   Response: `ApiResponse<ContactUsResponseDTO>`. `404 Not Found`.
+*   **`PUT /admin/contact-us-submissions/{submissionUuid}`** (If admins can edit, e.g., add notes, change status)
+    *   Request Body: `AdminContactUsUpdateDTO` (or a generic `ContactUsUpdateDTO`).
+    *   Response: `ApiResponse<ContactUsResponseDTO>`.
+*   **`DELETE /admin/contact-us-submissions/{submissionUuid}`** (Soft delete)
+    *   Response: `204 No Content`. `404 Not Found`.
+    *   *(Note: Public POST for Contact Us is at `/api/v1/contact-us`)*
+
+### Admin - About Us Content Management (`/admin/about-us`)
+*   **`GET /admin/about-us`** (If multiple entries possible, or to get the single one)
+    *   Response: `ApiResponse<List<AboutUsResponseDTO>>` (or `ApiResponse<AboutUsResponseDTO>` if singleton).
+*   **`POST /admin/about-us`** (To create an entry, if system allows more than one or none exists)
+    *   Request Body: `AboutUsCreateDTO`.
+    *   Response: `201 Created` with `ApiResponse<AboutUsResponseDTO>`.
+*   **`GET /admin/about-us/{aboutUsUuid}`** (To get a specific entry by UUID if multiple allowed)
+    *   Response: `ApiResponse<AboutUsResponseDTO>`. `404 Not Found`.
+*   **`PUT /admin/about-us/{aboutUsUuid}`** (To update a specific entry by UUID)
+    *   Request Body: `AboutUsUpdateDTO`.
+    *   Response: `ApiResponse<AboutUsResponseDTO>`. `404 Not Found`.
+    *   *(If "About Us" is a singleton, a common pattern is `PUT /api/v1/admin/about-us/content`)*
+*   **`DELETE /admin/about-us/{aboutUsUuid}`** (If multiple entries allowed)
+    *   Response: `204 No Content`. `404 Not Found`.
+
+---
+
+**3. Frontend Component Overview (Brief - for a general `DEVELOPMENT_GUIDE.md` or similar)**
+
+```markdown
+## Frontend Admin Components
+
+The admin section of the frontend application provides interfaces for managing various entities. These components are typically found under `src/components/Admin/` or `src/views/Admin/`.
+
+**General Pattern:**
+*   **List Management Views (e.g., `AdminUserManagement.vue`, `AdminRentalManagement.vue`):**
+    *   Fetch and display a list of entities from the corresponding `/api/v1/admin/{resource}` endpoint.
+    *   Handle the `ApiResponse` wrapper from the backend.
+    *   Provide functionality for searching, sorting, and pagination (if implemented).
+    *   Allow navigation to create new entities (e.g., via a route like `/admin/{resource}/create`).
+    *   Offer inline editing capabilities or links to a dedicated edit page.
+    *   Implement soft deletion with confirmation modals.
+    *   Use UUIDs for identifying specific resources when making API calls for update/delete/read-specific.
+    *   Utilize shared modal components (`LoadingModal`, `SuccessModal`, `FailureModal`, `ConfirmationModal`) for user feedback.
+    *   API calls are made using the central `api.js` Axios instance, which handles token attachment and refresh logic.
+*   **Create/Edit Form Views (e.g., `AdminCreateUser.vue`, `AdminEditCar.vue`):**
+    *   Provide forms for inputting data for new or existing entities.
+    *   Use appropriate Request DTOs (`...CreateDTO`, `...UpdateDTO`) when submitting data to the backend.
+    *   Handle `ApiResponse` for success or failure (validation errors from `GlobalExceptionHandler`).
+    *   Client-side validation is often included for better UX before API submission.
+
+**Key Vue Components for Admin:**
+*   `AdminUserManagement.vue`: Manages users (list, create link, edit, delete).
+*   `AdminCarManagement.vue`: Manages cars.
+*   `AdminRentalManagement.vue`: Manages rentals (the post-booking stage).
+*   `AdminBookingManagement.vue`: (If you have a separate one for pre-pickup bookings).
+*   `AdminFaqManagement.vue`: Manages FAQs.
+*   `AdminHelpCenterManagement.vue`: Manages Help Center topics.
+*   `AdminFeedbackManagement.vue`: Manages user feedback.
+*   `AdminContactUsManagement.vue`: Manages contact us submissions.
+*   `AdminAboutUsManagement.vue`: Manages "About Us" content.
+
+These components rely on `api.js` for backend communication and Vue Router for navigation. Data is passed between list views and edit/create views typically via route parameters (UUIDs).
