@@ -2,7 +2,7 @@ package za.ac.cput.factory.impl;
 
 import za.ac.cput.domain.entity.Booking;
 import za.ac.cput.domain.entity.Car;
-import za.ac.cput.domain.security.User;
+import za.ac.cput.domain.entity.security.User;
 
 import java.time.LocalDateTime;
 

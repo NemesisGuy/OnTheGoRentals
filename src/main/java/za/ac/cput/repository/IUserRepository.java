@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface IUserRepository extends JpaRepository<User, Integer> {
 
     Boolean existsByEmail(String email);
 
@@ -28,6 +28,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findByDeletedFalse();
 
     Optional<User> findByUuidAndDeletedFalse(UUID uuid);
+
+    boolean existsByEmailAndIdNot(String email, int userId);
 }
 
 

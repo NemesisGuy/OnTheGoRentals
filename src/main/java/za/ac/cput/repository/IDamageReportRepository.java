@@ -21,5 +21,5 @@ public interface IDamageReportRepository extends JpaRepository<DamageReport, Int
 
     Optional<DamageReport> findByIdAndDeletedFalse(Integer integer);
 
-    DamageReport findByUuidAndDeletedFalse(UUID uuid);
+    Optional<DamageReport> findByUuidAndDeletedFalse(UUID uuid);
 }

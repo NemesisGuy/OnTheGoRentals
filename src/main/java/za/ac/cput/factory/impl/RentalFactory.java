@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.entity.Rental;
 import za.ac.cput.domain.enums.RentalStatus;
-import za.ac.cput.domain.security.User;
+import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.factory.IFactory;
 
 import java.time.LocalDateTime;

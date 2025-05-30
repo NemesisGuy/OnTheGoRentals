@@ -1,4 +1,4 @@
-package za.ac.cput.domain.security;
+package za.ac.cput.domain.entity.security;
 /**
  * Author: Peter Buckingham (220165289)
  */
@@ -23,8 +23,8 @@ public class Role implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
 
+    @Column(nullable = false, unique = true) // <<< ADD unique = true HERE
     RoleName roleName;
 
     public Role (String roleName) {

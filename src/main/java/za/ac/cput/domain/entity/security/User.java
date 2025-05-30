@@ -1,4 +1,4 @@
-package za.ac.cput.domain.security;
+package za.ac.cput.domain.entity.security;
 /**
  * Author: Peter Buckingham (220165289)
  */
@@ -133,16 +133,21 @@ public class User implements Serializable, UserDetails {
     // Inside za.ac.cput.domain.security.User.java
 
     @PrePersist
-    protected void onCreate() {
+    @PreUpdate
+    protected void initializeDefaults() {
         if (this.uuid == null) {
             this.uuid = UUID.randomUUID();
             System.out.println("User Entity @PrePersist: Generated UUID: " + this.uuid); // For debugging
         }
-        if (this.authProvider == null) { // Good place to set defaults
+        if (this.authProvider == null) {
             this.authProvider = AuthProvider.LOCAL;
         }
-        // this.deleted is already defaulted to false by its declaration, which is fine.
+        if (this.roles == null || this.roles.isEmpty()) {
+            this.roles = new ArrayList<>();
+            this.roles.add(new Role("USER")); // Ensure "USER" exists in your database
+        }
     }
+
 
 }
 

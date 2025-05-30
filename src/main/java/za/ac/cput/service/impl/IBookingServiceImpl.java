@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.entity.Booking;
 import za.ac.cput.domain.entity.Car;
-import za.ac.cput.domain.security.User;
+import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.BookingRepository;
@@ -22,7 +22,7 @@ public class IBookingServiceImpl implements IBookingService {
     @Autowired
     private CarRepository carRepository;
     @Autowired
-    private UserService userService;
+    private UserServiceImpl  userService;
     @Autowired
     private CarServiceImpl carService;
 
@@ -43,7 +43,7 @@ public class IBookingServiceImpl implements IBookingService {
         if (car == null) {
             throw new ResourceNotFoundException("Car not found");
         }//get user from its uuid
-        User user = userService.readByUuid(booking.getUser().getUuid());
+        User user = userService.read(booking.getUser().getUuid());
 
         //User user = userService.read(booking.getUser().getId());
         List<Booking> activeBookings = bookingRepository.findByCarIdAndStatusAndDeletedFalse(car.getId(), "CONFIRMED");
@@ -57,7 +57,7 @@ public class IBookingServiceImpl implements IBookingService {
         builder.setUser(user);
         return bookingRepository.save(booking);
     }
-
+    @Override
     public Booking confirmBooking(int bookingId) {
         Booking booking = bookingRepository.findByIdAndDeletedFalse(bookingId).orElse(null);
         if (booking != null) {
@@ -67,7 +67,7 @@ public class IBookingServiceImpl implements IBookingService {
         }
         return null;
     }
-
+    @Override
     public Booking cancelBooking(int bookingId) {
         Booking booking = bookingRepository.findByIdAndDeletedFalse(bookingId).orElse(null);
         if (booking != null) {
@@ -77,7 +77,7 @@ public class IBookingServiceImpl implements IBookingService {
         }
         return null;
     }
-
+    @Override
     public List<Booking> getUserBookings(int userId) {
         return bookingRepository.findByUserIdAndDeletedFalse(userId);
     }
@@ -103,9 +103,6 @@ public class IBookingServiceImpl implements IBookingService {
         return bookingRepository.findByUuidAndDeletedFalse(uuid).orElse(null);
     }
 
-    public Booking readByUuid(UUID id) {
-        return bookingRepository.findByUuidAndDeletedFalse(id).orElse(null);
-    }
 
 
     //@Override

@@ -1,4 +1,4 @@
-package za.ac.cput.domain.security;
+package za.ac.cput.domain.entity.security;
 
 /**
  * Author: Peter Buckingham (220165289)

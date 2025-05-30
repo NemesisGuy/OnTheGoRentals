@@ -3,6 +3,7 @@ package za.ac.cput.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import za.ac.cput.domain.entity.Rental;
+import za.ac.cput.domain.enums.RentalStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,5 +47,9 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
     Optional<Rental> findByIdAndDeletedFalse(Integer id);
 
     Optional<Rental> findByUuidAndDeletedFalse(UUID rentalId);
+
+/*
+    List<Rental> findByUserIdAndReturnedDateIsNullAndDeletedFalse(Integer id, List<RentalStatus> active);
+*/
 }
 

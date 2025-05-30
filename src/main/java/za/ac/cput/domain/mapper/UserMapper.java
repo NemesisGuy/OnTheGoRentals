@@ -1,7 +1,7 @@
 package za.ac.cput.domain.mapper;
 
-import za.ac.cput.domain.security.Role;
-import za.ac.cput.domain.security.User;
+import org.springframework.stereotype.Component;
+import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.dto.request.UserCreateDTO; // Using generic create DTO
 import za.ac.cput.domain.dto.request.UserUpdateDTO; // Using generic update DTO
 import za.ac.cput.domain.dto.response.UserResponseDTO;
@@ -9,7 +9,7 @@ import za.ac.cput.domain.dto.response.UserResponseDTO;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Component
 public class UserMapper {
 
     public static UserResponseDTO toDto(User user) {
@@ -49,7 +49,8 @@ public class UserMapper {
         if (createDto.getProfileImageUrl() != null) {
             builder.profileImageUrl(createDto.getProfileImageUrl());
         }
-        // UUID is set by @PrePersist. Roles set by service. Deleted defaults to false.
+        // Roles are set here
+        // UUID is set by @PrePersist.  Deleted defaults to false.
         return builder.build();
     }
 

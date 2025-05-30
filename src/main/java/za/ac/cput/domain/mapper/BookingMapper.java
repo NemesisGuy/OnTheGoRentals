@@ -8,7 +8,7 @@ import za.ac.cput.domain.dto.response.BookingResponseDTO;
 
 
 import za.ac.cput.domain.entity.Car;     // Entity
-import za.ac.cput.domain.security.User; // Entity
+import za.ac.cput.domain.entity.security.User; // Entity
 import za.ac.cput.domain.dto.request.BookingRequestDTO;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
 import za.ac.cput.domain.dto.response.UserResponseDTO;

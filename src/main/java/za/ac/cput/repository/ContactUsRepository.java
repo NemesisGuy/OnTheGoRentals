@@ -17,5 +17,7 @@ public interface ContactUsRepository extends JpaRepository<ContactUs, Integer> {
     Optional<ContactUs> findByIdAndDeletedFalse(int id);
 
     Optional<ContactUs> findByUuidAndDeletedFalse(UUID uuid);
+
+    boolean existsByIdAndDeletedFalse(Integer submissionId);
     //Optional<Object> findById();
 }

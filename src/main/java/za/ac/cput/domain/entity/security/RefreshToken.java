@@ -1,4 +1,4 @@
-package za.ac.cput.domain.security;
+package za.ac.cput.domain.entity.security;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -3,8 +3,8 @@ package za.ac.cput.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
-import za.ac.cput.domain.security.RefreshToken;
-import za.ac.cput.domain.security.User;
+import za.ac.cput.domain.entity.security.RefreshToken;
+import za.ac.cput.domain.entity.security.User;
 
 import java.util.Optional;
 

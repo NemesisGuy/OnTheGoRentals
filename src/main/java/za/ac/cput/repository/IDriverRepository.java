@@ -17,4 +17,6 @@ public interface IDriverRepository extends JpaRepository<Driver, Integer> {
     Optional<Driver> findByIdAndDeletedFalse(Integer id);
 
     Optional<Driver> findByUuidAndDeletedFalse(UUID driverUuid);
+
+    boolean existsByIdAndDeletedFalse(Integer driverId);
 }

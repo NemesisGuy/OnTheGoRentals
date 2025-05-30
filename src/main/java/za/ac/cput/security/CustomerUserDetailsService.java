@@ -1,29 +1,60 @@
 package za.ac.cput.security;
-/**
- * Author: Peter Buckingham (220165289)
- */
 
-import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger; // Import SLF4J Logger
+import org.slf4j.LoggerFactory; // Import SLF4J LoggerFactory
+// import lombok.RequiredArgsConstructor; // Keep if you prefer Lombok
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
-import za.ac.cput.domain.security.User;
-import za.ac.cput.repository.UserRepository;
+import org.springframework.stereotype.Service; // Use @Service for consistency
+import za.ac.cput.domain.entity.security.User;
+import za.ac.cput.repository.IUserRepository;
 
-
-@Component
-@RequiredArgsConstructor
+/**
+ * CustomerUserDetailsService.java
+ * Implements Spring Security's {@link UserDetailsService} interface.
+ * Responsible for loading user-specific data (as a {@link UserDetails} object)
+ * by username (which is email in this application) from the database.
+ * This service is used by Spring Security's authentication providers.
+ *
+ * Author: Peter Buckingham (220165289)
+ * Date: [Original Date - Please specify if known]
+ * Updated by: Peter Buckingham
+ * Updated: 2025-05-28
+ */
+@Service // Changed from @Component to @Service as it's a service layer component
+// @RequiredArgsConstructor // Can be used if you prefer Lombok for constructor
 public class CustomerUserDetailsService implements UserDetailsService {
 
-    private final UserRepository iUserRepository;
+    private static final Logger log = LoggerFactory.getLogger(CustomerUserDetailsService.class); // Manual SLF4J Logger
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = iUserRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found !"));
-        return user;
+    private final IUserRepository userRepository; // Corrected variable name
 
+    // Constructor injection is preferred
+    public CustomerUserDetailsService(IUserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-
+    /**
+     * Loads a user by their username (which is their email address in this application).
+     * Fetches the user from the database and returns a {@link UserDetails} object
+     * (our {@link User} entity implements UserDetails).
+     *
+     * @param email The email address (username) of the user to load.
+     * @return A {@link UserDetails} object representing the user.
+     * @throws UsernameNotFoundException if the user with the given email is not found.
+     */
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        log.debug("Attempting to load user by email (username): '{}'", email);
+        User user = userRepository.findByEmailAndDeletedFalse(email) // Ensure we don't load soft-deleted users
+                .orElseThrow(() -> {
+                    log.warn("User not found with email: '{}'", email);
+                    return new UsernameNotFoundException("User not found with email: " + email);
+                });
+        log.info("User found and loaded successfully for email: '{}'. User ID: {}", email, user.getId());
+        // Your User entity must implement UserDetails for this to work directly.
+        // If it doesn't, you'd map User to a UserDetails implementation here.
+        return user;
+    }
 }

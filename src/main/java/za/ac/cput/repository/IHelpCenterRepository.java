@@ -29,4 +29,6 @@ public interface IHelpCenterRepository extends JpaRepository<HelpCenter, Integer
     List<HelpCenter> findByCategoryAndDeletedFalse(String category);
 
     Optional<HelpCenter> findByUuidAndDeletedFalse(UUID uuid);
+
+    boolean existsByIdAndDeletedFalse(Integer topicId);
 }

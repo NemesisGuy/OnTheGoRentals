@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.enums.RentalStatus;
-import za.ac.cput.domain.security.User;
+import za.ac.cput.domain.entity.security.User;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -40,13 +40,12 @@ public class Rental implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY) // Good to keep LAZY
     @JoinColumn(name = "driver_id")
     private Driver driver;
-
     private int issuer;
     private int receiver;
     private int fine;
     @Column(nullable = false)
-
     private LocalDateTime issuedDate;
+    private LocalDateTime expectedReturnDate; // Optional, can be used for future enhancements
     private LocalDateTime returnedDate;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -76,7 +75,7 @@ public class Rental implements Serializable {
     public Rental() {
     }
 
-    public Rental(int id, User user, Car car, int issuer, int receiver, int fine, LocalDateTime issuedDate, LocalDateTime returnedDate, RentalStatus status , LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Rental(int id, User user, Car car, int issuer, int receiver, int fine, LocalDateTime issuedDate, LocalDateTime expectedReturnDate,LocalDateTime returnedDate, RentalStatus status , LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.user = user;
         this.car = car;
@@ -84,6 +83,7 @@ public class Rental implements Serializable {
         this.receiver = receiver;
         this.fine = fine;
         this.issuedDate = issuedDate;
+        this.expectedReturnDate = expectedReturnDate;
         this.returnedDate = returnedDate;
         this.deleted = false;
         this.status = status;
@@ -101,6 +101,7 @@ public class Rental implements Serializable {
         this.receiver = builder.receiver;
         this.fine = builder.fine;
         this.issuedDate = builder.issuedDate;
+        this.expectedReturnDate = builder.expectedReturnDate;
         this.returnedDate = builder.returnedDate;
         this.deleted = builder.deleted;
         this.status = builder.status;
@@ -133,6 +134,7 @@ public class Rental implements Serializable {
                 ", receiver=" + receiver +
                 ", fine=" + fine +
                 ", issuedDate=" + issuedDate +
+                ", expectedReturnDate=" + expectedReturnDate +
                 ", returnedDate=" + returnedDate +
                 ", status=" + status +
                 ", deleted=" + deleted +
@@ -151,6 +153,7 @@ public class Rental implements Serializable {
         private int receiver;
         private int fine;
         private LocalDateTime issuedDate;
+        private LocalDateTime expectedReturnDate;
         private LocalDateTime returnedDate;
         private RentalStatus status;
         private boolean deleted;
@@ -202,6 +205,10 @@ public class Rental implements Serializable {
             this.issuedDate = issuedDate;
             return this;
         }
+        public Builder setExpectedReturnDate(LocalDateTime expectedReturnDate) {
+            this.expectedReturnDate = expectedReturnDate;
+            return this;
+        }
 
         public Builder setReturnedDate(LocalDateTime returnedDate) {
             this.returnedDate = returnedDate;
@@ -235,6 +242,7 @@ public class Rental implements Serializable {
             this.receiver = rental.receiver;
             this.fine = rental.fine;
             this.issuedDate = rental.issuedDate;
+            this.expectedReturnDate = rental.expectedReturnDate;
             this.returnedDate = rental.returnedDate;
             this.status = rental.status;
             this.deleted = rental.deleted;

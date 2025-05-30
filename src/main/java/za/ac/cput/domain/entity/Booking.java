@@ -2,7 +2,7 @@ package za.ac.cput.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import za.ac.cput.domain.security.User;
+import za.ac.cput.domain.entity.security.User;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

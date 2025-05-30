@@ -14,4 +14,6 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
 
 
     Optional<Feedback> findByUuidAndDeletedFalse(UUID uuid);
+
+    boolean existsByIdAndDeletedFalse(Integer feedbackId);
 }

@@ -3,8 +3,7 @@ package za.ac.cput.domain.mapper;
 import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.entity.Driver;
 import za.ac.cput.domain.entity.Rental;
-import za.ac.cput.domain.enums.RentalStatus;
-import za.ac.cput.domain.security.User;
+import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.dto.request.RentalRequestDTO;
 import za.ac.cput.domain.dto.request.RentalUpdateDTO; // Assuming you create this
 import za.ac.cput.domain.dto.response.CarResponseDTO;
@@ -97,8 +96,8 @@ public class RentalMapper {
 
         Rental.Builder builder = new Rental.Builder().copy(existingRental);
 
-        if (updateDto.getExpectedReturnedDate() != null) {
-            builder.setReturnedDate(updateDto.getExpectedReturnedDate());
+        if (updateDto.getReturnedDate() != null) {
+            builder.setReturnedDate(updateDto.getReturnedDate());
         }
         // Example if car or driver can be changed during an update (complex logic)
         // if (newCarEntity != null) {

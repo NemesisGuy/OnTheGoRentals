@@ -11,10 +11,14 @@ import java.util.UUID;
 public interface AboutUsRepository extends JpaRepository<AboutUs, Integer> {
     boolean existsByIdAndDeletedFalse(int id);
 
-    List<AboutUs> findByDeletedFalse();
+    List<AboutUs> findAllByDeletedFalse();
 
     Optional<AboutUs> findByIdAndDeletedFalse(int id);
 
     Optional<AboutUs>  findByUuidAndDeletedFalse(UUID uuid);
+
+/*
+    Optional<AboutUs>  read(UUID uuid);
+*/
 }
 

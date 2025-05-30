@@ -1,7 +1,7 @@
 package za.ac.cput.domain.entity;
 
+
 import jakarta.persistence.*;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.annotation.Id;
 
 import java.util.Objects;
@@ -9,7 +9,8 @@ import java.util.UUID;
 
 @Entity
 public class Driver {
-    @jakarta.persistence.Id
+
+    @jakarta.persistence.Id // This is the correct JPA annotation for the primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -99,7 +100,7 @@ public class Driver {
         private String firstName;
         private String lastName;
         private String licenseCode;
-        private boolean deleted = false;
+        private boolean deleted = false; // Good default
 
         public Builder setId(int id) {
             this.id = id;
@@ -143,8 +144,6 @@ public class Driver {
             return new Driver(this);
         }
 
-        public Builder id(int nextInt) {
-            return null;
-        }
+
     }
 }

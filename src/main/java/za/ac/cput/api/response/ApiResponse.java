@@ -1,39 +1,63 @@
 package za.ac.cput.api.response;
 
-import lombok.Getter; // Import Lombok Getter
-import lombok.NoArgsConstructor; // Import NoArgsConstructor
-import lombok.Setter; // Import Lombok Setter (optional if only for serialization)
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Collections; // For empty list
+import java.util.Collections;
 import java.util.List;
 
-@Getter // Add Lombok's @Getter for all fields
-@Setter // Add Lombok's @Setter if you ever need to deserialize this or for completeness
-@NoArgsConstructor // Ensures a no-argument constructor exists (good for Jackson)
+/**
+ * ApiResponse.java
+ * A generic wrapper for API responses to provide a consistent structure.
+ * It includes fields for the actual data payload, a list of errors (if any),
+ * and a status indicator ("success" or "fail").
+ *
+ * Author: Peter Buckingham (220165289) // Assuming based on context
+ * Date: [Date of creation - e.g., 2025-05-28]
+ * Updated by: Peter Buckingham
+ * Updated: 2025-05-28
+ */
+@Getter
+@Setter
+@NoArgsConstructor // For Jackson deserialization and general flexibility
 public class ApiResponse<T> {
     private T data;
     private List<FieldErrorDto> errors;
-    private String status;
+    private String status; // e.g., "success", "fail", "error"
 
-    // Constructor for successful response
+    /**
+     * Constructor for a successful response.
+     *
+     * @param data The data payload of the response.
+     */
     public ApiResponse(T data) {
         this.data = data;
-        this.status = "success";
-        this.errors = Collections.emptyList(); // Use Collections.emptyList() for an immutable empty list
+        this.status = "success"; // Convention for successful responses
+        this.errors = Collections.emptyList(); // No errors for a successful response
     }
 
-    // Constructor for error response
+    /**
+     * Constructor for an error response.
+     *
+     * @param errors A list of {@link FieldErrorDto} detailing the errors.
+     */
     public ApiResponse(List<FieldErrorDto> errors) {
-        this.errors = errors;
-        this.status = "fail"; // Or "error" depending on your convention
-        this.data = null; // Explicitly null for error responses
+        this.data = null; // No data payload for an error response
+        this.status = "fail"; // Convention for responses with errors (e.g., validation, not found)
+        // Could also be "error" for unexpected server errors.
+        this.errors = (errors != null) ? errors : Collections.emptyList();
     }
 
-    // If not using Lombok, you would manually write:
-    // public T getData() { return data; }
-    // public void setData(T data) { this.data = data; }
-    // public List<FieldErrorDto> getErrors() { return errors; }
-    // public void setErrors(List<FieldErrorDto> errors) { this.errors = errors; }
-    // public String getStatus() { return status; }
-    // public void setStatus(String status) { this.status = status; }
+    /**
+     * Constructor for an error response with a custom status string.
+     *
+     * @param errors A list of {@link FieldErrorDto} detailing the errors.
+     * @param status A custom status string (e.g., "error" for server errors).
+     */
+    public ApiResponse(List<FieldErrorDto> errors, String status) {
+        this.data = null;
+        this.status = status;
+        this.errors = (errors != null) ? errors : Collections.emptyList();
+    }
 }

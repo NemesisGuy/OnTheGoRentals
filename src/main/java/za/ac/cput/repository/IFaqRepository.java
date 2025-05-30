@@ -24,4 +24,6 @@ public interface IFaqRepository extends JpaRepository<Faq, Integer> {
    Optional <Faq> findByIdAndDeletedFalse(Integer integer);
 
     Optional <Faq> findByUuidAndDeletedFalse(UUID uuid);
+
+    boolean existsByIdAndDeletedFalse(Integer faqId);
 }
