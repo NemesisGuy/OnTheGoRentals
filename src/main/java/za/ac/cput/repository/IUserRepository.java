@@ -3,7 +3,7 @@ package za.ac.cput.repository;
 /*import com.ons.securitylayerJwt.models.User;*/
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import za.ac.cput.domain.security.User;
+import za.ac.cput.domain.entity.security.User;
 
 import java.util.List;
 import java.util.Optional;
