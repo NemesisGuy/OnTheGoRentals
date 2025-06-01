@@ -18,14 +18,14 @@ public class CarFactory implements IFactory<Car> {
     public Car createCar(int id, String make, String model, int year, String category, PriceGroup priceGroup, String licensePlate, boolean available) {
         return Car.builder()
 
-                .id(id)
-                .make(make)
-                .model(model)
-                .year(year)
-                .category(category)
-                .priceGroup(priceGroup)
-                .licensePlate(licensePlate)
-                .available(available)
+                .setId(id)
+                .setMake(make)
+                .setModel(model)
+                .setYear(year)
+                .setCategory(category)
+                .setPriceGroup(priceGroup)
+                .setLicensePlate(licensePlate)
+                .setAvailable(available)
                 .build();
     }
 

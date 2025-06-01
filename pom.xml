@@ -30,6 +30,8 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <!-- Spring Boot's parent POM manages the version for JUnit, Mockito etc. -->
+            <!-- Avoid specifying versions for JUnit artifacts directly unless you know what you're doing -->
         </dependency>
         <!-- Spring Data JPA dependency -->
         <dependency>
@@ -38,7 +40,7 @@
         </dependency>
 
         <!-- JUnit Jupiter dependencies for testing -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.9.2</version>
@@ -57,7 +59,7 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.9.2</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
 
         <!-- MySQL connector -->
         <dependency>

@@ -3,7 +3,7 @@ package za.ac.cput.service.impl;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired; // Explicitly add if not already
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -22,15 +22,15 @@ import za.ac.cput.domain.entity.security.Role;
 import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.exception.EmailAlreadyExistsException;
+import za.ac.cput.exception.ResourceNotFoundException; // If roleRepository.findByRoleName might throw this
 import za.ac.cput.exception.TokenRefreshException;
 import za.ac.cput.repository.IRoleRepository;
-// Assuming IUserRepository is your user repository interface
-// import za.ac.cput.repository.IUserRepository;
 import za.ac.cput.security.JwtUtilities;
 import za.ac.cput.service.IAuthService;
 import za.ac.cput.service.IRefreshTokenService;
-import za.ac.cput.service.IUserService; // To interact with User CRUD
+import za.ac.cput.service.IUserService;
 
+import java.util.ArrayList; // For initializing roles list if needed
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -42,19 +42,21 @@ import java.util.stream.Collectors;
  * Implementation of the {@link IAuthService} interface.
  * Handles user registration, login, token refresh, and logout operations,
  * including JWT generation/validation and cookie management for refresh tokens.
+ * This service orchestrates actions using {@link IUserService}, {@link IRefreshTokenService},
+ * and Spring Security components.
  *
  * Author: Peter Buckingham
  * Date: 2025-05-28
  * Updated by: Peter Buckingham
- * Updated: 2025-05-28
+ * Updated: 2025-05-30
  */
 @Service
-@Transactional // Apply transactionality to public methods
+@Transactional // Apply transactionality to public methods, especially registration
 public class AuthServiceImpl implements IAuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 
-    private final IUserService userService; // For user creation and retrieval
+    private final IUserService userService;
     private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -70,20 +72,20 @@ public class AuthServiceImpl implements IAuthService {
     @Value("${app.security.refresh-cookie.path}")
     private String refreshTokenCookiePath;
 
-    @Value("${app.security.cookie.secure:true}")
+    @Value("${app.security.cookie.secure:true}") // Default to true, configurable
     private boolean secureCookie;
 
     /**
      * Constructs the AuthServiceImpl with necessary dependencies.
      *
-     * @param userService         Service for user data operations.
-     * @param roleRepository      Repository for role data access.
-     * @param passwordEncoder     Encoder for user passwords.
-     * @param authenticationManager Spring's authentication manager.
-     * @param jwtUtilities        Utility for JWT operations.
-     * @param refreshTokenService Service for refresh token management.
+     * @param userService         Service for user data operations (e.g., checking email existence, creating user).
+     * @param roleRepository      Repository for role data access (e.g., finding default roles).
+     * @param passwordEncoder     Encoder for hashing user passwords.
+     * @param authenticationManager Spring's authentication manager for validating credentials.
+     * @param jwtUtilities        Utility for JWT generation and cookie creation.
+     * @param refreshTokenService Service for managing the lifecycle of refresh tokens.
      */
-    @Autowired // Good practice for constructor injection
+    @Autowired
     public AuthServiceImpl(IUserService userService,
                            IRoleRepository roleRepository,
                            PasswordEncoder passwordEncoder,
@@ -96,7 +98,8 @@ public class AuthServiceImpl implements IAuthService {
         this.authenticationManager = authenticationManager;
         this.jwtUtilities = jwtUtilities;
         this.refreshTokenService = refreshTokenService;
-        log.info("AuthServiceImpl initialized. Secure cookie flag: {}", secureCookie);
+        log.info("AuthServiceImpl initialized. Secure cookie flag: {}, Refresh token cookie name: '{}', Path: '{}', Duration: {}ms",
+                secureCookie, refreshTokenCookieName, refreshTokenCookiePath, refreshTokenDurationMs);
     }
 
     // --- Private Helper methods for cookie generation ---
@@ -108,14 +111,14 @@ public class AuthServiceImpl implements IAuthService {
                 .secure(secureCookie)
                 .path(refreshTokenCookiePath)
                 .maxAge(TimeUnit.MILLISECONDS.toSeconds(refreshTokenDurationMs))
-                .sameSite("Lax")
+                .sameSite("Lax") // "Lax" is a good default for refresh tokens. "Strict" is more secure but might affect some cross-site scenarios.
                 .build();
     }
 
     private ResponseCookie getCleanHttpOnlyRefreshTokenCookie() {
         log.debug("Generating clean (expiring) HTTP-only refresh token cookie. Name: '{}', Path: '{}', Secure: {}",
                 refreshTokenCookieName, refreshTokenCookiePath, secureCookie);
-        return ResponseCookie.from(refreshTokenCookieName, "")
+        return ResponseCookie.from(refreshTokenCookieName, "") // Empty value
                 .httpOnly(true)
                 .secure(secureCookie)
                 .path(refreshTokenCookiePath)
@@ -127,39 +130,35 @@ public class AuthServiceImpl implements IAuthService {
     /**
      * {@inheritDoc}
      */
+    // In AuthServiceImpl.java
     @Override
     public User registerUser(String firstName, String lastName, String email, String plainPassword, RoleName defaultRoleName) {
         log.info("AuthService: Attempting to register new user with email: {}", email);
-        if (userService.read(email) != null) {
+        if (userService.read(email) != null) { // Check via IUserService.read()
             log.warn("AuthService: Registration failed. Email '{}' already exists.", email);
             throw new EmailAlreadyExistsException("Email " + email + " is already taken!");
         }
 
-        User user = new User();
-        // User's UUID will be set by userService.saveUser if not already set by @PrePersist or other means.
-        // Or explicitly:
-        if (user.getUuid() == null) {
-            user.setUuid(UUID.randomUUID());
+        Role userRoleEntity = roleRepository.findByRoleName(defaultRoleName);
+        if (userRoleEntity == null) {
+            log.error("AuthService: Default role '{}' not found. This is a critical configuration error.", defaultRoleName);
+            throw new IllegalStateException("Default role " + defaultRoleName + " not found.");
         }
-        user.setEmail(email);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setPassword(passwordEncoder.encode(plainPassword));
-        user.setDeleted(false);
+        List<Role> rolesToAssign = Collections.singletonList(userRoleEntity);
 
-        Role userRole = roleRepository.findByRoleName(RoleName.USER); // Use .name() for enum
-        if (userRole == null) {
-            log.error("AuthService: Default role '{}' not found for registration. This is a critical configuration error.", defaultRoleName);
-            throw new IllegalStateException("Default role " + defaultRoleName + " not found. Please ensure roles are seeded/configured in the database.");
-        }
-        user.setRoles(Collections.singletonList(userRole));
+        // Build the User object that will be passed to userService.createUser
+        User userToCreateDetails = User.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .password(plainPassword) // Pass plain password to IUserService.createUser
+                // IUserService.createUser is responsible for encoding
+                // UUID, deleted, authProvider should be handled by User's @PrePersist or IUserService.createUser
+                .build();
 
-        // Use IUserService to create the user with roles (if IUserService.createUser handles roles)
-        // or save the user then assign roles.
-        // Assuming IUserService.saveUser is a generic save.
-        // If IUserService has a specific createUser(User userDetails, List<Role> roles), use that.
-        // For now, using the generic userService.saveUser which assumes roles are already set on 'user' object.
-        User savedUser = userService.saveUser(user); // Pass the fully prepared user
+        // IUserService.createUser handles encoding, setting roles, and saving.
+        User savedUser = userService.createUser(userToCreateDetails, rolesToAssign);
+
         log.info("AuthService: Successfully registered user. ID: {}, UUID: '{}', Email: '{}'",
                 savedUser.getId(), savedUser.getUuid(), savedUser.getEmail());
         return savedUser;
@@ -170,25 +169,30 @@ public class AuthServiceImpl implements IAuthService {
      */
     @Override
     public AuthDetails loginUser(String email, String plainPassword, HttpServletResponse httpServletResponse) {
-        log.info("AuthService: Attempting to authenticate user with email: {}", email);
+        log.info("AuthService: Attempting to authenticate user with email: '{}'", email);
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, plainPassword)
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.debug("AuthService: Spring Security Authentication successful for '{}'.", email);
 
-            User user = userService.read(authentication.getName());
+            // Fetch the full User entity using IUserService
+            User user = userService.read(authentication.getName()); // authentication.getName() is usually the username (email)
             if (user == null) {
-                log.error("AuthService: CRITICAL - Authenticated user '{}' not found by userService. Data inconsistency or UserDetailsService issue.", authentication.getName());
-                throw new UsernameNotFoundException("User details for authenticated principal '" + authentication.getName() + "' not found in system.");
+                // This state (authenticated by AuthenticationManager but not found by userService.read)
+                // indicates a potential data inconsistency or issue with UserDetailsService logic if separate.
+                log.error("AuthService: CRITICAL - Authenticated user '{}' was not found by IUserService.read(). " +
+                        "This might indicate a data consistency issue or UserDetailsService discrepancy.", authentication.getName());
+                throw new UsernameNotFoundException("User details for authenticated principal '" + authentication.getName() + "' not found in system after successful Spring Security authentication.");
             }
 
             List<String> roleNames = user.getRoles().stream()
-                    .map(Role::getRoleName) // Assuming Role entity has getRoleName() returning String
+                    .map(Role::getRoleName) // Uses Role.getRoleName() which returns String
                     .collect(Collectors.toList());
 
             String accessToken = jwtUtilities.generateToken(user, roleNames);
-            RefreshToken refreshTokenEntity = refreshTokenService.createRefreshToken(user.getId());
+            RefreshToken refreshTokenEntity = refreshTokenService.createRefreshToken(user.getId()); // Manages DB persistence
 
             ResponseCookie refreshTokenCookie = generateHttpOnlyRefreshTokenCookie(refreshTokenEntity.getToken());
             httpServletResponse.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
@@ -198,10 +202,10 @@ public class AuthServiceImpl implements IAuthService {
 
         } catch (BadCredentialsException e) {
             log.warn("AuthService: Authentication failed for user '{}': Invalid credentials.", email);
-            throw e;
-        } catch (AuthenticationException e) {
-            log.warn("AuthService: Authentication failed for user '{}': {}", email, e.getMessage(), e);
-            throw e;
+            throw e; // Re-throw for the controller/global handler to manage the HTTP response
+        } catch (AuthenticationException e) { // Catch other authentication-related issues
+            log.warn("AuthService: Authentication attempt failed for user '{}': {}", email, e.getMessage());
+            throw e; // Re-throw
         }
     }
 
@@ -211,38 +215,42 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     public RefreshedTokenDetails refreshAccessToken(String refreshTokenFromCookie, HttpServletResponse httpServletResponse) {
         log.info("AuthService: Attempting to refresh access token using refresh token from cookie.");
-        // Avoid logging the full token value.
-        // log.debug("AuthService: Received refresh token from cookie (partial): {}...", refreshTokenFromCookie.substring(0, Math.min(10, refreshTokenFromCookie.length())));
-
+        // Avoid logging the full token string for security.
+        // log.debug("AuthService: Received refresh token from cookie (partial for logging): {}...",
+        //           refreshTokenFromCookie != null && refreshTokenFromCookie.length() > 10 ?
+        //           refreshTokenFromCookie.substring(0, 10) : refreshTokenFromCookie);
 
         return refreshTokenService.findByToken(refreshTokenFromCookie)
-                .map(refreshTokenEntity -> {
-                    log.debug("AuthService: Found refresh token entity (ID: {}) for user ID: {}", refreshTokenEntity.getId(), refreshTokenEntity.getUser().getId());
-                    return refreshTokenService.verifyDeviceAndExpiration(refreshTokenEntity);
+                .map(refreshTokenEntity -> { // Renamed for clarity
+                    log.debug("AuthService: Found refresh token entity (ID: {}) for user ID: {}",
+                            refreshTokenEntity.getId(), refreshTokenEntity.getUser().getId());
+                    return refreshTokenService.verifyDeviceAndExpiration(refreshTokenEntity); // Throws if invalid/expired
                 })
-                .map(validRefreshTokenEntity -> {
+                .map(validRefreshTokenEntity -> { // Renamed for clarity
                     User user = validRefreshTokenEntity.getUser();
-                    log.debug("AuthService: User ID: {} (Email: '{}') verified for token refresh. Proceeding to rotate refresh token.", user.getId(), user.getEmail());
+                    log.debug("AuthService: User ID: {} (Email: '{}') verified for token refresh. Proceeding to rotate refresh token.",
+                            user.getId(), user.getEmail());
 
                     refreshTokenService.deleteByToken(refreshTokenFromCookie); // Invalidate (delete) the used refresh token
-                    log.debug("AuthService: Old refresh token (ending ...{}) invalidated from DB.", refreshTokenFromCookie.substring(Math.max(0, refreshTokenFromCookie.length() - 6)));
+                    log.debug("AuthService: Old refresh token (ending ...{}) invalidated/deleted from DB.",
+                            refreshTokenFromCookie.substring(Math.max(0, refreshTokenFromCookie.length() - 6)));
 
                     RefreshToken newRefreshTokenEntity = refreshTokenService.createRefreshToken(user.getId()); // Create a new one
                     ResponseCookie newRefreshTokenCookie = generateHttpOnlyRefreshTokenCookie(newRefreshTokenEntity.getToken());
                     httpServletResponse.addHeader(HttpHeaders.SET_COOKIE, newRefreshTokenCookie.toString());
-                    log.info("AuthService: New refresh token cookie set for user ID: {}", user.getId());
+                    log.info("AuthService: New refresh token cookie set for user ID: {}.", user.getId());
 
                     List<String> roleNames = user.getRoles().stream()
                             .map(Role::getRoleName)
                             .collect(Collectors.toList());
                     String newAccessToken = jwtUtilities.generateToken(user, roleNames);
-                    log.info("AuthService: New access token generated for user ID: {}", user.getId());
+                    log.info("AuthService: New access token generated for user ID: {}.", user.getId());
 
                     return new RefreshedTokenDetails(newAccessToken);
                 })
                 .orElseThrow(() -> {
-                    log.warn("AuthService: Refresh token from cookie not found in database or is invalid/expired.");
-                    return new TokenRefreshException(refreshTokenFromCookie, "Refresh token is not in database or invalid!");
+                    log.warn("AuthService: Refresh token from cookie not found in database, is invalid, or has expired.");
+                    return new TokenRefreshException(refreshTokenFromCookie, "Refresh token is not in database or is invalid/expired!");
                 });
     }
 
@@ -253,24 +261,28 @@ public class AuthServiceImpl implements IAuthService {
     public boolean logoutUser(int userId, HttpServletResponse httpServletResponse) {
         log.info("AuthService: Performing logout for user ID: {}", userId);
         try {
+            // Step 1: Invalidate server-side refresh token(s) for the user
             refreshTokenService.deleteByUserId(userId);
-            log.debug("AuthService: Server-side refresh tokens invalidated for user ID: {}.", userId);
+            log.debug("AuthService: Server-side refresh tokens potentially invalidated for user ID: {}.", userId);
 
+            // Step 2: Instruct client to clear its authentication cookies
             clearAuthCookies(httpServletResponse);
 
+            // Step 3: Clear the Spring Security context for the current request
             SecurityContextHolder.clearContext();
-            log.debug("AuthService: Security context cleared for user ID: {}.", userId);
+            log.debug("AuthService: Spring Security context cleared for current request.");
 
-            log.info("AuthService: Logout process completed successfully for user ID: {}.", userId);
+            log.info("AuthService: Logout process completed for user ID: {}.", userId);
             return true;
         } catch (Exception e) {
-            log.error("AuthService: Error during logout process for user ID: {}. Attempting cookie cleanup as fallback.", userId, e);
+            log.error("AuthService: Error during logout process for user ID: {}. Attempting cookie cleanup as a fallback.", userId, e);
+            // Attempt to clear cookies even if other steps (like DB delete of RT) fail
             try {
                 clearAuthCookies(httpServletResponse);
             } catch (Exception cookieEx) {
                 log.error("AuthService: Further error while attempting to clear cookies during logout failure for user ID: {}:", userId, cookieEx);
             }
-            return false; // Indicate logout might not have fully completed.
+            return false; // Indicate logout might not have fully completed as expected.
         }
     }
 
@@ -279,23 +291,24 @@ public class AuthServiceImpl implements IAuthService {
      */
     @Override
     public void clearAuthCookies(HttpServletResponse httpServletResponse) {
-        log.debug("AuthService: Preparing to clear authentication cookies.");
+        log.debug("AuthService: Preparing to add headers to clear authentication cookies.");
         ResponseCookie cleanRtCookie = getCleanHttpOnlyRefreshTokenCookie();
         httpServletResponse.addHeader(HttpHeaders.SET_COOKIE, cleanRtCookie.toString());
-        // If an access token cookie is also used (less common for JWT access tokens in body):
-        // ResponseCookie cleanAtCookie = getCleanHttpOnlyAccessTokenCookie(); // Define this helper if needed in JwtUtilities
+        // If an access token cookie is also used (less common for JWT access tokens in body), clear it too:
+        // ResponseCookie cleanAtCookie = getCleanHttpOnlyAccessTokenCookie(); // Define this helper if needed
         // httpServletResponse.addHeader(HttpHeaders.SET_COOKIE, cleanAtCookie.toString());
-        log.debug("AuthService: Headers added to response to clear refresh token cookie.");
+        log.debug("AuthService: Headers added to HTTP response to instruct client to clear refresh token cookie.");
     }
 
     // --- Helper classes for returning structured data (internal to this service) ---
     // These are not web DTOs but internal data carriers.
-    // The controller layer maps data from these into web DTOs.
+    // The controller layer is responsible for mapping data from these into web DTOs.
 
     /**
-     * Internal helper class to hold data related to a successful authentication.
-     * Contains the authenticated {@link User} entity, the generated access token string,
-     * and a list of the user's role names.
+     * Internal helper class to hold data related to a successful authentication event.
+     * Contains the authenticated {@link User} entity, the generated JWT access token string,
+     * and a list of the user's role names (as strings). This object is returned by
+     * the authentication service method to the controller, which then maps it to a response DTO.
      */
     public static class AuthDetails {
         private final User user;
@@ -305,7 +318,7 @@ public class AuthServiceImpl implements IAuthService {
         public AuthDetails(User user, String accessToken, List<String> roleNames) {
             this.user = user;
             this.accessToken = accessToken;
-            this.roleNames = roleNames;
+            this.roleNames = roleNames != null ? List.copyOf(roleNames) : Collections.emptyList();
         }
         public User getUser() { return user; }
         public String getAccessToken() { return accessToken; }
@@ -313,7 +326,8 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     /**
-     * Internal helper class to hold the new access token string after a successful token refresh.
+     * Internal helper class to hold the new JWT access token string after a successful token refresh operation.
+     * This object is returned by the token refresh service method to the controller.
      */
     public static class RefreshedTokenDetails {
         private final String newAccessToken;

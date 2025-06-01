@@ -50,13 +50,13 @@ public class RentalRequestDTO {
      * The identifier (e.g., staff ID) of the person or system component that issued the rental.
      * This field is optional.
      */
-    private Integer issuer; // Consider renaming to issuerId if it's an ID
+    private UUID issuer; // Consider renaming to issuerId if it's an ID
 
     /**
      * The identifier (e.g., staff ID) of the person or system component that received the car upon return.
      * This field is optional, especially at creation.
      */
-    private Integer receiver; // Consider renaming to receiverId if it's an ID
+    private UUID receiver; // Consider renaming to receiverId if it's an ID
 
     /**
      * The amount of any fine associated with the rental.
@@ -80,7 +80,7 @@ public class RentalRequestDTO {
      */
     @NotNull(message = "Expected return date cannot be null")
     @FutureOrPresent(message = "Expected return date must be in the present or future")
-    private LocalDateTime expectedReturnedDate; // WHEN IT'S DUE
+    private LocalDateTime expectedReturnDate; // WHEN IT'S DUE
 
     /**
         * The actual date and time when the rental car was returned.
@@ -94,7 +94,7 @@ public class RentalRequestDTO {
 
 
     /**
-     * The current status of the rental (e.g., "ACTIVE", "PENDING", "COMPLETED", "CANCELED").
+     * The current status of the rental (e.g., "ACTIVE", "COMPLETED", "CANCELED").
      * This field is optional; the system might assign a default status if not provided at creation.
      */
 

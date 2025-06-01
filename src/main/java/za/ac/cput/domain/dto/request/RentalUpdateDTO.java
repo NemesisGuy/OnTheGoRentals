@@ -1,6 +1,7 @@
 package za.ac.cput.domain.dto.request;
 
 import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero; // For fine amount
 import lombok.*; // Added Builder for consistency if desired
 
@@ -30,6 +31,7 @@ public class RentalUpdateDTO {
      * The new UUID of the User to be associated with this rental.
      * Use with caution, as reassigning a rental to a different user is a significant change.
      */
+
     private UUID userUuid;
 
     /**
@@ -47,12 +49,13 @@ public class RentalUpdateDTO {
     /**
      * The updated identifier (e.g., staff ID) of the person or system component that issued the rental.
      */
-    private Integer issuer; // Consider renaming to issuerId
+    @NotNull(message = "Issuer ID (staff ID) cannot be null")
+    private UUID issuer; // Consider renaming to issuerId
 
     /**
      * The updated identifier (e.g., staff ID) of the person or system component that received/will receive the car upon return.
      */
-    private Integer receiver; // Consider renaming to receiverId
+    private UUID receiver; // Consider renaming to receiverId
 
     /**
      * The updated fine amount associated with the rental.

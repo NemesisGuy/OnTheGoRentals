@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import za.ac.cput.domain.dto.request.RentalFromBookingRequestDTO;
 import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.entity.Driver;
 import za.ac.cput.domain.entity.Rental;
@@ -33,7 +34,6 @@ import java.util.UUID;
  * Primarily handles operations for the currently authenticated user, such as creating
  * rentals, viewing their own rentals, and performing actions like confirming or canceling.
  * Includes endpoints that might be used by staff/admins (e.g., completing a rental).
- *
  * Author: Peter Buckingham (220165289)
  * Date: 10 April 2023
  * Updated by: Peter Buckingham
@@ -221,10 +221,8 @@ public class RentalController {
                 throw new CarNotAvailableException("The newly selected car (UUID: " + rentalUpdateDTO.getCarUuid() + ") is not available.");
             }
             if (existingRental.getCar() != null && !existingRental.getCar().isAvailable() &&
-                    (existingRental.getStatus() == RentalStatus.ACTIVE ||
-                            existingRental.getStatus() == RentalStatus.CONFIRMED ||
-                            existingRental.getStatus() == RentalStatus.IN_PROGRESS)) {
-                Car oldCarToMakeAvailable = Car.builder().copy(existingRental.getCar()).available(true).build();
+                    (existingRental.getStatus() == RentalStatus.ACTIVE)) {
+                Car oldCarToMakeAvailable = Car.builder().copy(existingRental.getCar()).setAvailable(true).build();
                 carService.update(oldCarToMakeAvailable);
                 log.info("Admin [{}]: Rental update - Old car ID {} made available due to car change.", adminId, oldCarToMakeAvailable.getId());
             }
@@ -375,5 +373,40 @@ public class RentalController {
         log.info("Requester [{}]: Successfully completed rental with ID: {} and UUID: {}. Fine applied: {}",
                 requesterId, completedRental.getId(), completedRental.getUuid(), fineAmount);
         return ResponseEntity.ok(RentalMapper.toDto(completedRental));
+    }
+    /**
+     * Creates a new Rental record from an existing, confirmed Booking.
+     * This endpoint is typically used by staff when a customer arrives to pick up their car.
+     * It marks the booking as processed into a rental and the car as unavailable.
+     *
+     * @param bookingUuid The UUID of the confirmed Booking to convert.
+     * @param dto         The {@link RentalFromBookingRequestDTO} containing any additional details
+     *                    required at pickup (e.g., staff issuer ID, actual pickup time if different, driver).
+     * @return A ResponseEntity containing the created {@link RentalResponseDTO} and HTTP status CREATED.
+     * @throws za.ac.cput.exception.ResourceNotFoundException if the booking is not found.
+     * @throws IllegalStateException if the booking is not in a state that can be converted to a rental.
+     * @throws za.ac.cput.exception.CarNotAvailableException if the car is no longer available.
+     */
+    @PostMapping("/from-booking/{bookingUuid}")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<RentalResponseDTO> createRentalFromBooking(
+            @PathVariable UUID bookingUuid,
+            @Valid @RequestBody RentalFromBookingRequestDTO dto) {
+
+        String requesterId = SecurityUtils.getRequesterIdentifier(); // Logged-in staff/admin
+        log.info("Requester [{}]: Attempting to create rental from Booking UUID: {} with details: {}",
+                requesterId, bookingUuid, dto);
+
+        // The service method now orchestrates everything
+        Rental createdRental = rentalService.createRentalFromBooking(
+                bookingUuid,
+                dto.getIssuerId(),       // Staff member ID who is issuing
+                dto.getDriverUuid(),     // Optional driver assigned at pickup
+                dto.getActualPickupTime() // Actual time of pickup, could default to now in service if null
+        );
+
+        log.info("Requester [{}]: Successfully created Rental UUID: {} from Booking UUID: {}",
+                requesterId, createdRental.getUuid(), bookingUuid);
+        return new ResponseEntity<>(RentalMapper.toDto(createdRental), HttpStatus.CREATED);
     }
 }

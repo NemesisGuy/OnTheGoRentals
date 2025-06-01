@@ -1,5 +1,6 @@
 package za.ac.cput.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.Booking;
 
 import java.util.List;
@@ -26,6 +27,9 @@ public interface IBookingService {
      * @return The persisted {@link Booking} entity, typically with its generated ID and UUID.
      */
     Booking create(Booking booking);
+
+    @Transactional
+    Booking createBooking(Booking booking);
 
     /**
      * Confirms an existing booking.
@@ -99,4 +103,6 @@ public interface IBookingService {
      * @return A list of all non-deleted {@link Booking} entities. Can be empty.
      */
     List<Booking> getAll();
+
+    List<Booking> findBookingsForCollectionToday();
 }

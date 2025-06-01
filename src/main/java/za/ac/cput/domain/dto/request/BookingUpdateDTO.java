@@ -4,6 +4,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import za.ac.cput.domain.enums.BookingStatus;
 import za.ac.cput.domain.enums.RentalStatus;
 
 import java.time.LocalDateTime;
@@ -26,7 +27,7 @@ public class BookingUpdateDTO {
     @FutureOrPresent(message = "Booking end date must be in the present or future if provided")
     private LocalDateTime bookingEndDate;
 
-    private RentalStatus status;
+    private BookingStatus status;
 
 //    private Integer issuerId;
 //    private Integer receiverId; // e.g., when car is returned by admin/staff

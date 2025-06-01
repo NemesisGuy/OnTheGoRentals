@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IRoleRepository extends JpaRepository<Role, Integer> {
 
-    <Optional>Role findByRoleName(RoleName roleName);
+    Role findByRoleName(RoleName roleName);
     //get all roles
 
 

@@ -7,6 +7,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.Id;
 import za.ac.cput.domain.enums.PriceGroup;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -26,9 +27,7 @@ public class Car {
     private int id;
     @Column(nullable = false, unique = true, updatable = false)
     private UUID uuid ;
-  /*  @JsonIgnore
-    @OneToMany(mappedBy = "car") //one car to many rentals
-    private final List<Rental> rentals = new ArrayList<>();*/
+
     private String make;
     private String model;
     private int year;
@@ -44,17 +43,34 @@ public class Car {
 
     @Column(nullable = false)
     @ColumnDefault("false")
-    private boolean deleted = false;
+    private boolean deleted ;
+
+   /* @Column(updatable = false)*/
+    private LocalDateTime createdAt;
+    /*@Column(updatable = false)*/
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
         if (this.uuid == null) {
             this.uuid = UUID.randomUUID();
-            System.out.println("Car Entity @PrePersist: Generated UUID: " + this.uuid); // For debugging
+        }
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = LocalDateTime.now();
         }
             this.available = true; // Default to available if not set
+            this.deleted = false; // Default to not deleted
 
     }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public Car() {
         // Default constructor
     }
@@ -70,22 +86,15 @@ public class Car {
         this.licensePlate = builder.licensePlate;
         this.available = builder.available;
         this.deleted= builder.deleted;
+        this.createdAt = builder.createdAt;
+        this.updatedAt = builder.updatedAt;
     }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-
 
     @Override
     public String toString() {
         return "Car{" +
                 "id=" + id +
                 ", uuid=" + uuid +
-/*
-                ", rentals=" + rentals +
-*/
                 ", make='" + make + '\'' +
                 ", model='" + model + '\'' +
                 ", year=" + year +
@@ -94,10 +103,14 @@ public class Car {
                 ", licensePlate='" + licensePlate + '\'' +
                 ", available=" + available +
                 ", deleted=" + deleted +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 
-
+    public static Builder builder() {
+        return new Builder();
+    }
 
     public static class Builder {
         private int id;
@@ -108,55 +121,65 @@ public class Car {
         private String category;
         private PriceGroup priceGroup;
         private String licensePlate;
-        private boolean available= true; // Default to available
-        private boolean deleted = false;
+        private boolean available; // Default to available
+        private boolean deleted;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
 
-        public Builder id(int id) {
+        public Builder setId(int id) {
             this.id = id;
             return this;
         }
-        public Builder uuid(UUID uuid) {
+        public Builder setUuid(UUID uuid) {
             this.uuid = uuid;
             return this;
         }
 
-        public Builder make(String make) {
+        public Builder setMake(String make) {
             this.make = make;
             return this;
         }
 
-        public Builder model(String model) {
+        public Builder setModel(String model) {
             this.model = model;
             return this;
         }
 
-        public Builder year(int year) {
+        public Builder setYear(int year) {
             this.year = year;
             return this;
         }
 
-        public Builder category(String category) {
+        public Builder setCategory(String category) {
             this.category = category;
             return this;
         }
 
-        public Builder priceGroup(PriceGroup priceGroup) {
+        public Builder setPriceGroup(PriceGroup priceGroup) {
             this.priceGroup = priceGroup;
             return this;
         }
 
-        public Builder licensePlate(String licensePlate) {
+        public Builder setLicensePlate(String licensePlate) {
             this.licensePlate = licensePlate;
             return this;
 
         }
 
-        public Builder available(boolean available) {
+        public Builder setAvailable(boolean available) {
             this.available = available;
             return this;
         }
-        public Builder deleted(boolean deleted) {
+        public Builder setDeleted(boolean deleted) {
             this.deleted = deleted;
+            return this;
+        }
+        public Builder setCreatedAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+        public Builder setUpdatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
             return this;
         }
 
@@ -171,6 +194,8 @@ public class Car {
             this.licensePlate = car.licensePlate;
             this.available = car.available;
             this.deleted = car.deleted;
+            this.createdAt = car.createdAt;
+            this.updatedAt = car.updatedAt;
             return this;
         }
 

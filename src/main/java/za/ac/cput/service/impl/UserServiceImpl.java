@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.security.Role;
+import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.exception.EmailAlreadyExistsException;
 import za.ac.cput.exception.ResourceNotFoundException;
@@ -15,6 +16,7 @@ import za.ac.cput.repository.IRoleRepository; // For saveRole
 import za.ac.cput.service.IRefreshTokenService; // For deleting tokens on user delete
 import za.ac.cput.service.IUserService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -67,38 +69,46 @@ public class UserServiceImpl implements IUserService {
     /**
      * {@inheritDoc}
      */
+    // In UserServiceImpl.java
     @Override
+    @Transactional // Ensure this method is transactional
     public User createUser(User userDetails, List<Role> roles) {
         String email = userDetails.getEmail();
-        List<String> roleNames = roles != null ? roles.stream().map(Role::getRoleName).collect(Collectors.toList()) : List.of();
-        log.info("Attempting to create new user. Email: '{}', Assigned Roles: {}", email, roleNames);
+        log.info("UserServiceImpl: Attempting to create new user. Email: '{}', Provided Roles: {}",
+                email, roles != null ? roles.stream().map(Role::getRoleName).collect(Collectors.toList()) : "null/empty");
 
         if (userRepository.existsByEmail(email)) {
-            log.warn("User creation failed for email '{}'. Email already exists.", email);
+            log.warn("UserServiceImpl: User creation failed for email '{}'. Email already exists.", email);
             throw new EmailAlreadyExistsException("Email " + email + " is already taken!");
         }
 
-        // User entity has @PrePersist for UUID, AuthProvider, and default Role if roles list is empty.
-        // We still need to encode password and set provided roles.
-
-        // Ensure password from userDetails is encoded
         if (userDetails.getPassword() == null || userDetails.getPassword().isEmpty()) {
-            log.error("User creation failed for email '{}': Password cannot be null or empty.", email);
+            log.error("UserServiceImpl: User creation failed for email '{}': Password cannot be null or empty.", email);
             throw new IllegalArgumentException("Password cannot be null or empty for new user creation.");
         }
         userDetails.setPassword(passwordEncoder.encode(userDetails.getPassword()));
-        log.debug("Password encoded for new user '{}'", email);
+        log.debug("UserServiceImpl: Password encoded for new user '{}'", email);
 
-        // If roles are provided, set them. Otherwise, @PrePersist will handle default.
-        if (roles != null && !roles.isEmpty()) {
-            userDetails.setRoles(roles); // Roles should be validated and fetched (managed entities) before calling this
+        List<Role> rolesToSet = roles;
+        if (rolesToSet == null || rolesToSet.isEmpty()) {
+            log.warn("UserServiceImpl: No roles provided for new user '{}'. Assigning default USER role.", email);
+            Role defaultUserRole = roleRepository.findByRoleName(RoleName.USER); // Use RoleName enum
+            if (defaultUserRole == null) {
+                log.error("UserServiceImpl: CRITICAL - Default USER role not found in database. Cannot assign default role to user '{}'. This is a system configuration error.", email);
+                throw new IllegalStateException("Default USER role not found. System configuration error. Please ensure roles are seeded.");
+            }
+            rolesToSet = Collections.singletonList(defaultUserRole); // This is a MANAGED entity
         }
-        // userDetails.setUuid(null); // Allow @PrePersist to generate UUID if not already set
-        // userDetails.setAuthProvider(null); // Allow @PrePersist to set default if not provided
-        userDetails.setDeleted(false); // Explicitly set non-deleted
+        userDetails.setRoles(rolesToSet); // Assign the (potentially defaulted) managed roles
+        log.debug("UserServiceImpl: Roles set for user '{}': {}", email, rolesToSet.stream().map(Role::getRoleName).collect(Collectors.toList()));
+
+        // Let @PrePersist in User entity handle UUID, createdAt, updatedAt, authProvider, deleted flag
+        // userDetails.setUuid(null); // Allow @PrePersist to set UUID
+        // userDetails.setAuthProvider(AuthProvider.LOCAL); // Or let @PrePersist set default
+        // userDetails.setDeleted(false); // @PrePersist will set this
 
         User savedUser = userRepository.save(userDetails);
-        log.info("Successfully created user. ID: {}, UUID: '{}', Email: '{}', Roles: {}",
+        log.info("UserServiceImpl: Successfully created user. ID: {}, UUID: '{}', Email: '{}', Roles: {}",
                 savedUser.getId(), savedUser.getUuid(), savedUser.getEmail(),
                 savedUser.getRoles().stream().map(Role::getRoleName).collect(Collectors.toList()));
         return savedUser;
@@ -240,11 +250,13 @@ public class UserServiceImpl implements IUserService {
 
 
         if (needsSave) {
-            User savedUser = userRepository.save(existingUser); // Save the modified 'existingUser'
-            log.info("Successfully updated user ID: {}, UUID: '{}', Email: '{}'", savedUser.getId(), savedUser.getUuid(), savedUser.getEmail());
-            return savedUser;
+            User trulySavedUser = userRepository.save(existingUser); // Assign to a new variable or reassign existingUser
+            log.info("Successfully updated user ID: {}, UUID: '{}', Email: '{}'",
+                    trulySavedUser.getId(), trulySavedUser.getUuid(), trulySavedUser.getEmail());
+            return trulySavedUser;
         } else {
-            log.info("No updatable changes detected for user ID: {}. Returning existing user without save.", userId);
+            log.info("No updatable changes detected for user ID: {}. Returning existing user without save. Email: '{}'",
+                    userId, existingUser.getEmail()); // Log details of existingUser
             return existingUser;
         }
     }
@@ -314,6 +326,10 @@ public class UserServiceImpl implements IUserService {
         // The User entity's @PrePersist should handle UUID generation if 'user.getUuid()' is null.
         // It also handles default AuthProvider and default Role if roles list is empty.
         // This method directly saves the provided user state.
+        if (user.getId() == null && user.getUuid() == null) { // If truly new and no UUID yet
+            user.setUuid(UUID.randomUUID());
+            log.debug("Generated UUID '{}' for user in generic saveUser.", user.getUuid());
+        }
         if (user.getId() == null && user.isDeleted() && (user.getUuid() == null || userRepository.findByUuidAndDeletedFalse(user.getUuid()).isEmpty())) {
             // If it's a new user (no ID) and it's marked as deleted (which is unusual for a direct save of a new entity),
             // and it's not an existing user being "undeleted" by UUID, then set deleted to false.

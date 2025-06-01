@@ -2,8 +2,6 @@
 package za.ac.cput.domain.dto.response;
 
 import lombok.*;
-import za.ac.cput.domain.dto.response.CarResponseDTO;
-import za.ac.cput.domain.dto.response.UserResponseDTO;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,10 +15,11 @@ public class RentalResponseDTO {
     private UserResponseDTO user;
     private CarResponseDTO car;
     private DriverResponseDTO driver; // Assuming you have DriverResponseDTO
-    private Integer issuer;
-    private Integer receiver;
+    private UUID issuer;
+    private UUID receiver;
     private double fine;
     private LocalDateTime issuedDate;
+    private LocalDateTime expectedReturnDate; // Optional, can be null if not set
     private LocalDateTime returnedDate; // Will be null until car is returned
     private String status;
 }

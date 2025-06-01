@@ -12,6 +12,7 @@ import za.ac.cput.domain.entity.security.User; // Entity
 import za.ac.cput.domain.dto.request.BookingRequestDTO;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
 import za.ac.cput.domain.dto.response.UserResponseDTO;
+import za.ac.cput.domain.enums.BookingStatus;
 import za.ac.cput.domain.enums.RentalStatus; // Make sure this enum is correctly imported
 
 import java.util.List;
@@ -46,7 +47,7 @@ public class BookingMapper {
                 .car(carDto)
                 .bookingStartDate(booking.getStartDate())
                 .bookingEndDate(booking.getEndDate())
-                .status(RentalStatus.valueOf(booking.getStatus())) // Assuming Booking entity has RentalStatus enum
+                .status(booking.getStatus()) // Assuming Booking entity
                 .build();
     }
 
@@ -84,7 +85,8 @@ public class BookingMapper {
         //         booking.setStatus(RentalStatus.PENDING); // Default status
         //     }
         // } else {
-        .setStatus(String.valueOf(RentalStatus.ACTIVE))
+               //if null then we set to ACTIVE
+        .setStatus(requestDto.getStatus() != null ? requestDto.getStatus() : BookingStatus.CONFIRMED) // Default to ACTIVE if not specified
         // }
 
         .setDeleted(false) // Default for new bookings
@@ -119,7 +121,8 @@ public class BookingMapper {
                 //         booking.setStatus(RentalStatus.PENDING); // Default status
                 //     }
                 // } else {
-                .setStatus(String.valueOf(RentalStatus.ACTIVE))
+                // if null then we set to CONFIRMED
+                .setStatus(requestDto.getStatus() != null ? requestDto.getStatus() : BookingStatus.CONFIRMED) // Default to CONFIRMED if not specified
                 // }
 
                 .setDeleted(false) // Default for new bookings
@@ -208,7 +211,7 @@ public class BookingMapper {
 
         if (updateDto.getBookingStartDate() != null) builder.setStartDate(updateDto.getBookingStartDate());
         if (updateDto.getBookingEndDate() != null) builder.setEndDate(updateDto.getBookingEndDate());
-        if (updateDto.getStatus() != null) builder.setStatus(String.valueOf(updateDto.getStatus()));
+        if (updateDto.getStatus() != null) builder.setStatus(updateDto.getStatus());
 /*
         if (updateDto.getIssuerId() != null) builder.(updateDto.getIssuerId());
 */

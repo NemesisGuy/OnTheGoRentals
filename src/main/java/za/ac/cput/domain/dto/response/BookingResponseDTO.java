@@ -10,6 +10,7 @@ import java.util.UUID;
 
 
 import lombok.*;
+import za.ac.cput.domain.enums.BookingStatus;
 import za.ac.cput.domain.enums.RentalStatus; // Assuming RentalStatus enum exists
 
 import java.time.LocalDateTime;
@@ -25,6 +26,5 @@ public class BookingResponseDTO {
     private CarResponseDTO car;   // Nested DTO for car details
     private LocalDateTime bookingStartDate;
     private LocalDateTime bookingEndDate;
-    private RentalStatus status; // Use the enum type for clarity if possible, or String
-    // Potentially other fields like fine, issuer/receiver DTOs if applicable
+    private BookingStatus status; // Use the enum type for clarity if possible
 }

@@ -3,6 +3,7 @@ package za.ac.cput.domain.dto.request;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import za.ac.cput.domain.enums.BookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -31,5 +32,5 @@ public class BookingRequestDTO {
     // Status for a new booking is typically set by the backend (e.g., "PENDING" or "CONFIRMED")
     // If client can suggest a status, include it. Otherwise, it's backend-determined.
     // For this example, let's assume status is set by backend during creation.
-    // private String status;
+    private BookingStatus status;
 }

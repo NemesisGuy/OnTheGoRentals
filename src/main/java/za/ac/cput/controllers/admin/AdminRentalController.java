@@ -150,8 +150,8 @@ public class AdminRentalController {
                 throw new CarNotAvailableException("Newly selected car (UUID: " + updateDto.getCarUuid() + ") is not available.");
             }
             // Old car availability logic
-            if (existingRental.getCar() != null && !existingRental.getCar().isAvailable() && (existingRental.getStatus() == za.ac.cput.domain.enums.RentalStatus.ACTIVE || existingRental.getStatus() == za.ac.cput.domain.enums.RentalStatus.CONFIRMED || existingRental.getStatus() == za.ac.cput.domain.enums.RentalStatus.IN_PROGRESS)) {
-                Car oldCar = Car.builder().copy(existingRental.getCar()).available(true).build();
+            if (existingRental.getCar() != null && !existingRental.getCar().isAvailable() && (existingRental.getStatus() == za.ac.cput.domain.enums.RentalStatus.ACTIVE || existingRental.getStatus() == RentalStatus.ACTIVE || existingRental.getStatus() == RentalStatus.ACTIVE)) {
+                Car oldCar = Car.builder().copy(existingRental.getCar()).setAvailable(true).build();
                 carService.update(oldCar);
                 log.info("Admin [{}]: Rental update - Old car ID {} made available.", adminId, oldCar.getId());
             }
@@ -287,5 +287,31 @@ public class AdminRentalController {
         Rental completedRental = rentalService.completeRentalByUuid(rentalUuid, fineAmount);
         log.info("Admin [{}]: Successfully completed rental with ID: {} and UUID: {}. Fine applied: {}", adminId, completedRental.getId(), completedRental.getUuid(), fineAmount);
         return ResponseEntity.ok(RentalMapper.toDto(completedRental));
+    }
+    // In AdminRentalController.java (or StaffOperationsController)
+    @GetMapping("/returns-due-today")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<List<RentalResponseDTO>> getRentalsDueForReturnToday() {
+        String requesterId = SecurityUtils.getRequesterIdentifier();
+        log.info("Staff/Admin [{}]: Request for rentals due for return today.", requesterId);
+        List<Rental> rentals = rentalService.findRentalsDueToday(); // We created this service method
+        if (rentals.isEmpty()) {
+            log.info("Staff/Admin [{}]: No rentals due for return today.", requesterId);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(RentalMapper.toDtoList(rentals));
+    }
+
+    @GetMapping("/overdue-rentals")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<List<RentalResponseDTO>> getOverdueRentals() {
+        String requesterId = SecurityUtils.getRequesterIdentifier();
+        log.info("Staff/Admin [{}]: Request for overdue rentals.", requesterId);
+        List<Rental> rentals = rentalService.findOverdueRentals(); // We created this
+        if (rentals.isEmpty()) {
+            log.info("Staff/Admin [{}]: No overdue rentals.", requesterId);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(RentalMapper.toDtoList(rentals));
     }
 }

@@ -8,6 +8,7 @@ import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.factory.IFactory;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Pete Buckingham - 220165289
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @Component
 public class RentalFactory implements IFactory<Rental> {
 
-    public Rental create(int id, User user, Car car, int issuer, int receiver, int fine,
+    public Rental create(int id, User user, Car car, UUID issuer, UUID receiver, int fine,
                          LocalDateTime issuedDate, LocalDateTime returnedDate) {
 
         RentalStatus status = determineStatus(issuedDate, returnedDate);

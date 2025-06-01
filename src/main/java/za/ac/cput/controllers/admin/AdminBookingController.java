@@ -21,6 +21,7 @@ import za.ac.cput.service.IBookingService;
 import za.ac.cput.service.ICarService;
 import za.ac.cput.service.IDriverService;
 import za.ac.cput.service.IUserService;
+import za.ac.cput.utils.SecurityUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -285,7 +286,7 @@ public class AdminBookingController {
         // or prepares the existing one for update via service layer.
         Booking bookingToUpdate = new Booking.Builder()
                 .copy(existingBooking)
-                .setStatus(BookingStatus.CONFIRMED.name()) // Use enum's name() for string representation
+                .setStatus(BookingStatus.CONFIRMED) // Use enum's name() for string representation
                 .build();
 
         Booking updatedBooking = bookingService.update(bookingToUpdate); // Service.update takes the entity
@@ -309,12 +310,30 @@ public class AdminBookingController {
 
         Booking bookingToUpdate = new Booking.Builder()
                 .copy(existingBooking)
-                .setStatus(BookingStatus.CANCELED.name()) // Use enum's name() for string representation
+                .setStatus(BookingStatus.ADMIN_CANCELLED) // Use enum's name() for string representation
                 .build();
 
         Booking updatedBooking = bookingService.update(bookingToUpdate); // Service.update takes the entity
         log.info("Successfully canceled booking with ID: {} (UUID: {}).", updatedBooking.getId(), bookingUuid);
         BookingResponseDTO canceledDto = BookingMapper.toDto(updatedBooking);
         return ResponseEntity.ok(canceledDto);
+    }
+    /**
+     * Retrieves bookings that are confirmed and scheduled for collection today.
+     * Intended for staff to prepare for customer pickups.
+     *
+     * @return ResponseEntity with a list of BookingResponseDTOs due for collection today.
+     */
+    @GetMapping("/collections-due-today")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<List<BookingResponseDTO>> getBookingsForCollectionToday() {
+        String requesterId = SecurityUtils.getRequesterIdentifier();
+        log.info("Staff/Admin [{}]: Request for bookings due for collection today.", requesterId);
+        List<Booking> bookings = bookingService.findBookingsForCollectionToday(); // New service method
+        if (bookings.isEmpty()) {
+            log.info("Staff/Admin [{}]: No bookings due for collection today.", requesterId);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(BookingMapper.toDtoList(bookings));
     }
 }

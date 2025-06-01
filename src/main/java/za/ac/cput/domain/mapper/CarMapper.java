@@ -32,21 +32,21 @@ public class CarMapper {
     public static Car toEntity(CarCreateDTO createDto) {
         if (createDto == null) return null;
         Car.Builder builder = new Car.Builder()
-                .make(createDto.getMake())
-                .model(createDto.getModel())
-                .year(createDto.getYear()) // Assumes int in DTO and Builder
-                .category(createDto.getCategory())
-                .priceGroup(createDto.getPriceGroup())
-                .licensePlate(createDto.getLicensePlate());
+                .setMake(createDto.getMake())
+                .setModel(createDto.getModel())
+                .setYear(createDto.getYear()) // Assumes int in DTO and Builder
+                .setCategory(createDto.getCategory())
+                .setPriceGroup(createDto.getPriceGroup())
+                .setLicensePlate(createDto.getLicensePlate());
 
         // Handle nullable Boolean for availability
         if (createDto.getAvailable() != null) {
-            builder.available(createDto.getAvailable());
+            builder.setAvailable(createDto.getAvailable());
         } else {
-            builder.available(true); // Default to true if not specified in DTO
+            builder.setAvailable(true); // Default to true if not specified in DTO
         }
         // uuid set by @PrePersist, id by DB, deleted defaults to false by entity builder/PrePersist
-        builder.deleted(false); // Explicitly set default for clarity
+        builder.setDeleted(false); // Explicitly set default for clarity
         return builder.build();
     }
 
@@ -56,13 +56,13 @@ public class CarMapper {
         }
         Car.Builder builder = new Car.Builder().copy(existingCar); // Start with existing values
 
-        if (updateDto.getMake() != null) builder.make(updateDto.getMake());
-        if (updateDto.getModel() != null) builder.model(updateDto.getModel());
-        if (updateDto.getYear() != null) builder.year(updateDto.getYear());
-        if (updateDto.getCategory() != null) builder.category(updateDto.getCategory());
-        if (updateDto.getPriceGroup() != null) builder.priceGroup(updateDto.getPriceGroup());
-        if (updateDto.getLicensePlate() != null) builder.licensePlate(updateDto.getLicensePlate());
-        if (updateDto.getAvailable() != null) builder.available(updateDto.getAvailable());
+        if (updateDto.getMake() != null) builder.setMake(updateDto.getMake());
+        if (updateDto.getModel() != null) builder.setModel(updateDto.getModel());
+        if (updateDto.getYear() != null) builder.setYear(updateDto.getYear());
+        if (updateDto.getCategory() != null) builder.setCategory(updateDto.getCategory());
+        if (updateDto.getPriceGroup() != null) builder.setPriceGroup(updateDto.getPriceGroup());
+        if (updateDto.getLicensePlate() != null) builder.setLicensePlate(updateDto.getLicensePlate());
+        if (updateDto.getAvailable() != null) builder.setAvailable(updateDto.getAvailable());
 
         return builder.build(); // Returns a new Car instance with merged data
     }

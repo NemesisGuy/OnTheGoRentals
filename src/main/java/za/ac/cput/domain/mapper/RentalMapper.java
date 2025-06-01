@@ -32,7 +32,7 @@ public class RentalMapper {
                 .receiver(rental.getReceiver()) // Assuming entity has getReceiverId()
                 .fine(rental.getFine())
                 .issuedDate(rental.getIssuedDate())
-                .returnedDate(rental.getReturnedDate())
+                .expectedReturnDate(rental.getExpectedReturnDate())
                 .returnedDate(rental.getReturnedDate()) // Added
                 .status(String.valueOf(rental.getStatus()))
                 .build();
@@ -54,6 +54,7 @@ public class RentalMapper {
                 .setCar(carEntity)
                 .setDriver(driverEntity) // driverEntity can be null if optional
                 .setIssuedDate(createDto.getIssuedDate())
+                .setExpectedReturnDate(createDto.getExpectedReturnDate())
                 .setReturnedDate(createDto.getReturnedDate())
                 // status, fine, issuerId, receiverId typically set by business logic or defaults in @PrePersist
                 // uuid, id, createdAt, updatedAt, deleted handled by entity/JPA

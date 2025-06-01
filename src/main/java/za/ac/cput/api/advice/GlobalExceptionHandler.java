@@ -11,12 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import za.ac.cput.api.response.ApiResponse;
 import za.ac.cput.api.response.FieldErrorDto;
-import za.ac.cput.exception.ResourceNotFoundException;
-import za.ac.cput.exception.BadRequestException;
-import za.ac.cput.exception.RoleNotFoundException; // Added for consistency
-import za.ac.cput.exception.CarNotAvailableException; // Added for consistency
-import za.ac.cput.exception.UserCantRentMoreThanOneCarException; // Added for consistency
-import za.ac.cput.exception.UnauthorisedException; // Added for consistency
+import za.ac.cput.exception.*;
 import za.ac.cput.utils.SecurityUtils;
 
 import java.util.Collections;
@@ -174,5 +169,19 @@ public class GlobalExceptionHandler {
 
         FieldErrorDto error = new FieldErrorDto("general", "An unexpected internal server error occurred. Please try again later.");
         return new ResponseEntity<>(new ApiResponse<>(Collections.singletonList(error)), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    /**
+     * Handles custom {@link InvalidDateRangeException}.
+     * Responds with HTTP 400 Bad Request and the exception message.
+     *
+     * @param ex The caught {@link InvalidDateRangeException}.
+     * @return A ResponseEntity containing an {@link ApiResponse} with the error.
+     */
+    @ExceptionHandler(InvalidDateRangeException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidDateRangeException(InvalidDateRangeException ex) {
+        String requesterId = SecurityUtils.getRequesterIdentifier(); // If you have this utility
+        log.warn("Requester [{}]: InvalidDateRangeException: {}", requesterId, ex.getMessage());
+        FieldErrorDto error = new FieldErrorDto("dateRange", ex.getMessage());
+        return new ResponseEntity<>(new ApiResponse<>(Collections.singletonList(error)), HttpStatus.BAD_REQUEST);
     }
 }

@@ -1,4 +1,4 @@
-package za.ac.cput.controllers;
+package za.ac.cput.controllers; // Assuming this is your public CarController
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,16 +7,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
-import za.ac.cput.domain.enums.PriceGroup;
+import za.ac.cput.domain.enums.PriceGroup; // Your PriceGroup enum
 import za.ac.cput.domain.mapper.CarMapper;
-import za.ac.cput.exception.ResourceNotFoundException; // Good for consistency
-import za.ac.cput.service.ICarService; // Import interface
-// import za.ac.cput.service.IRentalService; // Not directly used in these methods
-import za.ac.cput.utils.SecurityUtils; // Import your helper
+import za.ac.cput.exception.BadRequestException; // Custom exception for bad input
+import za.ac.cput.exception.ResourceNotFoundException;
+import za.ac.cput.service.ICarService;
+import za.ac.cput.utils.SecurityUtils;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale; // For toUpperCase with locale
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * CarController.java
@@ -24,93 +25,36 @@ import java.util.stream.Collectors;
  * Provides endpoints to list all cars, filter by price group,
  * list available cars, and retrieve details of a specific car by UUID.
  *
- * Author: [Original Author Name - Please specify if known]
- * Date: [Original Date - Please specify if known]
+ * Author: Peter Buckingham (220165289)
+ * Date: [Original Date]
  * Updated by: Peter Buckingham
- * Updated: 2025-05-28
+ * Updated: 2025-05-30
  */
 @RestController
-@RequestMapping("/api/v1/cars") // Standard public API path
+@RequestMapping("/api/v1/cars")
 public class CarController {
 
     private static final Logger log = LoggerFactory.getLogger(CarController.class);
+    private final ICarService carService;
 
-    private final ICarService carService; // Use interface
-    // private final IRentalService rentalService; // Not directly used in these methods
-
-    /**
-     * Constructs a CarController with the necessary Car service.
-     *
-     * @param carService    The car service for car data operations.
-     * //@param rentalService The rental service (if needed for future car-related logic).
-     */
     @Autowired
-    public CarController(ICarService carService /*, IRentalService rentalService */) {
+    public CarController(ICarService carService) {
         this.carService = carService;
-        // this.rentalService = rentalService; // Removed as not used
         log.info("CarController initialized.");
     }
 
     /**
-     * Retrieves a list of all cars, regardless of their availability or status.
-     * This endpoint is publicly accessible.
+     * Retrieves a list of all cars currently marked as available for rental.
+     * Handles a special path variable "all" to signify no price group filtering.
      *
-     * @return A ResponseEntity containing a list of {@link CarResponseDTO}s. Returns 204 No Content if no cars exist.
-     */
-    @GetMapping
-    public ResponseEntity<List<CarResponseDTO>> getAllCars() {
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Request to get all cars.", requesterId);
-
-        List<Car> cars = carService.getAll(); // Assumes getAll() returns non-deleted cars by default or all for public view
-        if (cars.isEmpty()) {
-            log.info("Requester [{}]: No cars found in the system.", requesterId);
-            return ResponseEntity.noContent().build();
-        }
-        // Efficient mapping using CarMapper.toDtoList if available, otherwise stream().map() is fine.
-        List<CarResponseDTO> carDTOs = CarMapper.toDtoList(cars);
-        log.info("Requester [{}]: Successfully retrieved {} cars.", requesterId, carDTOs.size());
-        return ResponseEntity.ok(carDTOs);
-    }
-
-    /**
-     * Retrieves a list of cars filtered by a specific price group.
-     * This endpoint is publicly accessible.
-     *
-     * @param group The {@link PriceGroup} to filter by.
-     * @return A ResponseEntity containing a list of {@link CarResponseDTO}s matching the price group. Returns 204 No Content if no cars match.
-     */
-    @GetMapping("/price-group/{group}")
-    public ResponseEntity<List<CarResponseDTO>> getCarsByPriceGroup(@PathVariable PriceGroup group) {
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Request to get cars by price group: {}", requesterId, group);
-
-        List<Car> cars = carService.findAllAvailableByPriceGroup(group);
-        if (cars.isEmpty()) {
-            log.info("Requester [{}]: No cars found for price group: {}", requesterId, group);
-            return ResponseEntity.noContent().build();
-        }
-        List<CarResponseDTO> carDTOs = CarMapper.toDtoList(cars);
-        log.info("Requester [{}]: Successfully retrieved {} cars for price group: {}", requesterId, carDTOs.size(), group);
-        return ResponseEntity.ok(carDTOs);
-    }
-
-    /**
-     * Retrieves a list of cars that are currently marked as available and not soft-deleted.
-     * This endpoint is publicly accessible.
-     *
-     * @return A ResponseEntity containing a list of available {@link CarResponseDTO}s. Returns 204 No Content if no cars are available.
+     * @return A ResponseEntity containing a list of available {@link CarResponseDTO}s.
      */
     @GetMapping("/available")
     public ResponseEntity<List<CarResponseDTO>> getAvailableCars() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get all available cars.", requesterId);
 
-        // The service layer should ideally have a method like `findAllAvailableAndNonDeleted()`
-        // List<Car> availableCars = carService.getAll().stream()
-        //         .filter(car -> car.isAvailable() && !car.isDeleted()) // This filtering logic is better in the service/repository
-        //         .collect(Collectors.toList());
-        List<Car> availableCars = carService.findAllAvailableAndNonDeleted(); // Assuming this method exists
+        List<Car> availableCars = carService.findAllAvailableAndNonDeleted();
 
         if (availableCars.isEmpty()) {
             log.info("Requester [{}]: No cars are currently available.", requesterId);
@@ -122,52 +66,107 @@ public class CarController {
     }
 
     /**
-     * Retrieves a list of available cars filtered by a specific price group.
-     * This endpoint is publicly accessible.
+     * Retrieves a list of available cars filtered by a specific price group string.
+     * The price group string is converted to the PriceGroup enum case-insensitively.
      *
-     * @param group The {@link PriceGroup} to filter by.
-     * @return A ResponseEntity containing a list of available {@link CarResponseDTO}s matching the price group. Returns 204 No Content if none match.
+     * @param groupString The price group string from the URL path (e.g., "luxury", "ECONOMY", "special").
+     * @return A ResponseEntity containing a list of available {@link CarResponseDTO}s matching the price group.
+     * @throws BadRequestException if the provided groupString is not a valid PriceGroup.
      */
-    @GetMapping("/available/price-group/{group}")
-    public ResponseEntity<List<CarResponseDTO>> getAvailableCarsByPriceGroup(@PathVariable PriceGroup group) {
+    @GetMapping("/available/price-group/{groupString}")
+    public ResponseEntity<List<CarResponseDTO>> getAvailableCarsByPriceGroup(@PathVariable String groupString) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Request to get available cars by price group: {}", requesterId, group);
+        log.info("Requester [{}]: Request to get available cars by price group string: '{}'", requesterId, groupString);
 
-        // Assuming carService.getAvailableCarsByPrice(group) correctly fetches available & non-deleted cars for the group
-        List<Car> cars = carService.findAllAvailableByPriceGroup(group);
+        PriceGroup priceGroupEnum;
+        try {
+            // Convert string to enum, case-insensitively
+            priceGroupEnum = PriceGroup.valueOf(groupString.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            log.warn("Requester [{}]: Invalid price group string provided: '{}'. Valid values are: {}",
+                    requesterId, groupString, java.util.Arrays.toString(PriceGroup.values()));
+            throw new BadRequestException("Invalid price group value: '" + groupString + "'. Please use a valid price group.");
+        }
+
+        List<Car> cars = carService.getAvailableCarsByPrice(priceGroupEnum); // Assumes service method expects Enum
         if (cars.isEmpty()) {
-            log.info("Requester [{}]: No available cars found for price group: {}", requesterId, group);
+            log.info("Requester [{}]: No available cars found for price group: {}", requesterId, priceGroupEnum);
             return ResponseEntity.noContent().build();
         }
         List<CarResponseDTO> carDTOs = CarMapper.toDtoList(cars);
-        log.info("Requester [{}]: Successfully retrieved {} available cars for price group: {}", requesterId, carDTOs.size(), group);
+        log.info("Requester [{}]: Successfully retrieved {} available cars for price group: {}", requesterId, carDTOs.size(), priceGroupEnum);
         return ResponseEntity.ok(carDTOs);
     }
 
-    /**
-     * Retrieves a specific car by its UUID.
-     * This endpoint is publicly accessible.
-     *
-     * @param carUuid The UUID of the car to retrieve. (Changed from carId to carUuid for clarity)
-     * @return A ResponseEntity containing the {@link CarResponseDTO} if found, or 404 Not Found.
-     */
-    @GetMapping("/{carUuid}") // Path variable name matches parameter name
-    public ResponseEntity<CarResponseDTO> getCarByUuid(@PathVariable UUID carUuid) { // Parameter name changed to carUuid
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Request to get car by UUID: {}", requesterId, carUuid);
+    // --- Other CarController methods like getAllCars, getCarByUuid etc. ---
+    // These would remain as they were if they don't involve PriceGroup path variable conversion.
 
-        // Assuming carService.read(uuid) or carService.readByUuid(uuid) exists
-        // and service will throw ResourceNotFoundException if not found.
-        Car car = carService.read(carUuid); // Changed from readByUuid to align with other services' read(UUID) pattern
-        // and assume it throws ResourceNotFoundException
-        if (car == null) { // This check is redundant if service.read(uuid) throws.
-            log.warn("Requester [{}]: Car not found with UUID: {}", requesterId, carUuid);
-            // throw new ResourceNotFoundException("Car not found with UUID: " + carUuid); // Prefer service to throw
-            return ResponseEntity.notFound().build();
+    /**
+     * Retrieves a list of all cars, optionally filtered by a specific price group.
+     * If no group is specified or "all" is provided, all cars are returned.
+     *
+     * @param groupString Optional price group string from the URL path.
+     * @return A ResponseEntity containing a list of {@link CarResponseDTO}s.
+     */
+    @GetMapping(value = {"/price-group", "/price-group/{groupString}"}) // Handles both with and without group
+    public ResponseEntity<List<CarResponseDTO>> getAllCarsByPriceGroupOptional(
+            @PathVariable(required = false) String groupString) {
+        String requesterId = SecurityUtils.getRequesterIdentifier();
+        List<Car> cars;
+
+        if (groupString == null || groupString.trim().isEmpty() || "all".equalsIgnoreCase(groupString.trim())) {
+            log.info("Requester [{}]: Request to get all cars (no price group filter or 'all' specified).", requesterId);
+            cars = carService.getAll(); // Fetches all non-deleted cars
+        } else {
+            log.info("Requester [{}]: Request to get cars by price group string: '{}'", requesterId, groupString);
+            PriceGroup priceGroupEnum;
+            try {
+                priceGroupEnum = PriceGroup.valueOf(groupString.trim().toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException e) {
+                log.warn("Requester [{}]: Invalid price group string provided: '{}'. Valid values are: {}",
+                        requesterId, groupString, java.util.Arrays.toString(PriceGroup.values()));
+                throw new BadRequestException("Invalid price group value: '" + groupString + "'.");
+            }
+            cars = carService.getCarsByPriceGroup(priceGroupEnum);
         }
 
-        log.info("Requester [{}]: Successfully retrieved car with ID: {} for UUID: {}",
+        if (cars.isEmpty()) {
+            log.info("Requester [{}]: No cars found for the specified criteria (Price Group String: {}).",
+                    requesterId, groupString != null ? groupString : "None");
+            return ResponseEntity.noContent().build();
+        }
+        List<CarResponseDTO> carDTOs = CarMapper.toDtoList(cars);
+        log.info("Requester [{}]: Successfully retrieved {} cars (Price Group String: {}).",
+                requesterId, carDTOs.size(), groupString != null ? groupString : "All");
+        return ResponseEntity.ok(carDTOs);
+    }
+
+
+    @GetMapping("/{carUuid}")
+    public ResponseEntity<CarResponseDTO> getCarByUuid(@PathVariable UUID carUuid) {
+        String requesterId = SecurityUtils.getRequesterIdentifier();
+        log.info("Requester [{}]: Request to get car by UUID: {}", requesterId, carUuid);
+        Car car = carService.read(carUuid);
+        if (car == null) {
+            log.warn("Requester [{}]: Car not found with UUID: {}", requesterId, carUuid);
+            throw new ResourceNotFoundException("Car not found with UUID: " + carUuid);
+        }
+        log.info("Requester [{}]: Successfully retrieved car ID: {} for UUID: {}",
                 requesterId, car.getId(), car.getUuid());
         return ResponseEntity.ok(CarMapper.toDto(car));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CarResponseDTO>> getAllCars() {
+        String requesterId = SecurityUtils.getRequesterIdentifier();
+        log.info("Requester [{}]: Request to get all cars (unfiltered).", requesterId);
+        List<Car> cars = carService.getAll();
+        if (cars.isEmpty()) {
+            log.info("Requester [{}]: No cars found in the system.", requesterId);
+            return ResponseEntity.noContent().build();
+        }
+        List<CarResponseDTO> carDTOs = CarMapper.toDtoList(cars);
+        log.info("Requester [{}]: Successfully retrieved {} cars (unfiltered).", requesterId, carDTOs.size());
+        return ResponseEntity.ok(carDTOs);
     }
 }

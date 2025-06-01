@@ -71,6 +71,7 @@ public class SpringSecurityConfig {
                                 // Help center and FAQ user endpoints
                                 .requestMatchers("/api/faq/**").permitAll()
                                 .requestMatchers("/api/help-center/**").permitAll()
+
                                 // User booking endpoints
                                 .requestMatchers("/api/bookings/**").permitAll() // for dev purposes
                                 .requestMatchers("/api/v1/bookings").permitAll() // for dev purposes
@@ -99,6 +100,11 @@ public class SpringSecurityConfig {
 
                                 // Current User's Profile & Data (Authenticated)
                                 .requestMatchers("/api/v1/users/me/**").authenticated()
+
+                                // help center and FAQ user endpoints
+                                .requestMatchers("/api/v1/help-center/**").permitAll()
+                                .requestMatchers("/api/v1/faq/**").permitAll()
+                                .requestMatchers("/api/v1/contact-us").permitAll()
                                 // Admin endpoints
                                 .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
                                 .requestMatchers("/api/v1/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
