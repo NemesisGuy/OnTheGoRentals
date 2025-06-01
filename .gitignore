@@ -1,66 +1,73 @@
-###intellij###
+### Build output ###
 target/
 out/
-.idea/
-###!.mvn/wrapper/maven-wrapper.jar
-###!**/src/main/**/target/
-###!**/src/test/**/target/
+build/ # For NetBeans, if used elsewhere
 
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+### IDEs ###
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### Eclipse ###
+# Eclipse
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
+# VS Code
 .vscode/
 
-### Mac OS ###
+### OS generated files ###
 .DS_Store
 
-### Custom ###
-/src/main/resources/mysql-db.properties
-/.idea/
-
-### Secrets ###
-### Database credentials ###
-### Ignore database configuration file ###
-mysql-db.properties
-/spring/.mvn/
-*.log
+### Maven ###
+# Ignore .mvn directory at the root, but keep the wrapper jar
 .mvn/
+!.mvn/wrapper/maven-wrapper.jar
+
+### Log files ###
+*.log
+
+### Secrets and Configuration ###
+# Ignore specific sensitive or environment-specific files
+# If you want to commit a template, name it e.g., application.properties.template
 application.properties
 application-api.properties
-HELP.md
 application-secrets.properties
-
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-!src/main/resources/mysql-db.properties
-/OnTheGoRentals.drawio
-/src/main/resources/mysql-db.properties
+mysql-db.properties # Ignores this file anywhere, unless un-ignored below for a specific path
 /src/main/resources/old-application.properties
-/dev/
+# If you need to commit mysql-db.properties for src/main/resources, un-ignore it:
+# !src/main/resources/mysql-db.properties
+
+### Specific Files to Ignore at Root ###
+/OnTheGoRentals.drawio
+# HELP.md # Typically, you want to commit this. Uncomment if you want to ignore.
+
+### Directories to Commit ###
+# Explicitly un-ignore top-level directories like 'docs' if they might be caught by other rules
+# or to make their inclusion clear.
+!docs/
+# Add other similar directories if needed:
+# !assets/
+# !diagrams/
+
+### Problematic un-ignores (Review if you really need these) ###
+# The following lines un-ignore 'target' directories within src. This is NOT recommended.
+# If you have specific files within these 'target' folders to commit,
+# list them explicitly with a leading '!' instead of un-ignoring the whole folder.
+# Example: !src/main/java/com/example/target/my-generated-file.txt
+# --- Commented out for safety ---
+# !**/src/main/**/target/
+# !**/src/test/**/target/
