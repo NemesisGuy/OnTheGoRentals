@@ -6,64 +6,76 @@ Base URL for all v1 APIs: `/api/v1`
 
 ## Authentication (`/auth`)
 *(This section remains the same as previously defined)*
-*   `POST /auth/register` (Public) - Req: `RegisterDto`, Resp: `AuthResponseDto` & `rtk` cookie
-*   `POST /auth/login` (Public) - Req: `LoginDto`, Resp: `AuthResponseDto` & `rtk` cookie
-*   `POST /auth/refresh` (Public, needs `rtk` cookie) - Resp: `TokenRefreshResponseDto` & new `rtk` cookie
-*   `POST /auth/logout` (Authenticated) - Resp: Success message & clears `rtk` cookie
+*   `POST /auth/register` - Req: `RegisterDto`, Resp: `AuthResponseDto` & `rtk` cookie, Authentication: Public
+*   `POST /auth/login` - Req: `LoginDto`, Resp: `AuthResponseDto` & `rtk` cookie, Authentication: Public
+*   `POST /auth/refresh` - Resp: `TokenRefreshResponseDto` & new `rtk` cookie, Authentication: Public (needs rtk cookie)
+*   `POST /auth/logout` - Resp: `ApiResponse<String>` & clears `rtk` cookie, Authentication: Authenticated
 
 ---
 
 ## Current User (`/users/me`)
-*(This section remains the same as previously defined - All endpoints require authentication)*
-*   `GET /users/me/profile` - Resp: `UserResponseDTO`
-*   `PUT /users/me/profile` - Req: `UserUpdateRequestDTO`, Resp: `UserResponseDTO`
-*   `GET /users/me/rental-history` - Resp: `List<RentalResponseDTO>` or `204 No Content`
+*(All endpoints require authentication)*
+*   `GET /users/me/profile` - Resp: `UserResponseDTO`, Authentication: Authenticated
+*   `PUT /users/me/profile` - Req: `UserUpdateDTO`, Resp: `UserResponseDTO`, Authentication: Authenticated
+*   `GET /users/me/rental-history` - Resp: `List<RentalResponseDTO>` or `204 No Content`, Authentication: Authenticated
 
 ---
 
 ## Public Car Information (`/cars`)
-*(This section remains the same as previously defined - All endpoints are Public)*
-*   `GET /cars` - Resp: `List<CarResponseDTO>`
-*   `GET /cars/price-group/{group}` - Path Var: `group` (PriceGroup enum), Resp: `List<CarResponseDTO>`
-*   `GET /cars/available` - Resp: `List<CarResponseDTO>`
-*   `GET /cars/available/price-group/{group}` - Path Var: `group`, Resp: `List<CarResponseDTO>`
-*   `GET /cars/{carUuid}` - Path Var: `carUuid` (UUID), Resp: `CarResponseDTO` or `404`
+*(All endpoints are Public)*
+*   `GET /cars` - Resp: `List<CarResponseDTO>`, Authentication: Public
+*   `GET /cars/price-group/{groupString}` - Path Var: `groupString` (PriceGroup enum, case-insensitive String), Resp: `List<CarResponseDTO>`. Description: Retrieves cars by the specified price group. Authentication: Public
+*   `GET /cars/available` - Resp: `List<CarResponseDTO>`, Authentication: Public
+*   `GET /cars/available/price-group/{groupString}` - Path Var: `groupString` (PriceGroup enum, case-insensitive String), Resp: `List<CarResponseDTO>`, Authentication: Public
+*   `GET /cars/{carUuid}` - Path Var: `carUuid` (UUID), Resp: `CarResponseDTO` or `404`, Authentication: Public
 
 ---
 
 ## Public Booking Operations (`/bookings`)
 *(This section reflects the refactored user-facing BookingController - Most endpoints require authentication)*
-*   `POST /bookings` - Req: `BookingRequestDTO`, Resp: `201` with `BookingResponseDTO`
-*   `GET /bookings/my-bookings` - Resp: `List<BookingResponseDTO>` or `204`
-*   `GET /bookings/{bookingUuid}` - Resp: `BookingResponseDTO` or `404`
-*   `PUT /bookings/{bookingUuid}` - Req: `BookingUpdateDTO` (or `BookingRequestDTO` if reused), Resp: `BookingResponseDTO` or `404`
-*   `POST /bookings/{bookingUuid}/confirm` - Resp: `BookingResponseDTO` or `404`
-*   `POST /bookings/{bookingUuid}/cancel` - Resp: `BookingResponseDTO` or `404`
-*   `GET /bookings/available-cars` (Helper) - Resp: `List<CarResponseDTO>` (Public or Authenticated)
+*   `POST /bookings` - Req: `BookingRequestDTO`, Resp: `201` with `BookingResponseDTO`, Authentication: Public (permitAll in config - development only)
+*   `GET /bookings/my-bookings` - Resp: `List<BookingResponseDTO>` or `204`, Authentication: Public (permitAll in config - development only)
+*   `GET /bookings/{bookingUuid}` - Resp: `BookingResponseDTO` or `404`, Authentication: Public (permitAll in config - development only)
+*   `PUT /bookings/{bookingUuid}` - Req: `BookingUpdateDTO` (or `BookingRequestDTO` if reused), Resp: `BookingResponseDTO` or `404`, Authentication: Public (permitAll in config - development only)
+*   `POST /bookings/{bookingUuid}/confirm` - Resp: `BookingResponseDTO` or `404`, Authentication: Public (permitAll in config - development only)
+*   `POST /bookings/{bookingUuid}/cancel` - Resp: `BookingResponseDTO` or `404`, Authentication: Public (permitAll in config - development only)
+*   `GET /bookings/available-cars` (Helper) - Resp: `List<CarResponseDTO>`, Authentication: Public
+*   `GET /bookings/user-profile` - Resp: `UserResponseDTO`. Description: Retrieves the profile of the currently authenticated user (helper for booking context), Authentication: Public (permitAll in config - development only)
 
 ---
 
 ## Public FAQs (`/faqs`)
 *(All GET endpoints are Public)*
-*   `GET /faqs` - Query Param: `category` (optional String), Resp: `List<FaqResponseDTO>` or `204`
-*   `GET /faqs/{faqUuid}` - Resp: `FaqResponseDTO` or `404`
+*   `GET /faqs` - Resp: `List<FaqResponseDTO>` or `204`, Authentication: Public
+*   `GET /faqs/{faqUuid}` - Resp: `FaqResponseDTO` or `404`, Authentication: Public
 
 ---
 
 ## Public Help Topics (`/help-topics`)
 *(All GET endpoints are Public)*
-*   `GET /help-topics` - Query Param: `category` (optional String), Resp: `List<HelpCenterResponseDTO>` or `204`
-*   `GET /help-topics/{topicUuid}` - Resp: `HelpCenterResponseDTO` or `404`
+*   `GET /help-topics` - Query Param: `category` (optional String), Resp: `List<HelpCenterResponseDTO>` or `204`, Authentication: Public
+*   `GET /help-topics/{topicUuid}` - Resp: `HelpCenterResponseDTO` or `404`, Authentication: Public
 
 ---
 
 ## Public Feedback Submission (`/feedback`)
-*   `POST /feedback` - Req: `FeedbackCreateDTO`, Resp: `201` with `FeedbackResponseDTO` (Public)
+**Note:** While feedback submission (POST) is intended to be broadly accessible, current security configuration requires authentication for all `/api/v1/feedback` endpoints. For administrative management of feedback, including viewing all and deleting, use the `/api/v1/admin/feedback` endpoints.
+*   `POST /feedback` - Req: `FeedbackCreateDTO`, Resp: `201` with `FeedbackResponseDTO`, Authentication: Authenticated
+*   `GET /feedback` - Resp: `List<FeedbackResponseDTO> or 204`, Authentication: Authenticated
+*   `GET /feedback/{feedbackUuid}` - Path Var: `feedbackUuid` (UUID), Resp: `FeedbackResponseDTO or 404`, Authentication: Authenticated
+*   `DELETE /feedback/{feedbackUuid}` - Path Var: `feedbackUuid` (UUID), Resp: `204 No Content or 404`, Authentication: Authenticated
 
 ---
 
 ## Public Contact Us Submission (`/contact-us`)
-*   `POST /contact-us` - Req: `ContactUsCreateDTO`, Resp: `201` with `ContactUsResponseDTO` (Public)
+*   `POST /contact-us` - Req: `ContactUsCreateDTO`, Resp: `201` with `ContactUsResponseDTO`, Authentication: Public
+
+---
+
+## Public About Us Information (`/about-us`)
+*   `GET /about-us` - Resp: `List<AboutUsResponseDTO> or 204`. Description: Retrieves all "About Us" entries. Authentication: Public
+*   `GET /about-us/latest` - Resp: `AboutUsResponseDTO or 404`. Description: Retrieves the latest "About Us" entry. Authentication: Public
+*   `GET /about-us/{id}` - Path Var: `id` (Integer), Resp: `AboutUsResponseDTO or 404`. Description: Retrieves a specific "About Us" entry by its internal ID. Authentication: Public
 
 ---
 ---
@@ -106,9 +118,9 @@ All endpoints under `/api/v1/admin` require ADMIN or SUPERADMIN authentication.
 
 ### Admin - Rental/Booking Management (`/admin/rentals`)
 *   **`GET /admin/rentals`** - Resp: `List<RentalResponseDTO>` or `204`.
-*   **`POST /admin/rentals`** - Req: `BookingRequestDTO` (or `AdminRentalCreateDTO`), Resp: `201` with `RentalResponseDTO`.
+*   **`POST /admin/rentals`** - Req: `BookingRequestDTO` (or a specific `AdminRentalCreateDTO` if defined), Resp: `201` with `RentalResponseDTO`.
 *   **`GET /admin/rentals/{rentalUuid}`** - Resp: `RentalResponseDTO` or `404`.
-*   **`PUT /admin/rentals/{rentalUuid}`** - Req: `BookingUpdateDTO` (or `AdminRentalUpdateDTO`), Resp: `RentalResponseDTO` or `404`.
+*   **`PUT /admin/rentals/{rentalUuid}`** - Req: `BookingUpdateDTO` (or a specific `AdminRentalUpdateDTO` if defined), Resp: `RentalResponseDTO` or `404`.
 *   **`DELETE /admin/rentals/{rentalUuid}`** - Resp: `204 No Content` or `404`.
 *   **`POST /admin/rentals/{rentalUuid}/confirm`** - Resp: `RentalResponseDTO` or `404`.
 *   **`POST /admin/rentals/{rentalUuid}/cancel`** - Resp: `RentalResponseDTO` or `404`.
@@ -160,7 +172,7 @@ This documentation provides a good overview. You'll want to:
 Base URL for all v1 APIs: `/api/v1`
 
 ---
-*(Sections for `/auth`, `/users/me`, `/cars`, `/bookings` (user-facing), `/faqs` (public), `/help-topics` (public), `/feedback` (public POST), `/contact-us` (public POST) would remain as previously detailed, ensuring they return `ApiResponse<YourDTO>`)*
+*(All successful non-admin responses are wrapped in ApiResponse<YourDTO> by default. The Resp: field below indicates the type of YourDTO.)*
 ---
 
 ## Administrative Endpoints (`/admin`)
