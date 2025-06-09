@@ -4,7 +4,7 @@ You are an AI assistant. The following describes the current architecture and ke
 
 ## I. Core Technologies
 
-* **Backend:** Java, Spring Boot (likely 3.x), Spring MVC (REST Controllers), Spring Data JPA (with Hibernate), Spring Security
+* **Backend:** Java 17, Spring Boot (likely 3.x), Spring MVC (REST Controllers), Spring Data JPA (with Hibernate), Spring Security
 * **Database:** Relational (e.g., H2 for development, potentially PostgreSQL/MySQL for deployment)
 * **Build Tool:** Maven or Gradle
 * **Utilities:** Lombok for boilerplate code reduction
