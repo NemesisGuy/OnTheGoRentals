@@ -11,7 +11,7 @@ This file contains tracked bugs, planned improvements, and technical notes for i
 # 🐛 Bugs to Fix
 - [ ] Backend bookings sends whole user object including password in json response - switch to DTO
 - [ ] Booking(admin create booking) form dates: date not getting to DB could be date picker not working 
-- [ ] user profile update and read returning ful user object, switch to DTO
+- [x] user profile update and read returning ful user object, switch to DTO (UserResponseDTO is used in UserController and AdminUserController for profile read/update responses)
 
 
 # ✅ Done

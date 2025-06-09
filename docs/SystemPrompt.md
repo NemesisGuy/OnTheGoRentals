@@ -85,7 +85,12 @@ You are an AI assistant. The following describes the current architecture and ke
 
 ### Public Endpoints:
 
-* `/cars`, `/faqs`, `/contact-us`, `/about-us`, `/help-topics`
+* `/cars/**`: For listing all cars, available cars, cars by price group, and specific car details by UUID.
+* `/faqs/**`: For listing all FAQs and retrieving a specific FAQ by UUID.
+* `/help-topics/**`: For listing help topics (optionally by category) and retrieving a specific topic by UUID.
+* `/contact-us`: For submitting contact form messages (POST).
+* `/about-us/**`: For listing all "About Us" entries, retrieving the latest, and a specific entry by its ID.
+* `/feedback`: For submitting feedback (POST). Also includes GET (list/specific) and DELETE operations that currently require authentication.
 
 ### Authentication Endpoints `/auth`
 
@@ -97,15 +102,11 @@ You are an AI assistant. The following describes the current architecture and ke
 
 ### Bookings `/bookings`
 
-* `/my-bookings`, create/update/confirm/cancel bookings, `/available-cars`
-
-### Rentals `/rentals`
-
-* `/my-rentals`, confirm, cancel, complete (some admin-only actions)
+* `/my-bookings`, `/user-profile`, `/available-cars`, and operations to create, view, update, confirm, and cancel bookings.
 
 ### Admin `/admin/...`
 
-* Full CRUD for Users, Cars, Bookings, Rentals, Drivers, DamageReports, AboutUs, ContactUs, FAQs, HelpCenter, Settings
+* Management of Users, Cars, Rentals/Bookings, site content (FAQs, HelpTopics, AboutUs, ContactUs submissions, Feedback), and other system entities.
 * UUIDs used in path variables
 
 ## V. Service Layer
