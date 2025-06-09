@@ -23,7 +23,7 @@ The OnTheGoRentals system is composed of several key components that work togeth
 
 ## 3. Technology Stack Summary
 
-*   **Backend:** Java 17, Spring Boot 3, Spring Security 6, Spring Data JPA, JWT (JSON Web Tokens)
+*   **Backend:** Java 21, Spring Boot 3.5.0, Spring Security 6.5.0, Spring Data JPA, JWT (JSON Web Tokens)
 *   **Frontend:** Vue.js
 *   **Database:** MySQL
 *   **Build Tool:** Maven
