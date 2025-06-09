@@ -17,7 +17,7 @@ The core purpose is to allow registered users to browse available cars, make boo
 ## Key Features
 
 *   **User Management:** Secure user registration, login/logout functionality, and profile management.
-*   **JWT-Based Authentication:** Robust and stateless authentication using JSON Web Tokens.
+*   **JWT-Based Authentication:** Robust and stateless authentication using JSON Web Tokens, typically involving short-lived access tokens and refresh tokens managed via cookies.
 *   **Car Fleet Management:** Admins can add, update, and remove car details, including pricing and availability.
 *   **Car Browsing & Search:** Users can browse the car catalog, filter by various criteria (e.g., price group), and view detailed information for each vehicle.
 *   **Rental Booking System:** Users can book available cars for specific periods, view their current and past bookings, and manage them.
@@ -42,6 +42,7 @@ The core purpose is to allow registered users to browse available cars, make boo
     *   Vue.js (Developed and maintained in a separate repository: [OnTheGoRentalsFrontend](https://github.com/NemesisGuy/OnTheGoRentalsFrontend))
 *   **API:**
     *   RESTful API architecture
+    *   Base Path: `/api/v1`
     *   Secured using JSON Web Tokens (JWT)
 *   **Containerization:**
     *   Docker
@@ -147,7 +148,7 @@ For instructions on setting up and running the Vue.js frontend application, plea
 Once the backend (and frontend) are running:
 *   **Users** can register for an account, log in, browse available cars, make bookings, and view their rental history.
 *   **Administrators** can log in with admin credentials to access the admin dashboard for managing users, cars, rentals, and site content.
-    *   (Information on creating an initial admin user or default credentials should be added here if applicable, e.g., via data seeding or a setup script).
+    *   Default user accounts (e.g., `user@gmail.com`, `admin@gmail.com`, `superadmin@gmail.com`) are typically created via data seeding during application startup if they don't already exist. The default password pattern before hashing is `rolename + "password"` (e.g., 'adminpassword'). These passwords will be hashed by the system. Please refer to `DefaultDataInitializer.java` for the exact logic.
 
 For detailed information on API endpoints, request/response formats, and authentication mechanisms, please refer to our [API Endpoints Documentation](docs/API_ENDPOINTS.md).
 

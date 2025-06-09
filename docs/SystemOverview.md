@@ -9,7 +9,7 @@ OnTheGoRentals is a comprehensive car rental system designed to facilitate the p
 The OnTheGoRentals system is composed of several key components that work together to provide its services:
 
 *   **Backend API:**
-    *   **Description:** A robust server-side application that exposes RESTful APIs to handle all business logic, data processing, and core functionalities.
+    *   **Description:** A robust server-side application that exposes RESTful APIs to handle all business logic, data processing, and core functionalities. The API is versioned, with the current primary version being `/api/v1`.
     *   **Technology:** Built with Java using the Spring Boot framework, incorporating Spring Security for authentication/authorization and Spring Data JPA for database interaction.
 *   **Frontend Single Page Application (SPA):**
     *   **Description:** An interactive and responsive user interface that allows users and administrators to interact with the system. The frontend project is maintained in a separate repository: [OnTheGoRentalsFrontend](https://github.com/NemesisGuy/OnTheGoRentalsFrontend).
@@ -39,7 +39,7 @@ The OnTheGoRentals application follows a common client-server architecture:
     *   The Backend API processes these requests, performs necessary operations, and returns responses (typically in JSON format, wrapped in a standard `ApiResponse` structure) to the frontend.
 *   **Backend API Responsibilities:**
     *   The Backend API is the heart of the system. It handles:
-        *   User authentication and authorization (via Spring Security and JWT).
+        *   User authentication and authorization (via Spring Security and JWT); this typically involves issuing a short-lived access token in the API response and a longer-lived refresh token via a secure HTTP-only cookie.
         *   All business logic related to car rentals, bookings, user management, etc.
         *   Interaction with the **Database** for creating, reading, updating, and deleting data (CRUD operations) via Spring Data JPA.
         *   Serving content for FAQs, help topics, and other informational sections.
