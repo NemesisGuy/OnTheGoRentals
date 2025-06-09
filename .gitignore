@@ -46,7 +46,8 @@ build/ # For NetBeans, if used elsewhere
 application.properties
 application-api.properties
 application-secrets.properties
-mysql-db.properties # Ignores this file anywhere, unless un-ignored below for a specific path
+mysql-db.properties
+ # Ignores this file anywhere, unless un-ignored below for a specific path
 /src/main/resources/old-application.properties
 # If you need to commit mysql-db.properties for src/main/resources, un-ignore it:
 # !src/main/resources/mysql-db.properties
@@ -71,3 +72,9 @@ mysql-db.properties # Ignores this file anywhere, unless un-ignored below for a 
 # --- Commented out for safety ---
 # !**/src/main/**/target/
 # !**/src/test/**/target/
+
+# Ignore all uploaded files
+/uploads/
+# Specific upload directories
+uploads/cars/
+uploads/selfies/
