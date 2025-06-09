@@ -1,8 +1,8 @@
 # OnTheGoRentals
 
-[![Java Version](https://img.shields.io/badge/Java-17-yellow.svg?style=for-the-badge)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
-[![Spring Boot Version](https://img.shields.io/badge/Spring_Boot-3.x.x-blueviolet.svg?style=for-the-badge)](https://spring.io/projects/spring-boot)
-[![Spring Security Version](https://img.shields.io/badge/Spring_Security-6.x.x-blueviolet.svg?style=for-the-badge)](https://spring.io/projects/spring-security)
+[![Java Version](https://img.shields.io/badge/Java-21-yellow.svg?style=for-the-badge)](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
+[![Spring Boot Version](https://img.shields.io/badge/Spring_Boot-3.5.0-blueviolet.svg?style=for-the-badge)](https://spring.io/projects/spring-boot)
+[![Spring Security Version](https://img.shields.io/badge/Spring_Security-6.5.0-blueviolet.svg?style=for-the-badge)](https://spring.io/projects/spring-security)
 [![JWT Authentication](https://img.shields.io/badge/Authentication-JWT-blue.svg?style=for-the-badge)](https://jwt.io/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg?style=for-the-badge)](docs/LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg?style=for-the-badge)](https://example.com/build-status) <!-- Placeholder -->
@@ -32,9 +32,9 @@ The core purpose is to allow registered users to browse available cars, make boo
 ## Technology Stack
 
 *   **Backend:**
-    *   Java 17
-    *   Spring Boot 3
-    *   Spring Security 6 (with JWT for authentication)
+    *   Java 21
+    *   Spring Boot 3.5.0
+    *   Spring Security 6.5.0 (with JWT for authentication)
     *   Spring Data JPA (for database interaction)
     *   MySQL (Database)
     *   Maven (Build Tool)
@@ -56,7 +56,7 @@ To get the OnTheGoRentals system up and running, follow these instructions.
 
 ### Prerequisites
 
-*   **Java Development Kit (JDK):** Version 17 or later.
+*   **Java Development Kit (JDK):** Version 21 or later.
 *   **Maven:** Apache Maven build tool.
 *   **Docker:** Docker Desktop or Docker Engine with Docker Compose.
 *   **Node.js & npm/yarn:** Required if you plan to build and run the [frontend application](https://github.com/NemesisGuy/OnTheGoRentalsFrontend) locally.
