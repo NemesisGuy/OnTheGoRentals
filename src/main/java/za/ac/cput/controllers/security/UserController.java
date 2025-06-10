@@ -1,132 +1,145 @@
 package za.ac.cput.controllers.security;
 
-import jakarta.validation.Valid; // For validating request body
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication; // For logout
-import org.springframework.security.core.context.SecurityContextHolder; // For logout
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.Rental;
-import za.ac.cput.domain.dto.RentalDTO;
-import za.ac.cput.domain.dto.LoginDto;
-import za.ac.cput.domain.dto.RegisterDto;
-import za.ac.cput.domain.dto.AuthResponseDto; // Import
-import za.ac.cput.domain.dto.TokenRefreshRequestDto; // Import
-import za.ac.cput.domain.dto.TokenRefreshResponseDto; // Import
+import org.springframework.web.multipart.MultipartFile;
+import za.ac.cput.domain.dto.request.UserUpdateDTO;
+
+import za.ac.cput.domain.dto.response.RentalResponseDTO;
+import za.ac.cput.domain.dto.response.UserResponseDTO;
+import za.ac.cput.domain.entity.Rental;
+import za.ac.cput.domain.entity.security.User;
+import za.ac.cput.domain.enums.ImageType;
 import za.ac.cput.domain.mapper.RentalMapper;
 import za.ac.cput.domain.mapper.UserMapper;
-import za.ac.cput.domain.security.User;
-import za.ac.cput.service.IRentalService; // Keep this
-import za.ac.cput.service.impl.RentalServiceImpl; // Keep this
-import za.ac.cput.service.impl.UserService; // Change to concrete type or keep interface if preferred
+import za.ac.cput.exception.BadRequestException;
+import za.ac.cput.exception.ResourceNotFoundException;
+import za.ac.cput.service.FileStorageService;
+import za.ac.cput.service.IRentalService;
+import za.ac.cput.service.IUserService;
+import za.ac.cput.utils.SecurityUtils;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
-@CrossOrigin(origins = "*")
+/**
+ * UserController.java
+ * Controller for authenticated users to manage their own profile and related data.
+ * This includes updating profile info, uploading a profile image, and viewing rental history.
+ *
+ * Author: Peter Buckingham (220165289)
+ * Updated: 2024-06-07
+ */
 @RestController
-@RequestMapping("/api/user")
-// @RequiredArgsConstructor // If using this, ensure all final fields are in constructor
+@RequestMapping("/api/v1/users/me")
 public class UserController {
 
-    private final RentalServiceImpl rentalService; // Assuming direct injection
-    // private final IRentalService iRentalService; // You have both, choose one or clarify
-    private final UserService userService; // Use concrete type to access new methods directly
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    @Autowired // If not using @RequiredArgsConstructor for all
-    public UserController(RentalServiceImpl rentalService, UserService userService) {
-        this.rentalService = rentalService;
+    private final IUserService userService;
+    private final IRentalService rentalService;
+    private final FileStorageService fileStorageService;
+
+    @Autowired
+    public UserController(IUserService userService, IRentalService rentalService, FileStorageService fileStorageService) {
         this.userService = userService;
+        this.rentalService = rentalService;
+        this.fileStorageService = fileStorageService;
+        log.info("UserController initialized.");
     }
 
-    //RessourceEndPoint:http://localhost:8080/api/user/register
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterDto registerDto) {
-        System.out.println("Register called, registerDto = " + registerDto);
-        // UserService.register now returns ResponseEntity<AuthResponseDto> or ResponseEntity<String>
-        return userService.register(registerDto); // This should now return the ResponseEntity with AuthResponseDto
+    /**
+     * Retrieves the profile of the currently authenticated user.
+     *
+     * @return A ResponseEntity containing the {@link UserResponseDTO}.
+     */
+    @GetMapping("/profile")
+    public ResponseEntity<UserResponseDTO> getCurrentUserProfile() {
+        String userEmail = SecurityUtils.getRequesterIdentifier();
+        log.info("User [{}] requesting their profile.", userEmail);
+
+        User user = userService.read(userEmail); // Throws exception if not found
+        log.info("Successfully retrieved profile for user [{}].", userEmail);
+        return ResponseEntity.ok(UserMapper.toDto(user));
     }
 
+    /**
+     * Updates the profile of the currently authenticated user.
+     *
+     * @param userUpdateDTO The DTO containing the fields to update.
+     * @return A ResponseEntity containing the updated {@link UserResponseDTO}.
+     */
+    @PutMapping("/profile")
+    public ResponseEntity<UserResponseDTO> updateCurrentUserProfile(@Valid @RequestBody UserUpdateDTO userUpdateDTO) {
+        String userEmail = SecurityUtils.getRequesterIdentifier();
+        log.info("User [{}] requesting to update their profile with DTO: {}", userEmail, userUpdateDTO);
 
-    //RessourceEndPoint:http://localhost:8080/api/user/authenticate
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthResponseDto> authenticate(@Valid @RequestBody LoginDto loginDto) {
-        System.out.println("Authenticate called, loginDto = " + loginDto);
-        AuthResponseDto authResponse = userService.authenticateAndGenerateTokens(loginDto);
-        return ResponseEntity.ok(authResponse);
+        User currentUser = userService.read(userEmail);
+        User userWithUpdates = UserMapper.applyUpdateDtoToEntity(userUpdateDTO, currentUser);
+
+        User updatedUser = userService.update(currentUser.getId(), userWithUpdates);
+        log.info("Successfully updated profile for user [{}].", userEmail);
+        return ResponseEntity.ok(UserMapper.toDto(updatedUser));
     }
 
-    // NEW ENDPOINT for refreshing token
-    //RessourceEndPoint:http://localhost:8080/api/user/refresh
-    @PostMapping("/refresh")
-    public ResponseEntity<TokenRefreshResponseDto> refreshToken(@Valid @RequestBody TokenRefreshRequestDto request) {
-        String requestRefreshToken = request.getRefreshToken();
-        TokenRefreshResponseDto response = userService.refreshToken(requestRefreshToken);
-        return ResponseEntity.ok(response);
-    }
+    /**
+     * [NEW] Uploads or replaces the profile image for the currently authenticated user.
+     *
+     * @param file The image file sent as multipart/form-data.
+     * @return A ResponseEntity containing the updated {@link UserResponseDTO} with the new image URL.
+     */
+    @PostMapping("/profile-image")
+    public ResponseEntity<UserResponseDTO> uploadProfileImage(@RequestParam("file") MultipartFile file) {
+        String userEmail = SecurityUtils.getRequesterIdentifier();
+        log.info("User [{}] is uploading a profile image.", userEmail);
 
-    // OPTIONAL LOGOUT ENDPOINT
-    //RessourceEndPoint:http://localhost:8080/api/user/logout
-    @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser() {
-        System.out.println("Logout called");
-        // Get current user (principal) to invalidate their refresh token
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName(); // usually the email or username
-            User user = userService.read(username);
-            if (user != null) {
-                userService.logoutUser(user.getId());
-                return ResponseEntity.ok("User logged out successfully and refresh token invalidated.");
-            }
+        if (file == null || file.isEmpty()) {
+            throw new BadRequestException("Profile image file cannot be empty.");
         }
 
-        return ResponseEntity.badRequest().body("Could not logout user.");
+        User currentUser = userService.read(userEmail);
+
+        // Save the new file
+        String filename = fileStorageService.save(ImageType.SELFIE.getFolder(), file);
+
+        // Update the user entity with the new image details
+        User.UserBuilder builder = currentUser.toBuilder()
+                .profileImageFileName(filename)
+                .profileImageType(ImageType.SELFIE.getFolder())
+                .profileImageUploadedAt(LocalDateTime.now());
+
+        User updatedUser = userService.update(currentUser.getId(), builder.build());
+
+        log.info("Successfully uploaded profile image '{}' for user [{}].", filename, userEmail);
+        return ResponseEntity.ok(UserMapper.toDto(updatedUser));
     }
 
 
-    // Endpoint to get user profile
-    @GetMapping("/profile/read/{userId}")
-    public ResponseEntity<?> getUserProfile(@PathVariable Integer userId) {
-        System.out.println("Get user profile called, userId = " + userId);
-        User userProfile = userService.read(userId);
-        if (userProfile != null) {
-            // Optionally, use a DTO to avoid sending sensitive info like password hash
-            // UserDTO userDto = userService.readDTO(userId);
-            return ResponseEntity.ok(UserMapper.toDto(userProfile)); // or userDto
-        } else {
-            return ResponseEntity.status(404).body("User profile not found");
-        }
-    }
+    /**
+     * Retrieves the rental history for the currently authenticated user.
+     *
+     * @return A ResponseEntity containing a list of the user's rentals.
+     */
+    @GetMapping("/rental-history")
+    public ResponseEntity<List<RentalResponseDTO>> getCurrentUserRentalHistory() {
+        String userEmail = SecurityUtils.getRequesterIdentifier();
+        log.info("User [{}] requesting their rental history.", userEmail);
 
-    // Endpoint to update user profile
-    @PutMapping("/profile/update/{userId}")
-    public ResponseEntity<?> updateUserProfile(@PathVariable Integer userId, @RequestBody User user) {
-        User updatedUser = userService.update(userId, user);
-        if (updatedUser != null) {
-            return ResponseEntity.ok(UserMapper.toDto(updatedUser));
-        }
-        return ResponseEntity.status(404).body("User not found or update failed.");
-    }
+        User currentUser = userService.read(userEmail);
 
-    @GetMapping("/profile/{userId}/rental-history")
-    public ResponseEntity<List<RentalDTO>> getRentalHistory(@PathVariable Integer userId) {
-        User user = userService.read(userId);
-        if (user == null) {
-            return ResponseEntity.status(404).body(null); // Or an empty list with appropriate message
-        }
-        List<Rental> rentalHistory = rentalService.getRentalHistoryByUser(user);
+        List<Rental> rentalHistory = rentalService.getRentalHistoryByUser(currentUser);
         if (rentalHistory.isEmpty()) {
-            return ResponseEntity.status(404).body(null); // Or an empty list with appropriate message
+            log.info("No rental history found for user [{}].", userEmail);
+            return ResponseEntity.noContent().build();
         }
-        // Convert Rental to RentalDTO if needed
-        List <RentalDTO> rentalHistoryDTO = new ArrayList<RentalDTO>();
-        for (Rental rental : rentalHistory) {
-            rentalHistoryDTO.add(RentalMapper.toDto(rental));
-        }
-
-        return ResponseEntity.ok(rentalHistoryDTO);
+        log.info("Successfully retrieved {} rental history entries for user [{}].", rentalHistory.size(), userEmail);
+        return ResponseEntity.ok(RentalMapper.toDtoList(rentalHistory));
     }
+
+    // The old, incorrect selfie endpoint is removed.
 }

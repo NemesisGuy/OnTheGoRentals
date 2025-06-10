@@ -3,18 +3,17 @@ package za.ac.cput.service.impl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory; // Or JacksonFactory if you prefer
+import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.ac.cput.domain.dto.AuthResponseDto;
-
+import za.ac.cput.domain.dto.response.AuthResponseDto;
+import za.ac.cput.domain.entity.security.RefreshToken;
+import za.ac.cput.domain.entity.security.Role;
+import za.ac.cput.domain.entity.security.RoleName;
+import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.enums.AuthProvider;
-import za.ac.cput.domain.security.Role;
-import za.ac.cput.domain.security.RoleName;
-import za.ac.cput.domain.security.User;
-import za.ac.cput.domain.security.RefreshToken;
 import za.ac.cput.repository.IRoleRepository;
 import za.ac.cput.repository.IUserRepository;
 import za.ac.cput.security.JwtUtilities;
@@ -31,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 public class GoogleOAuth2UserService {
 
-    private final IUserRepository userRepository;
+    private final IUserRepository IUserRepository;
     private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder; // For generating a dummy password for OAuth users
     private final JwtUtilities jwtUtilities;
@@ -43,10 +42,10 @@ public class GoogleOAuth2UserService {
 
     // The google.oauth2.audience should be your Google Client ID
     public GoogleOAuth2UserService(@Value("${spring.security.oauth2.client.registration.google.client-id}") String googleClientId,
-                                   IUserRepository userRepository, IRoleRepository roleRepository,
+                                   IUserRepository IUserRepository, IRoleRepository roleRepository,
                                    PasswordEncoder passwordEncoder, JwtUtilities jwtUtilities,
                                    IRefreshTokenService refreshTokenService) {
-        this.userRepository = userRepository;
+        this.IUserRepository = IUserRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtilities = jwtUtilities;
@@ -78,7 +77,7 @@ public class GoogleOAuth2UserService {
                 throw new IllegalArgumentException("Google email not verified.");
             }
 
-            Optional<User> userOptional = userRepository.findByEmail(email); // Prioritize email
+            Optional<User> userOptional = IUserRepository.findByEmail(email); // Prioritize email
             User user;
 
             if (userOptional.isPresent()) {
@@ -89,10 +88,13 @@ public class GoogleOAuth2UserService {
                     user.setAuthProvider(AuthProvider.GOOGLE);
                     user.setGoogleId(googleUserId);
                     // Optionally update name/picture if local versions are empty or different
-                    if (user.getFirstName() == null || user.getFirstName().isEmpty()) user.setFirstName(extractFirstName(name));
-                    if (user.getLastName() == null || user.getLastName().isEmpty()) user.setLastName(extractLastName(name, extractFirstName(name)));
-                    if (user.getProfileImageUrl() == null || user.getProfileImageUrl().isEmpty()) user.setProfileImageUrl(pictureUrl);
-                    userRepository.save(user);
+                    if (user.getFirstName() == null || user.getFirstName().isEmpty())
+                        user.setFirstName(extractFirstName(name));
+                    if (user.getLastName() == null || user.getLastName().isEmpty())
+                        user.setLastName(extractLastName(name, extractFirstName(name)));
+                 /*   if (user.getProfileImageUrl() == null || user.getProfileImageUrl().isEmpty())
+                        user.setProfileImageUrl(pictureUrl);*/
+                    IUserRepository.save(user);
                 } else if (user.getAuthProvider() == AuthProvider.GOOGLE && (user.getGoogleId() == null || !user.getGoogleId().equals(googleUserId))) {
                     // Email exists, registered with Google, but Google ID mismatch (highly unlikely if email is verified unique)
                     // Handle this edge case, maybe log an error or throw exception
@@ -105,7 +107,7 @@ public class GoogleOAuth2UserService {
                 user.setEmail(email);
                 user.setFirstName(extractFirstName(name));
                 user.setLastName(extractLastName(name, extractFirstName(name)));
-                user.setProfileImageUrl(pictureUrl);
+            /*    user.setProfileImageUrl(pictureUrl);*/
                 user.setAuthProvider(AuthProvider.GOOGLE);
                 user.setGoogleId(googleUserId);
                 // OAuth2 users usually don't have a password managed by our system
@@ -114,17 +116,17 @@ public class GoogleOAuth2UserService {
                 user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
                 Role userRole = roleRepository.findByRoleName(RoleName.USER);
                 user.setRoles(Collections.singletonList(userRole));
-                userRepository.save(user);
+                IUserRepository.save(user);
             }
 
             // Generate your application's tokens
             List<String> rolesNames = user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toList());
-            String appAccessToken = jwtUtilities.generateToken(user.getEmail(), rolesNames);
+            String appAccessToken = jwtUtilities.generateToken(user, rolesNames);
             RefreshToken appRefreshToken = refreshTokenService.createRefreshToken(user.getId());
 
             return new AuthResponseDto(
                     appAccessToken,
-                    appRefreshToken.getToken(),
+                    //    appRefreshToken.getToken(),
                     "Bearer",
                     accessTokenExpirationMs,
                     user.getEmail(),

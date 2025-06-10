@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,6 +18,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -28,43 +34,54 @@ public class SpringSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(Customizer.withDefaults())
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable()
+/*
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+*/
+/*
+                        .ignoringRequestMatchers("/api/v1/auth/**") // Allow JWT endpoints to bypass CSRF
+*/
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // User endpoints
-                        .requestMatchers("/api/user/register").permitAll()
-                        .requestMatchers("/api/user/authenticate").permitAll()
-                        .requestMatchers("/api/user/refresh").permitAll() // <<< ADD THIS
-                        .requestMatchers("/api/user/logout").authenticated() // <<< ADD THIS (needs auth to identify user for logout)
-                        .requestMatchers("/api/oauth2/google/login").permitAll() // Or /api/oauth2/google/code
-                        .requestMatchers("/api/user/profile/*").authenticated()
-                        .requestMatchers("/api/user/profile/*/*").authenticated()
-                        .requestMatchers("/api/user/rentals/*").authenticated()
-                        // User about and contact us endpoints
-                        .requestMatchers("/api/aboutUs/read/*").permitAll()
-                        .requestMatchers("/api/aboutUs/all").permitAll()
-                        .requestMatchers("/api/aboutUs/latest").permitAll()
-                        .requestMatchers("/api/contactUs/create").permitAll()
-                        // User settings endpoints
-                        .requestMatchers("/api/settings/read").permitAll()
-                        // User car endpoints
-                        .requestMatchers("/api/cars/**").permitAll()
-                        // Help center and FAQ user endpoints
-                        .requestMatchers("/api/faq/**").permitAll()
-                        .requestMatchers("/api/help-center/**").permitAll()
-                        .requestMatchers("/api/bookings/**").permitAll() // for dev purposes
-                        ///actuator/prometheus
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/actuator/prometheus").permitAll()
-                        ///actuator/prometheus
-                        .requestMatchers("/metrics").permitAll()
-                        .requestMatchers("/metrics/**").permitAll()
+                        // Preflight support
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Admin endpoints
-                        .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
-                        .requestMatchers("/api/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+                        // Public v1 endpoints
+                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
+                        .requestMatchers("/api/v1/about-us/**").permitAll()
+                        .requestMatchers("/api/v1/cars/**").permitAll()
+                        .requestMatchers("/api/v1/help-center/**").permitAll()
+                        .requestMatchers("/api/v1/faq/**").permitAll()
+                        .requestMatchers("/api/v1/contact-us").permitAll()
+                        .requestMatchers("/api/v1/bookings/available-cars").permitAll()
+
+                        // Authenticated v1 endpoints
+                        .requestMatchers("/api/v1/auth/logout").authenticated()
+                        .requestMatchers("/api/v1/users/me/**").authenticated()
+                        .requestMatchers("/api/v1/files/**").permitAll()
+                        .requestMatchers("/api/v1/admin/cars/list/available").authenticated()
+                        .requestMatchers("/api/v1/files/selfies/**").authenticated()
+                        .requestMatchers("/api/v1/admin/cars/list/**").authenticated()
+                        .requestMatchers("/api/v1/admin/rentals/from-booking/**").authenticated()
+                        .requestMatchers("/api/v1/rentals/from-booking/**").authenticated()
+                        .requestMatchers("/api/v1/admin/rentals/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+
+
+                        // Admin v1 endpoints
+                        .requestMatchers("/api/v1/admin/**", "/api/v1/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+
+                        // Public static & framework paths
+                        .requestMatchers("/public/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/oauth2/**").permitAll()
+
+                        // Actuator endpoints (non-versioned)
+                        .requestMatchers("/actuator/**", "/metrics", "/metrics/**").permitAll()
+
+                        // Default deny
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -90,5 +107,34 @@ public class SpringSecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",
+                "https://otgr.nemesisnet.co.za"
+        ));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"
+        ));
+        configuration.setExposedHeaders(Arrays.asList(
+                "Origin", "Content-Type", "Accept", "Authorization",
+                "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"
+        ));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

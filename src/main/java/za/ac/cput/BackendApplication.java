@@ -1,64 +1,25 @@
+// src/main/java/za/ac/cput/BackendApplication.java
 package za.ac.cput;
-/**
- * BackendApplication.java
- * This is the main class for the backend
- * Author: Peter Buckingham (220165289)
- * Date: 05 April 2023
- */
 
-import org.springframework.boot.CommandLineRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import za.ac.cput.service.IUserService;
-import za.ac.cput.domain.security.Role;
-import za.ac.cput.domain.security.RoleName;
-import za.ac.cput.domain.security.User;
-import za.ac.cput.repository.IRoleRepository;
-import za.ac.cput.repository.IUserRepository;
-/*import za.ac.cput.domain.User;
-import za.ac.cput.repository.UserRepository;
-import za.ac.cput.service.impl.UserServiceImpl;*/
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @SpringBootApplication
 public class BackendApplication {
 
+    private static final Logger log = LoggerFactory.getLogger(BackendApplication.class);
+    /**
+     * Main method to start the Spring Boot application.
+     * This method initializes the application context and starts the embedded server.
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(BackendApplication.class, args);
-    }
-
-    @Bean
-    CommandLineRunner run(IUserService userService, IRoleRepository roleRepository, IUserRepository userRepository, PasswordEncoder passwordEncoder) {
-        return args -> {
-            List<RoleName> roleNames = Arrays.asList(RoleName.USER, RoleName.ADMIN, RoleName.SUPERADMIN);
-
-            for (RoleName roleName : roleNames) {
-                Role role = roleRepository.findByRoleName(roleName);
-
-                if (role == null) {
-                    userService.saveRole(new Role(roleName));
-
-                    String userName = "Default-" + roleName.toString().toLowerCase() + "-user";
-                    String email = roleName.toString().toLowerCase() + "@gmail.com";
-                    String password = roleName.toString().toLowerCase() + "password"; //eg. adminpassword
-
-
-                    userService.saverUser(new User(userName, email, passwordEncoder.encode(password), new ArrayList<>()));
-
-                    role = roleRepository.findByRoleName(roleName);
-                    User user = userRepository.findByEmail(email).orElse(null);
-
-                    if (user != null) {
-                        user.getRoles().add(role);
-                        userService.saverUser(user);
-                    }
-                }
-            }
-        };
+        log.info("BackendApplication started successfully.");
+        // Log the application startup
+        /// Note that the DefaultDataInitializer will run automatically on application startup,it will initialize default roles and users
     }
 }

@@ -5,14 +5,9 @@ package za.ac.cput.factory.impl;
  * Date: 23/09/2023
  */
 
-import za.ac.cput.domain.ContactUs;
+import za.ac.cput.domain.entity.ContactUs;
 
 public class ContactUsFactory {
-
-    public ContactUs create() {
-
-        return new ContactUs.Builder().build();
-    }
 
     public static ContactUs buildContactUs(int id, String title, String firstName, String lastName, String email, String subject, String message) {
         return new ContactUs.Builder()
@@ -24,5 +19,10 @@ public class ContactUsFactory {
                 .setSubject(subject)
                 .setMessage(message)
                 .build();
+    }
+
+    public ContactUs create() {
+
+        return new ContactUs.Builder().build();
     }
 }

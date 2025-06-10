@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version> <!-- Ensure this version is consistent -->
+        <version>3.5.0</version> <!-- Ensure this version is consistent -->
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>az.ac.cput</groupId>
@@ -14,7 +14,7 @@
 
     <description>OnTheGoRentals</description>
     <properties>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
     </properties>
 
     <dependencies>
@@ -30,6 +30,8 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <!-- Spring Boot's parent POM manages the version for JUnit, Mockito etc. -->
+            <!-- Avoid specifying versions for JUnit artifacts directly unless you know what you're doing -->
         </dependency>
         <!-- Spring Data JPA dependency -->
         <dependency>
@@ -38,7 +40,7 @@
         </dependency>
 
         <!-- JUnit Jupiter dependencies for testing -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.9.2</version>
@@ -57,7 +59,7 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.9.2</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
 
         <!-- MySQL connector -->
         <dependency>
@@ -121,6 +123,11 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <version>3.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>8.0.1.Final</version>
         </dependency>
 
         <!-- Oauth2 -->

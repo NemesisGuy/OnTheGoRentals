@@ -6,13 +6,9 @@ package za.ac.cput.factory.impl;
  * Date: 24/09/2023
  */
 
-import za.ac.cput.domain.AboutUs;
+import za.ac.cput.domain.entity.AboutUs;
 
 public class AboutUsFactory {
-
-    public AboutUs create() {
-        return new AboutUs.Builder().build();
-    }
 
     public static AboutUs createAboutUs(int id, String address, String officeHours, String email, String telephone, String whatsApp) {
         return new AboutUs.Builder()
@@ -23,6 +19,10 @@ public class AboutUsFactory {
                 .setTelephone(telephone)
                 .setWhatsApp(whatsApp)
                 .build();
+    }
+
+    public AboutUs create() {
+        return new AboutUs.Builder().build();
     }
 }
 

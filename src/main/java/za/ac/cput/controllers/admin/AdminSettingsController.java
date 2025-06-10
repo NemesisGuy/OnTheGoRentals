@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.settings.Settings;
-import za.ac.cput.service.SettingsService;
+import za.ac.cput.service.ISettingsService;
 
 import java.util.List;
 
@@ -16,17 +16,17 @@ import java.util.List;
 public class AdminSettingsController {
 
     @Autowired
-    private SettingsService settingsService;
+    private ISettingsService ISettingsService;
 
     @GetMapping("/list/all")
     public ResponseEntity<List<Settings>> getAll() {
-        List<Settings> allSettings = (List<Settings>) settingsService.getAll();
+        List<Settings> allSettings = (List<Settings>) ISettingsService.getAll();
         return ResponseEntity.ok(allSettings);
     }
 
     @PostMapping("/create")
     public ResponseEntity<Settings> createSettings(@RequestBody Settings settings) {
-        Settings created = settingsService.create(settings);
+        Settings created = ISettingsService.create(settings);
         if (created == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -35,7 +35,7 @@ public class AdminSettingsController {
 
     @GetMapping("/read")
     public ResponseEntity<Settings> getSettings() {
-        Settings settings = settingsService.read(1);
+        Settings settings = ISettingsService.read(1);
         if (settings == null) {
             return ResponseEntity.notFound().build();
         }
@@ -44,14 +44,14 @@ public class AdminSettingsController {
 
     @PutMapping("/update")
     public ResponseEntity<Void> updateSettings(@RequestBody Settings settings) {
-        settingsService.update(settings);
+        ISettingsService.update(settings);
         System.out.println("Settings updated");
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/delete/{settingsId}")
     public ResponseEntity<Void> deleteSettings(@PathVariable Integer settingsId) {
-        boolean deleted = settingsService.delete(settingsId);
+        boolean deleted = ISettingsService.delete(settingsId);
         if (!deleted) {
             return ResponseEntity.notFound().build();
         }

@@ -3,17 +3,22 @@ package za.ac.cput.domain.settings;
  * Author: Peter Buckingham (220165289)
  */
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+
+import java.util.UUID;
 
 @Entity
 public class Settings {
 
     @Id
     private int id;
-
+    @Column(nullable = false, unique = true, updatable = false)
+    private final UUID uuid = UUID.randomUUID();
     private String currencyName;
     private String currencySymbol;
+    private final boolean deleted = false;
 
     public Settings() {
 
@@ -34,12 +39,17 @@ public class Settings {
         return currencySymbol;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
     // Builder Pattern
     public static class Builder {
 
         private int id;
         private String currencyName;
         private String currencySymbol;
+        private boolean deleted = false;
 
         public Builder id(int id) {
             this.id = id;
@@ -53,6 +63,11 @@ public class Settings {
 
         public Builder currencySymbol(String currencySymbol) {
             this.currencySymbol = currencySymbol;
+            return this;
+        }
+
+        public Builder deleted(boolean deleted) {
+            this.deleted = deleted;
             return this;
         }
 

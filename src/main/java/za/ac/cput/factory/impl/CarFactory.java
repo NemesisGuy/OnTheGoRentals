@@ -6,7 +6,7 @@ package za.ac.cput.factory.impl;
  */
 
 import org.springframework.stereotype.Component;
-import za.ac.cput.domain.Car;
+import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.enums.PriceGroup;
 import za.ac.cput.factory.IFactory;
 
@@ -16,28 +16,28 @@ public class CarFactory implements IFactory<Car> {
 
 
     public Car createCar(int id, String make, String model, int year, String category, PriceGroup priceGroup, String licensePlate, boolean available) {
-        return Car.builder()
+        return new  Car.Builder()
 
-                .id(id)
-                .make(make)
-                .model(model)
-                .year(year)
-                .category(category)
-                .priceGroup(priceGroup)
-                .licensePlate(licensePlate)
-                .available(available)
+                .setId(id)
+                .setMake(make)
+                .setModel(model)
+                .setYear(year)
+                .setCategory(category)
+                .setPriceGroup(priceGroup)
+                .setLicensePlate(licensePlate)
+                .setAvailable(available)
                 .build();
     }
 
 
     @Override
     public Car create() {
-        return Car.builder().build();
+        return new Car.Builder().build();
     }
 
 
     public Car create(Car car) {
-        return Car.builder()
+        return new Car.Builder()
                 .copy(car)
                 .build();
     }

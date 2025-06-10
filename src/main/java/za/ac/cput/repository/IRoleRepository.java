@@ -1,8 +1,8 @@
 package za.ac.cput.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import za.ac.cput.domain.security.Role;
-import za.ac.cput.domain.security.RoleName;
+import za.ac.cput.domain.entity.security.Role;
+import za.ac.cput.domain.entity.security.RoleName;
 
 import java.util.List;
 

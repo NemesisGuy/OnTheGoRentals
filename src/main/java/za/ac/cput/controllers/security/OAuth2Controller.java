@@ -2,8 +2,8 @@ package za.ac.cput.controllers.security;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.dto.AuthResponseDto; // Your existing DTO
-import za.ac.cput.service.impl.GoogleOAuth2UserService; // New service
+import za.ac.cput.domain.dto.response.AuthResponseDto;
+import za.ac.cput.service.impl.GoogleOAuth2UserService;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
