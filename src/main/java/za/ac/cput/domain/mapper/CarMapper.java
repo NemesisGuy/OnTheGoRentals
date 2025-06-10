@@ -43,9 +43,9 @@ public class CarMapper {
                 .year(car.getYear())
                 .category(car.getCategory())
                 .priceGroup(car.getPriceGroup())
-                .licensePlate(car.getLicensePlate())
+                //.licensePlate(car.getLicensePlate()) // Removed from DTO
                 .available(car.isAvailable())
-                .vin(car.getVin())
+                //.vin(car.getVin())                   // Removed from DTO
                 .build();
 
         // NEW LOGIC: Build a list of image URLs from the car's images collection

@@ -47,6 +47,7 @@ application.properties
 application-api.properties
 application-secrets.properties
 mysql-db.properties
+.env # Ignore .env files for environment variables
  # Ignores this file anywhere, unless un-ignored below for a specific path
 /src/main/resources/old-application.properties
 # If you need to commit mysql-db.properties for src/main/resources, un-ignore it:

@@ -53,32 +53,22 @@ public class CarResponseDTO {
      */
     private PriceGroup priceGroup;
 
-    /**
-     * The license plate number of the car.
-     */
-    private String licensePlate;
+    // Removed licensePlate
+    // private String licensePlate;
 
     /**
      * The availability status of the car for rental.
      */
     private boolean available;
 
-    /**
-     * The server-generated filename for the car's image (e.g., "uuid.jpg").
-     * This is primarily for internal use or debugging.
-     */
-    private String imageFileName;
+    // Removed imageFileName
+    // private String imageFileName;
 
-    /**
-     * The type or folder where the image is stored (e.g., "cars").
-     * This is primarily for internal use or debugging.
-     */
-    private String imageType;
+    // Removed imageType
+    // private String imageType;
 
-    /**
-     * The Vehicle Identification Number of the car.
-     */
-    private String vin;
+    // Removed vin
+    // private String vin;
 
     /**
      * A list of fully-formed, publicly accessible URLs for the car's images.

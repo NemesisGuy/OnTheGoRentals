@@ -61,16 +61,17 @@ public class SpringSecurityConfig {
                         // Authenticated v1 endpoints
                         .requestMatchers("/api/v1/auth/logout").authenticated()
                         .requestMatchers("/api/v1/users/me/**").authenticated()
-                        .requestMatchers("/api/v1/files/**").permitAll()
-                        .requestMatchers("/api/v1/admin/cars/list/available").authenticated()
-                        .requestMatchers("/api/v1/files/selfies/**").authenticated()
-                        .requestMatchers("/api/v1/admin/cars/list/**").authenticated()
-                        .requestMatchers("/api/v1/admin/rentals/from-booking/**").authenticated()
+                        .requestMatchers("/api/v1/files/cars/**").permitAll() // Allow public access to car images
+                        .requestMatchers("/api/v1/files/**").authenticated() // Default for other files, was changed from permitAll
+                        .requestMatchers("/api/v1/files/selfies/**").authenticated() // This is more specific, remains authenticated
                         .requestMatchers("/api/v1/rentals/from-booking/**").authenticated()
-                        .requestMatchers("/api/v1/admin/rentals/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
-
+                        // Removed specific /api/v1/admin/... rules that were .authenticated()
+                        // They will now be covered by the broader /api/v1/admin/** rule below.
 
                         // Admin v1 endpoints
+                        // Ensure this rule covers all /api/v1/admin paths correctly.
+                        // Specific admin sub-paths like /api/v1/admin/rentals/** are explicitly defined before or covered here.
+                        .requestMatchers("/api/v1/admin/rentals/**").hasAnyAuthority("ADMIN", "SUPERADMIN") // Explicit rule, good
                         .requestMatchers("/api/v1/admin/**", "/api/v1/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
 
                         // Public static & framework paths
@@ -78,7 +79,7 @@ public class SpringSecurityConfig {
                         .requestMatchers("/oauth2/**").permitAll()
 
                         // Actuator endpoints (non-versioned)
-                        .requestMatchers("/actuator/**", "/metrics", "/metrics/**").permitAll()
+                        .requestMatchers("/actuator/**", "/metrics", "/metrics/**").hasAnyAuthority("ADMIN", "SUPERADMIN") // Changed from permitAll
 
                         // Default deny
                         .anyRequest().authenticated()
