@@ -7,7 +7,7 @@ import za.ac.cput.domain.settings.Settings;
  * Interface defining the contract for application settings services.
  * Manages CRUD operations for {@link Settings} entities, which typically
  * represent a singleton-like configuration record.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham

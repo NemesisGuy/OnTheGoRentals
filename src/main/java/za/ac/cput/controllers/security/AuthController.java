@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value; // For JWT expiration
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,20 +15,18 @@ import za.ac.cput.domain.dto.request.LoginDto;
 import za.ac.cput.domain.dto.request.RegisterDto;
 import za.ac.cput.domain.dto.response.AuthResponseDto;
 import za.ac.cput.domain.dto.response.TokenRefreshResponseDto;
-import za.ac.cput.domain.entity.security.RoleName; // For default role in registration
+import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
-import za.ac.cput.service.IAuthService; // Import new IAuthService
-import za.ac.cput.service.impl.AuthServiceImpl; // To access nested DTO-like classes
+import za.ac.cput.service.IAuthService;
+import za.ac.cput.service.impl.AuthServiceImpl;
 import za.ac.cput.utils.SecurityUtils;
-
-import java.util.List; // For roles in AuthResponseDto
 
 /**
  * AuthController.java
  * Controller for handling user authentication and authorization processes.
  * Utilizes {@link IAuthService} for core authentication logic.
  * Includes endpoints for user registration, login, token refresh, and logout.
- *
+ * <p>
  * Author: [Original Author Name - Please specify if known]
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham
@@ -60,8 +58,8 @@ public class AuthController {
      *
      * @param registerDto The {@link RegisterDto} containing user registration details.
      * @return A ResponseEntity containing an {@link AuthResponseDto} with the access token
-     *         and user information upon successful registration. Cookies for refresh token
-     *         are set by the AuthService via HttpServletResponse.
+     * and user information upon successful registration. Cookies for refresh token
+     * are set by the AuthService via HttpServletResponse.
      */
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDto> register(
@@ -148,7 +146,7 @@ public class AuthController {
      */
     @PostMapping("/refresh")
     public ResponseEntity<TokenRefreshResponseDto> refreshToken(
-            @CookieValue(name = "${app.security.refresh-cookie.name}") String refreshTokenFromCookie,
+            @CookieValue(name = "${app.security.refresh-cookie.name}", required = false) String refreshTokenFromCookie,
             HttpServletResponse httpServletResponse
     ) {
         String requesterId = SecurityUtils.getRequesterIdentifier();

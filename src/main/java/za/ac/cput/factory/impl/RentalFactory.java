@@ -2,9 +2,10 @@ package za.ac.cput.factory.impl;
 
 import org.springframework.stereotype.Component;
 import za.ac.cput.domain.entity.Car;
+import za.ac.cput.domain.entity.Driver;
 import za.ac.cput.domain.entity.Rental;
-import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.domain.entity.security.User;
+import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.factory.IFactory;
 
 import java.time.LocalDateTime;
@@ -71,5 +72,20 @@ public class RentalFactory implements IFactory<Rental> {
         } else {
             return RentalStatus.COMPLETED;
         }
+    }
+
+    public Rental create(User user, Car carToRent, Driver driver, UUID issuerId, LocalDateTime issuedDate,LocalDateTime expectedReturnDate,  LocalDateTime endDate) {
+        RentalStatus status = determineStatus(issuedDate, endDate);
+
+        return new Rental.Builder()
+                .setUser(user)
+                .setCar(carToRent)
+                .setDriver(driver)
+                .setIssuer(issuerId)
+                .setIssuedDate(issuedDate)
+                .setExpectedReturnDate(expectedReturnDate)
+                .setReturnedDate(endDate)
+                .setStatus(status)
+                .build();
     }
 }

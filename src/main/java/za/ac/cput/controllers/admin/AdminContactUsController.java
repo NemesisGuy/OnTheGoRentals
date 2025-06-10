@@ -3,15 +3,15 @@ package za.ac.cput.controllers.admin;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired; // Added for constructor injection standard
-import org.springframework.http.HttpStatus; // Added for HttpStatus.CREATED
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.entity.ContactUs;
 import za.ac.cput.domain.dto.request.AdminContactUsUpdateDTO;
 import za.ac.cput.domain.dto.response.ContactUsResponseDTO;
+import za.ac.cput.domain.entity.ContactUs;
 import za.ac.cput.domain.mapper.ContactUsMapper;
-import za.ac.cput.exception.ResourceNotFoundException; // Assuming this exists
+import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.IContactUsService;
 
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.UUID;
  * Allows admins to retrieve, update, and delete existing contact submissions.
  * Submissions are identified externally by UUIDs. Internal service operations
  * primarily use integer IDs. This controller handles the translation.
- *
+ * <p>
  * Author: Cwenga Dlova (214310671)
  * Updated by: System/AI
  * Date: 23/09/2023

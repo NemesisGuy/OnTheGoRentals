@@ -19,15 +19,25 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
 
     List<Car> findByPriceGroupAndDeletedFalse(PriceGroup priceGroup);
     //List<Car> findAvailableCars();
+
     /// is car by id available
     boolean existsByIdAndAvailableTrue(int id);
+
     boolean existsByIdAndAvailableTrueAndDeletedFalse(int id);
+
     List<Car> findByDeletedFalse();
+
     List<Car> findByDeletedTrue();
+
     Optional<Car> findByUuidAndDeletedFalse(UUID id);
+
     Optional<Car> findByUuid(UUID uuid);
+
     List<Car> findAllByAvailableTrueAndDeletedFalse();
+
     List<Car> findAllByAvailableTrueAndDeletedFalseAndCategory(String category);
+
     List<Car> findAllByAvailableTrueAndDeletedFalseAndPriceGroup(PriceGroup priceGroup);
+
     Optional<Car> findByIdAndDeletedFalse(Integer id);
 }

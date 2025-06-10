@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Spring's Transactional
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.Faq;
+import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.IFaqRepository;
-import za.ac.cput.exception.ResourceNotFoundException; // For consistency
 import za.ac.cput.service.IFaqService;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.UUID;
  * Implementation of the {@link IFaqService} interface.
  * Manages FAQ (Frequently Asked Questions) entries, including CRUD operations.
  * Entities are treated as immutable; updates are performed using a Builder pattern with a copy method.
- *
+ * <p>
  * Author: Aqeel Hanslo (219374422) // Assuming from previous context
  * Date: [Original Date - Please specify if known, e.g., 29 August 2023]
  * Updated by: Peter Buckingham
@@ -106,6 +106,7 @@ public class FaqServiceImpl implements IFaqService {
      * {@inheritDoc}
      * Updates an existing FAQ entry.
      * The input {@code faqWithUpdates} should be the complete new state.
+     *
      * @throws ResourceNotFoundException if the FAQ with the given ID does not exist.
      */
     @Override

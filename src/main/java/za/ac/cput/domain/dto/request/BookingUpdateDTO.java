@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import za.ac.cput.domain.enums.BookingStatus;
-import za.ac.cput.domain.enums.RentalStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

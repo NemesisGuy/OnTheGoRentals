@@ -2,11 +2,11 @@ package za.ac.cput.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired; // Good practice for constructor injection
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Good for service methods that modify data
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.AboutUs;
-import za.ac.cput.repository.AboutUsRepository; // Import the interface
+import za.ac.cput.repository.AboutUsRepository;
 import za.ac.cput.service.IAboutUsService;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.UUID;
  * AboutUsServiceImpl.java
  * Service implementation for managing "About Us" content.
  * Provides CRUD operations and retrieval of "About Us" entries.
- *
+ * <p>
  * Original Author: Cwenga Dlova (214310671)
  * Original Date: 24/09/2023
  * Updated by: Peter Buckingham

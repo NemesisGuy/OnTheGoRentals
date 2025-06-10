@@ -2,14 +2,14 @@ package za.ac.cput.service;
 
 import za.ac.cput.domain.entity.ContactUs;
 
-import java.util.List; // Use List interface for getAll
+import java.util.List;
 import java.util.UUID;
 
 /**
  * IContactUsService.java
  * Interface defining the contract for "Contact Us" submission services.
  * This includes creating new submissions and managing existing ones (CRUD operations).
- *
+ * <p>
  * Author: Cwenga Dlova (214310671)
  * Date: 23/09/2023
  * Updated by: Peter Buckingham

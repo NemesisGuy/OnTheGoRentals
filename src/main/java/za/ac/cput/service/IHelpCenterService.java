@@ -10,7 +10,7 @@ import java.util.UUID;
  * Interface defining the contract for Help Center topic/article services.
  * Extends the generic {@link IService} for basic CRUD and adds methods for
  * category-based filtering and UUID-based retrieval.
- *
+ * <p>
  * Author: Aqeel Hanslo (219374422) // Assuming from previous context
  * Date: [Original Date - e.g., 29 August 2023 from previous context]
  * Updated by: Peter Buckingham

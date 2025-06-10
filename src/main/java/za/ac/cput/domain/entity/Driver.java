@@ -2,11 +2,14 @@ package za.ac.cput.domain.entity;
 
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
 @Entity
 public class Driver {
 
@@ -15,20 +18,16 @@ public class Driver {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(nullable = false, unique = true, updatable = false)
-    private UUID uuid ;
+    private UUID uuid;
     private String firstName;
     private String lastName;
     private String licenseCode;
-    @Column(nullable = false )
-    private boolean deleted ;
-    @PrePersist
-    protected  void onCreate() {
-        if (this.uuid == null) {
-            this.uuid = UUID.randomUUID();
-
-        }
-        this.deleted = false; // Default value for deleted
-    }
+    @Column(nullable = false)
+    private boolean deleted;
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    @Column(updatable = false)
+    private LocalDateTime updatedAt;
 
     public Driver() {
     }
@@ -40,30 +39,35 @@ public class Driver {
         this.lastName = builder.lastName;
         this.licenseCode = builder.licenseCode;
         this.deleted = builder.deleted;
-    }
+        this.createdAt = builder.createdAt;
+        this.updatedAt = builder.updatedAt;
 
-    public int getId() {
-        return id;
-    }
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getLicenseCode() {
-        return licenseCode;
     }
 
     public static Driver.Builder builder() {
         return new Driver.Builder();
     }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+
+        }
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = LocalDateTime.now();
+        }
+        this.deleted = false; // Default value for deleted
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public boolean isDeleted() {
         return deleted;
     }
@@ -89,23 +93,27 @@ public class Driver {
                 ", lastName='" + lastName + '\'' +
                 ", licenseCode='" + licenseCode + '\'' +
                 ", deleted=" + deleted +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 
 
-
     public static class Builder {
         private int id;
-        private UUID uuid ;
+        private UUID uuid;
         private String firstName;
         private String lastName;
         private String licenseCode;
-        private boolean deleted = false; // Good default
+        private boolean deleted; // Good default
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
 
         public Builder setId(int id) {
             this.id = id;
             return this;
         }
+
         public Builder setUuid(UUID uuid) {
             this.uuid = uuid;
             return this;
@@ -125,8 +133,19 @@ public class Driver {
             this.licenseCode = licenseCode;
             return this;
         }
+
         public Builder setDeleted(boolean deleted) {
             this.deleted = deleted;
+            return this;
+        }
+
+        public Builder setCreatedAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder setUpdatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
             return this;
         }
 
@@ -137,6 +156,8 @@ public class Driver {
             this.lastName = driver.lastName;
             this.licenseCode = driver.licenseCode;
             this.deleted = driver.deleted;
+            this.createdAt = driver.createdAt;
+            this.updatedAt = driver.updatedAt;
             return this;
         }
 

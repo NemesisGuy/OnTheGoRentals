@@ -9,7 +9,7 @@ import java.util.UUID;
  * IDriverService.java
  * Interface defining the contract for Driver related services.
  * Provides methods for CRUD operations on {@link Driver} entities.
- *
+ * <p>
  * Author: Peter Buckingham // Assuming based on consistent authorship
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham

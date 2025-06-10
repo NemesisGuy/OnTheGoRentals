@@ -1,9 +1,9 @@
 package za.ac.cput.domain.entity; // Or your actual entity package
 
 import jakarta.persistence.*;
-import lombok.Getter; // Only getters
+import lombok.Getter;
 
-import java.time.LocalDateTime; // Assuming feedback might have a timestamp
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -21,14 +21,16 @@ public class Feedback {
     @Column(columnDefinition = "TEXT")
     private String comment;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
     @Column(nullable = false)
     private boolean deleted;
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    @Column(updatable = false)
+    private LocalDateTime updatedAt;
 
     // Protected no-arg constructor for JPA
-    protected Feedback() {}
+    protected Feedback() {
+    }
 
     // Private constructor to force use of builder
     private Feedback(Builder builder) {
@@ -37,6 +39,7 @@ public class Feedback {
         this.name = builder.name;
         this.comment = builder.comment;
         this.createdAt = builder.createdAt;
+        this.updatedAt = builder.updatedAt; // Default to now if not set
         this.deleted = builder.deleted;
     }
 
@@ -44,8 +47,20 @@ public class Feedback {
     protected void onCreate() {
         if (this.uuid == null) {
             this.uuid = UUID.randomUUID();
+
         }
-        this.createdAt = LocalDateTime.now(); // Set createdAt only on persist
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = LocalDateTime.now();
+        }
+        this.deleted = false; // Default value for deleted
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
     // Static Builder class
@@ -55,6 +70,7 @@ public class Feedback {
         private String name;
         private String comment;
         private LocalDateTime createdAt;
+        private LocalDateTime updatedAt; // Optional, can be set by @PreUpdate
         private boolean deleted = false; // Default
 
         public Builder setId(int id) {
@@ -82,6 +98,12 @@ public class Feedback {
             return this;
         }
 
+        public Builder setUpdatedAt(LocalDateTime updatedAt) { // Optional, can be set by @PreUpdate
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
+
         public Builder setDeleted(boolean deleted) {
             this.deleted = deleted;
             return this;
@@ -93,6 +115,7 @@ public class Feedback {
             this.name = feedback.getName();
             this.comment = feedback.getComment();
             this.createdAt = feedback.getCreatedAt();
+            this.updatedAt = feedback.getUpdatedAt();
             this.deleted = feedback.isDeleted();
             return this;
         }

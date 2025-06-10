@@ -34,21 +34,6 @@ public class Faq {
     @Column(nullable = false)
     private boolean deleted = false;
 
-    @PrePersist
-    protected void onCreate() {
-        if (this.uuid == null) {
-            this.uuid = UUID.randomUUID();
-        }
-        LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now; // Set createdAt only on persist
-        this.updatedAt = now; // Set updatedAt on persist as well
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now(); // Update updatedAt on any update
-    }
-
 
     public Faq() {
     }
@@ -65,6 +50,26 @@ public class Faq {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (this.createdAt == null) {
+            this.createdAt = now; // Set createdAt only on persist
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = now; // Set updatedAt on persist as well
+        }
+        this.deleted = false; // Default value for deleted
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now(); // Update updatedAt on any update
     }
 
     @Override
@@ -105,6 +110,7 @@ public class Faq {
             this.id = id;
             return this;
         }
+
         public Builder setUuid(UUID uuid) {
             this.uuid = uuid;
             return this;
@@ -129,6 +135,7 @@ public class Faq {
             this.updatedAt = updatedAt;
             return this;
         }
+
         public Builder setDeleted(boolean deleted) {
             this.deleted = deleted;
             return this;

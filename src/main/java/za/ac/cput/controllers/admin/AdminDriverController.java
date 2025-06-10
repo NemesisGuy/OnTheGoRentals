@@ -12,8 +12,8 @@ import za.ac.cput.domain.dto.request.DriverUpdateDTO;
 import za.ac.cput.domain.dto.response.DriverResponseDTO;
 import za.ac.cput.domain.entity.Driver;
 import za.ac.cput.domain.mapper.DriverMapper;
-import za.ac.cput.service.IDriverService;
 import za.ac.cput.exception.ResourceNotFoundException;
+import za.ac.cput.service.IDriverService;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +24,7 @@ import java.util.UUID;
  * Allows admins to create, retrieve, update, and delete drivers.
  * External identification of drivers is by UUID. Internal service operations
  * primarily use integer IDs. This controller bridges that gap.
- *
+ * <p>
  * Author: Peter Buckingham
  * Updated by: System/AI
  * Date: [Original Date - e.g., 2023-XX-XX]

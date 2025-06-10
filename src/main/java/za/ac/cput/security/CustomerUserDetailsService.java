@@ -1,12 +1,11 @@
 package za.ac.cput.security;
 
-import org.slf4j.Logger; // Import SLF4J Logger
-import org.slf4j.LoggerFactory; // Import SLF4J LoggerFactory
-// import lombok.RequiredArgsConstructor; // Keep if you prefer Lombok
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service; // Use @Service for consistency
+import org.springframework.stereotype.Service;
 import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.repository.IUserRepository;
 
@@ -16,7 +15,7 @@ import za.ac.cput.repository.IUserRepository;
  * Responsible for loading user-specific data (as a {@link UserDetails} object)
  * by username (which is email in this application) from the database.
  * This service is used by Spring Security's authentication providers.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham

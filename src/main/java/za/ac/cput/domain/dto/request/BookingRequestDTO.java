@@ -2,7 +2,10 @@ package za.ac.cput.domain.dto.request;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import za.ac.cput.domain.enums.BookingStatus;
 
 import java.time.LocalDateTime;

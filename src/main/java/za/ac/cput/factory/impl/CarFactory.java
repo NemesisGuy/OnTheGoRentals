@@ -16,7 +16,7 @@ public class CarFactory implements IFactory<Car> {
 
 
     public Car createCar(int id, String make, String model, int year, String category, PriceGroup priceGroup, String licensePlate, boolean available) {
-        return Car.builder()
+        return new  Car.Builder()
 
                 .setId(id)
                 .setMake(make)
@@ -32,12 +32,12 @@ public class CarFactory implements IFactory<Car> {
 
     @Override
     public Car create() {
-        return Car.builder().build();
+        return new Car.Builder().build();
     }
 
 
     public Car create(Car car) {
-        return Car.builder()
+        return new Car.Builder()
                 .copy(car)
                 .build();
     }

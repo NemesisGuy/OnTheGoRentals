@@ -11,10 +11,6 @@ import za.ac.cput.domain.enums.PriceGroup;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CarUpdateDTO {
-    // All fields are optional for an update.
-    // The client sends only the fields they want to change.
-    // Validation applies if a field IS provided.
-
     @Size(max = 50, message = "Make cannot exceed 50 characters if provided")
     private String make;
 
@@ -22,7 +18,7 @@ public class CarUpdateDTO {
     private String model;
 
     @Min(value = 1900, message = "Year must be a valid year (e.g., 1900 or later) if provided")
-    private Integer year; // Use Integer to allow it to be omitted (null)
+    private Integer year;
 
     @Size(max = 50, message = "Category cannot exceed 50 characters if provided")
     private String category;
@@ -32,5 +28,10 @@ public class CarUpdateDTO {
     @Size(max = 15, message = "License plate cannot exceed 15 characters if provided")
     private String licensePlate;
 
-    private Boolean available; // Allow admin to change availability
+    @Size(min = 11, max = 17, message = "VIN must be between 11 and 17 characters if provided")
+    private String vin;
+
+    private Boolean available; // nullable
+
+    // REMOVED imageFileName and imageType. Image updates will be handled via a dedicated endpoint.
 }

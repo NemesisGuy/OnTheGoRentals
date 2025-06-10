@@ -13,7 +13,7 @@ import java.util.UUID;
  * RentalFromBookingRequestDTO.java
  * Data Transfer Object used by staff/admin when creating a Rental from an existing Booking.
  * Contains details that might be confirmed or provided at the time of vehicle pickup.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-30
  */

@@ -9,8 +9,10 @@ package za.ac.cput.domain.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+
 @Getter
 @Entity
 public class AboutUs {
@@ -27,14 +29,10 @@ public class AboutUs {
     private String whatsApp;
     @Column(nullable = false)
     private boolean deleted;
-
-    @PrePersist
-    protected void onCreate() {
-        if (this.uuid == null) {
-            this.uuid = UUID.randomUUID();
-        }
-        this.deleted = false; // Default
-    }
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    @Column(updatable = false)
+    private LocalDateTime updatedAt;
 
     protected AboutUs() {
     }
@@ -47,10 +45,30 @@ public class AboutUs {
         this.email = builder.email;
         this.telephone = builder.telephone;
         this.whatsApp = builder.whatsApp;
-        this.deleted = false;
+        this.deleted = builder.deleted;
+        this.createdAt = builder.createdAt != null ? builder.createdAt : LocalDateTime.now();
+        this.updatedAt = builder.updatedAt != null ? builder.updatedAt : LocalDateTime.now();
+
     }
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = LocalDateTime.now();
+        }
+        this.deleted = false; // Default
+    }
 
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -75,6 +93,8 @@ public class AboutUs {
                 ", telephone='" + telephone + '\'' +
                 ", whatsApp='" + whatsApp + '\'' +
                 ", deleted=" + deleted +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 
@@ -88,6 +108,8 @@ public class AboutUs {
         private String telephone;
         private String whatsApp;
         private boolean deleted;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
 
         public Builder setId(int id) {
             this.id = id;
@@ -129,6 +151,16 @@ public class AboutUs {
             return this;
         }
 
+        public Builder setCreatedAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder setUpdatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
         public Builder copy(AboutUs aboutUs) {
             this.id = aboutUs.id;
             this.uuid = aboutUs.uuid;
@@ -138,6 +170,8 @@ public class AboutUs {
             this.telephone = aboutUs.telephone;
             this.whatsApp = aboutUs.whatsApp;
             this.deleted = aboutUs.deleted;
+            this.createdAt = aboutUs.createdAt;
+            this.updatedAt = aboutUs.updatedAt;
             return this;
         }
 

@@ -13,10 +13,6 @@ import java.time.LocalDateTime;
 
 public class DamageReportFactory {
 
-    public DamageReport create() {
-        return new DamageReport.Builder().build();
-    }
-
     public static DamageReport createReport(int id, Rental rental, String description, LocalDateTime dateAndTime, String location, double repairCost) {
         return new DamageReport.Builder().setId(id)
                 .setRental(rental)
@@ -26,6 +22,10 @@ public class DamageReportFactory {
                 .setRepairCost(repairCost)
                 .build();
 
+    }
+
+    public DamageReport create() {
+        return new DamageReport.Builder().build();
     }
 
 }

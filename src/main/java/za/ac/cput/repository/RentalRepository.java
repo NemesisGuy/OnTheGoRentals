@@ -14,7 +14,7 @@ import java.util.UUID;
  * RentalRepository.java
  * Spring Data JPA repository for {@link Rental} entities.
  * Provides standard CRUD operations and custom query methods for rentals.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: [15-05-2023]
  * Updated by: Peter Buckingham
@@ -25,6 +25,7 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
 
     /**
      * Finds a non-deleted rental by its internal integer ID.
+     *
      * @param id The ID of the rental.
      * @return An {@link Optional} containing the rental if found and not deleted, otherwise empty.
      */
@@ -32,6 +33,7 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
 
     /**
      * Finds a non-deleted rental by its UUID.
+     *
      * @param uuid The UUID of the rental.
      * @return An {@link Optional} containing the rental if found and not deleted, otherwise empty.
      */
@@ -39,12 +41,14 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
 
     /**
      * Finds all non-deleted rentals.
+     *
      * @return A list of non-deleted rentals.
      */
     List<Rental> findAllByDeletedFalse();
 
     /**
      * Checks if a non-deleted rental exists by its internal integer ID.
+     *
      * @param id The ID to check.
      * @return True if a non-deleted rental exists with the ID, false otherwise.
      */
@@ -109,4 +113,5 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
      */
     List<Rental> findByUserIdAndStatusAndReturnedDateIsNullAndDeletedFalse(Integer userId, RentalStatus status);
 
+    List<Rental> findByStatusAndReturnedDateIsNullAndDeletedFalse(RentalStatus rentalStatus);
 }

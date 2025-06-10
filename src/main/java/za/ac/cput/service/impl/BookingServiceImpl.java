@@ -1,11 +1,12 @@
 package za.ac.cput.service.impl;
 
 // Use org.springframework.transaction.annotation.Transactional
-import org.springframework.transaction.annotation.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.Booking;
 import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.entity.security.User;
@@ -15,7 +16,7 @@ import za.ac.cput.exception.InvalidDateRangeException;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.BookingRepository;
 import za.ac.cput.service.IBookingService;
-import za.ac.cput.service.ICarService;   // Prefer using ICarService
+import za.ac.cput.service.ICarService;
 import za.ac.cput.service.IUserService;
 
 import java.time.LocalDate;
@@ -32,11 +33,11 @@ import java.util.UUID;
  * Manages the lifecycle of bookings, including creation with validation,
  * status changes (confirm, cancel), and retrieval.
  * Entities are treated as immutable; updates are performed using a Builder pattern with a copy method.
- *
+ * <p>
  * Author: [Original Author - Cwenga Dlova or Peter Buckingham]
  * Date: [Original Date]
  * Updated by: Peter Buckingham
- * Updated: 2025-05-30
+ * Updated: 2025-06-01 // Date updated to reflect current modification
  */
 @Service("bookingServiceImpl") // Explicit bean name, class name conventional
 public class BookingServiceImpl implements IBookingService {
@@ -46,9 +47,6 @@ public class BookingServiceImpl implements IBookingService {
     private final BookingRepository bookingRepository;
     private final ICarService carService; // Use ICarService for car operations
     private final IUserService userService; // If needed for user validation/fetching
-
-    // CarRepository can be removed if all car interactions go through ICarService
-    // private final CarRepository carRepository;
 
     /**
      * Constructs the BookingServiceImpl with necessary repository and service dependencies.
@@ -71,16 +69,16 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     @Transactional
     public Booking create(Booking bookingDetails) {
-        log.info("Attempting to create booking for User ID: {} and Car UUID: {}",
-                bookingDetails.getUser() != null ? bookingDetails.getUser().getUuid() : "N/A", // Log User UUID
-                bookingDetails.getCar() != null ? bookingDetails.getCar().getUuid() : "N/A");  // Log Car UUID
+        log.info("Attempting to create booking for User UUID: {} and Car UUID: {}", // Changed log to use UUIDs
+                bookingDetails.getUser() != null ? bookingDetails.getUser().getUuid() : "N/A",
+                bookingDetails.getCar() != null ? bookingDetails.getCar().getUuid() : "N/A");
 
         if (bookingDetails.getUser() == null || bookingDetails.getCar() == null ||
                 bookingDetails.getStartDate() == null || bookingDetails.getEndDate() == null) {
             log.error("Booking creation failed: User, Car, StartDate, or EndDate is null in bookingDetails.");
             throw new IllegalArgumentException("User, Car, Start Date, and End Date must be provided for booking.");
         }
-        if (bookingDetails.getUser().getUuid() == null || bookingDetails.getCar().getUuid() == null){
+        if (bookingDetails.getUser().getUuid() == null || bookingDetails.getCar().getUuid() == null) {
             log.error("Booking creation failed: User UUID or Car UUID is null.");
             throw new IllegalArgumentException("User UUID and Car UUID must be valid for booking creation.");
         }
@@ -106,8 +104,7 @@ public class BookingServiceImpl implements IBookingService {
             log.warn("Booking creation failed: Car with UUID {} not found.", bookingDetails.getCar().getUuid());
             throw new ResourceNotFoundException("Car with UUID " + bookingDetails.getCar().getUuid() + " not found.");
         }
-        // It's good practice that bookingDetails contains managed entities or is rebuilt with them.
-        // Ensure the User is also a managed entity or correctly fetched if only UUID is provided.
+
         User user = userService.read(bookingDetails.getUser().getUuid());
         if (user == null) {
             log.warn("Booking creation failed: User with UUID {} not found.", bookingDetails.getUser().getUuid());
@@ -122,15 +119,11 @@ public class BookingServiceImpl implements IBookingService {
         }
         log.debug("Car UUID {} availability confirmed for the period.", car.getUuid());
 
-        // Build the final entity to save, ensuring all required fields are set.
-        // The Booking entity's @PrePersist handles its own UUID, createdAt, updatedAt, deleted=false.
-        // Status is set here as per business logic.
         Booking bookingToSave = new Booking.Builder()
-                .copy(bookingDetails) // Copies user, car (now managed), dates, driver (if any)
-                .setUser(user) // Ensure managed user entity
-                .setCar(car)   // Ensure managed car entity
-                .setStatus(BookingStatus.CONFIRMED) // Default for self-service booking
-                // UUID, deleted, audit fields handled by @PrePersist or builder's build()
+                .copy(bookingDetails)
+                .setUser(user)
+                .setCar(car)
+                .setStatus(BookingStatus.CONFIRMED)
                 .build();
 
         Booking savedBooking = bookingRepository.save(bookingToSave);
@@ -145,14 +138,16 @@ public class BookingServiceImpl implements IBookingService {
     @Transactional
     @Override
     public Booking createBooking(Booking booking) {
+        // This method is a simplified version. We assume necessary fields are present.
+        // For robust creation, the primary `create(Booking bookingDetails)` method is preferred.
         log.warn("Calling simplified createBooking(Booking) method. Consider using the more detailed create(Booking) method with full validation. Booking for Car UUID: {}",
                 booking.getCar() != null ? booking.getCar().getUuid() : "N/A");
 
-        // Basic check, more robust checks are in the primary create method
         if (booking.getCar() == null || booking.getCar().getUuid() == null ||
-                booking.getUser() == null || booking.getUser().getUuid() == null) {
-            log.error("Simplified createBooking failed: Car or User UUID is missing.");
-            throw new IllegalArgumentException("Car UUID and User UUID must be provided.");
+                booking.getUser() == null || booking.getUser().getUuid() == null ||
+                booking.getStartDate() == null || booking.getEndDate() == null) { // Added date checks
+            log.error("Simplified createBooking failed: Car UUID, User UUID, StartDate or EndDate is missing.");
+            throw new IllegalArgumentException("Car UUID, User UUID, StartDate and EndDate must be provided.");
         }
 
         Car car = carService.read(booking.getCar().getUuid());
@@ -165,6 +160,7 @@ public class BookingServiceImpl implements IBookingService {
         }
 
         // Simplified availability check - more robust check is in isCarDoubleBooked
+        // Note: This simplified check doesn't exclude a current booking ID if this method were used for updates.
         List<Booking> activeBookings = bookingRepository.findOverlappingBookings(
                 car.getId(), BookingStatus.CONFIRMED, booking.getStartDate(), booking.getEndDate()
         );
@@ -175,10 +171,9 @@ public class BookingServiceImpl implements IBookingService {
 
         Booking bookingToSave = new Booking.Builder()
                 .copy(booking)
-                .setUser(user) // Ensure managed entity
-                .setCar(car)   // Ensure managed entity
-                .setStatus(BookingStatus.CONFIRMED) // Default status
-                // @PrePersist in Booking handles UUID, etc.
+                .setUser(user)
+                .setCar(car)
+                .setStatus(BookingStatus.CONFIRMED)
                 .build();
 
         Booking savedBooking = bookingRepository.save(bookingToSave);
@@ -193,20 +188,25 @@ public class BookingServiceImpl implements IBookingService {
     @Transactional
     public Booking confirmBooking(int bookingId) {
         log.info("Attempting to confirm booking with ID: {}", bookingId);
-        Booking booking = read(bookingId); // Use the service's read method
+        Booking booking = read(bookingId);
         if (booking == null) {
             log.warn("Confirmation failed: Booking not found with ID: {}", bookingId);
             throw new ResourceNotFoundException("Booking not found with ID: " + bookingId + " for confirmation.");
         }
-        // Add business logic: e.g., can only confirm PENDING_CONFIRMATION or re-confirm CONFIRMED
-     /*   if (booking.getStatus() != BookingStatus.PENDING_CONFIRMATION && booking.getStatus() != BookingStatus.CONFIRMED) {
+
+        // A booking can be "confirmed" if it's already CONFIRMED (idempotent)
+        // or if it's in a state that allows confirmation (e.g., PENDING_CONFIRMATION, though not used in current flow)
+        if (booking.getStatus() == BookingStatus.USER_CANCELLED ||
+                booking.getStatus() == BookingStatus.ADMIN_CANCELLED ||
+                booking.getStatus() == BookingStatus.RENTAL_INITIATED ||
+                booking.getStatus() == BookingStatus.NO_SHOW) {
             log.warn("Booking ID {} cannot be confirmed. Current status: {}", bookingId, booking.getStatus());
             throw new IllegalStateException("Booking cannot be confirmed from status: " + booking.getStatus());
-        }*/
+        }
 
         Booking updatedBooking = new Booking.Builder().copy(booking).setStatus(BookingStatus.CONFIRMED).build();
-        Booking savedBooking = bookingRepository.save(updatedBooking);
-        log.info("Booking ID: {} confirmed successfully.", savedBooking.getId());
+        Booking savedBooking = bookingRepository.save(updatedBooking); // save returns the merged/updated entity
+        log.info("Booking ID: {} confirmed successfully. Status: {}", savedBooking.getId(), savedBooking.getStatus()); // Log status from saved entity
         return savedBooking;
     }
 
@@ -222,16 +222,22 @@ public class BookingServiceImpl implements IBookingService {
             log.warn("Cancellation failed: Booking not found with ID: {}", bookingId);
             throw new ResourceNotFoundException("Booking not found with ID: " + bookingId + " for cancellation.");
         }
-        // Add business logic: e.g., cannot cancel if RENTAL_INITIATED or too close to start date
-        if (booking.getStatus() == BookingStatus.RENTAL_INITIATED || booking.getStatus() == BookingStatus.CONFIRMED) {
+
+        // Business rule: Can only cancel if not yet RENTAL_INITIATED.
+        // Other statuses like ADMIN_CANCELLED, USER_CANCELLED, NO_SHOW are also terminal for cancellation.
+        if (booking.getStatus() == BookingStatus.RENTAL_INITIATED ||
+                booking.getStatus() == BookingStatus.USER_CANCELLED || // Already cancelled
+                booking.getStatus() == BookingStatus.ADMIN_CANCELLED || // Already cancelled
+                booking.getStatus() == BookingStatus.NO_SHOW) {
             log.warn("Booking ID {} cannot be cancelled. Current status: {}", bookingId, booking.getStatus());
-            throw new IllegalStateException("Cannot cancel booking with status: " + booking.getStatus());
+            throw new IllegalStateException("Booking cannot be cancelled from status: " + booking.getStatus());
         }
-        // Assuming USER_CANCELLED by default. If admin cancels, it might be ADMIN_CANCELLED.
-        // This might need a separate method or a parameter to distinguish user vs admin cancellation.
+        // If it's CONFIRMED, a user can cancel it.
+        // If it's PENDING (if that status existed), it could also be cancelled.
+
         Booking updatedBooking = new Booking.Builder().copy(booking).setStatus(BookingStatus.USER_CANCELLED).build();
-        Booking savedBooking = bookingRepository.save(updatedBooking);
-        log.info("Booking ID: {} cancelled successfully.", savedBooking.getId());
+        Booking savedBooking = bookingRepository.save(updatedBooking); // save returns the merged/updated entity
+        log.info("Booking ID: {} cancelled successfully. Status: {}", savedBooking.getId(), savedBooking.getStatus()); // Log status from saved
         return savedBooking;
     }
 
@@ -265,8 +271,6 @@ public class BookingServiceImpl implements IBookingService {
 
     /**
      * {@inheritDoc}
-     * The input {@code bookingWithUpdates} should be the complete new state, typically built by the
-     * controller after applying DTO changes to a fetched entity.
      */
     @Override
     @Transactional
@@ -278,46 +282,68 @@ public class BookingServiceImpl implements IBookingService {
             log.error("Update failed: Booking ID is missing or invalid (0).");
             throw new IllegalArgumentException("A valid Booking ID must be provided for update.");
         }
-        // Ensure the booking exists and is not deleted before updating
+
         Booking existingBooking = bookingRepository.findByIdAndDeletedFalse(bookingId)
                 .orElseThrow(() -> {
                     log.warn("Update failed: Booking not found or is deleted for ID: {}", bookingId);
                     return new ResourceNotFoundException("Booking not found with ID: " + bookingId + " for update.");
                 });
 
-        // Validate date range if dates are being changed
-        if (bookingWithUpdates.getStartDate() != null && bookingWithUpdates.getEndDate() != null) {
-            if (!bookingWithUpdates.getEndDate().isAfter(bookingWithUpdates.getStartDate())) {
-                log.warn("Booking update failed for ID {}: End date must be after start date.", bookingId);
-                throw new InvalidDateRangeException("Booking end date must be after the booking start date for update.");
+        // Prevent status changes that should go through dedicated methods (e.g., cancel, confirm, initiate rental)
+        // Admins might be allowed to change some fields, but status lifecycle should be respected.
+        if (bookingWithUpdates.getStatus() != existingBooking.getStatus()) {
+            if (existingBooking.getStatus() == BookingStatus.RENTAL_INITIATED ||
+                    existingBooking.getStatus() == BookingStatus.USER_CANCELLED ||
+                    existingBooking.getStatus() == BookingStatus.ADMIN_CANCELLED ||
+                    existingBooking.getStatus() == BookingStatus.NO_SHOW) {
+                log.warn("Update failed for Booking ID {}: Status cannot be changed from a terminal state like {}", bookingId, existingBooking.getStatus());
+                throw new IllegalStateException("Cannot update status from " + existingBooking.getStatus() + " via general update.");
             }
-            // Further check: if dates changed, re-validate car availability
-            if (!bookingWithUpdates.getStartDate().equals(existingBooking.getStartDate()) ||
-                    !bookingWithUpdates.getEndDate().equals(existingBooking.getEndDate()) ||
-                    !bookingWithUpdates.getCar().getUuid().equals(existingBooking.getCar().getUuid())) {
-
-                Car carForUpdate = carService.read(bookingWithUpdates.getCar().getUuid());
-                if (carForUpdate == null) throw new ResourceNotFoundException("Car for update not found.");
-
-                if (isCarDoubleBooked(carForUpdate, bookingWithUpdates.getStartDate(), bookingWithUpdates.getEndDate(), bookingId)) {
-                    log.warn("Booking update failed for ID {}: Car UUID {} is not available for the new period.", bookingId, carForUpdate.getUuid());
-                    throw new CarNotAvailableException("Car " + carForUpdate.getMake() + " " + carForUpdate.getModel() + " is not available for the new selected dates.");
-                }
-                // If car in bookingWithUpdates is different, ensure it's the managed one
-                bookingWithUpdates = new Booking.Builder().copy(bookingWithUpdates).setCar(carForUpdate).build();
-            }
+            // Add more specific status transition checks if needed for admin updates
         }
 
 
-        // 'bookingWithUpdates' IS the new state. Builder sets updatedAt via @PreUpdate.
-        // Ensure essential immutable fields from existingBooking are preserved if not meant to change.
+        Car carForUpdate = existingBooking.getCar(); // Default to existing car
+        boolean datesOrCarChanged = false;
+
+        if (bookingWithUpdates.getCar() != null && !bookingWithUpdates.getCar().getUuid().equals(existingBooking.getCar().getUuid())) {
+            carForUpdate = carService.read(bookingWithUpdates.getCar().getUuid());
+            if (carForUpdate == null) {
+                throw new ResourceNotFoundException("Car for update not found with UUID: " + bookingWithUpdates.getCar().getUuid());
+            }
+            datesOrCarChanged = true;
+        }
+
+        if (bookingWithUpdates.getStartDate() != null && !bookingWithUpdates.getStartDate().equals(existingBooking.getStartDate())) {
+            datesOrCarChanged = true;
+        }
+        if (bookingWithUpdates.getEndDate() != null && !bookingWithUpdates.getEndDate().equals(existingBooking.getEndDate())) {
+            datesOrCarChanged = true;
+        }
+
+        if (datesOrCarChanged) {
+            LocalDateTime checkStartDate = bookingWithUpdates.getStartDate() != null ? bookingWithUpdates.getStartDate() : existingBooking.getStartDate();
+            LocalDateTime checkEndDate = bookingWithUpdates.getEndDate() != null ? bookingWithUpdates.getEndDate() : existingBooking.getEndDate();
+
+            if (!checkEndDate.isAfter(checkStartDate)) {
+                log.warn("Booking update failed for ID {}: End date must be after start date.", bookingId);
+                throw new InvalidDateRangeException("Booking end date must be after the booking start date for update.");
+            }
+            if (isCarDoubleBooked(carForUpdate, checkStartDate, checkEndDate, bookingId)) {
+                log.warn("Booking update failed for ID {}: Car UUID {} is not available for the new period.", bookingId, carForUpdate.getUuid());
+                throw new CarNotAvailableException("Car " + carForUpdate.getMake() + " " + carForUpdate.getModel() + " is not available for the new selected dates.");
+            }
+        }
+
         Booking entityToSave = new Booking.Builder()
-                .copy(bookingWithUpdates) // This has the new data from controller
-                .setId(existingBooking.getId()) // Ensure correct ID
-                .setUuid(existingBooking.getUuid()) // UUID is immutable
-                .setUser(existingBooking.getUser()) // User of booking typically doesn't change
-                .setCreatedAt(existingBooking.getCreatedAt()) // Preserve original creation time
-                .setDeleted(existingBooking.isDeleted()) // Preserve deleted status unless update explicitly changes it
+                .copy(existingBooking) // Start with existing to preserve immutable fields
+                // Apply changes from bookingWithUpdates carefully
+                .setStartDate(bookingWithUpdates.getStartDate() != null ? bookingWithUpdates.getStartDate() : existingBooking.getStartDate())
+                .setEndDate(bookingWithUpdates.getEndDate() != null ? bookingWithUpdates.getEndDate() : existingBooking.getEndDate())
+                .setCar(carForUpdate) // Use the potentially re-fetched carForUpdate
+                .setStatus(bookingWithUpdates.getStatus() != null ? bookingWithUpdates.getStatus() : existingBooking.getStatus())
+                .setDriver(bookingWithUpdates.getDriver() != null ? bookingWithUpdates.getDriver() : existingBooking.getDriver()) // Allow driver to be updated/set/cleared
+                // ID, UUID, User, CreatedAt, Deleted are preserved from existingBooking by starting with copy()
                 .build();
 
         Booking savedBooking = bookingRepository.save(entityToSave);
@@ -336,19 +362,22 @@ public class BookingServiceImpl implements IBookingService {
         Optional<Booking> bookingOpt = bookingRepository.findByIdAndDeletedFalse(id);
         if (bookingOpt.isPresent()) {
             Booking booking = bookingOpt.get();
-            // Business rule: Can only delete if not yet RENTAL_INITIATED or FULFILLED
-           /* if (booking.getStatus() == BookingStatus.RENTAL_INITIATED || booking.getStatus() == BookingStatus.CONFIRMED) {
+            // Business rule: For admin delete, might be more lenient or use ADMIN_CANCELLED
+            // If this delete is user-initiated, it should perhaps go through cancelBooking.
+            // For a generic admin delete, ADMIN_CANCELLED makes sense.
+            if (booking.getStatus() == BookingStatus.RENTAL_INITIATED) {
                 log.warn("Soft-delete failed for Booking ID {}: Cannot delete booking with status {}", id, booking.getStatus());
-                // Or throw new IllegalStateException("Cannot delete a booking that has already been processed into a rental or fulfilled.");
-                return false; // Or let exception propagate
-            }*/
+                throw new IllegalStateException("Cannot delete a booking that has already been processed into a rental.");
+            }
+
             Booking deletedBooking = new Booking.Builder().copy(booking)
                     .setDeleted(true)
-                    .setStatus(BookingStatus.ADMIN_CANCELLED) // Or a specific "DELETED" status
+                    // If not already cancelled, set to ADMIN_CANCELLED to reflect it was an admin action
+                    .setStatus(booking.getStatus() == BookingStatus.USER_CANCELLED || booking.getStatus() == BookingStatus.ADMIN_CANCELLED ?
+                            booking.getStatus() : BookingStatus.ADMIN_CANCELLED)
                     .build();
             bookingRepository.save(deletedBooking);
             log.info("Successfully soft-deleted booking ID: {}", id);
-            // If a car was "soft-reserved" by this booking, that logic would go here.
             return true;
         }
         log.warn("Soft-delete failed: Booking not found or already deleted for ID: {}", id);

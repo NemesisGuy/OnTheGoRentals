@@ -11,7 +11,7 @@ import java.util.UUID;
  * Interface defining the contract for booking-related services.
  * This includes creating bookings, managing their lifecycle (confirm, cancel),
  * and retrieving booking information.
- *
+ * <p>
  * Author: [Original Author - Please specify if known, or Peter Buckingham if you created/refactored it]
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham
@@ -39,7 +39,7 @@ public interface IBookingService {
      * @param bookingId The internal integer ID of the booking to confirm.
      * @return The updated {@link Booking} entity with its new (e.g., CONFIRMED) status.
      * @throws za.ac.cput.exception.ResourceNotFoundException if the booking with the given ID is not found.
-     * @throws IllegalStateException if the booking cannot be confirmed from its current state.
+     * @throws IllegalStateException                          if the booking cannot be confirmed from its current state.
      */
     Booking confirmBooking(int bookingId);
 
@@ -50,7 +50,7 @@ public interface IBookingService {
      * @param bookingId The internal integer ID of the booking to cancel.
      * @return The updated {@link Booking} entity with its new (e.g., CANCELLED) status.
      * @throws za.ac.cput.exception.ResourceNotFoundException if the booking with the given ID is not found.
-     * @throws IllegalStateException if the booking cannot be cancelled from its current state.
+     * @throws IllegalStateException                          if the booking cannot be cancelled from its current state.
      */
     Booking cancelBooking(int bookingId);
 

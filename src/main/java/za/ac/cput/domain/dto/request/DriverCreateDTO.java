@@ -12,7 +12,7 @@ import lombok.*;
 public class DriverCreateDTO {
 
     @NotBlank(message = "First name cannot be null")
-    @Size (max = 50, message = "First name cannot exceed 50 characters")
+    @Size(max = 50, message = "First name cannot exceed 50 characters")
     private String firstName;
     @NotBlank(message = "Last name cannot be null")
     @Size(max = 50, message = "Last name cannot exceed 50 characters")

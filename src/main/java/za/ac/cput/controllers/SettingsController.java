@@ -3,18 +3,19 @@ package za.ac.cput.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity; // Good practice to return ResponseEntity
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import za.ac.cput.domain.settings.Settings;
-import za.ac.cput.exception.ResourceNotFoundException; // If settings might not be found
-import za.ac.cput.service.ISettingsService; // Use interface
-import za.ac.cput.utils.SecurityUtils; // Import your helper
+import za.ac.cput.service.ISettingsService;
+import za.ac.cput.utils.SecurityUtils;
 
 /**
  * SettingsController.java
  * Controller for retrieving application settings.
  * Currently provides an endpoint to read a specific settings entry (e.g., by ID 1).
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: [Original Date - If known]
  * Updated by: Peter Buckingham

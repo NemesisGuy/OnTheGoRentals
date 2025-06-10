@@ -1,9 +1,9 @@
 package za.ac.cput.domain.mapper;
 
-import za.ac.cput.domain.entity.ContactUs;
+import za.ac.cput.domain.dto.request.AdminContactUsUpdateDTO;
 import za.ac.cput.domain.dto.request.ContactUsCreateDTO;
-import za.ac.cput.domain.dto.request.AdminContactUsUpdateDTO; // Using admin update DTO
 import za.ac.cput.domain.dto.response.ContactUsResponseDTO;
+import za.ac.cput.domain.entity.ContactUs;
 
 import java.util.List;
 import java.util.stream.Collectors;

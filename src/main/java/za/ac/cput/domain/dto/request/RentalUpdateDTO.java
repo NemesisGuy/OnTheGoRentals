@@ -2,8 +2,11 @@ package za.ac.cput.domain.dto.request;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero; // For fine amount
-import lombok.*; // Added Builder for consistency if desired
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,7 +18,7 @@ import java.util.UUID;
  * This DTO is typically used by an administrator, allowing modification of various rental attributes.
  * All fields are optional; only the fields provided in the request will be considered for update.
  * The rental to be updated is identified by its UUID in the URL path, not within this DTO.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: [ 2025-05-28]
  * Updated by: Peter Buckingham

@@ -4,13 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Spring's Transactional
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.ContactUs;
-import za.ac.cput.repository.ContactUsRepository; // Assuming interface name IContactUsRepository
-import za.ac.cput.exception.ResourceNotFoundException; // For consistency
+import za.ac.cput.exception.ResourceNotFoundException;
+import za.ac.cput.repository.ContactUsRepository;
 import za.ac.cput.service.IContactUsService;
 
-import java.time.LocalDateTime; // For submission date if not set by @PrePersist
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,7 +20,7 @@ import java.util.UUID;
  * Implementation of the {@link IContactUsService} interface.
  * Manages "Contact Us" submissions, including CRUD operations.
  * Entities are treated as immutable; updates are performed using a Builder pattern with a copy method.
- *
+ * <p>
  * Author: Cwenga Dlova (214310671)
  * Date: 23/09/2023
  * Updated by: Peter Buckingham
@@ -113,6 +113,7 @@ public class ContactUsServiceImpl implements IContactUsService {
      * Updates an existing "Contact Us" submission. This is typically an admin action
      * (e.g., to mark as responded, add internal notes).
      * The input {@code contactUsWithUpdates} should be the complete new state.
+     *
      * @throws ResourceNotFoundException if the submission with the given ID does not exist or is deleted.
      */
     @Override

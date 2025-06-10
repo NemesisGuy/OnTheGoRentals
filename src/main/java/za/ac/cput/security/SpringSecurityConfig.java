@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -19,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,86 +32,56 @@ public class SpringSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Apply CORS configuration
-
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable()
+/*
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+*/
+/*
+                        .ignoringRequestMatchers("/api/v1/auth/**") // Allow JWT endpoints to bypass CSRF
+*/
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                                // Permit OPTIONS requests globally for preflight
-                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                // User endpoints
-                                .requestMatchers("/api/user/register").permitAll()
-                                .requestMatchers("/api/user/authenticate").permitAll()
-                                .requestMatchers("/api/user/refresh").permitAll() // <<< ADD THIS
-                                .requestMatchers("/api/user/logout").authenticated() // <<< ADD THIS (needs auth to identify user for logout)
-                                .requestMatchers("/api/oauth2/google/login").permitAll() // Or /api/oauth2/google/code
-                                .requestMatchers("/api/user/profile/*").authenticated()
-                                .requestMatchers("/api/user/profile/*/*").authenticated()
-                                .requestMatchers("/api/user/rentals/*").authenticated()
+                        // Preflight support
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Public v1 endpoints
+                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
+                        .requestMatchers("/api/v1/about-us/**").permitAll()
+                        .requestMatchers("/api/v1/cars/**").permitAll()
+                        .requestMatchers("/api/v1/help-center/**").permitAll()
+                        .requestMatchers("/api/v1/faq/**").permitAll()
+                        .requestMatchers("/api/v1/contact-us").permitAll()
+                        .requestMatchers("/api/v1/bookings/available-cars").permitAll()
+
+                        // Authenticated v1 endpoints
+                        .requestMatchers("/api/v1/auth/logout").authenticated()
+                        .requestMatchers("/api/v1/users/me/**").authenticated()
+                        .requestMatchers("/api/v1/files/**").permitAll()
+                        .requestMatchers("/api/v1/admin/cars/list/available").authenticated()
+                        .requestMatchers("/api/v1/files/selfies/**").authenticated()
+                        .requestMatchers("/api/v1/admin/cars/list/**").authenticated()
+                        .requestMatchers("/api/v1/admin/rentals/from-booking/**").authenticated()
+                        .requestMatchers("/api/v1/rentals/from-booking/**").authenticated()
+                        .requestMatchers("/api/v1/admin/rentals/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
 
 
-                                // User about and contact us endpoints
-                                .requestMatchers("/api/v1/about-us").permitAll()
-                                .requestMatchers("/api/v1/about-us/*").permitAll()
-                                .requestMatchers("/api/aboutUs/read/*").permitAll()
-                                .requestMatchers("/api/aboutUs/all").permitAll()
-                                .requestMatchers("/api/aboutUs/latest").permitAll()
-                                .requestMatchers("/api/contactUs/create").permitAll()
-                                // User settings endpoints
-                                .requestMatchers("/api/settings/read").permitAll()
-                                // User car endpoints
-                                .requestMatchers("/api/v1/cars").permitAll()
-                                .requestMatchers("/api/v1/cars/**").permitAll()
-                                // Help center and FAQ user endpoints
-                                .requestMatchers("/api/faq/**").permitAll()
-                                .requestMatchers("/api/help-center/**").permitAll()
+                        // Admin v1 endpoints
+                        .requestMatchers("/api/v1/admin/**", "/api/v1/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
 
-                                // User booking endpoints
-                                .requestMatchers("/api/bookings/**").permitAll() // for dev purposes
-                                .requestMatchers("/api/v1/bookings").permitAll() // for dev purposes
-                                .requestMatchers("/api/v1/bookings/**").permitAll() // for dev purposes
-                                ///actuator/prometheus
-                                .requestMatchers("/actuator/**").permitAll()
-                                .requestMatchers("/actuator/prometheus").permitAll()
-                                ///actuator/prometheus
-                                .requestMatchers("/metrics").permitAll()
-                                .requestMatchers("/metrics/**").permitAll()
+                        // Public static & framework paths
+                        .requestMatchers("/public/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/oauth2/**").permitAll()
 
-                                // Admin endpoints
-                                .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
-                                .requestMatchers("/api/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+                        // Actuator endpoints (non-versioned)
+                        .requestMatchers("/actuator/**", "/metrics", "/metrics/**").permitAll()
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                // User endpoints V1
-                                // Authentication Endpoints (Public)
-                                .requestMatchers("/api/v1/auth/register").permitAll()
-                                .requestMatchers("/api/v1/auth/login").permitAll()
-                                .requestMatchers("/api/v1/auth/refresh").permitAll()
-
-                                // Authentication Endpoints (Authenticated)
-                                .requestMatchers("/api/v1/auth/logout").authenticated()
-
-                                // Current User's Profile & Data (Authenticated)
-                                .requestMatchers("/api/v1/users/me/**").authenticated()
-
-                                // help center and FAQ user endpoints
-                                .requestMatchers("/api/v1/help-center/**").permitAll()
-                                .requestMatchers("/api/v1/faq/**").permitAll()
-                                .requestMatchers("/api/v1/contact-us").permitAll()
-                                // Admin endpoints
-                                .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
-                                .requestMatchers("/api/v1/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
-
-                                // Deny all other requests by default if not explicitly permitted
-                                .anyRequest().authenticated()
-
+                        // Default deny
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -142,11 +112,9 @@ public class SpringSecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Define your allowed origins EXPLICITLY
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",          // For local Vue dev (if this is your port)
-                "https://otgr.nemesisnet.co.za"   // Your production frontend
-                // Add other origins if needed (e.g., staging)
+                "http://localhost:5173",
+                "https://otgr.nemesisnet.co.za"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList(
@@ -158,16 +126,15 @@ public class SpringSecurityConfig {
                 "Access-Control-Request-Method",
                 "Access-Control-Request-Headers"
         ));
-        configuration.setExposedHeaders(Arrays.asList( // If you have custom headers client needs to read
+        configuration.setExposedHeaders(Arrays.asList(
                 "Origin", "Content-Type", "Accept", "Authorization",
                 "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"
-                // "Set-Cookie" might not need to be explicitly exposed if handled by browser correctly
         ));
-        configuration.setAllowCredentials(true); // Crucial for cookies
-        configuration.setMaxAge(3600L); // How long the results of a preflight request can be cached
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Apply this configuration to all paths
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }

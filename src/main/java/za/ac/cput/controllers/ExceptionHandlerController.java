@@ -15,7 +15,7 @@ import za.ac.cput.utils.SecurityUtils;
  * for specific custom exceptions thrown by REST controllers.
  * These handlers currently return plain text error messages with appropriate HTTP status codes.
  * For more structured JSON error responses, see {@link za.ac.cput.api.advice.GlobalExceptionHandler}.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: [Original Date - If known, otherwise assume similar to ErrorController]
  * Updated by: Peter Buckingham

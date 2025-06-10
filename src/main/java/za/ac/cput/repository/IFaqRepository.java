@@ -4,8 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import za.ac.cput.domain.entity.Faq;
 
-
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,9 +19,9 @@ import java.util.UUID;
 public interface IFaqRepository extends JpaRepository<Faq, Integer> {
     List<Faq> findByDeletedFalse();
 
-   Optional <Faq> findByIdAndDeletedFalse(Integer integer);
+    Optional<Faq> findByIdAndDeletedFalse(Integer integer);
 
-    Optional <Faq> findByUuidAndDeletedFalse(UUID uuid);
+    Optional<Faq> findByUuidAndDeletedFalse(UUID uuid);
 
     boolean existsByIdAndDeletedFalse(Integer faqId);
 }

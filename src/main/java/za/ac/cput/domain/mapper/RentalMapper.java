@@ -1,15 +1,15 @@
 package za.ac.cput.domain.mapper;
 
-import za.ac.cput.domain.entity.Car;
-import za.ac.cput.domain.entity.Driver;
-import za.ac.cput.domain.entity.Rental;
-import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.dto.request.RentalRequestDTO;
-import za.ac.cput.domain.dto.request.RentalUpdateDTO; // Assuming you create this
+import za.ac.cput.domain.dto.request.RentalUpdateDTO;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
 import za.ac.cput.domain.dto.response.DriverResponseDTO;
 import za.ac.cput.domain.dto.response.RentalResponseDTO;
 import za.ac.cput.domain.dto.response.UserResponseDTO;
+import za.ac.cput.domain.entity.Car;
+import za.ac.cput.domain.entity.Driver;
+import za.ac.cput.domain.entity.Rental;
+import za.ac.cput.domain.entity.security.User;
 
 import java.util.List;
 import java.util.stream.Collectors;

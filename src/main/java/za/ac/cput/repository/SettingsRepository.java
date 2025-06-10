@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface SettingsRepository extends JpaRepository<Settings, Integer> {
     Iterable<Settings> findByDeletedFalse();
 
-    Optional <Settings> findByIdAndDeletedFalse(Integer id);
+    Optional<Settings> findByIdAndDeletedFalse(Integer id);
 
     boolean existsByIdAndDeletedFalse(Integer settingsId);
 }

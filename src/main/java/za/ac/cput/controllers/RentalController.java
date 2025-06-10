@@ -8,22 +8,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.dto.request.RentalFromBookingRequestDTO;
-import za.ac.cput.domain.entity.Car;
-import za.ac.cput.domain.entity.Driver;
-import za.ac.cput.domain.entity.Rental;
 import za.ac.cput.domain.dto.request.RentalRequestDTO;
 import za.ac.cput.domain.dto.request.RentalUpdateDTO;
 import za.ac.cput.domain.dto.response.RentalResponseDTO;
+import za.ac.cput.domain.entity.Car;
+import za.ac.cput.domain.entity.Driver;
+import za.ac.cput.domain.entity.Rental;
+import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.domain.mapper.RentalMapper;
-import za.ac.cput.domain.entity.security.User;
-import za.ac.cput.exception.ResourceNotFoundException; // For consistency
-import za.ac.cput.exception.CarNotAvailableException;  // For specific error
+import za.ac.cput.exception.CarNotAvailableException;
+import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.ICarService;
 import za.ac.cput.service.IDriverService;
 import za.ac.cput.service.IRentalService;
 import za.ac.cput.service.IUserService;
-import za.ac.cput.utils.SecurityUtils; // Import your helper
+import za.ac.cput.utils.SecurityUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -75,7 +75,7 @@ public class RentalController {
      * @param rentalRequestDTO The {@link RentalRequestDTO} containing details for the new rental.
      * @return A ResponseEntity containing the created {@link RentalResponseDTO} and HTTP status 201 Created.
      * @throws ResourceNotFoundException if the specified User, Car, or Driver (if provided) is not found.
-     * @throws CarNotAvailableException if the specified car is not available.
+     * @throws CarNotAvailableException  if the specified car is not available.
      */
     @PostMapping
     public ResponseEntity<RentalResponseDTO> createRental(@Valid @RequestBody RentalRequestDTO rentalRequestDTO) {
@@ -142,6 +142,12 @@ public class RentalController {
 
         Rental rentalEntity = rentalService.read(rentalUuid);
         // rentalService.read(UUID) should throw ResourceNotFoundException if not found.
+        if (rentalEntity == null) {
+            log.warn("Requester [{}]: Rental with UUID: {} not found.", requesterId, rentalUuid);
+            throw new ResourceNotFoundException("Rental not found with UUID: " + rentalUuid);
+        }
+        log.debug("Requester [{}]: Found rental with ID: {}, UUID: {}", requesterId, rentalEntity.getId(), rentalEntity.getUuid());
+        System.out.println("rental issuer: " + rentalEntity.getIssuer());
 
         // TODO: Implement robust authorization check.
         // Example: Ensure the current user owns this rental or has admin/staff role.
@@ -190,8 +196,8 @@ public class RentalController {
      * Typically, only certain fields are updatable by the user who owns the rental.
      * Access control is crucial here.
      *
-     * @param rentalUuid        The UUID of the rental to update.
-     * @param rentalUpdateDTO   The {@link RentalUpdateDTO} containing the fields to update.
+     * @param rentalUuid      The UUID of the rental to update.
+     * @param rentalUpdateDTO The {@link RentalUpdateDTO} containing the fields to update.
      * @return A ResponseEntity containing the updated {@link RentalResponseDTO}.
      * @throws ResourceNotFoundException if the rental or related entities (if changed) are not found.
      */
@@ -222,7 +228,7 @@ public class RentalController {
             }
             if (existingRental.getCar() != null && !existingRental.getCar().isAvailable() &&
                     (existingRental.getStatus() == RentalStatus.ACTIVE)) {
-                Car oldCarToMakeAvailable = Car.builder().copy(existingRental.getCar()).setAvailable(true).build();
+                Car oldCarToMakeAvailable = new Car.Builder().copy(existingRental.getCar()).setAvailable(true).build();
                 carService.update(oldCarToMakeAvailable);
                 log.info("Admin [{}]: Rental update - Old car ID {} made available due to car change.", adminId, oldCarToMakeAvailable.getId());
             }
@@ -233,7 +239,7 @@ public class RentalController {
 
         // Update driver
         boolean updateDriverField = rentalUpdateDTO.getDriverUuid() != null ||
-                (existingRental.getDriver() != null && rentalUpdateDTO.getDriverUuid() == null );
+                (existingRental.getDriver() != null && rentalUpdateDTO.getDriverUuid() == null);
         // ^^^ Added check for explicit null from DTO to remove driver.
         // This requires isDriverUuidPresentInJson() method in RentalUpdateDTO or using Optional.
         // Simplified logic for now:
@@ -299,6 +305,7 @@ public class RentalController {
         log.info("Admin [{}]: Successfully updated rental ID: {}, UUID: {}", adminId, persistedRental.getId(), persistedRental.getUuid());
         return ResponseEntity.ok(RentalMapper.toDto(persistedRental));
     }
+
     /**
      * Allows the authenticated user (or admin/staff) to confirm a rental.
      *
@@ -374,39 +381,35 @@ public class RentalController {
                 requesterId, completedRental.getId(), completedRental.getUuid(), fineAmount);
         return ResponseEntity.ok(RentalMapper.toDto(completedRental));
     }
+
     /**
      * Creates a new Rental record from an existing, confirmed Booking.
-     * This endpoint is typically used by staff when a customer arrives to pick up their car.
-     * It marks the booking as processed into a rental and the car as unavailable.
+     * This single endpoint handles the entire transactional process of converting a booking
+     * into a rental, including updating the booking's status and the car's availability.
      *
      * @param bookingUuid The UUID of the confirmed Booking to convert.
-     * @param dto         The {@link RentalFromBookingRequestDTO} containing any additional details
-     *                    required at pickup (e.g., staff issuer ID, actual pickup time if different, driver).
-     * @return A ResponseEntity containing the created {@link RentalResponseDTO} and HTTP status CREATED.
-     * @throws za.ac.cput.exception.ResourceNotFoundException if the booking is not found.
-     * @throws IllegalStateException if the booking is not in a state that can be converted to a rental.
-     * @throws za.ac.cput.exception.CarNotAvailableException if the car is no longer available.
+     * @param dto         The DTO containing any additional details required at pickup.
+     * @return A ResponseEntity containing the created {@link RentalResponseDTO}.
      */
     @PostMapping("/from-booking/{bookingUuid}")
-    // @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<RentalResponseDTO> createRentalFromBooking(
             @PathVariable UUID bookingUuid,
             @Valid @RequestBody RentalFromBookingRequestDTO dto) {
 
-        String requesterId = SecurityUtils.getRequesterIdentifier(); // Logged-in staff/admin
-        log.info("Requester [{}]: Attempting to create rental from Booking UUID: {} with details: {}",
-                requesterId, bookingUuid, dto);
+        String requesterId = SecurityUtils.getRequesterIdentifier();
+        log.info("Requester [{}]: Request to create rental from Booking UUID: {}", requesterId, bookingUuid);
 
-        // The service method now orchestrates everything
+        // The service method now orchestrates everything.
         Rental createdRental = rentalService.createRentalFromBooking(
                 bookingUuid,
-                dto.getIssuerId(),       // Staff member ID who is issuing
-                dto.getDriverUuid(),     // Optional driver assigned at pickup
-                dto.getActualPickupTime() // Actual time of pickup, could default to now in service if null
+                dto.getIssuerId(),
+                dto.getDriverUuid(),
+                dto.getActualPickupTime()
         );
 
-        log.info("Requester [{}]: Successfully created Rental UUID: {} from Booking UUID: {}",
-                requesterId, createdRental.getUuid(), bookingUuid);
+        log.info("Requester [{}]: Successfully processed Booking UUID {} into Rental UUID {}",
+                requesterId, bookingUuid, createdRental.getUuid());
         return new ResponseEntity<>(RentalMapper.toDto(createdRental), HttpStatus.CREATED);
     }
+
 }

@@ -1,5 +1,5 @@
 // src/main/java/za/ac/cput/DefaultDataInitializer.java
-package za.ac.cput;
+package za.ac.cput.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

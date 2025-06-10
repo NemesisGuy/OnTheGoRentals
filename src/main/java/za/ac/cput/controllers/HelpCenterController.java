@@ -7,14 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.entity.HelpCenter;
 import za.ac.cput.domain.dto.request.HelpCenterCreateDTO;
 import za.ac.cput.domain.dto.request.HelpCenterUpdateDTO;
 import za.ac.cput.domain.dto.response.HelpCenterResponseDTO;
+import za.ac.cput.domain.entity.HelpCenter;
 import za.ac.cput.domain.mapper.HelpCenterMapper;
-import za.ac.cput.exception.ResourceNotFoundException; // For consistency
+import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.IHelpCenterService;
-import za.ac.cput.utils.SecurityUtils; // Import your helper
+import za.ac.cput.utils.SecurityUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +26,7 @@ import java.util.UUID;
  * endpoints for creating, updating, and deleting them.
  * CRUD operations (POST, PUT, DELETE) should be secured for admin-only access
  * or moved to a dedicated AdminHelpCenterController.
- *
+ * <p>
  * Author: Aqeel Hanslo (219374422)
  * Date: 29 August 2023
  * Updated by: Peter Buckingham

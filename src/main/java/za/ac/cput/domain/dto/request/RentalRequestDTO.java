@@ -2,8 +2,11 @@ package za.ac.cput.domain.dto.request;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero; // Assuming fine should be non-negative
-import lombok.*;
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,7 +17,7 @@ import java.util.UUID;
  * This DTO is used to convey rental details, typically when an administrator
  * is creating or managing a rental record, as it allows specifying comprehensive details
  * including user, car, driver, issuer/receiver staff, fines, dates, and status.
- *
+ * <p>
  * Author: Peter Buckingham (220165289) // Assuming based on consistent authorship, please confirm/correct
  * Date: [Original Date of DTO creation - Please specify if known]
  * Updated by: Peter Buckingham
@@ -83,14 +86,13 @@ public class RentalRequestDTO {
     private LocalDateTime expectedReturnDate; // WHEN IT'S DUE
 
     /**
-        * The actual date and time when the rental car was returned.
-        * This field is mandatory and must be in the present or future.
-        * It is typically set when the rental is completed.
-        */
+     * The actual date and time when the rental car was returned.
+     * This field is mandatory and must be in the present or future.
+     * It is typically set when the rental is completed.
+     */
 
     @FutureOrPresent(message = "Return date must be in the present or future")
     private LocalDateTime returnedDate;
-
 
 
     /**

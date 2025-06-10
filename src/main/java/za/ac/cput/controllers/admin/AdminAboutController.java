@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.entity.AboutUs;
 import za.ac.cput.domain.dto.request.AboutUsCreateDTO;
 import za.ac.cput.domain.dto.request.AboutUsUpdateDTO;
 import za.ac.cput.domain.dto.response.AboutUsResponseDTO;
+import za.ac.cput.domain.entity.AboutUs;
 import za.ac.cput.domain.mapper.AboutUsMapper;
-import za.ac.cput.exception.ResourceNotFoundException; // Assuming this exists for consistency
+import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.IAboutUsService;
 
 import java.util.List;
@@ -24,12 +24,12 @@ import java.util.UUID;
  * Allows administrators to create, retrieve, update, and delete "About Us" entries.
  * External identification of "About Us" entries is done via UUIDs, while internal
  * service operations primarily use integer IDs. This controller bridges that gap.
- **
+ * *
  * Author: Cwenga Dlova (214310671)
  * Date: 24/09/2023
- **
+ * *
  * Updated by: Peter Buckingham / System
- **
+ * *
  * Updated: [2025-05-28]
  */
 @RestController

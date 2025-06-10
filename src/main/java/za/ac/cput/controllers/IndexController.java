@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import za.ac.cput.utils.SecurityUtils; // Import your helper
+import za.ac.cput.utils.SecurityUtils;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * IndexController.java
  * A simple controller providing a basic greeting message with a visitor counter.
  * This was primarily for testing purposes and might be removed in production.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: 05 April 2023
  * Updated by: Peter Buckingham
@@ -25,15 +25,6 @@ public class IndexController {
     private static final Logger log = LoggerFactory.getLogger(IndexController.class);
     private static final String TEMPLATE = "Hello, %s!"; // Renamed for clarity, though not used in current output
     private final AtomicLong counter = new AtomicLong();
-
-    /**
-     * Record representing a simple message with an ID.
-     *
-     * @param content The message content.
-     * @param id      A unique identifier for the message (visitor count in this case).
-     */
-    public record Message(String content, long id) {
-    }
 
     /**
      * Handles requests to various root/home paths and returns a greeting message
@@ -50,5 +41,14 @@ public class IndexController {
         log.info("Requester [{}]: Greeting endpoint accessed. Visitor number: {}", requesterId, visitorNumber);
 
         return new Message(messageContent, visitorNumber);
+    }
+
+    /**
+     * Record representing a simple message with an ID.
+     *
+     * @param content The message content.
+     * @param id      A unique identifier for the message (visitor count in this case).
+     */
+    public record Message(String content, long id) {
     }
 }

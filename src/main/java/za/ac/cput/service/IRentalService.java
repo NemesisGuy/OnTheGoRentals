@@ -4,7 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.Rental;
 import za.ac.cput.domain.entity.security.User;
 
-import java.time.LocalDate; // For findRentalsDueOnDate
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +15,7 @@ import java.util.UUID;
  * Extends the generic {@link IService} for basic CRUD and adds rental-specific
  * operations like confirming, canceling, completing rentals, and querying rental history,
  * as well as finding rentals due or overdue.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham
@@ -25,7 +25,8 @@ public interface IRentalService extends IService<Rental, Integer> {
 
     // create(Rental), read(Integer), update(Rental), delete(Integer) are inherited from IService
 
-    @Transactional // CRITICAL: This whole operation must be one transaction
+    @Transactional
+        // CRITICAL: This whole operation must be one transaction
     Rental createRentalFromBooking(UUID bookingUuid, UUID issuerId, UUID driverUuid, LocalDateTime actualIssuedDate);
 
     /**
@@ -47,7 +48,8 @@ public interface IRentalService extends IService<Rental, Integer> {
      * @deprecated Prefer {@link IService#update(Object)} where the new state is passed directly.
      */
     @Deprecated
-    @Transactional // org.springframework.transaction.annotation.Transactional
+    @Transactional
+    // org.springframework.transaction.annotation.Transactional
     Rental update(int id, Rental rental);
 
     /**
@@ -151,4 +153,6 @@ public interface IRentalService extends IService<Rental, Integer> {
      * @return A list of {@link Rental} entities due on the specific date.
      */
     List<Rental> findRentalsDueOnDate(LocalDate specificDate);
+
+    List<Rental> findActiveRentals();
 }

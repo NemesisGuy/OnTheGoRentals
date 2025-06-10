@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.transaction.annotation.Transactional; // Typically service layer handles transactions
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.dto.request.DamageReportCreateDTO;
 import za.ac.cput.domain.dto.request.DamageReportUpdateDTO;
@@ -28,7 +27,7 @@ import java.util.UUID;
  * which are associated with specific rentals.
  * External identification of damage reports is by UUID. Internal service operations
  * primarily use integer IDs. This controller bridges that gap.
- *
+ * <p>
  * Author: Cwenga Dlova (214310671)
  * Updated by: System/AI
  * Date: 08/09/2023

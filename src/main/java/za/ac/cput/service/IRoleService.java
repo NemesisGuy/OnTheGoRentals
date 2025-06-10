@@ -10,7 +10,7 @@ import java.util.List;
  * Interface defining the contract for role-related services.
  * This includes finding roles by name and resolving lists of role names
  * into managed {@link Role} entities.
- *
+ * <p>
  * Author: Peter Buckingham // Assuming based on context, please confirm/correct
  * Date: 2025-05-28 // Assuming created around this refactoring
  */
@@ -21,7 +21,7 @@ public interface IRoleService {
      *
      * @param roleName The {@link RoleName} enum to search for. Cannot be null.
      * @return The found {@link Role} entity.
-     * @throws IllegalArgumentException if roleName is null.
+     * @throws IllegalArgumentException                       if roleName is null.
      * @throws za.ac.cput.exception.ResourceNotFoundException if the role corresponding to roleName is not found in the database.
      */
     Role findByRoleName(RoleName roleName);

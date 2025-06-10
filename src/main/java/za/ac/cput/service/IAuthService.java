@@ -3,7 +3,7 @@ package za.ac.cput.service;
 import jakarta.servlet.http.HttpServletResponse;
 import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
-import za.ac.cput.service.impl.AuthServiceImpl; // For the nested helper classes
+import za.ac.cput.service.impl.AuthServiceImpl;
 
 /**
  * IAuthService.java
@@ -11,7 +11,7 @@ import za.ac.cput.service.impl.AuthServiceImpl; // For the nested helper classes
  * This includes user registration, login (authentication), token refresh, and logout.
  * It orchestrates interactions between user data, token generation/validation,
  * and cookie management for authentication purposes.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-28
  */
@@ -27,7 +27,7 @@ public interface IAuthService {
      * @param defaultRoleName The default role for the new user.
      * @return The created {@link User} entity.
      * @throws za.ac.cput.exception.EmailAlreadyExistsException if the email is already in use.
-     * @throws IllegalStateException if the default role is not found.
+     * @throws IllegalStateException                            if the default role is not found.
      */
     User registerUser(String firstName, String lastName, String email, String plainPassword, RoleName defaultRoleName);
 
@@ -38,7 +38,7 @@ public interface IAuthService {
      * @param plainPassword       The user's plain text password.
      * @param httpServletResponse The response object to add the refresh token cookie to.
      * @return An {@link AuthServiceImpl.AuthDetails} object containing the authenticated {@link User},
-     *         the access token string, and their role names.
+     * the access token string, and their role names.
      * @throws org.springframework.security.core.AuthenticationException if authentication fails.
      */
     AuthServiceImpl.AuthDetails loginUser(String email, String plainPassword, HttpServletResponse httpServletResponse);

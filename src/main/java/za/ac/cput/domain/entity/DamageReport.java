@@ -13,6 +13,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+
 @Getter
 @Entity
 public class DamageReport {
@@ -21,12 +22,9 @@ public class DamageReport {
     private int id;
     @Column(nullable = false, unique = true, updatable = false)
     private UUID uuid;
-   /* @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "rental", referencedColumnName = "id", unique = true)
-    private Rental rental;*/
-   @ManyToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "rental", nullable = false)
-   private Rental rental;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rental", nullable = false)
+    private Rental rental;
     @Column(columnDefinition = "TEXT")
     private String description;
     @Column(updatable = false)
@@ -35,16 +33,10 @@ public class DamageReport {
     private double repairCost;
     @Column(updatable = false)
     private LocalDateTime createdAt; // When the report was created in the system
+    @Column(updatable = false)
+    private LocalDateTime updatedAt; // Added for tracking updates, if needed
     @Column(nullable = false)
     private boolean deleted = false;
-
-    @PrePersist
-    protected void onCreate() { // Renamed to avoid clash with entity field if any
-        if (this.uuid == null) this.uuid = UUID.randomUUID();
-        this.createdAt = LocalDateTime.now(); // Set report creation time
-        this.deleted = false;
-        if (this.dateAndTime == null) this.dateAndTime = this.createdAt; // Default damage time to report time if not specified
-    }
 
     public DamageReport() {
     }
@@ -58,7 +50,23 @@ public class DamageReport {
         this.location = builder.location;
         this.repairCost = builder.repairCost;
         this.createdAt = builder.createdAt;
+        this.updatedAt = builder.updatedAt;
         this.deleted = builder.deleted;
+    }
+
+    @PrePersist
+    protected void onCreate() { // Renamed to avoid clash with entity field if any
+        if (this.uuid == null) this.uuid = UUID.randomUUID();
+        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
+        if (this.updatedAt == null) this.updatedAt = LocalDateTime.now();
+        this.deleted = false;
+        if (this.dateAndTime == null)
+            this.dateAndTime = this.createdAt; // Default damage time to report time if not specified
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now(); // Update timestamp on any update
     }
 
     @Override
@@ -84,6 +92,7 @@ public class DamageReport {
                 ", location='" + location + '\'' +
                 ", repairCost=" + repairCost +
                 ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 ", deleted=" + deleted +
                 '}';
     }
@@ -97,12 +106,14 @@ public class DamageReport {
         private String location;
         private double repairCost;
         private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
         private boolean deleted = false;
 
         public Builder setId(int id) {
             this.id = id;
             return this;
         }
+
         public Builder setUuid(UUID uuid) {
             this.uuid = uuid;
             return this;
@@ -132,10 +143,17 @@ public class DamageReport {
             this.repairCost = repairCost;
             return this;
         }
+
         public Builder setCreatedAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
         }
+
+        public Builder setUpdatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
         public Builder setDeleted(boolean deleted) {
             this.deleted = deleted;
             return this;
@@ -150,6 +168,7 @@ public class DamageReport {
             this.location = report.location;
             this.repairCost = report.repairCost;
             this.createdAt = report.createdAt;
+            this.updatedAt = report.updatedAt;
             this.deleted = report.deleted;
             return this;
         }

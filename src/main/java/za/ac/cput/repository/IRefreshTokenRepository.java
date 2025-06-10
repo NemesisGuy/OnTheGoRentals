@@ -15,7 +15,8 @@ public interface IRefreshTokenRepository extends JpaRepository<RefreshToken, Lon
 
     Optional<RefreshToken> findByUser(User user); // Useful if one active token per user
 
-    @Modifying // Required for delete or update operations
+    @Modifying
+        // Required for delete or update operations
     int deleteByUser(User user);
 
     void deleteByToken(String token); // If you implement token rotation

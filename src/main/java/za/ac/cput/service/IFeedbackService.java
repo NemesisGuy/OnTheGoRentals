@@ -9,7 +9,7 @@ import java.util.UUID;
  * IFeedbackService.java
  * Interface defining the contract for Feedback related services.
  * Provides methods for creating feedback submissions and managing them.
- *
+ * <p>
  * Author: Peter Buckingham // Assuming based on consistent authorship
  * Date: [Original Date - e.g., 2025-05-15 from previous context]
  * Updated by: Peter Buckingham

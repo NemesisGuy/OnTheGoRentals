@@ -58,7 +58,7 @@ graph LR
     style BackendAPI fill:#9f9,stroke:#333,stroke-width:2px;
     style Database fill:#ff9,stroke:#333,stroke-width:2px;
     style DockerEnv fill:#ddd,stroke:#333,stroke-width:2px;
-```
+``` 
 
 *(Note: The Mermaid diagram above provides a simplified visual representation of the interaction flow.)*
 

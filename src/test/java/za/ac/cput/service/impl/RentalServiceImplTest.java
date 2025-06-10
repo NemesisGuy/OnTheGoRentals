@@ -82,8 +82,8 @@ class RentalServiceImplTest {
         sampleUser = User.builder().id(1).email("test@example.com").firstName("Test").lastName("User").uuid(UUID.randomUUID()).build();
         sampleDriver = new Driver.Builder().setId(1).setUuid(UUID.randomUUID()).setFirstName("Drive").setLastName("Ryder").build();
 
-        sampleCarAvailable = Car.builder().setId(1).setUuid(UUID.randomUUID()).setMake("Toyota").setModel("Corolla").setAvailable(true).setDeleted(false).build();
-        sampleCarUnavailable = Car.builder().setId(2).setUuid(UUID.randomUUID()).setMake("Honda").setModel("Civic").setAvailable(false).setDeleted(false).build();
+        sampleCarAvailable = new Car.Builder().setId(1).setUuid(UUID.randomUUID()).setMake("Toyota").setModel("Corolla").setAvailable(true).setDeleted(false).build();
+        sampleCarUnavailable = new Car.Builder().setId(2).setUuid(UUID.randomUUID()).setMake("Honda").setModel("Civic").setAvailable(false).setDeleted(false).build();
 
         sampleBookingConfirmed = new Booking.Builder()
                 .setId(1)
@@ -95,7 +95,7 @@ class RentalServiceImplTest {
                 .setStatus(BookingStatus.CONFIRMED)
                 .build();
 
-        Car carForActiveRental = Car.builder().copy(sampleCarAvailable).setAvailable(false).build();
+        Car carForActiveRental = new Car.Builder().copy(sampleCarAvailable).setAvailable(false).build();
         sampleRentalActive = new Rental.Builder()
                 .setId(1)
                 .setUuid(commonRentalUuid)
@@ -120,7 +120,7 @@ class RentalServiceImplTest {
                 .setExpectedReturnDate(LocalDateTime.now().plusDays(2))
                 .build();
 
-        Car carMadeUnavailable = Car.builder().copy(sampleCarAvailable).setAvailable(false).build();
+        Car carMadeUnavailable = new Car.Builder().copy(sampleCarAvailable).setAvailable(false).build();
         Rental rentalPreparedByFactory = new Rental.Builder() // Simulate what factory does
                 .copy(rentalDataFromController)
                 .setCar(carMadeUnavailable) // Service updates car ref *after* factory in current impl
@@ -184,7 +184,7 @@ class RentalServiceImplTest {
         UUID driverUuidForRental = (sampleDriver != null) ? sampleDriver.getUuid() : null;
 
         Car carFromBooking = sampleBookingConfirmed.getCar(); // Initially available
-        Car carMadeUnavailable = Car.builder().copy(carFromBooking).setAvailable(false).build();
+        Car carMadeUnavailable = new Car.Builder().copy(carFromBooking).setAvailable(false).build();
 
         Rental finalRentalState = new Rental.Builder()
                 .setUser(sampleUser)
@@ -224,14 +224,14 @@ class RentalServiceImplTest {
     // --- update Tests ---
     @Test
     void update_shouldUpdateRentalAndMakeCarAvailable_whenCarIsReturned() {
-        Car carInRental = Car.builder().copy(sampleCarUnavailable).setAvailable(false).build(); // Car is unavailable
+        Car carInRental = new Car.Builder().copy(sampleCarUnavailable).setAvailable(false).build(); // Car is unavailable
         Rental existingRental = new Rental.Builder()
                 .copy(sampleRentalActive)
                 .setId(1).setUuid(commonRentalUuid)
                 .setCar(carInRental).setStatus(RentalStatus.ACTIVE)
                 .build();
 
-        Car carMadeAvailable = Car.builder().copy(carInRental).setAvailable(true).build();
+        Car carMadeAvailable = new Car.Builder().copy(carInRental).setAvailable(true).build();
         Rental rentalWithUpdates = new Rental.Builder().copy(existingRental)
                 .setReturnedDate(LocalDateTime.now())
                 .setStatus(RentalStatus.COMPLETED)
@@ -260,13 +260,13 @@ class RentalServiceImplTest {
     // --- delete Tests ---
     @Test
     void delete_shouldSoftDeleteAndMakeCarAvailable_ifRentalWasActive() {
-        Car carForActiveRental = Car.builder().copy(sampleCarAvailable).setAvailable(false).build();
+        Car carForActiveRental = new Car.Builder().copy(sampleCarAvailable).setAvailable(false).build();
         Rental activeRentalToDelete = new Rental.Builder().copy(sampleRentalActive)
                 .setCar(carForActiveRental).setStatus(RentalStatus.ACTIVE).build();
         activeRentalToDelete = new Rental.Builder().copy(activeRentalToDelete).setId(1).build();
 
 
-        Car carMadeAvailable = Car.builder().copy(carForActiveRental).setAvailable(true).build();
+        Car carMadeAvailable = new Car.Builder().copy(carForActiveRental).setAvailable(true).build();
         Rental finalStateAfterDelete = new Rental.Builder().copy(activeRentalToDelete)
                 .setDeleted(true).setStatus(RentalStatus.CANCELLED)
                 .setCar(carMadeAvailable).build();
@@ -287,13 +287,13 @@ class RentalServiceImplTest {
     // (Similar pattern: mock read, mock saves, assert returned rental's car state)
     @Test
     void confirmRentalByUuid_shouldConfirmAndMakeCarUnavailable() {
-        Car carInitiallyAvailable = Car.builder().copy(sampleCarAvailable).setAvailable(true).build();
+        Car carInitiallyAvailable = new Car.Builder().copy(sampleCarAvailable).setAvailable(true).build();
         Rental rentalToConfirm = new Rental.Builder().copy(sampleRentalActive)
                 .setCar(carInitiallyAvailable)
                 .setStatus(RentalStatus.ACTIVE) // Assuming confirming means ensuring it's active
                 .setUuid(commonRentalUuid).build();
 
-        Car carMadeUnavailable = Car.builder().copy(carInitiallyAvailable).setAvailable(false).build();
+        Car carMadeUnavailable = new Car.Builder().copy(carInitiallyAvailable).setAvailable(false).build();
         Rental rentalAfterConfirm = new Rental.Builder().copy(rentalToConfirm)
                 .setCar(carMadeUnavailable) // Rental should now have the car in its 'unavailable' state
                 .setStatus(RentalStatus.ACTIVE)
@@ -313,12 +313,12 @@ class RentalServiceImplTest {
 
     @Test
     void cancelRentalByUuid_shouldCancelAndMakeCarAvailable() {
-        Car carInitiallyUnavailable = Car.builder().copy(sampleCarAvailable).setAvailable(false).build();
+        Car carInitiallyUnavailable = new Car.Builder().copy(sampleCarAvailable).setAvailable(false).build();
         Rental rentalToCancel = new Rental.Builder().copy(sampleRentalActive)
                 .setCar(carInitiallyUnavailable)
                 .setStatus(RentalStatus.ACTIVE).setUuid(commonRentalUuid).build();
 
-        Car carMadeAvailable = Car.builder().copy(carInitiallyUnavailable).setAvailable(true).build();
+        Car carMadeAvailable = new Car.Builder().copy(carInitiallyUnavailable).setAvailable(true).build();
         Rental rentalAfterCancel = new Rental.Builder().copy(rentalToCancel)
                 .setStatus(RentalStatus.CANCELLED).setCar(carMadeAvailable).build();
 
@@ -335,13 +335,13 @@ class RentalServiceImplTest {
 
     @Test
     void completeRentalByUuid_shouldCompleteAndMakeCarAvailable() {
-        Car carInitiallyUnavailable = Car.builder().copy(sampleCarAvailable).setAvailable(false).build();
+        Car carInitiallyUnavailable = new Car.Builder().copy(sampleCarAvailable).setAvailable(false).build();
         Rental rentalToComplete = new Rental.Builder().copy(sampleRentalActive)
                 .setCar(carInitiallyUnavailable)
                 .setStatus(RentalStatus.ACTIVE).setUuid(commonRentalUuid).build();
         double fineAmount = 50.0;
 
-        Car carMadeAvailable = Car.builder().copy(carInitiallyUnavailable).setAvailable(true).build();
+        Car carMadeAvailable = new Car.Builder().copy(carInitiallyUnavailable).setAvailable(true).build();
         LocalDateTime returnTime = LocalDateTime.now(); // Capture before mocking
         Rental rentalAfterComplete = new Rental.Builder().copy(rentalToComplete)
                 .setStatus(RentalStatus.COMPLETED)
@@ -412,14 +412,14 @@ class RentalServiceImplTest {
     // In RentalServiceImplTest.java
     @Test
     void delete_shouldSoftDeleteRentalAndMakeCarAvailable_ifRentalWasActive() {
-        Car carForRental = Car.builder().copy(sampleCarAvailable).setAvailable(false).build();
+        Car carForRental = new Car.Builder().copy(sampleCarAvailable).setAvailable(false).build();
         Rental activeRentalToDelete = new Rental.Builder().copy(sampleRentalActive)
                 .setCar(carForRental)
                 .setStatus(RentalStatus.ACTIVE)
                 .setId(1) // Ensure ID is set
                 .build();
 
-        Car carMadeAvailable = Car.builder().copy(carForRental).setAvailable(true).build();
+        Car carMadeAvailable = new Car.Builder().copy(carForRental).setAvailable(true).build();
         Rental finalStateAfterDelete = new Rental.Builder().copy(activeRentalToDelete)
                 .setDeleted(true).setStatus(RentalStatus.CANCELLED)
                 .setCar(carMadeAvailable).build();

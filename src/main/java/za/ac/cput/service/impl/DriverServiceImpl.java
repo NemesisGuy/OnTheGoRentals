@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Spring's Transactional
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.Driver;
+import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.IDriverRepository;
-import za.ac.cput.exception.ResourceNotFoundException; // For consistency
 import za.ac.cput.service.IDriverService;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.UUID;
  * Implementation of the {@link IDriverService} interface.
  * Manages Driver entities, including CRUD operations.
  * Entities are treated as immutable; updates are performed using a Builder pattern with a copy method.
- *
+ * <p>
  * Author: Peter Buckingham // Assuming based on consistent authorship
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham
@@ -109,6 +109,7 @@ public class DriverServiceImpl implements IDriverService {
      * {@inheritDoc}
      * Updates an existing driver.
      * The input {@code driverWithUpdates} should be the complete new state.
+     *
      * @throws ResourceNotFoundException if the driver with the given ID does not exist or is deleted.
      */
     @Override

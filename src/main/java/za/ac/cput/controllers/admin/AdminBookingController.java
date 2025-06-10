@@ -7,14 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import za.ac.cput.domain.dto.request.BookingRequestDTO;
+import za.ac.cput.domain.dto.request.BookingUpdateDTO;
+import za.ac.cput.domain.dto.response.BookingResponseDTO;
 import za.ac.cput.domain.entity.Booking;
 import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.entity.Driver;
-import za.ac.cput.domain.dto.request.BookingRequestDTO;
-import za.ac.cput.domain.dto.request.BookingUpdateDTO;
-import za.ac.cput.domain.enums.BookingStatus;
 import za.ac.cput.domain.entity.security.User;
-import za.ac.cput.domain.dto.response.BookingResponseDTO;
+import za.ac.cput.domain.enums.BookingStatus;
 import za.ac.cput.domain.mapper.BookingMapper;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.IBookingService;
@@ -318,6 +318,7 @@ public class AdminBookingController {
         BookingResponseDTO canceledDto = BookingMapper.toDto(updatedBooking);
         return ResponseEntity.ok(canceledDto);
     }
+
     /**
      * Retrieves bookings that are confirmed and scheduled for collection today.
      * Intended for staff to prepare for customer pickups.
@@ -336,4 +337,5 @@ public class AdminBookingController {
         }
         return ResponseEntity.ok(BookingMapper.toDtoList(bookings));
     }
+
 }

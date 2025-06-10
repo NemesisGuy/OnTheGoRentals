@@ -20,7 +20,7 @@ import java.util.UUID;
  * Implementation of the {@link ICarService} interface.
  * Provides business logic for managing Car entities.
  * Entities are treated as immutable; updates are performed using a Builder pattern.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Updated by: Peter Buckingham
  * Updated: 2025-05-30
@@ -202,5 +202,11 @@ public class CarServiceImpl implements ICarService {
     public List<Car> findAllAvailableByPriceGroup(PriceGroup priceGroup) {
         log.warn("Calling findAllAvailableByPriceGroup, which is functionally similar to getAvailableCarsByPrice. Consolidate if possible.");
         return carRepository.findAllByAvailableTrueAndDeletedFalseAndPriceGroup(priceGroup);
+    }
+
+    @Override
+    public List<Car> getAvailableCars() {
+        log.debug("Fetching all available and non-deleted cars.");
+        return carRepository.findAllByAvailableTrueAndDeletedFalse();
     }
 }

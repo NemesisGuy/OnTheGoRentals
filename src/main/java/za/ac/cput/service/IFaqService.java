@@ -10,7 +10,7 @@ import java.util.UUID;
  * Interface defining the contract for FAQ (Frequently Asked Questions) services.
  * Extends the generic {@link IService} for basic CRUD operations and adds
  * specific methods for retrieving FAQs.
- *
+ * <p>
  * Author: Aqeel Hanslo (219374422) // Assuming from previous context
  * Date: [Original Date - e.g., 29 August 2023 from previous context]
  * Updated by: Peter Buckingham

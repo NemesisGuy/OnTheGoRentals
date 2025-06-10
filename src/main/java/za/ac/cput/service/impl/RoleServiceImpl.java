@@ -14,7 +14,6 @@ import za.ac.cput.service.IRoleService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-// No 'java.util.Optional' import needed here if repository doesn't return it for findByRoleName
 import java.util.stream.Collectors;
 
 /**
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
  * Implementation of the {@link IRoleService} interface.
  * Provides services for finding roles and resolving role names to {@link Role} entities.
  * Assumes IRoleRepository.findByRoleName(RoleName) returns a Role object or null.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-28
  * Updated by: Peter Buckingham

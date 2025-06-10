@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.security.RefreshToken;
 import za.ac.cput.domain.entity.security.User;
-import za.ac.cput.exception.ResourceNotFoundException; // For user not found
+import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.exception.TokenRefreshException;
 import za.ac.cput.repository.IRefreshTokenRepository;
 import za.ac.cput.repository.IUserRepository;
@@ -22,7 +22,7 @@ import java.util.UUID;
  * Implementation of the {@link IRefreshTokenService} interface.
  * Manages the lifecycle of refresh tokens, including creation, verification,
  * and deletion. Refresh tokens are persisted in the database.
- *
+ * <p>
  * Author: [Original Author Name - Please specify if known]
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham
@@ -32,12 +32,10 @@ import java.util.UUID;
 public class RefreshTokenServiceImpl implements IRefreshTokenService {
 
     private static final Logger log = LoggerFactory.getLogger(RefreshTokenServiceImpl.class);
-
-    @Value("${jwt.refresh-token.expiration-ms}")
-    private Long refreshTokenDurationMs;
-
     private final IRefreshTokenRepository refreshTokenRepository;
     private final IUserRepository userRepository; // Corrected variable name
+    @Value("${jwt.refresh-token.expiration-ms}")
+    private Long refreshTokenDurationMs;
 
     /**
      * Constructs the RefreshTokenServiceImpl.

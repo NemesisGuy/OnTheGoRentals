@@ -7,11 +7,11 @@ package za.ac.cput.service;
  *
  * @param <T>  The type of the entity managed by the service.
  * @param <ID> The type of the ID of the entity.
- *
- * Author: Peter Buckingham (220165289)
- * Date: [Original Date of IService creation - Please specify if known]
- * Updated by: Peter Buckingham
- * Updated: 2025-05-29
+ *             <p>
+ *             Author: Peter Buckingham (220165289)
+ *             Date: [Original Date of IService creation - Please specify if known]
+ *             Updated by: Peter Buckingham
+ *             Updated: 2025-05-29
  */
 public interface IService<T, ID> {
 
@@ -46,7 +46,7 @@ public interface IService<T, ID> {
      *
      * @param id The ID of the entity to delete.
      * @return {@code true} if the entity was successfully deleted, {@code false} otherwise
-     *         (e.g., if the entity was not found).
+     * (e.g., if the entity was not found).
      */
     boolean delete(ID id);
 }

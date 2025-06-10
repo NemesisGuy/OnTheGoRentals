@@ -1,581 +1,352 @@
 package za.ac.cput.service.impl;
 
-// Using org.springframework.transaction.annotation.Transactional for Spring's AOP-based transactions
-import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.Booking;
 import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.entity.Driver;
 import za.ac.cput.domain.entity.Rental;
+import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.enums.BookingStatus;
 import za.ac.cput.domain.enums.RentalStatus;
-import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.exception.UserCantRentMoreThanOneCarException;
-import za.ac.cput.factory.impl.RentalFactory; // Assuming still used for some default/complex initializations
-import za.ac.cput.repository.BookingRepository;
+import za.ac.cput.factory.impl.RentalFactory;
 import za.ac.cput.repository.CarRepository;
 import za.ac.cput.repository.RentalRepository;
-import za.ac.cput.service.*; // Import all service interfaces from the package
+import za.ac.cput.service.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
  * RentalServiceImpl.java
  * Implementation of the {@link IRentalService} interface.
  * Manages the lifecycle of rentals, including creation, retrieval, updates,
- * and status changes (confirm, cancel, complete). Interacts with User, Car,
- * and Booking services/repositories as needed.
- * Entities are treated as immutable; updates are performed using a Builder pattern with a copy method.
+ * and status changes. This version uses a builder with an 'applyTo'
+ * method to update managed JPA entities, preserving the entity's immutable public API.
  *
  * Author: Peter Buckingham (220165289)
- * Date: [Original Date - e.g. 10 April 2023]
- * Updated by: Peter Buckingham
- * Updated: 2025-05-30
+ * Updated: 2024-06-07
  */
 @Service("rentalServiceImpl")
+@Transactional
 public class RentalServiceImpl implements IRentalService {
 
     private static final Logger log = LoggerFactory.getLogger(RentalServiceImpl.class);
 
     private final RentalRepository rentalRepository;
-    private final CarRepository carRepository; // Direct repository for car state updates
-    private final BookingRepository bookingRepository; // For checking booking overlaps
-    private final RentalFactory rentalFactory; // If it provides more than simple builder instantiation
-    private final IUserService userService;
+    private final CarRepository carRepository;
+    private final ICarService carService;
     private final IBookingService bookingService;
-    private final ICarService carService; // For high-level car operations like read by UUID
+    private final IUserService userService;
     private final IDriverService driverService;
+    private final RentalFactory rentalFactory;
 
     @Autowired
-    public RentalServiceImpl(RentalRepository rentalRepository,
-                             CarRepository carRepository,
-                             BookingRepository bookingRepository,
-                             RentalFactory rentalFactory,
-                             IUserService userService,
-                             IBookingService bookingService,
-                             ICarService carService,
-                             IDriverService driverService) {
-        log.info("Initializing RentalServiceImpl with dependencies.");
+    public RentalServiceImpl(RentalRepository rentalRepository, CarRepository carRepository, ICarService carService, IBookingService bookingService, IUserService userService, IDriverService driverService, RentalFactory rentalFactory) {
         this.rentalRepository = rentalRepository;
         this.carRepository = carRepository;
-        this.bookingRepository = bookingRepository;
-        this.rentalFactory = rentalFactory;
-        this.userService = userService;
-        this.bookingService = bookingService;
         this.carService = carService;
+        this.bookingService = bookingService;
+        this.userService = userService;
         this.driverService = driverService;
+        this.rentalFactory = rentalFactory;
         log.info("RentalServiceImpl initialized.");
     }
 
-    // --- Private Helper Methods ---
-    private boolean isCarAvailableByCarId(Car car) {
-        if (car == null || car.getId() == 0) { // Check for null or unpersisted car ID
-            log.error("isCarAvailableByCarId check failed: Car entity or its ID is null/invalid.");
-            throw new IllegalArgumentException("Car entity and its ID must be valid for availability check.");
-        }
-        log.debug("Checking availability for car (by entity) ID: {}", car.getId());
-        // CarRepository should have a method that checks the 'available' flag and 'deleted' flag
-        boolean available = carRepository.existsByIdAndAvailableTrueAndDeletedFalse(car.getId());
-        log.debug("Car ID: {} (by entity) availability status: {}", car.getId(), available);
-        return available;
-    }
-
-    private String generateCarNotAvailableErrorMessage(Car car) {
-        if (car == null) return "The specified car is not available.";
-        return String.format("%s %s (License: %s) is not available for rental at this time.",
-                car.getMake(), car.getModel(), car.getLicensePlate());
-    }
-
-    private String generateUserRentingErrorMessage(User user) {
-        if (user == null) return "The user is already renting a car.";
-        Rental currentRental = getCurrentRental(user);
-        if (currentRental != null && currentRental.getCar() != null) {
-            Car rentedCar = currentRental.getCar();
-            return String.format("%s %s is currently renting %s %s (License: %s).",
-                    user.getFirstName(), user.getLastName(),
-                    rentedCar.getMake(), rentedCar.getModel(), rentedCar.getLicensePlate());
-        }
-        return String.format("%s %s is currently renting another car.", user.getFirstName(), user.getLastName());
-    }
-
-    // --- Public Service Methods from IRentalService ---
-
+    /**
+     * {@inheritDoc}
+     * This method is for creating a new Rental from raw data, strictly using the builder pattern.
+     */
     @Override
-    @Transactional
-    public Rental create(Rental rentalDataFromController) {
-        User user = rentalDataFromController.getUser();
-        Car carFromInput = rentalDataFromController.getCar(); // Car from input DTO/initial build
+    public Rental create(Rental rentalData) {
+        log.info("Attempting to create a new rental for user UUID {}", rentalData.getUser().getUuid());
 
-        log.info("Attempting to create rental for User ID: {} and Car ID: {}",
-                user != null ? user.getId() : "null", carFromInput != null ? carFromInput.getId() : "null");
+        User user = userService.read(rentalData.getUser().getUuid());
+        Car car = carService.read(rentalData.getCar().getUuid());
 
-        if (user == null || carFromInput == null) {
-            log.error("Rental creation failed: User or Car is null in the provided rental entity.");
-            throw new IllegalArgumentException("User and Car must be set in the Rental entity for creation.");
-        }
-        if (user.getId() == null || carFromInput.getId() == 0) { // Assuming Car ID is int and 0 means unpersisted
-            log.error("Rental creation failed: User ID or Car ID is null/invalid. Ensure entities are persisted or IDs are set.");
-            throw new IllegalArgumentException("User and Car must have valid IDs for rental creation.");
-        }
-
-        if (!isCarAvailableByCarId(carFromInput)) {
-            log.warn("Rental creation failed: Car ID {} is not available.", carFromInput.getId());
-            throw new CarNotAvailableException(generateCarNotAvailableErrorMessage(carFromInput));
+        if (car == null || !car.isAvailable()) {
+            throw new CarNotAvailableException("Car is not available for rental.");
         }
         if (isCurrentlyRenting(user)) {
-            log.warn("Rental creation failed: User ID {} is already renting another car.", user.getId());
-            throw new UserCantRentMoreThanOneCarException(generateUserRentingErrorMessage(user));
+            throw new UserCantRentMoreThanOneCarException("User is already renting a car.");
         }
 
-        // Mark car as unavailable *before* creating the final rental entity state
-        Car carToUpdate = carRepository.findById(carFromInput.getId()).orElseThrow(() -> new ResourceNotFoundException("Car not found during rental creation"));
-        Car carMadeUnavailable = Car.builder().copy(carToUpdate).setAvailable(false).build();
-        Car persistedUnavailableCar = carRepository.save(carMadeUnavailable);
-        log.info("Car ID {} marked as unavailable due to new rental.", persistedUnavailableCar.getId());
+        // Use the builder to modify the managed car entity
+        new Car.Builder().copy(car).setAvailable(false).applyTo(car);
+        log.info("Car UUID {} marked as unavailable for new rental.", car.getUuid());
 
-        // Now, use the 'persistedUnavailableCar' when building the rentalToCreate
-        // The rentalFactory.create might apply defaults or use builder logic.
-        // Assuming rentalDataFromController might be partial, factory completes it.
-        Rental tempRentalForFactory = new Rental.Builder()
-                .copy(rentalDataFromController)
-                .setCar(persistedUnavailableCar) // Use the car instance that's now unavailable
-                .build();
-        Rental rentalToCreate = rentalFactory.create(tempRentalForFactory); // Factory applies further logic/defaults
-
-        // Ensure essential fields are set by factory or @PrePersist, or set explicitly here if needed
-        if (rentalToCreate.getStatus() == null) {
-            rentalToCreate = new Rental.Builder().copy(rentalToCreate).setStatus(RentalStatus.ACTIVE).build();
-        }
-        if (rentalToCreate.getUuid() == null) {
-            rentalToCreate = new Rental.Builder().copy(rentalToCreate).setUuid(UUID.randomUUID()).build();
-        }
-        rentalToCreate = new Rental.Builder().copy(rentalToCreate).setDeleted(false).build();
-
+        // Construct the final rental object using the builder, NOT setters
+        Rental rentalToCreate = new Rental.Builder()
+                .copy(rentalData) // Copy initial data (dates, etc.) from the controller
+                .setUser(user)   // Set the managed User entity
+                .setCar(car)     // Set the managed Car entity (which is now unavailable)
+                .setStatus(RentalStatus.ACTIVE) // Ensure status is set correctly
+                .build();        // Build the final object
 
         Rental savedRental = rentalRepository.save(rentalToCreate);
-        log.info("Successfully created rental. ID: {}, UUID: '{}' for User ID: {}, Car ID: {}",
-                savedRental.getId(), savedRental.getUuid(), savedRental.getUser().getId(), savedRental.getCar().getId());
+        log.info("Successfully created new rental with UUID: {}", savedRental.getUuid());
         return savedRental;
     }
 
+    /**
+     * {@inheritDoc}
+     * This method orchestrates the entire business process of converting a confirmed booking
+     * into an active rental. It operates within a single database transaction, ensuring that
+     * all steps either succeed together or fail together, leaving the database in a
+     * consistent state.
+     */
     @Override
     @Transactional
     public Rental createRentalFromBooking(UUID bookingUuid, UUID issuerId, UUID driverUuid, LocalDateTime actualIssuedDate) {
-        log.info("Attempting to create rental from Booking UUID: {}", bookingUuid);
+        log.info("Service: Starting transaction to create rental from Booking UUID: {}", bookingUuid);
 
+        // 1. Fetch the source Booking
         Booking booking = bookingService.read(bookingUuid);
-        if (booking == null) {
-            log.warn("Rental creation from booking failed: Booking UUID '{}' not found.", bookingUuid);
-            throw new ResourceNotFoundException("Booking not found with UUID: " + bookingUuid);
-        }
+
+        // 2. Validate the state of the booking
         if (booking.getStatus() != BookingStatus.CONFIRMED) {
-            log.warn("Rental creation from booking failed: Booking UUID '{}' is not in CONFIRMED status. Current status: {}", bookingUuid, booking.getStatus());
             throw new IllegalStateException("Booking must be in CONFIRMED status to create a rental. Current status: " + booking.getStatus());
         }
 
-        Car carFromBooking = booking.getCar();
-        if (carFromBooking == null) {
-            log.error("Rental creation from booking failed: Booking UUID '{}' has no associated car.", bookingUuid);
-            throw new ResourceNotFoundException("Car not found for booking UUID: " + bookingUuid);
-        }
-        // Fetch the definitive current state of the car
-        Car carToRent = carService.read(carFromBooking.getUuid());
-        if (carToRent == null || !carToRent.isAvailable()) {
-            log.warn("Rental creation from booking failed: Car UUID '{}' for booking '{}' is no longer available or not found.",
-                    carFromBooking.getUuid(), bookingUuid);
-            throw new CarNotAvailableException("The car (UUID: " + carFromBooking.getUuid() + ") for this booking is no longer available.");
+        // 3. Validate the state of the Car
+        Car carToRent = carService.read(booking.getCar().getUuid());
+        if (!carToRent.isAvailable()) {
+            throw new CarNotAvailableException("Car '" + carToRent.getMake() + " " + carToRent.getModel() + "' is no longer available.");
         }
 
+        // 4. Gather all required entities
         User user = booking.getUser();
-        Driver driver = null;
-        if (driverUuid != null) {
-            driver = driverService.read(driverUuid);
-            if (driver == null) {
-                log.warn("Driver with UUID {} not found during rental creation from booking. Proceeding without driver.", driverUuid);
-            }
-        } else if (booking.getDriver() != null) {
-            driver = booking.getDriver();
-        }
+        // The driver can be newly assigned at pickup or taken from the original booking
+        Driver driver = (driverUuid != null) ? driverService.read(driverUuid) : booking.getDriver();
+        User issuer = userService.read(issuerId); // Fetch the staff member performing the action
 
-        // Mark car as unavailable
-        Car carMadeUnavailable = Car.builder().copy(carToRent).setAvailable(false).build();
-        carService.update(carMadeUnavailable); // Use ICarService to update
-        log.info("Car ID: {}, UUID: {} marked as unavailable via carService.", carMadeUnavailable.getId(), carMadeUnavailable.getUuid());
+        // 5. Create the new Rental entity using the factory
+        // The factory should correctly set the `returnedDate` to null by default.
+        Rental newRental = rentalFactory.create(
+                user,
+                carToRent,
+                driver,
+                issuer.getUuid(), // Pass the full User entity
+                actualIssuedDate != null ? actualIssuedDate : LocalDateTime.now(), // The RENTAL START DATE
+                booking.getEndDate(), // The EXPECTED RETURN DATE
+                null // The EXPECTED RETURN DATE
+        );
 
-        Rental newRental = new Rental.Builder()
-                .setUser(user)
-                .setCar(carMadeUnavailable) // Use the car instance that is now marked unavailable
-                .setDriver(driver)
-                .setIssuedDate(actualIssuedDate != null ? actualIssuedDate : LocalDateTime.now())
-                .setExpectedReturnDate(booking.getEndDate())
-                .setStatus(RentalStatus.ACTIVE)
-                .setIssuer(issuerId != null ? issuerId : UUID.randomUUID()) // Assuming 0 or another value means system/unassigned
-                .setDeleted(false)
-                // Rental's @PrePersist or Builder.build() will handle UUID, createdAt, updatedAt
-                .build();
+        // The actual return date is intentionally null at creation.
+        log.debug("New rental object created. Actual return date is null as expected.");
 
         Rental createdRental = rentalRepository.save(newRental);
-        log.info("Successfully created Rental ID: {}, UUID: {} from Booking UUID: {}",
-                createdRental.getId(), createdRental.getUuid(), bookingUuid);
+        log.info("Successfully created and saved Rental UUID {}", createdRental.getUuid());
 
-        Booking bookingToUpdate = new Booking.Builder().copy(booking)
-                .setStatus(BookingStatus.RENTAL_INITIATED)
-                .build();
-        bookingService.update(bookingToUpdate);
-        log.info("Booking UUID: {} status updated to RENTAL_INITIATED.", booking.getUuid());
+        // 6. Update the Car's status and persist the change
+        Car.Builder carBuilder = new Car.Builder();
+        carBuilder.copy(carToRent)
+                .setAvailable(false) // Mark the car as unavailable
+                .applyTo(carToRent); // Apply changes to the managed entity
+        carRepository.save(carToRent);
+        log.info("Car UUID {} marked as unavailable.", carToRent.getUuid());
 
+        // 7. Update the Booking's status and persist the change
+        Booking.Builder bookingBuilder = new Booking.Builder();
+        bookingBuilder.copy(booking)
+                .setStatus(BookingStatus.RENTAL_INITIATED) // Update the booking status
+                .applyTo(booking); // Apply changes to the managed entity
+
+        bookingService.update(booking);
+        log.info("Booking UUID {} status updated to RENTAL_INITIATED.", booking.getUuid());
+
+        // The transaction commits here, making all changes permanent.
         return createdRental;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Rental read(Integer id) {
-        log.debug("Attempting to read rental by internal ID: {}", id);
+        log.debug("Reading rental by ID: {}", id);
         return rentalRepository.findByIdAndDeletedFalse(id).orElse(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Rental read(UUID uuid) {
-        log.debug("Attempting to read rental by UUID: '{}'", uuid);
+        log.debug("Reading rental by UUID: {}", uuid);
         return rentalRepository.findByUuidAndDeletedFalse(uuid).orElse(null);
     }
 
+    /**
+     * {@inheritDoc}
+     * This method uses the Builder's `applyTo` method to update the managed entity,
+     * preserving the immutable public API of the Rental class.
+     */
     @Override
-    @Transactional
     public Rental update(Rental rentalWithUpdates) {
         Integer rentalId = rentalWithUpdates.getId();
-        log.info("Attempting to update rental. ID: {}", rentalId);
+        log.info("Attempting to update rental ID: {}", rentalId);
 
-        if (rentalId == null) {
-            log.error("Update failed: Rental ID is null.");
-            throw new IllegalArgumentException("Rental ID cannot be null for an update operation.");
-        }
-        // Fetch existing to ensure it's a valid, non-deleted rental before proceeding
+        if (rentalId == null) throw new IllegalArgumentException("Rental ID is required for an update.");
+
         Rental existingRental = rentalRepository.findByIdAndDeletedFalse(rentalId)
-                .orElseThrow(() -> {
-                    log.warn("Update failed: Rental not found or is deleted for ID: {}", rentalId);
-                    return new ResourceNotFoundException("Rental not found with ID: " + rentalId + " for update.");
-                });
+                .orElseThrow(() -> new ResourceNotFoundException("Rental not found with ID: " + rentalId));
 
-        Car carFromUpdate = rentalWithUpdates.getCar();
-        if (carFromUpdate == null || carFromUpdate.getId() == 0) { // Or carFromUpdate.getId() == null if Integer
-            log.error("Update failed for rental ID {}: Associated car or car ID is null/invalid in the update data.", rentalId);
-            throw new IllegalStateException("Rental entity must have a valid associated car for update.");
-        }
+        updateCarAvailabilityOnStatusChange(existingRental.getCar(), existingRental.getStatus(), rentalWithUpdates.getStatus());
 
-        // Fetch the definitive current state of the car to be associated, especially if carUuid might have changed
-        Car carToAssociateWithRental = carService.read(carFromUpdate.getUuid());
-        if (carToAssociateWithRental == null) {
-            log.error("Update failed for rental ID {}: Car UUID {} provided in update data not found.", rentalId, carFromUpdate.getUuid());
-            throw new ResourceNotFoundException("Car with UUID " + carFromUpdate.getUuid() + " not found for rental update.");
-        }
+        new Rental.Builder()
+                .copy(rentalWithUpdates)
+                .setCreatedAt(existingRental.getCreatedAt())
+                .setUuid(existingRental.getUuid())
+                .applyTo(existingRental);
 
-
-        boolean carAvailabilityNeedsUpdate = false;
-        Car carStateToSave = carToAssociateWithRental;
-
-        // Logic for car availability:
-        // 1. If rental is being COMPLETED or CANCELLED, car becomes available.
-        // 2. If rental is becoming ACTIVE (and wasn't returned), car becomes unavailable.
-        if ((rentalWithUpdates.getStatus() == RentalStatus.COMPLETED || rentalWithUpdates.getStatus() == RentalStatus.CANCELLED) &&
-                !carToAssociateWithRental.isAvailable()) {
-            carStateToSave = Car.builder().copy(carToAssociateWithRental).setAvailable(true).build();
-            carAvailabilityNeedsUpdate = true;
-            log.info("Car ID {} will be marked as available as rental ID {} status is {} or {}.",
-                    carToAssociateWithRental.getId(), rentalId, RentalStatus.COMPLETED, RentalStatus.CANCELLED);
-        } else if (rentalWithUpdates.getStatus() == RentalStatus.ACTIVE &&
-                rentalWithUpdates.getReturnedDate() == null && // Ensure it's not an update that also sets return date
-                carToAssociateWithRental.isAvailable()) {
-            carStateToSave = Car.builder().copy(carToAssociateWithRental).setAvailable(false).build();
-            carAvailabilityNeedsUpdate = true;
-            log.info("Car ID {} will be marked as unavailable as rental ID {} status is ACTIVE and not returned.",
-                    carToAssociateWithRental.getId(), rentalId);
-        }
-
-        if (carAvailabilityNeedsUpdate) {
-            carRepository.save(carStateToSave); // Persist car state change
-        }
-
-        // Ensure the rentalWithUpdates object uses the potentially updated carStateToSave
-        Rental finalRentalStateToSave = new Rental.Builder()
-                .copy(rentalWithUpdates) // This has the ID, UUID, and all desired fields from controller
-                .setCar(carStateToSave)   // Ensure it references the car instance whose availability we might have changed
-                .build(); // Builder sets updatedAt
-
-        Rental savedRental = rentalRepository.save(finalRentalStateToSave);
-        log.info("Successfully updated rental. ID: {}, UUID: '{}'", savedRental.getId(), savedRental.getUuid());
-        return savedRental;
+        log.info("Rental ID {} successfully updated. New status: {}", rentalId, existingRental.getStatus());
+        return existingRental;
     }
 
     @Override
     @Deprecated
-    @Transactional
-    public Rental update(int id, Rental rentalWithData) {
-        // ... (implementation as before, delegating to update(Rental)) ...
-        log.warn("Deprecated update(int, Rental) method called for rental ID: {}. Prefer update(Rental).", id);
-        if (rentalWithData.getId() == 0 || rentalWithData.getId() != id) { // ID is primitive int, check against 0
-            log.error("Update failed: ID mismatch or rental data ID is 0. Path ID: {}, Rental Data ID: {}", id, rentalWithData.getId());
-            throw new IllegalArgumentException("Rental ID in path and data must match and not be 0 for update via deprecated method.");
-        }
-        Rental rentalToUpdate = new Rental.Builder().copy(rentalWithData).setId(id).build();
-        return update(rentalToUpdate); // This will re-fetch using existsByIdAndDeletedFalse
+    public Rental update(int id, Rental rental) {
+        // This is now safe because the main update method will fetch the managed entity
+        // based on the ID set here.
+        new Rental.Builder().copy(rental).setId(id).applyTo(rental);
+        return update(rental);
     }
 
-
-    // In RentalServiceImpl.java
+    /**
+     * {@inheritDoc}
+     * Soft-deletes a rental by fetching the entity and using the builder's `applyTo` method.
+     */
     @Override
-    @Transactional
     public boolean delete(Integer id) {
-        log.info("Attempting to soft-delete rental with ID: {}", id);
-        Optional<Rental> rentalOpt = rentalRepository.findByIdAndDeletedFalse(id);
-        if (rentalOpt.isPresent()) {
-            Rental rental = rentalOpt.get();
-            Car originalCar = rental.getCar();
-            Car carToPersistInRental = originalCar; // Assume original car initially
-
-            // If the rental was active or confirmed and car was unavailable, make car available
-            if (originalCar != null && !originalCar.isAvailable() &&
-                    (rental.getStatus() == RentalStatus.ACTIVE /* || rental.getStatus() == RentalStatus.CONFIRMED */)) {
-                Car carMadeAvailable = Car.builder().copy(originalCar).setAvailable(true).build();
-                carRepository.save(carMadeAvailable); // Save the car with updated availability
-                carToPersistInRental = carMadeAvailable; // This is the car instance that should be in the saved Rental
-                log.info("Car ID {} associated with deleted (was ACTIVE) rental ID {} marked as available.", originalCar.getId(), id);
+        log.info("Attempting to soft-delete rental ID: {}", id);
+        return rentalRepository.findByIdAndDeletedFalse(id).map(rental -> {
+            Car car = rental.getCar();
+            if (car != null && !car.isAvailable() && rental.getStatus() == RentalStatus.ACTIVE) {
+                new Car.Builder().copy(car).setAvailable(true).applyTo(car);
+                log.info("Car UUID {} marked as available due to deletion of active rental ID {}", car.getUuid(), id);
             }
-
-            Rental deletedRental = new Rental.Builder()
-                    .copy(rental)
-                    .setDeleted(true)
-                    .setStatus(RentalStatus.CANCELLED)
-                    .setCar(carToPersistInRental) // <<< IMPORTANT: Set the car that reflects correct availability
-                    .build();
-            rentalRepository.save(deletedRental);
-            log.info("Rental ID: {} marked as deleted and status set to CANCELLED.", id);
+            new Rental.Builder().copy(rental).setDeleted(true).setStatus(RentalStatus.CANCELLED).applyTo(rental);
+            log.info("Rental ID {} successfully marked as deleted.", id);
             return true;
-        }
-        log.warn("Soft-delete failed: Rental not found or already deleted for ID: {}", id);
-        return false;
-    }
-    @Override
-    public List<Rental> getAll() {
-        log.debug("Fetching all non-deleted rentals.");
-        return rentalRepository.findAllByDeletedFalse();
+        }).orElse(false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean isCurrentlyRenting(User user) {
-        if (user == null || user.getId() == null) {
-            log.error("isCurrentlyRenting check failed: User or User ID is null.");
-            throw new IllegalArgumentException("User and User ID cannot be null for checking current rentals.");
-        }
-        log.debug("Checking if User ID: {} is currently renting (status ACTIVE, not returned, not deleted).", user.getId());
-        List<Rental> activeRentals = rentalRepository.findByUserIdAndStatusAndReturnedDateIsNullAndDeletedFalse(user.getId(), RentalStatus.ACTIVE);
-        boolean isRenting = !activeRentals.isEmpty();
-        log.debug("User ID: {} is currently renting: {}", user.getId(), isRenting);
-        return isRenting;
-    }
-
-    @Override
-    public Rental getCurrentRental(User user) {
-        // ... (implementation as before) ...
-        if (user == null || user.getId() == null) {
-            log.error("getCurrentRental failed: User or User ID is null.");
-            throw new IllegalArgumentException("User and User ID cannot be null for fetching current rental.");
-        }
-        log.debug("Fetching current rental for User ID: {} (status ACTIVE, not returned, not deleted).", user.getId());
-        List<Rental> activeRentals = rentalRepository.findByUserIdAndStatusAndReturnedDateIsNullAndDeletedFalse(user.getId(), RentalStatus.ACTIVE);
-        if (!activeRentals.isEmpty()) {
-            Rental currentRental = activeRentals.get(0);
-            log.debug("User ID: {} has an active rental. ID: {}, UUID: '{}'", user.getId(), currentRental.getId(), currentRental.getUuid());
-            if (activeRentals.size() > 1) {
-                log.warn("User ID: {} has multiple rentals with status ACTIVE and no return date. Data integrity issue suspected. Returning the first one found.", user.getId());
-            }
-            return currentRental;
-        }
-        log.debug("User ID: {} has no active rentals.", user.getId());
-        return null;
-    }
-
-    @Override
-    public boolean existsById(Integer id) {
-        log.debug("Checking if rental exists by ID: {}", id);
-        return rentalRepository.existsByIdAndDeletedFalse(id);
-    }
-
-    @Override
-    public List<Rental> getRentalHistoryByUser(User user) {
-        // ... (implementation as before) ...
-        if (user == null || user.getId() == null) {
-            log.error("getRentalHistoryByUser failed: User or User ID is null.");
-            throw new IllegalArgumentException("User and User ID cannot be null for fetching rental history.");
-        }
-        log.debug("Fetching all non-deleted rental history for User ID: {}", user.getId());
-        List<Rental> rentals = rentalRepository.findByUserIdAndDeletedFalse(user.getId());
-        log.debug("Found {} rental entries for User ID: {}", rentals.size(), user.getId());
-        return rentals;
-    }
-
-    @Override
-    @Transactional
-    public Rental confirmRentalByUuid(UUID rentalUuid) {
-        log.info("Attempting to confirm rental with UUID: '{}'", rentalUuid);
-        Rental rental = read(rentalUuid);
-        if (rental == null) {
-            log.warn("Confirmation failed: Rental not found with UUID: '{}'", rentalUuid);
-            throw new ResourceNotFoundException("Rental not found with UUID: " + rentalUuid + " for confirmation.");
-        }
-       // If the rental is ALREADY ACTIVE (default on creation from booking), this might just be a verification step.
-        if (rental.getStatus() != RentalStatus.ACTIVE  /* if status was from booking initially */) {
-            // This logic depends on what "confirm" means in your workflow for a Rental.
-            // If a Rental is created directly in ACTIVE state from a Booking, this check might change.
-            // Let's assume for now it should be coming from a state that *can* be confirmed into ACTIVE
-            // or it's re-affirming an ACTIVE state.
-            log.warn("Rental UUID '{}' current status is {}. Business logic for 'confirm' might need review if it's not already active or ready to be active.", rentalUuid, rental.getStatus());
-            // For now, we will ensure it becomes/stays ACTIVE
-        }
-
-        Car car = rental.getCar();
-        if (car == null) {
-            log.error("Confirmation failed for rental UUID '{}': Associated car not found.", rentalUuid);
-            throw new ResourceNotFoundException("Associated car not found for rental UUID: " + rentalUuid);
-        }
-
-        Car carToPersist = car;
-        if (car.isAvailable()) {
-            carToPersist = Car.builder().copy(car).setAvailable(false).build();
-            carRepository.save(carToPersist);
-            log.info("Car ID {} marked as unavailable upon rental UUID '{}' confirmation.", car.getId(), rentalUuid);
-        }
-
-        // Build the new state for the rental
-        Rental rentalToSave = new Rental.Builder().copy(rental)
-                .setStatus(RentalStatus.ACTIVE) // Ensure status is ACTIVE
-                .setCar(carToPersist) // Ensure it has the car (possibly updated availability)
-                // If confirmation also implies setting issuedDate to now:
-                // .setIssuedDate(LocalDateTime.now())
-                .build();
-
-        Rental savedRental = rentalRepository.save(rentalToSave);
-        log.info("Successfully confirmed rental (or ensured ACTIVE state). ID: {}, UUID: '{}'", savedRental.getId(), savedRental.getUuid());
-        return savedRental;
-    }
-
-
-    @Override
-    @Transactional
-    public Rental cancelRentalByUuid(UUID rentalUuid) {
-        // ... (implementation as before, ensure car is updated with builder) ...
-        log.info("Attempting to cancel rental with UUID: '{}'", rentalUuid);
-        Rental rental = read(rentalUuid);
-        if (rental == null) {
-            log.warn("Cancellation failed: Rental not found with UUID: '{}'", rentalUuid);
-            throw new ResourceNotFoundException("Rental not found with UUID: " + rentalUuid);
-        }
-        if (rental.getStatus() == RentalStatus.COMPLETED) {
-            log.warn("Cancellation failed for rental UUID '{}': Cannot cancel a COMPLETED rental.", rentalUuid);
-            throw new IllegalStateException("Cannot cancel a rental that is already COMPLETED.");
-        }
-        if (rental.getStatus() == RentalStatus.CANCELLED) {
-            log.info("Rental UUID '{}' is already CANCELLED.", rentalUuid);
-            return rental;
-        }
-
-        Car car = rental.getCar();
-        Car carToPersistInRental = car;
-        if (car != null && !car.isAvailable()) {
-            Car carMadeAvailable = Car.builder().copy(car).setAvailable(true).build();
-            carRepository.save(carMadeAvailable);
-            carToPersistInRental = carMadeAvailable;
-            log.info("Car ID {} marked as available upon rental UUID '{}' cancellation.", car.getId(), rentalUuid);
-        }
-
-        Rental cancelledRental = new Rental.Builder().copy(rental)
-                .setStatus(RentalStatus.CANCELLED)
-                .setCar(carToPersistInRental) // Set the car with updated availability
-                .build();
-        Rental savedRental = rentalRepository.save(cancelledRental);
-        log.info("Successfully cancelled rental. ID: {}, UUID: '{}'", savedRental.getId(), savedRental.getUuid());
-        return savedRental;
-    }
-
-    @Override
-    @Transactional
     public Rental completeRentalByUuid(UUID rentalUuid, double fineAmount) {
-        // ... (implementation as before, ensure car is updated with builder) ...
-        log.info("Attempting to complete rental with UUID: '{}', Fine amount: {}", rentalUuid, fineAmount);
+        log.info("Completing rental UUID: {}", rentalUuid);
         Rental rental = read(rentalUuid);
-        if (rental == null) {
-            log.warn("Completion failed: Rental not found with UUID: '{}'", rentalUuid);
-            throw new ResourceNotFoundException("Rental not found with UUID: " + rentalUuid);
-        }
-        if (rental.getStatus() != RentalStatus.ACTIVE) {
-            log.warn("Completion failed for rental UUID '{}': Rental is not ACTIVE. Current status: {}", rentalUuid, rental.getStatus());
-            throw new IllegalStateException("Only ACTIVE rentals can be completed. Current status: " + rental.getStatus());
-        }
-        // ... (fine amount check) ...
+        if (rental == null) throw new ResourceNotFoundException("Rental not found: " + rentalUuid);
+        if (rental.getStatus() != RentalStatus.ACTIVE) throw new IllegalStateException("Only an ACTIVE rental can be completed.");
 
         Car car = rental.getCar();
-        Car carToPersistInRental = car;
         if (car != null) {
-            Car carMadeAvailable = Car.builder().copy(car).setAvailable(true).build();
-            carRepository.save(carMadeAvailable);
-            carToPersistInRental = carMadeAvailable;
-            log.info("Car ID {} marked as available upon rental UUID '{}' completion.", car.getId(), rentalUuid);
+            new Car.Builder().copy(car).setAvailable(true).applyTo(car);
+            log.info("Car UUID {} marked as available upon rental completion.", car.getUuid());
         }
 
-        Rental completedRentalUpdate = new Rental.Builder().copy(rental)
+        new Rental.Builder().copy(rental)
                 .setStatus(RentalStatus.COMPLETED)
                 .setReturnedDate(LocalDateTime.now())
                 .setFine((int) fineAmount)
-                .setCar(carToPersistInRental)
-                .build();
-        Rental savedRental = rentalRepository.save(completedRentalUpdate);
-        log.info("Successfully completed rental. ID: {}, UUID: '{}'. Fine: {}", savedRental.getId(), savedRental.getUuid(), fineAmount);
-        return savedRental;
+                .applyTo(rental);
+
+        log.info("Rental UUID {} completed successfully.", rentalUuid);
+        return rental;
     }
 
-    // --- Methods for Due/Overdue Rentals (implementation as before) ---
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<Rental> findRentalsDueToday() { /* ... as before ... */
-        LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.atTime(23, 59, 59, 999999999);
-        log.debug("Finding rentals due today (between {} and {}) with status ACTIVE and no actual return date.", startOfDay, endOfDay);
-        return rentalRepository.findByExpectedReturnDateBetweenAndStatusAndReturnedDateIsNullAndDeletedFalse(
-                startOfDay, endOfDay, RentalStatus.ACTIVE);
-    }
-    @Override
-    public List<Rental> findOverdueRentals() { /* ... as before ... */
-        LocalDateTime now = LocalDateTime.now();
-        log.debug("Finding overdue rentals (expected return date before {} AND status ACTIVE AND no actual return date).", now);
-        return rentalRepository.findByExpectedReturnDateBeforeAndStatusAndReturnedDateIsNullAndDeletedFalse(
-                now, RentalStatus.ACTIVE);
-    }
-    @Override
-    public List<Rental> findRentalsDueOnDate(LocalDate specificDate) { /* ... as before ... */
-        if (specificDate == null) {
-            log.warn("Specific date provided for findRentalsDueOnDate is null. Returning empty list.");
-            return Collections.emptyList();
+    public Rental cancelRentalByUuid(UUID rentalUuid) {
+        log.info("Cancelling rental UUID: {}", rentalUuid);
+        Rental rental = read(rentalUuid);
+        if (rental == null) throw new ResourceNotFoundException("Rental not found: " + rentalUuid);
+        if (rental.getStatus() == RentalStatus.COMPLETED) throw new IllegalStateException("Cannot cancel a completed rental.");
+        if (rental.getStatus() == RentalStatus.CANCELLED) return rental;
+
+        Car car = rental.getCar();
+        if (car != null && !car.isAvailable()) {
+            new Car.Builder().copy(car).setAvailable(true).applyTo(car);
+            log.info("Car UUID {} marked as available upon rental cancellation.", car.getUuid());
         }
-        LocalDateTime startOfDay = specificDate.atStartOfDay();
-        LocalDateTime endOfDay = specificDate.atTime(23, 59, 59, 999999999);
-        log.debug("Finding rentals due on date {} (between {} and {}) with status ACTIVE and no actual return date.", specificDate, startOfDay, endOfDay);
-        return rentalRepository.findByExpectedReturnDateBetweenAndStatusAndReturnedDateIsNullAndDeletedFalse(
-                startOfDay, endOfDay, RentalStatus.ACTIVE);
+
+        new Rental.Builder().copy(rental).setStatus(RentalStatus.CANCELLED).applyTo(rental);
+        log.info("Rental UUID {} cancelled successfully.", rentalUuid);
+        return rental;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<Rental> findByUserIdAndReturnedDateIsNullAndDeletedFalse(Integer userId) {
-        log.debug("Fetching active (not returned, not deleted) rentals for User ID: {}", userId);
-        return rentalRepository.findByUserIdAndReturnedDateIsNullAndDeletedFalse(userId);
+    public Rental confirmRentalByUuid(UUID rentalUuid) {
+        log.info("Confirming rental UUID: {}", rentalUuid);
+        Rental rental = read(rentalUuid);
+        if (rental == null) throw new ResourceNotFoundException("Rental not found: " + rentalUuid);
+        if (rental.getStatus() == RentalStatus.ACTIVE) return rental;
+
+        Car car = rental.getCar();
+        if (car != null && car.isAvailable()) {
+            new Car.Builder().copy(car).setAvailable(false).applyTo(car);
+            log.info("Car UUID {} marked as unavailable upon rental confirmation.", car.getUuid());
+        }
+
+        new Rental.Builder().copy(rental).setStatus(RentalStatus.ACTIVE).applyTo(rental);
+        log.info("Rental UUID {} confirmed successfully.", rentalUuid);
+        return rental;
+    }
+
+    @Override public List<Rental> getAll() { return rentalRepository.findAllByDeletedFalse(); }
+    @Override public boolean isCurrentlyRenting(User user) { if(user==null || user.getId()==null) return false; return !rentalRepository.findByUserIdAndStatusAndReturnedDateIsNullAndDeletedFalse(user.getId(), RentalStatus.ACTIVE).isEmpty(); }
+    @Override public Rental getCurrentRental(User user) { if(user==null || user.getId()==null) return null; return rentalRepository.findByUserIdAndStatusAndReturnedDateIsNullAndDeletedFalse(user.getId(), RentalStatus.ACTIVE).stream().findFirst().orElse(null); }
+    @Override public boolean existsById(Integer id) { return rentalRepository.existsByIdAndDeletedFalse(id); }
+    @Override public List<Rental> getRentalHistoryByUser(User user) { if(user==null || user.getId()==null) return Collections.emptyList(); return rentalRepository.findByUserIdAndDeletedFalse(user.getId()); }
+    @Override public List<Rental> findRentalsDueToday() { LocalDateTime start = LocalDate.now().atStartOfDay(); LocalDateTime end = LocalDate.now().atTime(23, 59, 59); return rentalRepository.findByExpectedReturnDateBetweenAndStatusAndReturnedDateIsNullAndDeletedFalse(start, end, RentalStatus.ACTIVE); }
+    @Override public List<Rental> findOverdueRentals() { return rentalRepository.findByExpectedReturnDateBeforeAndStatusAndReturnedDateIsNullAndDeletedFalse(LocalDateTime.now(), RentalStatus.ACTIVE); }
+    @Override public List<Rental> findRentalsDueOnDate(LocalDate date) { LocalDateTime start = date.atStartOfDay(); LocalDateTime end = date.atTime(23, 59, 59); return rentalRepository.findByExpectedReturnDateBetweenAndStatusAndReturnedDateIsNullAndDeletedFalse(start, end, RentalStatus.ACTIVE); }
+
+    /**
+     * Finds all rentals that are currently considered "active".
+     * An active rental is defined as having the status ACTIVE, not being soft-deleted,
+     * and having no registered return date. This provides a robust and accurate
+     * representation of all cars currently in possession of a customer.
+     *
+     * @return A List of {@link Rental} entities that are currently active.
+     *         Returns an empty list if no active rentals are found.
+     */
+    @Override
+    public List<Rental> findActiveRentals() {
+        log.debug("Fetching all active rentals.");
+        List<Rental> activeRentals = rentalRepository.findByStatusAndReturnedDateIsNullAndDeletedFalse(RentalStatus.ACTIVE);
+        log.debug("Found {} active rentals.", activeRentals.size());
+        return activeRentals;
+    }
+
+    @Override public List<Rental> findByUserIdAndReturnedDateIsNullAndDeletedFalse(Integer userId) { return rentalRepository.findByUserIdAndReturnedDateIsNullAndDeletedFalse(userId); }
+
+    private void updateCarAvailabilityOnStatusChange(Car car, RentalStatus oldStatus, RentalStatus newStatus) {
+        if (car == null) return;
+        boolean wasActive = oldStatus == RentalStatus.ACTIVE;
+        boolean isNowTerminal = newStatus == RentalStatus.COMPLETED || newStatus == RentalStatus.CANCELLED;
+
+        if (wasActive && isNowTerminal && !car.isAvailable()) {
+            new Car.Builder().copy(car).setAvailable(true).applyTo(car);
+        } else if (!wasActive && newStatus == RentalStatus.ACTIVE && car.isAvailable()) {
+            new Car.Builder().copy(car).setAvailable(false).applyTo(car);
+        }
     }
 }

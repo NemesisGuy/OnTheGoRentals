@@ -6,7 +6,6 @@ import za.ac.cput.domain.dto.response.DriverResponseDTO;
 import za.ac.cput.domain.entity.Driver;
 
 import java.util.List;
-import java.util.UUID; // Not directly used in DTO->Entity mapping as UUID is generated
 import java.util.stream.Collectors;
 
 public class DriverMapper {

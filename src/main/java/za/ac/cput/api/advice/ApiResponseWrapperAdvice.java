@@ -3,6 +3,7 @@ package za.ac.cput.api.advice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.io.Resource; // Import the Resource class
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -10,27 +11,29 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import za.ac.cput.api.response.ApiResponse;
-import za.ac.cput.utils.SecurityUtils; // If you want to log requester for wrapped responses
+import za.ac.cput.controllers.FileController; // It's good practice to be specific
+import za.ac.cput.utils.SecurityUtils;
 
 /**
  * ApiResponseWrapperAdvice.java
- * A {@link ResponseBodyAdvice} that intercepts successful responses from controllers
- * within the specified base packages and wraps them in a standard {@link ApiResponse} envelope.
- * This ensures a consistent JSON structure for all successful API responses.
- *
- * Author: Peter Buckingham (220165289) // Assuming based on context
- * Date: [Date of creation - e.g., 2025-05-28]
- * Updated by: Peter Buckingham
- * Updated: 2025-05-28
+ * A {@link ResponseBodyAdvice} that intercepts and wraps successful responses
+ * from controllers in a standard {@link ApiResponse} envelope.
+ * It is configured to exclude file streaming endpoints.
+ * <p>
+ * Author: Peter Buckingham (220165289)
+ * Updated: 2024-06-07
  */
-@RestControllerAdvice(basePackages = "za.ac.cput.controllers") // IMPORTANT: Adjust to your REST controllers' package(s)
+@RestControllerAdvice(basePackages = "za.ac.cput.controllers")
 public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
 
     private static final Logger log = LoggerFactory.getLogger(ApiResponseWrapperAdvice.class);
 
     /**
-     * Determines if this advice should be applied to the given controller method's return type.
-     * It applies if the response is not already an {@link ApiResponse} or a ResponseEntity containing an ApiResponse.
+     * Determines if this advice should be applied.
+     * It will NOT apply if:
+     * 1. The method is in the FileController.
+     * 2. The return type is already an ApiResponse.
+     * 3. The return type is a Resource (for file streaming).
      *
      * @param returnType    The return type of the controller method.
      * @param converterType The selected HttpMessageConverter.
@@ -38,31 +41,41 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
      */
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+
+        // *** THE FIX: EXCLUDE THE ENTIRE FILECONTROLLER ***
+        // This is the simplest and most robust way to prevent wrapping file streams.
+        if (returnType.getContainingClass().equals(FileController.class)) {
+            log.trace("Skipping ApiResponse wrapping: Method is in FileController.");
+            return false;
+        }
+
+        // --- Alternative/Additional Checks for robustness ---
+
+        // Exclude if the method's return type is Resource or a subclass of Resource.
+        if (Resource.class.isAssignableFrom(returnType.getParameterType())) {
+            log.trace("Skipping ApiResponse wrapping: Return type is a Resource.");
+            return false;
+        }
+
         // Avoid wrapping if the return type is already ApiResponse
         if (ApiResponse.class.isAssignableFrom(returnType.getParameterType())) {
             log.trace("Skipping ApiResponse wrapping: Return type is already ApiResponse.");
             return false;
         }
+
         // Avoid wrapping if the return type is ResponseEntity<ApiResponse<...>>
-        // A more robust check for ResponseEntity<ApiResponse> might involve inspecting generic types carefully.
-        // This string check is a common approach but can be brittle.
         if (returnType.getGenericParameterType().getTypeName().startsWith("org.springframework.http.ResponseEntity<za.ac.cput.api.response.ApiResponse")) {
             log.trace("Skipping ApiResponse wrapping: Return type is ResponseEntity<ApiResponse>.");
             return false;
         }
-
-        // Add more specific exclusions if needed, e.g., for actuator endpoints, Swagger UI, etc.
-        // if (returnType.getDeclaringClass().getPackage().getName().startsWith("org.springdoc")) {
-        //     return false;
-        // }
 
         log.trace("Applying ApiResponse wrapping for return type: {}", returnType.getParameterType().getName());
         return true;
     }
 
     /**
-     * Modifies the response body before it's written by the HttpMessageConverter.
-     * Wraps the original body in an {@link ApiResponse} if it's not already one.
+     * Modifies the response body before it's written. This method will not be called
+     * for responses where supports() returns false (e.g., from FileController).
      *
      * @param body                  The original response body.
      * @param returnType            The return type of the controller method.
@@ -77,26 +90,17 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
                                   Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   ServerHttpRequest request, ServerHttpResponse response) {
 
-        String requesterId = SecurityUtils.getRequesterIdentifier(); // Get requester for context if needed
+        String requesterId = SecurityUtils.getRequesterIdentifier();
 
+        // This check is a safeguard, but supports() should have already filtered out this case.
         if (body instanceof ApiResponse) {
-            // This check is somewhat redundant if supports() already filters out ApiResponse,
-            // but acts as a safeguard.
             log.debug("Requester [{}]: Body is already an ApiResponse. Returning as is for path: {}", requesterId, request.getURI().getPath());
             return body;
         }
 
-        // Special handling for cases where Spring might return a String for an error view name
-        // or specific error scenarios not caught by ExceptionHandlers that produce structured errors.
-        // This is less common if controllers always return ResponseEntity or DTOs for success.
-        if (body instanceof String && !(selectedContentType != null && selectedContentType.includes(MediaType.APPLICATION_JSON))) {
-            // If it's a String and not explicitly JSON, it might be an error view or plain text.
-            // Decide if these should be wrapped or not. For API consistency, even string data could be wrapped.
-            log.debug("Requester [{}]: Wrapping String body in ApiResponse for path: {}", requesterId, request.getURI().getPath());
-        } else {
-            log.debug("Requester [{}]: Wrapping successful response body in ApiResponse for path: {}. Body type: {}",
-                    requesterId, request.getURI().getPath(), body != null ? body.getClass().getName() : "null");
-        }
+        log.debug("Requester [{}]: Wrapping successful response body in ApiResponse for path: {}. Body type: {}",
+                requesterId, request.getURI().getPath(), body != null ? body.getClass().getName() : "null");
+
         return new ApiResponse<>(body);
     }
 }

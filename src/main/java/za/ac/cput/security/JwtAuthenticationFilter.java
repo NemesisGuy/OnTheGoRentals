@@ -4,13 +4,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger; // Import SLF4J Logger
-import org.slf4j.LoggerFactory; // Import SLF4J LoggerFactory
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource; // For details
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,7 +22,7 @@ import java.io.IOException;
  * If a valid token is found in the Authorization header, it authenticates the user
  * and sets the {@link org.springframework.security.core.Authentication} object in the
  * {@link SecurityContextHolder}. This filter runs once per request.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham
@@ -95,8 +95,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         log.warn("Token was structurally valid but failed UserDetails validation for user '{}' and URI: {}", email, requestURI);
                     }
                 } else {
-                    if (email == null) log.warn("Email could not be extracted from a structurally valid token for URI: {}", requestURI);
-                    if (SecurityContextHolder.getContext().getAuthentication() != null) log.trace("Security context already populated for URI: {}", requestURI);
+                    if (email == null)
+                        log.warn("Email could not be extracted from a structurally valid token for URI: {}", requestURI);
+                    if (SecurityContextHolder.getContext().getAuthentication() != null)
+                        log.trace("Security context already populated for URI: {}", requestURI);
                 }
             } else {
                 log.debug("Token validation failed (e.g., expired, invalid signature) for token found in request to URI: {}", requestURI);

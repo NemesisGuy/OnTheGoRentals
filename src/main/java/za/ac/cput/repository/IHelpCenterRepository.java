@@ -24,7 +24,7 @@ public interface IHelpCenterRepository extends JpaRepository<HelpCenter, Integer
 
     Optional<HelpCenter> findByIdAndDeletedFalse(Integer integer);
 
-    List<HelpCenter>  findByDeletedFalse();
+    List<HelpCenter> findByDeletedFalse();
 
     List<HelpCenter> findByCategoryAndDeletedFalse(String category);
 

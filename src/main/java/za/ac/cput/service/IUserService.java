@@ -2,6 +2,7 @@ package za.ac.cput.service;
 
 // No HttpServletResponse needed here as this service won't handle cookies directly.
 // That will be the responsibility of AuthServiceImpl.
+
 import za.ac.cput.domain.entity.security.Role;
 import za.ac.cput.domain.entity.security.User;
 
@@ -13,10 +14,10 @@ import java.util.UUID;
  * Interface defining the contract for user data management services.
  * This includes User entity Create, Read, Update, Delete (CRUD) operations,
  * retrieving user collections, and managing associated roles.
- *
+ * <p>
  * Authentication-specific logic (login, registration process, token generation, logout)
  * is handled by a separate IAuthService.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-28
  */
@@ -67,7 +68,7 @@ public interface IUserService {
      * @param userUpdates A {@link User} entity containing the fields to update.
      *                    Password should be plain text if being changed. Roles should be managed entities.
      * @return The updated and persisted {@link User} entity.
-     * @throws za.ac.cput.exception.ResourceNotFoundException if the user with {@code userId} is not found.
+     * @throws za.ac.cput.exception.ResourceNotFoundException   if the user with {@code userId} is not found.
      * @throws za.ac.cput.exception.EmailAlreadyExistsException if the new email in {@code userUpdates} is already taken by another user.
      */
     User update(int userId, User userUpdates);
@@ -110,5 +111,16 @@ public interface IUserService {
      */
     User saveUser(User user);
 
+
+
     User save(User user);
+
+    /**
+     * Checks if a user with the given email already exists in the system.
+     * This is useful for validation during user creation or updates.
+     *
+     * @param email The email address to check.
+     * @return {@code true} if a user with the given email exists, {@code false} otherwise.
+     */
+    boolean existsByEmail(String email);
 }

@@ -8,21 +8,25 @@ public class CodeDuplicationDetector {
     public int detectDuplicates(String fileContent) {
         String[] lines = fileContent.split("\\r?\\n"); // Split content into lines
         Set<String> uniqueLines = new HashSet<>(); // To track unique lines
-        Set<String> duplicateLines = new HashSet<>(); // To track duplicates
+        Set<String> duplicatedLineValues = new HashSet<>(); // To track the distinct values of duplicated lines
 
         for (String line : lines) {
-            line = line.trim(); // Remove leading and trailing whitespace
+            String trimmedLine = line.trim(); // Remove leading and trailing whitespace
 
-            if (line.isEmpty()) {
+            if (trimmedLine.isEmpty()) {
                 continue; // Skip empty lines
             }
 
-            // Check if the line already exists in uniqueLines
-            if (!uniqueLines.add(line)) {
-                duplicateLines.add(line); // Add to duplicateLines if it's already in uniqueLines
+            // Normalize multiple spaces/tabs to a single space for more robust duplication detection
+            // String normalizedLine = trimmedLine.replaceAll("\\s+", " "); // Optional: can make it too aggressive
+
+            if (!uniqueLines.add(trimmedLine)) {
+                // If add returns false, it means the line was already in uniqueLines, so it's a duplicate
+                duplicatedLineValues.add(trimmedLine);
             }
         }
-
-        return duplicateLines.size(); // Return the count of unique duplicate lines
+        // This returns the count of *unique lines that are duplicated*.
+        // e.g., if "foo();" appears 3 times, it adds 1 to this count.
+        return duplicatedLineValues.size();
     }
 }

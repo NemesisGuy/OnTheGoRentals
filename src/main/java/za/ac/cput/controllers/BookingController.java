@@ -6,29 +6,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.entity.Booking;
-import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.dto.request.BookingRequestDTO;
-// Consider a BookingUpdateDTO if update fields differ significantly from creation
-// import za.ac.cput.domain.dto.request.BookingUpdateDTO;
 import za.ac.cput.domain.dto.response.BookingResponseDTO;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
 import za.ac.cput.domain.dto.response.UserResponseDTO;
+import za.ac.cput.domain.entity.Booking;
+import za.ac.cput.domain.entity.Car;
+import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.mapper.BookingMapper;
 import za.ac.cput.domain.mapper.CarMapper;
 import za.ac.cput.domain.mapper.UserMapper;
-import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.ResourceNotFoundException;
-import za.ac.cput.service.IBookingService; // Import interface
+import za.ac.cput.service.IBookingService;
 import za.ac.cput.service.ICarService;
 import za.ac.cput.service.IUserService;
-import za.ac.cput.utils.SecurityUtils; // Import your helper
+import za.ac.cput.utils.SecurityUtils;
 
-import java.time.LocalDateTime; // For logging potential dates
 import java.util.List;
 import java.util.UUID;
 
@@ -37,7 +32,7 @@ import java.util.UUID;
  * Controller for handling user-initiated booking operations.
  * Allows authenticated users to create, view, update, confirm, and cancel their bookings.
  * Also provides helper endpoints to list available cars and fetch the current user's profile.
- *
+ * <p>
  * Author: [Peter Buckingham]
  * Date: [2023-04-20]
  * Updated by: Peter Buckingham

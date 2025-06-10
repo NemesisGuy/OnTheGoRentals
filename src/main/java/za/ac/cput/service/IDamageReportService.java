@@ -3,14 +3,14 @@ package za.ac.cput.service;
 import za.ac.cput.domain.entity.DamageReport;
 
 import java.util.List;
-import java.util.Optional; // Kept as per original method signature
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * IDamageReportService.java
  * Interface defining the contract for Damage Report services.
  * Extends the generic {@link IService} for basic CRUD and adds specific retrieval methods.
- *
+ * <p>
  * Author: Cwenga Dlova (214310671)
  * Date: 08/09/2023
  * Updated by: Peter Buckingham
@@ -29,11 +29,12 @@ public interface IDamageReportService extends IService<DamageReport, Integer> {
      *
      * @param id The internal integer ID of the damage report.
      * @return An {@link Optional} containing the {@link DamageReport} if found and not deleted,
-     *         otherwise an empty Optional.
+     * otherwise an empty Optional.
      * @deprecated The generic {@link IService #read(Integer)} returns the entity or null, which is often simpler.
-     *             Consider aligning if {@code Optional} is not strictly needed across all {@code read(id)} methods.
+     * Consider aligning if {@code Optional} is not strictly needed across all {@code read(id)} methods.
      */
-    @Deprecated // If IService<T, Integer>.read(Integer) is preferred
+    @Deprecated
+    // If IService<T, Integer>.read(Integer) is preferred
     Optional<DamageReport> read(int id); // Original signature
 
     /**

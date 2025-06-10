@@ -14,6 +14,7 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
     Boolean existsByEmail(String email);
 
     Optional<User> findByEmail(String email);
+
     User findUserByEmail(String email);
 
     @Override
@@ -30,6 +31,7 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByUuidAndDeletedFalse(UUID uuid);
 
     boolean existsByEmailAndIdNot(String email, int userId);
+
 }
 
 

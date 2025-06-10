@@ -12,8 +12,8 @@ import za.ac.cput.domain.dto.request.HelpCenterUpdateDTO;
 import za.ac.cput.domain.dto.response.HelpCenterResponseDTO;
 import za.ac.cput.domain.entity.HelpCenter;
 import za.ac.cput.domain.mapper.HelpCenterMapper;
-import za.ac.cput.service.IHelpCenterService;
 import za.ac.cput.exception.ResourceNotFoundException;
+import za.ac.cput.service.IHelpCenterService;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +24,7 @@ import java.util.UUID;
  * Allows admins to create, retrieve, update, and delete help topics.
  * External identification of help topics is by UUID. Internal service operations
  * primarily use integer IDs. This controller bridges that gap.
- *
+ * <p>
  * Author: Aqeel Hanslo (219374422)
  * Updated by: System/AI
  * Date: 08 August 2023

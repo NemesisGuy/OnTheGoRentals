@@ -4,7 +4,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Builder; // Optional if you don't need builder for this simple DTO
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

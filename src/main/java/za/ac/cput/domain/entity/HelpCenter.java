@@ -1,18 +1,18 @@
 package za.ac.cput.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter; // Assuming you want public getters
+import lombok.Getter;
 
-import java.io.Serializable; // HelpCenter is an entity, Serializable is often included
+import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Objects; // For equals and hashCode
+import java.util.Objects;
 import java.util.UUID;
 
 /**
  * HelpCenter.java
  * Represents a single topic, article, or entry in the Help Center/FAQ section of the application.
  * Each entry typically has a title (or question), content (or answer), and a category for organization.
- *
+ * <p>
  * Author: Aqeel Hanslo (219374422)
  * Date: 29 August 2023
  * Updated by: Peter Buckingham
@@ -61,7 +61,8 @@ public class HelpCenter implements Serializable { // Added Serializable for comp
     /**
      * Default constructor for JPA.
      */
-    protected HelpCenter() {}
+    protected HelpCenter() {
+    }
 
     /**
      * Private constructor used by the static inner Builder class.
@@ -89,8 +90,12 @@ public class HelpCenter implements Serializable { // Added Serializable for comp
             this.uuid = UUID.randomUUID();
         }
         LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
-        this.updatedAt = now; // For new entity, createdAt and updatedAt are same
+        if (this.createdAt == null) {
+            this.createdAt = now; // Set createdAt to current time if not already set
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = now; // Set updatedAt to current time if not already set
+        }
         this.deleted = false; // Ensure default
     }
 
@@ -156,16 +161,48 @@ public class HelpCenter implements Serializable { // Added Serializable for comp
         /**
          * Default constructor for the Builder.
          */
-        public Builder() {}
+        public Builder() {
+        }
 
-        public Builder setId(int id) { this.id = id; return this; }
-        public Builder setUuid(UUID uuid) { this.uuid = uuid; return this; }
-        public Builder setCategory(String category) { this.category = category; return this; }
-        public Builder setTitle(String title) { this.title = title; return this; }
-        public Builder setContent(String content) { this.content = content; return this; }
-        public Builder setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
-        public Builder setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; return this; }
-        public Builder setDeleted(boolean deleted) { this.deleted = deleted; return this; }
+        public Builder setId(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder setUuid(UUID uuid) {
+            this.uuid = uuid;
+            return this;
+        }
+
+        public Builder setCategory(String category) {
+            this.category = category;
+            return this;
+        }
+
+        public Builder setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder setContent(String content) {
+            this.content = content;
+            return this;
+        }
+
+        public Builder setCreatedAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder setUpdatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
+        public Builder setDeleted(boolean deleted) {
+            this.deleted = deleted;
+            return this;
+        }
 
         /**
          * Copies the state from an existing {@link HelpCenter} object into this builder.

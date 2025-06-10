@@ -1,9 +1,9 @@
 package za.ac.cput.domain.mapper;
 
-import za.ac.cput.domain.entity.AboutUs;
 import za.ac.cput.domain.dto.request.AboutUsCreateDTO;
 import za.ac.cput.domain.dto.request.AboutUsUpdateDTO;
 import za.ac.cput.domain.dto.response.AboutUsResponseDTO;
+import za.ac.cput.domain.entity.AboutUs;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,9 +1,9 @@
 package za.ac.cput.domain.mapper;
 
-import za.ac.cput.domain.entity.Faq; // Your Faq Entity
 import za.ac.cput.domain.dto.request.FaqCreateDTO;
 import za.ac.cput.domain.dto.request.FaqUpdateDTO;
 import za.ac.cput.domain.dto.response.FaqResponseDTO;
+import za.ac.cput.domain.entity.Faq;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,10 +42,10 @@ public class FaqMapper {
     /**
      * Converts an FaqCreateDTO to a new Faq entity using the Faq.Builder.
      * UUID, createdAt, updatedAt, and deleted flag are handled by the entity's
-     * @PrePersist or builder defaults.
      *
      * @param createDto The FaqCreateDTO containing data for the new FAQ.
      * @return A new Faq entity.
+     * @PrePersist or builder defaults.
      */
     public static Faq toEntity(FaqCreateDTO createDto) {
         if (createDto == null) {
@@ -64,7 +64,7 @@ public class FaqMapper {
      * to the data from an existing Faq entity, using the Faq.Builder.
      * This is for immutable updates.
      *
-     * @param updateDto     The FaqUpdateDTO containing fields to update.
+     * @param updateDto   The FaqUpdateDTO containing fields to update.
      * @param existingFaq The current state of the Faq entity fetched from the database.
      * @return A new Faq instance with updated values, based on the existing Faq.
      */

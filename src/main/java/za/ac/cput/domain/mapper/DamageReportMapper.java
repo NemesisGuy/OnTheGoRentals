@@ -3,7 +3,7 @@ package za.ac.cput.domain.mapper;
 import za.ac.cput.domain.dto.request.DamageReportCreateDTO;
 import za.ac.cput.domain.dto.request.DamageReportUpdateDTO;
 import za.ac.cput.domain.dto.response.DamageReportResponseDTO;
-import za.ac.cput.domain.dto.response.RentalResponseDTO; // For nested DTO
+import za.ac.cput.domain.dto.response.RentalResponseDTO;
 import za.ac.cput.domain.entity.DamageReport;
 import za.ac.cput.domain.entity.Rental;
 

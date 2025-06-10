@@ -12,8 +12,8 @@ import za.ac.cput.domain.dto.request.FaqUpdateDTO;
 import za.ac.cput.domain.dto.response.FaqResponseDTO;
 import za.ac.cput.domain.entity.Faq;
 import za.ac.cput.domain.mapper.FaqMapper;
-import za.ac.cput.service.IFaqService;
 import za.ac.cput.exception.ResourceNotFoundException;
+import za.ac.cput.service.IFaqService;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +24,7 @@ import java.util.UUID;
  * Allows admins to create, retrieve, update, and delete FAQs.
  * External identification of FAQs is by UUID. Internal service operations
  * primarily use integer IDs. This controller bridges that gap.
- *
+ * <p>
  * Author: Aqeel Hanslo (219374422)
  * Updated by: System/AI
  * Date: 08 August 2023

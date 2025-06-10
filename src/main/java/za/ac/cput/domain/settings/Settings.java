@@ -15,10 +15,10 @@ public class Settings {
     @Id
     private int id;
     @Column(nullable = false, unique = true, updatable = false)
-    private UUID uuid = UUID.randomUUID();
+    private final UUID uuid = UUID.randomUUID();
     private String currencyName;
     private String currencySymbol;
-    private boolean deleted = false;
+    private final boolean deleted = false;
 
     public Settings() {
 
@@ -38,6 +38,7 @@ public class Settings {
     public String getCurrencySymbol() {
         return currencySymbol;
     }
+
     public boolean isDeleted() {
         return deleted;
     }
@@ -64,6 +65,7 @@ public class Settings {
             this.currencySymbol = currencySymbol;
             return this;
         }
+
         public Builder deleted(boolean deleted) {
             this.deleted = deleted;
             return this;

@@ -22,7 +22,6 @@ import za.ac.cput.domain.entity.security.Role;
 import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.exception.EmailAlreadyExistsException;
-import za.ac.cput.exception.ResourceNotFoundException; // If roleRepository.findByRoleName might throw this
 import za.ac.cput.exception.TokenRefreshException;
 import za.ac.cput.repository.IRoleRepository;
 import za.ac.cput.security.JwtUtilities;
@@ -30,10 +29,8 @@ import za.ac.cput.service.IAuthService;
 import za.ac.cput.service.IRefreshTokenService;
 import za.ac.cput.service.IUserService;
 
-import java.util.ArrayList; // For initializing roles list if needed
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -44,7 +41,7 @@ import java.util.stream.Collectors;
  * including JWT generation/validation and cookie management for refresh tokens.
  * This service orchestrates actions using {@link IUserService}, {@link IRefreshTokenService},
  * and Spring Security components.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-28
  * Updated by: Peter Buckingham
@@ -78,12 +75,12 @@ public class AuthServiceImpl implements IAuthService {
     /**
      * Constructs the AuthServiceImpl with necessary dependencies.
      *
-     * @param userService         Service for user data operations (e.g., checking email existence, creating user).
-     * @param roleRepository      Repository for role data access (e.g., finding default roles).
-     * @param passwordEncoder     Encoder for hashing user passwords.
+     * @param userService           Service for user data operations (e.g., checking email existence, creating user).
+     * @param roleRepository        Repository for role data access (e.g., finding default roles).
+     * @param passwordEncoder       Encoder for hashing user passwords.
      * @param authenticationManager Spring's authentication manager for validating credentials.
-     * @param jwtUtilities        Utility for JWT generation and cookie creation.
-     * @param refreshTokenService Service for managing the lifecycle of refresh tokens.
+     * @param jwtUtilities          Utility for JWT generation and cookie creation.
+     * @param refreshTokenService   Service for managing the lifecycle of refresh tokens.
      */
     @Autowired
     public AuthServiceImpl(IUserService userService,
@@ -134,7 +131,7 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     public User registerUser(String firstName, String lastName, String email, String plainPassword, RoleName defaultRoleName) {
         log.info("AuthService: Attempting to register new user with email: {}", email);
-        if (userService.read(email) != null) { // Check via IUserService.read()
+        if (userService.existsByEmail(email)) { // Check via IUserService.read()
             log.warn("AuthService: Registration failed. Email '{}' already exists.", email);
             throw new EmailAlreadyExistsException("Email " + email + " is already taken!");
         }
@@ -320,9 +317,18 @@ public class AuthServiceImpl implements IAuthService {
             this.accessToken = accessToken;
             this.roleNames = roleNames != null ? List.copyOf(roleNames) : Collections.emptyList();
         }
-        public User getUser() { return user; }
-        public String getAccessToken() { return accessToken; }
-        public List<String> getRoleNames() { return roleNames; }
+
+        public User getUser() {
+            return user;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public List<String> getRoleNames() {
+            return roleNames;
+        }
     }
 
     /**
@@ -331,7 +337,13 @@ public class AuthServiceImpl implements IAuthService {
      */
     public static class RefreshedTokenDetails {
         private final String newAccessToken;
-        public RefreshedTokenDetails(String newAccessToken) { this.newAccessToken = newAccessToken; }
-        public String getNewAccessToken() { return newAccessToken; }
+
+        public RefreshedTokenDetails(String newAccessToken) {
+            this.newAccessToken = newAccessToken;
+        }
+
+        public String getNewAccessToken() {
+            return newAccessToken;
+        }
     }
 }

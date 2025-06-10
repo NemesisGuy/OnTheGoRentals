@@ -1,21 +1,15 @@
 package za.ac.cput.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException; // Specific exception for expired token
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException; // Specific
-import io.jsonwebtoken.UnsupportedJwtException; // Specific
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException; // Specific
-
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger; // Import SLF4J Logger
-import org.slf4j.LoggerFactory; // Import SLF4J LoggerFactory
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders; // For Bearer token extraction
-import org.springframework.http.ResponseCookie; // For cookie generation if moved here
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -34,7 +28,7 @@ import java.util.function.Function;
  * Utility class for JSON Web Token (JWT) operations, including generation,
  * validation, and extraction of claims. This class is central to handling
  * stateless authentication with JWTs.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham

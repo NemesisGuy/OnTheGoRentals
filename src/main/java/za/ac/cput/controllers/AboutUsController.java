@@ -8,28 +8,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import za.ac.cput.domain.entity.AboutUs;
 import za.ac.cput.domain.dto.response.AboutUsResponseDTO;
+import za.ac.cput.domain.entity.AboutUs;
 import za.ac.cput.domain.mapper.AboutUsMapper;
-import za.ac.cput.exception.ResourceNotFoundException; // Good to use for consistency
-import za.ac.cput.service.IAboutUsService; // Import the interface
-import za.ac.cput.utils.SecurityUtils; // Import your new helper
+import za.ac.cput.service.IAboutUsService;
+import za.ac.cput.utils.SecurityUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * AboutUsController.java
  * This controller handles public requests related to "About Us" information.
  * It provides endpoints to retrieve specific, all, or the latest "About Us" content.
  * All endpoints are publicly accessible.
- *
+ * <p>
  * Original Author (Version 1): Cwenga Dlova (214310671)
  * Original Date (Version 1): 24/09/2023
- *
+ * <p>
  * Current Author (Version 2): Peter Buckingham (220165289)
  * Current Date (Version 2): 05 April 2023 // This seems like an older date, adjust if needed
- * Updated by: System/AI
+ * Updated by: Peter Buckingham
  * Last Updated: 2025-05-28
  */
 @RestController

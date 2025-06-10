@@ -9,7 +9,7 @@ import java.util.UUID;
  * IAboutUsService.java
  * Interface defining the contract for "About Us" page content services.
  * Provides methods for CRUD operations on {@link AboutUs} entities.
- *
+ * <p>
  * Author: Cwenga Dlova (214310671)
  * Date: 24/09/2023
  * Updated by: Peter Buckingham

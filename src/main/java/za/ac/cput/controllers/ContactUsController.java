@@ -6,19 +6,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.entity.ContactUs;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import za.ac.cput.domain.dto.request.ContactUsCreateDTO;
 import za.ac.cput.domain.dto.response.ContactUsResponseDTO;
+import za.ac.cput.domain.entity.ContactUs;
 import za.ac.cput.domain.mapper.ContactUsMapper;
 import za.ac.cput.service.IContactUsService;
-import za.ac.cput.utils.SecurityUtils; // Import your helper
+import za.ac.cput.utils.SecurityUtils;
 
 /**
  * ContactUsController.java
  * Controller for handling public "Contact Us" form submissions.
  * Allows any user (guest or authenticated) to submit a contact request.
- *
+ * <p>
  * Author: [Original Author Name - Please specify if known]
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham

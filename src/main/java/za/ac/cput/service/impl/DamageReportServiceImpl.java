@@ -4,14 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Spring's Transactional
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.DamageReport;
+import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.IDamageReportRepository;
-// import za.ac.cput.repository.RentalRepository; // Not directly used in provided methods after refactor
-// import za.ac.cput.service.impl.RentalServiceImpl; // Services generally shouldn't depend on other service impls directly, use interfaces
-import za.ac.cput.exception.ResourceNotFoundException; // For consistency
 import za.ac.cput.service.IDamageReportService;
-import za.ac.cput.service.IRentalService; // For potential future use or validation
+import za.ac.cput.service.IRentalService;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +20,7 @@ import java.util.UUID;
  * Service Class for the Damage Report, implementing {@link IDamageReportService}.
  * Manages CRUD operations for DamageReport entities.
  * Entities are treated as immutable; updates are performed using a Builder pattern with a copy method.
- *
+ * <p>
  * Author: Cwenga Dlova (214310671)
  * Date: 08/09/2023
  * Updated by: Peter Buckingham
@@ -55,6 +53,7 @@ public class DamageReportServiceImpl implements IDamageReportService { // Correc
      * Creates a new damage report.
      * Ensures the entity is not marked as deleted and assigns a UUID if not present.
      * Validates that the associated rental exists.
+     *
      * @throws ResourceNotFoundException if the associated Rental does not exist.
      */
     @Override
@@ -113,7 +112,6 @@ public class DamageReportServiceImpl implements IDamageReportService { // Correc
     }
 
 
-
     /**
      * {@inheritDoc}
      * Reads a damage report by its UUID.
@@ -152,8 +150,9 @@ public class DamageReportServiceImpl implements IDamageReportService { // Correc
      * {@inheritDoc}
      * Updates an existing damage report.
      * The input {@code damageReportWithUpdates} should be the complete new state.
+     *
      * @throws ResourceNotFoundException if the damage report with the given ID does not exist or is deleted.
-     * @throws IllegalArgumentException if the associated Rental is changed or missing.
+     * @throws IllegalArgumentException  if the associated Rental is changed or missing.
      */
     @Override
     @Transactional // Spring's Transactional

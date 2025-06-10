@@ -3,18 +3,17 @@ package za.ac.cput.service.impl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory; // Or JacksonFactory if you prefer
+import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.dto.response.AuthResponseDto;
-
-import za.ac.cput.domain.enums.AuthProvider;
+import za.ac.cput.domain.entity.security.RefreshToken;
 import za.ac.cput.domain.entity.security.Role;
 import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
-import za.ac.cput.domain.entity.security.RefreshToken;
+import za.ac.cput.domain.enums.AuthProvider;
 import za.ac.cput.repository.IRoleRepository;
 import za.ac.cput.repository.IUserRepository;
 import za.ac.cput.security.JwtUtilities;
@@ -89,9 +88,12 @@ public class GoogleOAuth2UserService {
                     user.setAuthProvider(AuthProvider.GOOGLE);
                     user.setGoogleId(googleUserId);
                     // Optionally update name/picture if local versions are empty or different
-                    if (user.getFirstName() == null || user.getFirstName().isEmpty()) user.setFirstName(extractFirstName(name));
-                    if (user.getLastName() == null || user.getLastName().isEmpty()) user.setLastName(extractLastName(name, extractFirstName(name)));
-                    if (user.getProfileImageUrl() == null || user.getProfileImageUrl().isEmpty()) user.setProfileImageUrl(pictureUrl);
+                    if (user.getFirstName() == null || user.getFirstName().isEmpty())
+                        user.setFirstName(extractFirstName(name));
+                    if (user.getLastName() == null || user.getLastName().isEmpty())
+                        user.setLastName(extractLastName(name, extractFirstName(name)));
+                 /*   if (user.getProfileImageUrl() == null || user.getProfileImageUrl().isEmpty())
+                        user.setProfileImageUrl(pictureUrl);*/
                     IUserRepository.save(user);
                 } else if (user.getAuthProvider() == AuthProvider.GOOGLE && (user.getGoogleId() == null || !user.getGoogleId().equals(googleUserId))) {
                     // Email exists, registered with Google, but Google ID mismatch (highly unlikely if email is verified unique)
@@ -105,7 +107,7 @@ public class GoogleOAuth2UserService {
                 user.setEmail(email);
                 user.setFirstName(extractFirstName(name));
                 user.setLastName(extractLastName(name, extractFirstName(name)));
-                user.setProfileImageUrl(pictureUrl);
+            /*    user.setProfileImageUrl(pictureUrl);*/
                 user.setAuthProvider(AuthProvider.GOOGLE);
                 user.setGoogleId(googleUserId);
                 // OAuth2 users usually don't have a password managed by our system
@@ -124,7 +126,7 @@ public class GoogleOAuth2UserService {
 
             return new AuthResponseDto(
                     appAccessToken,
-                //    appRefreshToken.getToken(),
+                    //    appRefreshToken.getToken(),
                     "Bearer",
                     accessTokenExpirationMs,
                     user.getEmail(),

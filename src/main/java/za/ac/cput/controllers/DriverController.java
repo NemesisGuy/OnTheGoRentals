@@ -7,14 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.entity.Driver;
 import za.ac.cput.domain.dto.request.DriverCreateDTO;
 import za.ac.cput.domain.dto.request.DriverUpdateDTO;
 import za.ac.cput.domain.dto.response.DriverResponseDTO;
+import za.ac.cput.domain.entity.Driver;
 import za.ac.cput.domain.mapper.DriverMapper;
-import za.ac.cput.exception.ResourceNotFoundException; // Good to have for explicit handling if service doesn't throw
+import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.IDriverService;
-import za.ac.cput.utils.SecurityUtils; // Import your helper
+import za.ac.cput.utils.SecurityUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +25,7 @@ import java.util.UUID;
  * This controller provides CRUD operations for drivers.
  * The specific access control (e.g., public, authenticated user, specific role)
  * for these operations would be defined by Spring Security configurations.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 20/10/2023
  * Updated by: Peter Buckingham

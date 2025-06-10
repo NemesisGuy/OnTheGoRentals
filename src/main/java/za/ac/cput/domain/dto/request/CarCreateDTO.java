@@ -8,12 +8,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import za.ac.cput.domain.enums.PriceGroup; // Assuming PriceGroup enum is in this package
+import za.ac.cput.domain.enums.PriceGroup;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder // Optional for request DTOs, but can be convenient
+@Builder
 public class CarCreateDTO {
 
     @NotBlank(message = "Make cannot be blank")
@@ -26,18 +26,22 @@ public class CarCreateDTO {
 
     @NotNull(message = "Year cannot be null")
     @Min(value = 1900, message = "Year must be a valid year (e.g., 1900 or later)")
-    private Integer year; // Use Integer to allow null if not set, though @NotNull makes it required
+    private Integer year;
 
     @Size(max = 50, message = "Category cannot exceed 50 characters")
     private String category;
 
     @NotNull(message = "Price group cannot be null")
-    private PriceGroup priceGroup; // Expecting the enum value directly (Jackson can map string to enum)
+    private PriceGroup priceGroup;
 
     @NotBlank(message = "License plate cannot be blank")
     @Size(max = 15, message = "License plate cannot exceed 15 characters")
     private String licensePlate;
 
-    // Admin might set initial availability. Defaults to true if not provided by DTO.
-    private Boolean available = true; // Default to true in the entity or service if not provided
+    @Size(min = 11, max = 17, message = "VIN must be between 11 and 17 characters")
+    private String vin;
+
+    private Boolean available = true; // Default to true if not provided
+
+    // REMOVED imageFileName and imageType - these are handled by the server on upload.
 }

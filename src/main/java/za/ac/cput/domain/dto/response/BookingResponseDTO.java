@@ -1,17 +1,11 @@
 // BookingResponseDTO.java
 package za.ac.cput.domain.dto.response;
 
-import lombok.*;
-import za.ac.cput.domain.dto.response.CarResponseDTO;
-import za.ac.cput.domain.dto.response.UserResponseDTO;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import za.ac.cput.domain.enums.BookingStatus;
-import za.ac.cput.domain.enums.RentalStatus; // Assuming RentalStatus enum exists
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -35,11 +35,12 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 60) // Adjust length for longest BookingStatus name
     private BookingStatus status; // PENDING, CONFIRMED, CANCELED
-    private  boolean deleted;
-   /* @Column(updatable = false)*/
+    private boolean deleted;
+    @Column(updatable = false)
     private LocalDateTime createdAt;
-   /* @Column(updatable = false)*/
+    @Column(updatable = false)
     private LocalDateTime updatedAt;
+
     public Booking() {
     }
 
@@ -61,6 +62,55 @@ public class Booking {
 
     }
 
+    private void setId(int id) {
+        this.id = id;
+    }
+
+    private void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    private void setUser(User user) {
+        this.user = user;
+    }
+
+    private void setCar(Car car) {
+        this.car = car;
+    }
+
+    private void setDriver(Driver driver) {
+        this.driver = driver;
+    }
+
+    private void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
+    }
+
+    private void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
+    }
+
+    private void setStatus(BookingStatus status) {
+        this.status = status;
+    }
+
+    private void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    private void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    private void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    /**
+     * Pre-persist lifecycle method to initialize default values.
+     * This method is called before the entity is persisted to the database.
+     */
+
     @PrePersist
     protected void onCreate() {
         if (this.uuid == null) {
@@ -80,8 +130,9 @@ public class Booking {
         if (this.updatedAt == null) {
             this.updatedAt = LocalDateTime.now();
         }
-            this.deleted = false; // Default to not deleted
+        this.deleted = false; // Default to not deleted
     }
+
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
@@ -117,6 +168,10 @@ public class Booking {
 
 // Builder pattern
 
+    /**
+     * Builder class for creating Booking instances.
+     * This allows for immutability and a fluent API style.
+     */
     public static class Builder {
         private int id;
         private UUID uuid;
@@ -174,17 +229,27 @@ public class Booking {
             this.deleted = deleted;
             return this;
         }
+
         public Builder setCreatedAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
         }
+
         public Builder setUpdatedAt(LocalDateTime updatedAt) {
             this.updatedAt = updatedAt;
             return this;
         }
+        /**
+         * Copies the state from an existing Booking instance to this builder.
+         * This is useful for creating a new Booking with the same properties as an existing one.
+         *
+         * @param booking The Booking instance to copy from
+         * @return this builder instance with copied properties
+         */
 
         public Builder copy(Booking booking) {
             this.id = booking.id;
+            this.uuid = booking.uuid;
             this.user = booking.user;
             this.car = booking.car;
             this.driver = booking.driver;
@@ -196,11 +261,44 @@ public class Booking {
             this.updatedAt = booking.updatedAt;
             return this;
         }
-
+        /**
+         * Builds the Booking instance, ensuring all pre-persist logic is applied.
+         * This method should be called after setting all required fields.
+         *
+         * @return a new Booking instance with the current builder's state
+         */
         public Booking build() {
-            return new Booking(this);
+            Booking booking = new Booking(this);
+            booking.onCreate(); // Ensure pre-persist logic is applied
+            return booking;
+
         }
 
+        /**
+         * Applies the current builder's state to an existing Booking instance.
+         * This is useful for updating managed JPA entities immutably.
+         *
+         * @param booking The Booking instance to update
+         * @return The updated Booking instance
+         * @throws IllegalArgumentException if the booking is null
+         */
+        public  Booking applyTo(Booking booking) {
+            if (booking == null) {
+                throw new IllegalArgumentException("Booking cannot be null");
+            }
+            booking.id = this.id;
+            booking.uuid = this.uuid;
+            booking.user = this.user;
+            booking.car = this.car;
+            booking.driver = this.driver;
+            booking.startDate = this.startDate;
+            booking.endDate = this.endDate;
+            booking.status = this.status;
+            booking.deleted = this.deleted;
+            booking.createdAt = this.createdAt;
+            booking.updatedAt = this.updatedAt;
+            return booking;
 
+        }
     }
 }

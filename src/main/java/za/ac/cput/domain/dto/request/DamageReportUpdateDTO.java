@@ -4,7 +4,6 @@ import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-// import java.util.UUID; // rentalUuid typically not changed for an existing damage report
 
 import java.time.LocalDateTime;
 

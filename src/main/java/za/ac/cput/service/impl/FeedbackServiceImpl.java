@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Spring's Transactional
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.Feedback;
-import za.ac.cput.repository.FeedbackRepository; // Assuming interface name IFeedbackRepository
-import za.ac.cput.exception.ResourceNotFoundException; // For consistency
+import za.ac.cput.exception.ResourceNotFoundException;
+import za.ac.cput.repository.FeedbackRepository;
 import za.ac.cput.service.IFeedbackService;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.UUID;
  * Implementation of the {@link IFeedbackService} interface.
  * Manages Feedback entities, including CRUD operations.
  * Entities are treated as immutable; updates are performed using a Builder pattern with a copy method.
- *
+ * <p>
  * Author: Peter Buckingham // Assuming based on consistent authorship
  * Date: [Original Date - e.g., 2025-05-15 from previous context]
  * Updated by: Peter Buckingham
@@ -110,6 +110,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
      * Updates an existing feedback entry. Feedback is generally immutable once submitted by a user.
      * This method allows an admin to update it if business rules permit (e.g., correcting typos, categorizing).
      * The input {@code feedbackWithUpdates} should be the complete new state.
+     *
      * @throws ResourceNotFoundException if the feedback with the given ID does not exist or is deleted.
      */
     @Override

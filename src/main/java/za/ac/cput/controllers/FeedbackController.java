@@ -7,14 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.entity.Feedback;
 import za.ac.cput.domain.dto.request.FeedbackCreateDTO;
-// import za.ac.cput.domain.dto.request.FeedbackUpdateDTO; // Uncomment if update functionality is added
 import za.ac.cput.domain.dto.response.FeedbackResponseDTO;
+import za.ac.cput.domain.entity.Feedback;
 import za.ac.cput.domain.mapper.FeedbackMapper;
-import za.ac.cput.exception.ResourceNotFoundException; // For consistency
+import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.IFeedbackService;
-import za.ac.cput.utils.SecurityUtils; // Import your helper
+import za.ac.cput.utils.SecurityUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +23,7 @@ import java.util.UUID;
  * Controller for managing Feedback entities. Primarily allows public users to submit feedback.
  * Includes endpoints that are typically for administrative review or management of feedback,
  * which should be secured accordingly or moved to an AdminFeedbackController.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-15
  * Updated by: Peter Buckingham

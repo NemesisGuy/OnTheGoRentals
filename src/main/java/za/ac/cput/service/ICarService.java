@@ -11,7 +11,7 @@ import java.util.UUID;
  * Interface defining the contract for car-related services.
  * Extends the generic {@link IService} for basic CRUD operations and adds
  * car-specific query methods, such as finding available cars or filtering by price group/category.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham
@@ -117,4 +117,6 @@ public interface ICarService extends IService<Car, Integer> {
      */
     @Deprecated
     List<Car> findAllAvailableByPriceGroup(PriceGroup priceGroup);
+
+    List<Car> getAvailableCars();
 }

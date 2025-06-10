@@ -1,14 +1,14 @@
 package za.ac.cput.api.response;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor; // Added for consistency and flexibility
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
  * FieldErrorDto.java
  * A Data Transfer Object representing a specific field error, typically used
  * in API error responses to detail validation failures or other contextual errors.
- *
+ * <p>
  * Author: Peter Buckingham (220165289) // Assuming based on context
  * Date: [Date of creation - e.g., 2025-05-28]
  * Updated by: Peter Buckingham

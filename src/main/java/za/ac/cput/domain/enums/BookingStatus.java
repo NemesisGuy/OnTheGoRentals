@@ -3,7 +3,7 @@ package za.ac.cput.domain.enums;
 /**
  * BookingStatus.java
  * Represents the lifecycle status of a car booking request made by a user.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: 2025-05-30
  */
@@ -49,4 +49,5 @@ public enum BookingStatus {
      * For now, RENTAL_INITIATED seems sufficient as the "good" terminal state.
      */
     // COMPLETED
+    PENDING
 }

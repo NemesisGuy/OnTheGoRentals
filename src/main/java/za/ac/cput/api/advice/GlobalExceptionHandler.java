@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException; // For Spring Security's 403
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * A {@link RestControllerAdvice} component that provides centralized exception handling
  * for REST controllers. It catches various exceptions and transforms them into a
  * standardized {@link ApiResponse} format with appropriate HTTP status codes.
- *
+ * <p>
  * Author: Peter Buckingham (220165289) // Assuming based on context
  * Date: [Date of creation - e.g., 2025-05-28]
  * Updated by: Peter Buckingham
@@ -154,6 +154,7 @@ public class GlobalExceptionHandler {
     }
 
     // Generic fallback handler
+
     /**
      * Handles all other unclassified {@link Exception}s.
      * Responds with HTTP 500 Internal Server Error and a generic error message.
@@ -170,6 +171,7 @@ public class GlobalExceptionHandler {
         FieldErrorDto error = new FieldErrorDto("general", "An unexpected internal server error occurred. Please try again later.");
         return new ResponseEntity<>(new ApiResponse<>(Collections.singletonList(error)), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     /**
      * Handles custom {@link InvalidDateRangeException}.
      * Responds with HTTP 400 Bad Request and the exception message.

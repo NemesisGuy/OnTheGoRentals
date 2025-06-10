@@ -4,11 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Spring's Transactional
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.settings.Settings;
-import za.ac.cput.factory.impl.SettingsFactory; // If used for validation/defaulting
+import za.ac.cput.exception.ResourceNotFoundException;
+import za.ac.cput.factory.impl.SettingsFactory;
 import za.ac.cput.repository.SettingsRepository;
-import za.ac.cput.exception.ResourceNotFoundException; // For consistency
 import za.ac.cput.service.ISettingsService;
 
 import java.util.Optional;
@@ -18,7 +18,7 @@ import java.util.Optional;
  * Implementation of the {@link ISettingsService} interface.
  * Manages application settings, typically a singleton-like configuration entity.
  * Entities are treated as immutable; updates are performed using a Builder pattern with a copy method.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: [Original Date - Please specify if known]
  * Updated by: Peter Buckingham
@@ -89,6 +89,7 @@ public class SettingsServiceImpl implements ISettingsService { // Renamed class 
      * {@inheritDoc}
      * Updates existing application settings. The input {@code settings} entity
      * should be the complete new state, typically built using the Builder pattern.
+     *
      * @throws ResourceNotFoundException if settings with the given ID do not exist.
      */
     @Override

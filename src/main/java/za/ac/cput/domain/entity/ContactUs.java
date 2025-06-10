@@ -12,6 +12,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+
 @Getter
 @Entity
 public class ContactUs {
@@ -19,7 +20,7 @@ public class ContactUs {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(nullable = false, unique = true, updatable = false)
-    private UUID uuid ;
+    private UUID uuid;
     private String title;
     private String firstName;
     private String lastName;
@@ -27,18 +28,12 @@ public class ContactUs {
     private String subject;
     @Column(columnDefinition = "TEXT")
     private String message;
-
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt; // Added for tracking submission time
+    @Column(updatable = false)
+    private LocalDateTime updatedAt; // Added for tracking updates, if needed
     @Column(nullable = false)
-
     private boolean deleted = false;
-    @PrePersist
-    protected void onCreate() {
-        if (this.uuid == null) this.uuid = UUID.randomUUID();
-        this.createdAt = LocalDateTime.now();
-        this.deleted = false; // Default
-    }
 
     protected ContactUs() {
     }
@@ -53,12 +48,24 @@ public class ContactUs {
         this.email = builder.email;
         this.subject = builder.subject;
         this.message = builder.message;
-        this.createdAt = LocalDateTime.now(); // Set createdAt to current time
+        this.createdAt = builder.createdAt; // Ensure createdAt is set
+        this.updatedAt = builder.updatedAt; // Ensure updatedAt is set
         this.deleted = builder.deleted;
 
     }
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) this.uuid = UUID.randomUUID();
+        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
+        if (this.updatedAt == null) this.updatedAt = LocalDateTime.now();
+        this.deleted = false; // Default
+    }
 
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -84,6 +91,7 @@ public class ContactUs {
                 ", subject='" + subject + '\'' +
                 ", message='" + message + '\'' +
                 ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 ", deleted=" + deleted +
                 '}';
     }
@@ -99,12 +107,14 @@ public class ContactUs {
         private String subject;
         private String message;
         private LocalDateTime createdAt; // Added for tracking submission time
+        private LocalDateTime updatedAt; // Added for tracking updates, if needed
         private boolean deleted;
 
         public Builder setId(int id) {
             this.id = id;
             return this;
         }
+
         public Builder setUuid(UUID uuid) {
             this.uuid = uuid;
             return this;
@@ -139,12 +149,19 @@ public class ContactUs {
             this.message = message;
             return this;
         }
+
         public Builder setDeleted(boolean deleted) {
             this.deleted = deleted;
             return this;
         }
+
         public Builder setCreatedAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder setUpdatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
             return this;
         }
 
@@ -159,6 +176,7 @@ public class ContactUs {
             this.subject = contactUs.subject;
             this.message = contactUs.message;
             this.createdAt = contactUs.createdAt;
+            this.updatedAt = contactUs.updatedAt;
             this.deleted = contactUs.deleted;
 
             return this;
