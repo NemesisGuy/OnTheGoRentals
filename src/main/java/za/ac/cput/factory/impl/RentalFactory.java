@@ -76,13 +76,14 @@ public class RentalFactory implements IFactory<Rental> {
 
     public Rental create(User user, Car carToRent, Driver driver, UUID issuerId, LocalDateTime issuedDate,LocalDateTime expectedReturnDate,  LocalDateTime endDate) {
         RentalStatus status = determineStatus(issuedDate, endDate);
-
+        //Default to the server's current time if the DTO doesn't provide a specific pickup time.
+        LocalDateTime pickupTime = (issuedDate != null) ? issuedDate : LocalDateTime.now();
         return new Rental.Builder()
                 .setUser(user)
                 .setCar(carToRent)
                 .setDriver(driver)
                 .setIssuer(issuerId)
-                .setIssuedDate(issuedDate)
+                .setIssuedDate(pickupTime)
                 .setExpectedReturnDate(expectedReturnDate)
                 .setReturnedDate(endDate)
                 .setStatus(status)

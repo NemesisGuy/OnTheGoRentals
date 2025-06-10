@@ -73,7 +73,6 @@ public class RentalRequestDTO {
      * This field is mandatory and must be in the present or future.
      */
     @NotNull(message = "Issue date (booking start date) cannot be null")
-    @FutureOrPresent(message = "Issue date must be in the present or future")
     private LocalDateTime issuedDate;
 
     /**
