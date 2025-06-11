@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  #----------------------------------------------------
+  # MySQL Database Service
+  #----------------------------------------------------
+  mysql-db:
+    image: mysql:8.0
+    container_name: on-the-go-rentals-mysql-db-container
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: OnTheGoRentalsDatabase
+      MYSQL_ROOT_PASSWORD: my_secret_password # YOUR EXPLICIT PASSWORD
+      # Consider creating a dedicated app user instead of using root for the app
+      # MYSQL_USER: your_app_db_user
+      # MYSQL_PASSWORD: your_app_db_password
+    ports:
+      - "3307:3306" # Host port 3307 to container port 3306
+    volumes:
+     # - mysql_data_volume:/var/lib/mysql # Persist MySQL data
+      - mysql-data:/var/lib/mysql # <--- USE YOUR ORIGINAL/CORRECT VOLUME NAME HERE
+
+    networks:
+      - on_the_go_rentals_app_network # Connect to the shared application network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--password=my_secret_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  #----------------------------------------------------
+  # Spring Boot Backend Service
+  #----------------------------------------------------
+  on-the-go-rentals-backend:
+    image: nemesisguy/on-the-go-rentals-backend:latest # Your backend image
+    container_name: on-the-go-rentals-backend-container
+    restart: unless-stopped
+    environment:
+      SERVER_PORT: 8080 # Spring Boot will listen on this port inside the container
+
+      # Database Connection (refers to the 'mysql-db' service name)
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/OnTheGoRentalsDatabase?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root # Use 'your_app_db_user' if you created one
+      SPRING_DATASOURCE_PASSWORD: my_secret_password # Match MYSQL_ROOT_PASSWORD or your_app_db_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      # JWT Configuration (these will override values in application.properties)
+      # Replace with your actual secure values, or better, use Portainer secrets/env vars for these
+      jwt.secret: 2b44b0b00fd822d8ce753e54dac3dc4e06c2725f7db930f3b9924468b53194dbccdbe23d7baa5ef5fbc414ca4b2e64700bad60c5a7c45eaba56880985582fba4
+      jwt.expiration: 36000000
+      jwt.refresh-token.expiration-ms: 604800000
+
+      # Google OAuth2 Configuration
+      # REPLACE with your actual Google Client ID and Secret
+      # For production, these should be injected via Portainer secrets or environment variables, not hardcoded.
+      GOOGLE_CLIENT_ID: your_actual_google_client_id # e.g., from Portainer env var: ${ENV_GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: your_actual_google_client_secret # e.g., from Portainer env var: ${ENV_GOOGLE_CLIENT_SECRET}
+      # This redirect URI must be authorized in your Google Cloud Console for your OAuth Client ID.
+      # It's the URI Google will redirect to after authentication.
+      # If your backend handles the code exchange (like /login/oauth2/code/google), this is a backend URI.
+      GOOGLE_REDIRECT_URI: http://localhost:8087/login/oauth2/code/google # Assuming backend is exposed on host 8087
+
+    ports:
+      - "8087:8080" # Host port 8087 maps to backend container's SERVER_PORT 8080
+    networks:
+      - on_the_go_rentals_app_network
+    depends_on:
+      mysql-db: # Backend will wait for mysql-db to be healthy before starting
+        condition: service_healthy
+
+  #----------------------------------------------------
+  # Vue.js Frontend Service (served by Nginx)
+  #----------------------------------------------------
+  on-the-go-rentals-frontend:
+    image: nemesisguy/on-the-go-rentals-frontend:latest # Your frontend image
+    container_name: on-the-go-rentals-frontend-container
+    restart: unless-stopped
+    ports:
+      - "8081:80" # Host port 8081 maps to Nginx's port 80 in the container
+    environment:
+      # This VUE_APP_API_URL is read by entrypoint.sh inside the frontend container
+      # to generate config.js for your Vue app.
+      # It should be the URL through which the user's BROWSER can reach the backend.
+     - BACKEND_API_BASE_URL=https://otgrapi.nemesisnet.co.za # Backend exposed on host port 8087
+    networks:
+      - on_the_go_rentals_app_network # Not strictly necessary if it only talks to backend via public URL, but good practice
+    depends_on:
+      - on-the-go-rentals-backend # Optional: Frontend might start before backend is fully ready,
+                    # but Nginx will serve static files. API calls will fail until backend is up.
+                    # Usually, this is fine as user interaction triggers API calls.
+
+# Define the named volume for MySQL data persistence
+volumes:
+  mysql-data: {} # <--- USE YOUR ORIGINAL/CORRECT VOLUME NAME HERE
+
+# Define the shared network for all services
+networks:
+  on_the_go_rentals_app_network:
+    driver: bridge

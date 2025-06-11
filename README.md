@@ -1,5 +1,7 @@
-# OnTheGoRentals
+# On-The-Go Rentals
 
+
+[![Latest Release](https://img.shields.io/github/v/release/NemesisGuy/OnTheGoRentals?include_prereleases&label=latest%20beta&color=blue)](https://github.com/NemesisGuy/OnTheGoRentals/releases/latest)
 [![Java Version](https://img.shields.io/badge/Java-21-yellow.svg?style=for-the-badge)](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
 [![Spring Boot Version](https://img.shields.io/badge/Spring_Boot-3.5.0-blueviolet.svg?style=for-the-badge)](https://spring.io/projects/spring-boot)
 [![Spring Security Version](https://img.shields.io/badge/Spring_Security-6.5.0-blueviolet.svg?style=for-the-badge)](https://spring.io/projects/spring-security)
