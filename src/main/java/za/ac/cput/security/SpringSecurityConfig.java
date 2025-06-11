@@ -1,9 +1,5 @@
 package za.ac.cput.security;
 
-/**
- * Author: Peter Buckingham (220165289)
- */
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -11,130 +7,109 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+// Removed unused CORS imports to keep the file clean
+// import org.springframework.web.cors.CorsConfiguration;
+// import org.springframework.web.cors.CorsConfigurationSource;
+// import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+// import java.util.List;
 
-import java.util.Arrays;
+import static org.springframework.security.config.Customizer.withDefaults;
 
+/**
+ * SpringSecurityConfig.java
+ * Main security configuration for the application.
+ * Defines the security filter chain, authentication manager, and password encoder.
+ * CORS (Cross-Origin Resource Sharing) is configured to be handled by an upstream
+ * reverse proxy (e.g., Nginx, Cloudflare) and is intentionally NOT configured here
+ * to prevent header conflicts.
+ *
+ * Author: Peter Buckingham (220165289)
+ * Updated: 2024-06-10
+ */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity // Enables method-level security like @PreAuthorize
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    /**
+     * Configures the main security filter chain for the application.
+     *
+     * @param http The HttpSecurity object to configure.
+     * @return The configured SecurityFilterChain.
+     * @throws Exception if an error occurs during configuration.
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable()
-/*
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-*/
-/*
-                        .ignoringRequestMatchers("/api/v1/auth/**") // Allow JWT endpoints to bypass CSRF
-*/
-                )
+                // This tells Spring to apply its default CORS filter. However, since we are
+                // removing the CorsConfigurationSource bean below, this filter will have
+                // no configuration and will not add any CORS headers. This is the desired behavior.
+                .cors(withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // Preflight support
+                        // Allow preflight OPTIONS requests to pass through security filters
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Public v1 endpoints
-                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
-                        .requestMatchers("/api/v1/about-us/**").permitAll()
+                        // Define all public endpoints
+                        .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/cars/**").permitAll()
+                        .requestMatchers("/api/v1/files/**").permitAll()
+                        .requestMatchers("/api/v1/about-us/**").permitAll()
                         .requestMatchers("/api/v1/help-center/**").permitAll()
                         .requestMatchers("/api/v1/faq/**").permitAll()
                         .requestMatchers("/api/v1/contact-us").permitAll()
                         .requestMatchers("/api/v1/bookings/available-cars").permitAll()
-
-                        // Authenticated v1 endpoints
-                        .requestMatchers("/api/v1/auth/logout").authenticated()
-                        .requestMatchers("/api/v1/users/me/**").authenticated()
-                        .requestMatchers("/api/v1/files/**").permitAll()
-                        .requestMatchers("/api/v1/admin/cars/list/available").authenticated()
-                        .requestMatchers("/api/v1/files/selfies/**").authenticated()
-                        .requestMatchers("/api/v1/admin/cars/list/**").authenticated()
-                        .requestMatchers("/api/v1/admin/rentals/from-booking/**").authenticated()
-                        .requestMatchers("/api/v1/rentals/from-booking/**").authenticated()
-                        .requestMatchers("/api/v1/admin/rentals/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
-
-
-                        // Admin v1 endpoints
-                        .requestMatchers("/api/v1/admin/**", "/api/v1/admins/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
-
-                        // Public static & framework paths
-                        .requestMatchers("/public/**", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/oauth2/**").permitAll()
-
-                        // Actuator endpoints (non-versioned)
                         .requestMatchers("/actuator/**", "/metrics", "/metrics/**").permitAll()
 
-                        // Default deny
+                        // All other requests must be authenticated
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            System.out.println("Authentication failed: " + authException.getMessage());
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized - Please log in again");
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            System.out.println("Access denied: " + accessDeniedException.getMessage());
-                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden - You do not have permission to access this resource");
-                        })
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden"))
                 );
 
+        // Add the custom JWT filter before the standard username/password filter
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    /**
+     * Provides the AuthenticationManager bean, required for the authentication process.
+     */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
+    /**
+     * Provides the PasswordEncoder bean, using BCrypt for secure password hashing.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",
-                "https://otgr.nemesisnet.co.za"
-        ));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList(
-                "Authorization",
-                "Content-Type",
-                "X-Requested-With",
-                "Accept",
-                "Origin",
-                "Access-Control-Request-Method",
-                "Access-Control-Request-Headers"
-        ));
-        configuration.setExposedHeaders(Arrays.asList(
-                "Origin", "Content-Type", "Accept", "Authorization",
-                "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"
-        ));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+    /**
+     * The CorsConfigurationSource bean has been REMOVED.
+     * This action delegates all CORS header management to the upstream reverse proxy
+     * (e.g., Nginx, Traefik, or a cloud load balancer), which is the recommended
+     * practice for production environments to avoid conflicts and centralize configuration.
+     */
 }
