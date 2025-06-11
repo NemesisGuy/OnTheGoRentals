@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.service.impl;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,10 +23,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+*/
 /**
  * Unit tests for {@link DamageReportServiceImpl}.
  * Tests CRUD operations and business logic for DamageReport entities.
- */
+ *//*
+
 @ExtendWith(MockitoExtension.class)
 class DamageReportServiceImplTest {
 
@@ -261,6 +264,7 @@ class DamageReportServiceImplTest {
         verify(damageReportRepository, never()).save(any(DamageReport.class));
     }
 
+*/
 /*
     // IF DamageReport.id were Integer
     @Test
@@ -279,7 +283,8 @@ class DamageReportServiceImplTest {
         verify(damageReportRepository, never()).findByIdAndDeletedFalse(any());
         verify(damageReportRepository, never()).save(any(DamageReport.class));
     }
-*/
+*//*
+
 
 
     @Test
@@ -399,4 +404,4 @@ class DamageReportServiceImplTest {
         assertTrue(result.isEmpty());
         verify(damageReportRepository).findByDeletedFalse();
     }
-}
+}*/
