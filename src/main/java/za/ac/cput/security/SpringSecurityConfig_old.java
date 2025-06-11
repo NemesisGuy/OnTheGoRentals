@@ -1,8 +1,11 @@
+/*
 package za.ac.cput.security;
 
+*/
 /**
  * Author: Peter Buckingham (220165289)
- */
+ *//*
+
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,12 +40,16 @@ public class SpringSecurityConfig_old {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable()
+*/
 /*
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+*//*
+
 */
 /*
                         .ignoringRequestMatchers("/api/v1/auth/**") // Allow JWT endpoints to bypass CSRF
-*/
+*//*
+
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
@@ -138,3 +145,4 @@ public class SpringSecurityConfig_old {
         return source;
     }
 }
+*/
