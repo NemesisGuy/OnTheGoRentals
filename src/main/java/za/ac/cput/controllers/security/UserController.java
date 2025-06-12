@@ -88,7 +88,10 @@ public class UserController {
     }
 
     /**
-     * [NEW] Uploads or replaces the profile image for the currently authenticated user.
+     * Uploads or replaces the profile image for the currently authenticated user.
+     * This method ensures that only the image-related fields are updated,
+     * explicitly nullifying the password in the update payload to prevent
+     * accidental re-hashing of the existing password.
      *
      * @param file The image file sent as multipart/form-data.
      * @return A ResponseEntity containing the updated {@link UserResponseDTO} with the new image URL.
@@ -104,16 +107,21 @@ public class UserController {
 
         User currentUser = userService.read(userEmail);
 
-        // Save the new file
+        // Save the new file to storage
         String filename = fileStorageService.save(ImageType.SELFIE.getFolder(), file);
 
-        // Update the user entity with the new image details
-        User.UserBuilder builder = currentUser.toBuilder()
+        // Use the 'toBuilder' pattern to create a copy of the user.
+        // **THE CRITICAL FIX**: Set the password to null in the builder to ensure
+        // the service layer does not attempt to update it.
+        User imageUpdatePayload = currentUser.toBuilder()
+                .password(null) // This prevents the password from being part of the update context.
                 .profileImageFileName(filename)
                 .profileImageType(ImageType.SELFIE.getFolder())
-                .profileImageUploadedAt(LocalDateTime.now());
+                .profileImageUploadedAt(LocalDateTime.now())
+                .build();
 
-        User updatedUser = userService.update(currentUser.getId(), builder.build());
+        // Call the generic update service with the payload containing only the changes.
+        User updatedUser = userService.update(currentUser.getId(), imageUpdatePayload);
 
         log.info("Successfully uploaded profile image '{}' for user [{}].", filename, userEmail);
         return ResponseEntity.ok(UserMapper.toDto(updatedUser));

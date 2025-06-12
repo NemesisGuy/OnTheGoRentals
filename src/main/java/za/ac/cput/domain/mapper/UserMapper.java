@@ -14,21 +14,14 @@ import java.util.stream.Collectors;
 /**
  * UserMapper.java
  * A utility class for mapping between User domain entities and their DTOs.
- * Handles the construction of the profile image URL for response DTOs.
  *
  * Author: Peter Buckingham (220165289)
- * Updated: 2024-06-07
+ * Updated: 2025-06-12
  */
 @Component
 public class UserMapper {
 
-    /**
-     * Converts a {@link User} entity to a {@link UserResponseDTO}.
-     * It constructs the full profile image URL if an image has been uploaded.
-     *
-     * @param user The User entity to convert.
-     * @return The resulting UserResponseDTO.
-     */
+    // ... toDto and toDtoList methods are correct and unchanged ...
     public static UserResponseDTO toDto(User user) {
         if (user == null) return null;
 
@@ -36,81 +29,80 @@ public class UserMapper {
                 user.getRoles().stream().map(role -> role.getRoleName()).collect(Collectors.toList()) :
                 Collections.emptyList();
 
-        UserResponseDTO dtoBuilder = UserResponseDTO.builder()
+        UserResponseDTO.UserResponseDTOBuilder dtoBuilder = UserResponseDTO.builder()
                 .uuid(user.getUuid())
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .roles(roleNames)
-                .build();
+                .roles(roleNames);
 
-        // Build the profile image URL if the data exists
         if (user.getProfileImageFileName() != null && !user.getProfileImageFileName().isEmpty()) {
             String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/api/v1/files/")
                     .path(user.getProfileImageType() + "/")
                     .path(user.getProfileImageFileName())
                     .toUriString();
-            dtoBuilder.setProfileImageUrl(imageUrl);
+            dtoBuilder.profileImageUrl(imageUrl);
         }
-
-        return dtoBuilder;
+        return dtoBuilder.build();
     }
 
-    /**
-     * Converts a list of {@link User} entities to a list of {@link UserResponseDTO}s.
-     *
-     * @param users The list of User entities.
-     * @return A list of UserResponseDTOs.
-     */
     public static List<UserResponseDTO> toDtoList(List<User> users) {
         if (users == null) return Collections.emptyList();
         return users.stream().map(UserMapper::toDto).collect(Collectors.toList());
     }
 
-    /**
-     * Converts a {@link UserCreateDTO} to a {@link User} entity.
-     * The service layer is responsible for encoding the plain text password.
-     *
-     * @param createDto The DTO with user creation data.
-     * @return A new User entity.
-     */
+    // ... toEntity from UserCreateDTO is correct and unchanged ...
     public static User toEntity(UserCreateDTO createDto) {
         if (createDto == null) return null;
         return User.builder()
                 .firstName(createDto.getFirstName())
                 .lastName(createDto.getLastName())
                 .email(createDto.getEmail())
-                .password(createDto.getPassword()) // Pass plain password; service will encode
+                .password(createDto.getPassword())
                 .authProvider(createDto.getAuthProvider())
                 .googleId(createDto.getGoogleId())
                 .build();
     }
 
     /**
-     * Applies updates from a {@link UserUpdateDTO} to an existing {@link User} entity.
+     * **THE DEFINITIVE FIX**
+     * Applies updates from a UserUpdateDTO to a new, "sparse" User object.
+     * This method creates a payload containing ONLY the fields that were provided in the DTO.
+     * This prevents old data (like a hashed password) from being accidentally passed
+     * to the update service.
      *
-     * @param updateDto    The DTO with update data.
-     * @param existingUser The existing User entity.
-     * @return The User entity with updated fields.
+     * @param updateDto The DTO containing the update data.
+     * @param existingUser The existing User entity (not used in this new implementation, but kept for signature consistency).
+     * @return A new User instance containing only the fields to be updated.
      */
     public static User applyUpdateDtoToEntity(UserUpdateDTO updateDto, User existingUser) {
-        if (updateDto == null || existingUser == null) {
-            throw new IllegalArgumentException("Update DTO and existing User entity must not be null.");
+        if (updateDto == null) {
+            throw new IllegalArgumentException("Update DTO must not be null.");
         }
 
-        // Use the 'toBuilder' pattern to create a mutable copy
-        User.UserBuilder builder = existingUser.toBuilder();
+        // Create a new, empty User object to act as a "sparse" payload.
+        User updatePayload = new User();
 
-        if (updateDto.getFirstName() != null) builder.firstName(updateDto.getFirstName());
-        if (updateDto.getLastName() != null) builder.lastName(updateDto.getLastName());
-        if (updateDto.getEmail() != null) builder.email(updateDto.getEmail());
+        // Only set fields on the payload if they exist in the DTO.
+        if (updateDto.getFirstName() != null) {
+            updatePayload.setFirstName(updateDto.getFirstName());
+        }
+        if (updateDto.getLastName() != null) {
+            updatePayload.setLastName(updateDto.getLastName());
+        }
+        if (updateDto.getEmail() != null) {
+            updatePayload.setEmail(updateDto.getEmail());
+        }
+        // Only set the password on the payload if a NEW one is provided in the DTO.
         if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
-            builder.password(updateDto.getPassword()); // Service must handle encoding
+            updatePayload.setPassword(updateDto.getPassword());
         }
-        if (updateDto.getDeleted() != null) builder.deleted(updateDto.getDeleted());
+        if (updateDto.getDeleted() != null) {
+            updatePayload.setDeleted(updateDto.getDeleted());
+        }
 
-        // Roles are handled by the service. Image is handled by a separate endpoint.
-        return builder.build();
+        // Return the sparse payload. All other fields on this object will be null.
+        return updatePayload;
     }
 }
