@@ -5,7 +5,7 @@ import za.ac.cput.domain.dto.request.CarCreateDTO;
 import za.ac.cput.domain.dto.request.CarUpdateDTO;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
 import za.ac.cput.domain.entity.Car;
-import za.ac.cput.domain.entity.CarImage; // Import the new entity
+import za.ac.cput.domain.entity.CarImage;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * A utility class for mapping between Car domain entities and DTOs.
  * This version is updated to handle a one-to-many relationship with CarImage entities,
  * building a list of full image URLs for the response.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Updated: 2024-06-07
  */
@@ -114,8 +114,8 @@ public class CarMapper {
      * Applies updates from a {@link CarUpdateDTO} to an existing {@link Car} entity.
      * This method uses the Car's own builder pattern with the 'applyTo' method.
      *
-     * @param updateDto    The DTO containing the update data.
-     * @param existingCar  The existing {@link Car} entity to be updated.
+     * @param updateDto   The DTO containing the update data.
+     * @param existingCar The existing {@link Car} entity to be updated.
      * @return The same existingCar instance, now modified with the new state.
      */
     public static Car applyUpdateDtoToEntity(CarUpdateDTO updateDto, Car existingCar) {

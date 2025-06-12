@@ -16,7 +16,6 @@ import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.enums.ImageType;
 import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.exception.BadRequestException;
-import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.IRoleRepository;
 import za.ac.cput.service.FileStorageService;
 import za.ac.cput.service.IRoleService;
@@ -25,7 +24,6 @@ import za.ac.cput.service.IUserService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * AdminUserController.java

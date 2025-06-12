@@ -2,12 +2,17 @@ package za.ac.cput.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.entity.security.User;
-import za.ac.cput.repository.IUserRepository;
+import za.ac.cput.repository.UserRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * CustomerUserDetailsService.java
@@ -27,10 +32,10 @@ public class CustomerUserDetailsService implements UserDetailsService {
 
     private static final Logger log = LoggerFactory.getLogger(CustomerUserDetailsService.class); // Manual SLF4J Logger
 
-    private final IUserRepository userRepository; // Corrected variable name
+    private final UserRepository userRepository; // Corrected variable name
 
     // Constructor injection is preferred
-    public CustomerUserDetailsService(IUserRepository userRepository) {
+    public CustomerUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -54,6 +59,13 @@ public class CustomerUserDetailsService implements UserDetailsService {
         log.info("User found and loaded successfully for email: '{}'. User ID: {}", email, user.getId());
         // Your User entity must implement UserDetails for this to work directly.
         // If it doesn't, you'd map User to a UserDetails implementation here.
+        // Get the roles from the user entity
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                // THE CHANGE IS HERE: Manually add the "ROLE_" prefix
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName()))
+                .collect(Collectors.toList());
+        // Set the authorities in the UserDetails object
+
         return user;
     }
 }

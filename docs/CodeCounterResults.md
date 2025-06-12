@@ -163,7 +163,7 @@
 | 88 | IHelpCenterRepository.java | 19 | 9 | 6 | 0 | 0 | 1 | 0 | 100,00 | 0 |
 | 89 | IRepository.java | 18 | 8 | 6 | 0 | 0 | 2 | 0 | 100,00 | 0 |
 | 90 | IRoleRepository.java | 17 | 10 | 1 | 0 | 0 | 1 | 0 | 100,00 | 0 |
-| 91 | IUserRepository.java | 23 | 12 | 1 | 0 | 0 | 1 | 0 | 100,00 | 0 |
+| 91 | UserRepository.java | 23 | 12 | 1 | 0 | 0 | 1 | 0 | 100,00 | 0 |
 | 92 | RentalRepository.java | 29 | 14 | 6 | 0 | 0 | 1 | 0 | 100,00 | 0 |
 | 93 | SettingsRepository.java | 12 | 5 | 5 | 0 | 0 | 1 | 1 | 100,00 | 0 |
 | 94 | UserRepository.java | 19 | 7 | 9 | 0 | 0 | 1 | 2 | 100,00 | 0 |

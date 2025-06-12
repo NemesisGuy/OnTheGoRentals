@@ -88,6 +88,7 @@ public class AdminRentalController {
         }
         return ResponseEntity.ok(RentalMapper.toDtoList(rentals));
     }
+
     @GetMapping("/active")
     public ResponseEntity<List<RentalResponseDTO>> getActiveRentals() {
         String adminId = SecurityUtils.getRequesterIdentifier();
@@ -101,6 +102,7 @@ public class AdminRentalController {
         log.info("Admin [{}]: Successfully retrieved {} active rentals.", adminId, dtoList.size());
         return ResponseEntity.ok(dtoList);
     }
+
     @PostMapping
     public ResponseEntity<RentalResponseDTO> createRentalByAdmin(@Valid @RequestBody RentalRequestDTO createDto) {
         String adminId = SecurityUtils.getRequesterIdentifier();
@@ -326,7 +328,6 @@ public class AdminRentalController {
         log.info("Admin [{}]: Successfully completed rental with ID: {} and UUID: {}. Fine applied: {}", adminId, completedRental.getId(), completedRental.getUuid(), fineAmount);
         return ResponseEntity.ok(RentalMapper.toDto(completedRental));
     }
-
 
 
 }

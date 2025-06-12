@@ -16,7 +16,7 @@ public class CarFactory implements IFactory<Car> {
 
 
     public Car createCar(int id, String make, String model, int year, String category, PriceGroup priceGroup, String licensePlate, boolean available) {
-        return new  Car.Builder()
+        return new Car.Builder()
 
                 .setId(id)
                 .setMake(make)

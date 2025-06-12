@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * UserMapper.java
  * A utility class for mapping between User domain entities and their DTOs.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Updated: 2025-06-12
  */
@@ -72,7 +72,7 @@ public class UserMapper {
      * This prevents old data (like a hashed password) from being accidentally passed
      * to the update service.
      *
-     * @param updateDto The DTO containing the update data.
+     * @param updateDto    The DTO containing the update data.
      * @param existingUser The existing User entity (not used in this new implementation, but kept for signature consistency).
      * @return A new User instance containing only the fields to be updated.
      */

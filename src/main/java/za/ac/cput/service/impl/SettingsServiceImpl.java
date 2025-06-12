@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.ac.cput.domain.settings.Settings;
+import za.ac.cput.domain.entity.settings.Settings;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.factory.impl.SettingsFactory;
 import za.ac.cput.repository.SettingsRepository;

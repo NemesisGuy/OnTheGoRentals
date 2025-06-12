@@ -14,7 +14,7 @@ import java.util.UUID;
  * This class represents the data transfer object for sending Car information to the client.
  * It includes all publicly accessible details of a car, as well as a list of fully-formed
  * URLs for any associated images.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: 2024-05-30
  */

@@ -1,6 +1,6 @@
 package za.ac.cput.service;
 
-import za.ac.cput.domain.settings.Settings;
+import za.ac.cput.domain.entity.settings.Settings;
 
 /**
  * ISettingsService.java

@@ -12,7 +12,7 @@ import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.exception.TokenRefreshException;
 import za.ac.cput.repository.IRefreshTokenRepository;
-import za.ac.cput.repository.IUserRepository;
+import za.ac.cput.repository.UserRepository;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -20,8 +20,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -38,7 +36,7 @@ class RefreshTokenServiceImplTest {
     @Mock
     private IRefreshTokenRepository refreshTokenRepository;
     @Mock
-    private IUserRepository userRepository;
+    private UserRepository userRepository;
 
     @InjectMocks
     private RefreshTokenServiceImpl refreshTokenService;

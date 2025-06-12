@@ -13,9 +13,8 @@ import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.enums.AuthProvider;
 import za.ac.cput.exception.EmailAlreadyExistsException;
-import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.IRoleRepository;
-import za.ac.cput.repository.IUserRepository;
+import za.ac.cput.repository.UserRepository;
 import za.ac.cput.service.IRefreshTokenService;
 
 import java.time.LocalDateTime; // For simulating audit fields
@@ -27,7 +26,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -43,7 +41,7 @@ import static org.mockito.Mockito.*;
 class UserServiceImplTest {
 
     @Mock
-    private IUserRepository userRepository;
+    private UserRepository userRepository;
     @Mock
     private IRoleRepository roleRepository;
     @Mock

@@ -45,7 +45,7 @@ public class SpringSecurityConfig_old {
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 *//*
 
-*/
+ */
 /*
                         .ignoringRequestMatchers("/api/v1/auth/**") // Allow JWT endpoints to bypass CSRF
 *//*

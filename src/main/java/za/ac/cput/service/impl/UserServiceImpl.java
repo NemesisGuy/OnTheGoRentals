@@ -12,15 +12,13 @@ import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.exception.EmailAlreadyExistsException;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.IRoleRepository;
-import za.ac.cput.repository.IUserRepository;
+import za.ac.cput.repository.UserRepository;
 import za.ac.cput.service.IRefreshTokenService;
 import za.ac.cput.service.IUserService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * UserServiceImpl.java
@@ -37,13 +35,13 @@ public class UserServiceImpl implements IUserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    private final IUserRepository userRepository;
+    private final UserRepository userRepository;
     private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final IRefreshTokenService refreshTokenService;
 
     @Autowired
-    public UserServiceImpl(IUserRepository userRepository,
+    public UserServiceImpl(UserRepository userRepository,
                            IRoleRepository roleRepository,
                            PasswordEncoder passwordEncoder,
                            IRefreshTokenService refreshTokenService) {
@@ -117,7 +115,6 @@ public class UserServiceImpl implements IUserService {
         return userRepository.findByEmailAndDeletedFalse(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
-
 
 
     /**

@@ -27,7 +27,7 @@ import java.util.UUID;
  * AdminCarController.java
  * Controller for administrative operations on Car entities.
  * Supports creating, reading, updating, deleting cars, and managing multiple images per car.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Updated: 2024-06-07
  */
@@ -96,7 +96,7 @@ public class AdminCarController {
     /**
      * Updates a car's non-image details.
      *
-     * @param carUuid The UUID of the car to update.
+     * @param carUuid      The UUID of the car to update.
      * @param carUpdateDTO The DTO with the updated data.
      * @return The updated car's DTO.
      */
@@ -136,7 +136,7 @@ public class AdminCarController {
      * Uploads one or more images and associates them with an existing car.
      *
      * @param carUuid The UUID of the car to add images to.
-     * @param files A list of files sent with the multipart key "images".
+     * @param files   A list of files sent with the multipart key "images".
      * @return The updated car DTO with the full list of image URLs.
      */
     @PostMapping("/{carUuid}/images")
@@ -173,7 +173,7 @@ public class AdminCarController {
     /**
      * Deletes a specific image from a car.
      *
-     * @param carUuid The UUID of the parent car.
+     * @param carUuid   The UUID of the parent car.
      * @param imageUuid The UUID of the image to delete.
      * @return A No Content (204) response on success.
      */

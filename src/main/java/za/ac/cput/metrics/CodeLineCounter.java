@@ -160,7 +160,8 @@ public class CodeLineCounter {
                             fileTotalCyclomaticComplexity += ccCalc.calculate(currentMethodBody.toString());
                             inMethod = false;
                         } else if (methodBraceLevel < 0) { // Should not happen with correct parsing
-                            inMethod = false; methodBraceLevel = 0;
+                            inMethod = false;
+                            methodBraceLevel = 0;
                         }
                     }
                 } else { // Inside a method body

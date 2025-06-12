@@ -16,7 +16,7 @@ import java.util.UUID;
  * Entity for the Car. This version is corrected to handle updates to collections
  * with orphanRemoval=true by clearing and re-populating the managed list,
  * rather than replacing it.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Updated: 2024-06-07
  */
@@ -64,19 +64,57 @@ public class Car {
     }
 
     // --- PRIVATE SETTERS ---
-    private void setId(int id) { this.id = id; }
-    private void setUuid(UUID uuid) { this.uuid = uuid; }
-    private void setMake(String make) { this.make = make; }
-    private void setModel(String model) { this.model = model; }
-    private void setYear(int year) { this.year = year; }
-    private void setCategory(String category) { this.category = category; }
-    private void setPriceGroup(PriceGroup priceGroup) { this.priceGroup = priceGroup; }
-    private void setLicensePlate(String licensePlate) { this.licensePlate = licensePlate; }
-    private void setVin(String vin) { this.vin = vin; }
-    private void setAvailable(boolean available) { this.available = available; }
-    private void setDeleted(boolean deleted) { this.deleted = deleted; }
-    private void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    private void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    private void setId(int id) {
+        this.id = id;
+    }
+
+    private void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    private void setMake(String make) {
+        this.make = make;
+    }
+
+    private void setModel(String model) {
+        this.model = model;
+    }
+
+    private void setYear(int year) {
+        this.year = year;
+    }
+
+    private void setCategory(String category) {
+        this.category = category;
+    }
+
+    private void setPriceGroup(PriceGroup priceGroup) {
+        this.priceGroup = priceGroup;
+    }
+
+    private void setLicensePlate(String licensePlate) {
+        this.licensePlate = licensePlate;
+    }
+
+    private void setVin(String vin) {
+        this.vin = vin;
+    }
+
+    private void setAvailable(boolean available) {
+        this.available = available;
+    }
+
+    private void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    private void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    private void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
     // The images list is modified directly, so no public setter is needed.
 
 
@@ -123,20 +161,75 @@ public class Car {
         private List<CarImage> images = new ArrayList<>();
 
         // --- Builder Setters ---
-        public Builder setId(int id) { this.id = id; return this; }
-        public Builder setUuid(UUID uuid) { this.uuid = uuid; return this; }
-        public Builder setMake(String make) { this.make = make; return this; }
-        public Builder setModel(String model) { this.model = model; return this; }
-        public Builder setYear(int year) { this.year = year; return this; }
-        public Builder setCategory(String category) { this.category = category; return this; }
-        public Builder setPriceGroup(PriceGroup priceGroup) { this.priceGroup = priceGroup; return this; }
-        public Builder setLicensePlate(String licensePlate) { this.licensePlate = licensePlate; return this; }
-        public Builder setVin(String vin) { this.vin = vin; return this; }
-        public Builder setAvailable(boolean available) { this.available = available; return this; }
-        public Builder setDeleted(boolean deleted) { this.deleted = deleted; return this; }
-        public Builder setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
-        public Builder setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; return this; }
-        public Builder setImages(List<CarImage> images) { this.images = images; return this; }
+        public Builder setId(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder setUuid(UUID uuid) {
+            this.uuid = uuid;
+            return this;
+        }
+
+        public Builder setMake(String make) {
+            this.make = make;
+            return this;
+        }
+
+        public Builder setModel(String model) {
+            this.model = model;
+            return this;
+        }
+
+        public Builder setYear(int year) {
+            this.year = year;
+            return this;
+        }
+
+        public Builder setCategory(String category) {
+            this.category = category;
+            return this;
+        }
+
+        public Builder setPriceGroup(PriceGroup priceGroup) {
+            this.priceGroup = priceGroup;
+            return this;
+        }
+
+        public Builder setLicensePlate(String licensePlate) {
+            this.licensePlate = licensePlate;
+            return this;
+        }
+
+        public Builder setVin(String vin) {
+            this.vin = vin;
+            return this;
+        }
+
+        public Builder setAvailable(boolean available) {
+            this.available = available;
+            return this;
+        }
+
+        public Builder setDeleted(boolean deleted) {
+            this.deleted = deleted;
+            return this;
+        }
+
+        public Builder setCreatedAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder setUpdatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
+        public Builder setImages(List<CarImage> images) {
+            this.images = images;
+            return this;
+        }
 
 
         public Builder copy(Car car) {

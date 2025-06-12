@@ -3,6 +3,7 @@ package za.ac.cput.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
  * Represents a single image file associated with a Car entity.
  * This entity allows a car to have a one-to-many relationship with its images,
  * enabling features like an image carousel.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Date: 2024-06-07
  */

@@ -239,6 +239,7 @@ public class Booking {
             this.updatedAt = updatedAt;
             return this;
         }
+
         /**
          * Copies the state from an existing Booking instance to this builder.
          * This is useful for creating a new Booking with the same properties as an existing one.
@@ -261,6 +262,7 @@ public class Booking {
             this.updatedAt = booking.updatedAt;
             return this;
         }
+
         /**
          * Builds the Booking instance, ensuring all pre-persist logic is applied.
          * This method should be called after setting all required fields.
@@ -282,7 +284,7 @@ public class Booking {
          * @return The updated Booking instance
          * @throws IllegalArgumentException if the booking is null
          */
-        public  Booking applyTo(Booking booking) {
+        public Booking applyTo(Booking booking) {
             if (booking == null) {
                 throw new IllegalArgumentException("Booking cannot be null");
             }

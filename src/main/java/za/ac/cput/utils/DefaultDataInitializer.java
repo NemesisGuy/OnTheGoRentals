@@ -6,20 +6,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-// import org.springframework.transaction.annotation.Transactional; // Keep commented for test
 import za.ac.cput.domain.entity.security.Role;
 import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.enums.AuthProvider;
 import za.ac.cput.repository.IRoleRepository;
-import za.ac.cput.repository.IUserRepository;
+import za.ac.cput.repository.UserRepository;
 import za.ac.cput.service.IUserService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class DefaultDataInitializer implements CommandLineRunner {
@@ -28,12 +23,12 @@ public class DefaultDataInitializer implements CommandLineRunner {
 
     private final IUserService userService;
     private final IRoleRepository roleRepository;
-    private final IUserRepository userRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DefaultDataInitializer(IUserService userService,
                                   IRoleRepository roleRepository,
-                                  IUserRepository userRepository,
+                                  UserRepository userRepository,
                                   PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.roleRepository = roleRepository;

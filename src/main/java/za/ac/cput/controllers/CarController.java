@@ -47,6 +47,7 @@ public class CarController {
         this.carService = carService;
         log.info("CarController initialized.");
     }
+
     /**
      * NEW: A dedicated, unambiguous endpoint for fetching available cars.
      * The path "/list/available" cannot be confused with "/{uuid}".

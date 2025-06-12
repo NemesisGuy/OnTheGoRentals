@@ -10,7 +10,7 @@ import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.exception.TokenRefreshException;
 import za.ac.cput.repository.IRefreshTokenRepository;
-import za.ac.cput.repository.IUserRepository;
+import za.ac.cput.repository.UserRepository;
 import za.ac.cput.service.IRefreshTokenService;
 
 import java.time.Instant;
@@ -33,7 +33,7 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
 
     private static final Logger log = LoggerFactory.getLogger(RefreshTokenServiceImpl.class);
     private final IRefreshTokenRepository refreshTokenRepository;
-    private final IUserRepository userRepository; // Corrected variable name
+    private final UserRepository userRepository; // Corrected variable name
     @Value("${jwt.refresh-token.expiration-ms}")
     private Long refreshTokenDurationMs;
 
@@ -43,7 +43,7 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
      * @param refreshTokenRepository The repository for refresh token persistence.
      * @param userRepository         The repository for user data access.
      */
-    public RefreshTokenServiceImpl(IRefreshTokenRepository refreshTokenRepository, IUserRepository userRepository) {
+    public RefreshTokenServiceImpl(IRefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository; // Corrected assignment
         log.info("RefreshTokenServiceImpl initialized. Refresh token duration: {} ms", refreshTokenDurationMs);

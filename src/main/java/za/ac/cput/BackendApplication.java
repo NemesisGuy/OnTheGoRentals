@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BackendApplication {
 
     private static final Logger log = LoggerFactory.getLogger(BackendApplication.class);
+
     /**
      * Main method to start the Spring Boot application.
      * This method initializes the application context and starts the embedded server.

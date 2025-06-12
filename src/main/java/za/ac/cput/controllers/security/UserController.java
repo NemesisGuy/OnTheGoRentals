@@ -5,11 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import za.ac.cput.domain.dto.request.UserUpdateDTO;
-
 import za.ac.cput.domain.dto.response.RentalResponseDTO;
 import za.ac.cput.domain.dto.response.UserResponseDTO;
 import za.ac.cput.domain.entity.Rental;
@@ -18,7 +16,6 @@ import za.ac.cput.domain.enums.ImageType;
 import za.ac.cput.domain.mapper.RentalMapper;
 import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.exception.BadRequestException;
-import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.FileStorageService;
 import za.ac.cput.service.IRentalService;
 import za.ac.cput.service.IUserService;
@@ -31,7 +28,7 @@ import java.util.List;
  * UserController.java
  * Controller for authenticated users to manage their own profile and related data.
  * This includes updating profile info, uploading a profile image, and viewing rental history.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Updated: 2024-06-07
  */

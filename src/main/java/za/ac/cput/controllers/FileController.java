@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  * FileController.java
  * Controller responsible for serving static files like images from the file system.
  * It provides a public endpoint to retrieve resources based on a folder and filename.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Updated: 2024-06-07
  */
@@ -55,7 +55,7 @@ public class FileController {
      * @param folder   The sub-directory within the base storage directory (e.g., "cars", "selfies").
      * @param filename The name of the file to be served, including its extension.
      * @return A {@link ResponseEntity} containing the file {@link Resource} if found,
-     *         or a 404 Not Found status if the file does not exist or cannot be read.
+     * or a 404 Not Found status if the file does not exist or cannot be read.
      */
     @GetMapping("/{folder}/{filename:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String folder, @PathVariable String filename) {

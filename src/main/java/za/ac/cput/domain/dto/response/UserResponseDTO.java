@@ -12,7 +12,7 @@ import java.util.UUID;
  * UserResponseDTO.java
  * DTO for sending User data to the client.
  * Includes user details, roles, and a fully qualified URL to their profile image.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Updated: 2024-06-07
  */

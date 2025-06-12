@@ -3,7 +3,7 @@ package za.ac.cput.factory.impl;
  * Author: Peter Buckingham (220165289)
  */
 
-import za.ac.cput.domain.settings.Settings;
+import za.ac.cput.domain.entity.settings.Settings;
 
 public class SettingsFactory {
 

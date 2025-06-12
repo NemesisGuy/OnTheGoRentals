@@ -1,4 +1,4 @@
-package za.ac.cput.domain.settings;
+package za.ac.cput.domain.entity.settings;
 /**
  * Author: Peter Buckingham (220165289)
  */
@@ -12,13 +12,13 @@ import java.util.UUID;
 @Entity
 public class Settings {
 
-    @Id
-    private int id;
     @Column(nullable = false, unique = true, updatable = false)
     private final UUID uuid = UUID.randomUUID();
+    private final boolean deleted = false;
+    @Id
+    private int id;
     private String currencyName;
     private String currencySymbol;
-    private final boolean deleted = false;
 
     public Settings() {
 

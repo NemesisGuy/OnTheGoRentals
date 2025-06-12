@@ -273,7 +273,7 @@
 | 152 | IRefreshTokenRepository.java | 23 | 15 | 1 | 0 | 0 | 1 | 0 | 100,00 | 0,00 |
 | 153 | IRepository.java | 18 | 8 | 6 | 0 | 0 | 2 | 0 | 100,00 | 0,00 |
 | 154 | IRoleRepository.java | 17 | 10 | 1 | 0 | 0 | 1 | 0 | 100,00 | 0,00 |
-| 155 | IUserRepository.java | 36 | 19 | 1 | 0 | 0 | 1 | 0 | 100,00 | 0,00 |
+| 155 | UserRepository.java | 36 | 19 | 1 | 0 | 0 | 1 | 0 | 100,00 | 0,00 |
 | 156 | RentalRepository.java | 117 | 26 | 76 | 0 | 0 | 1 | 8 | 83,69 | 0,00 |
 | 157 | SettingsRepository.java | 17 | 9 | 3 | 0 | 0 | 1 | 0 | 100,00 | 0,00 |
 

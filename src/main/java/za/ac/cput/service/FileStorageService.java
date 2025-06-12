@@ -6,8 +6,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface FileStorageService {
     String save(String folder, MultipartFile file);
+
     Resource load(String folder, String filename);
 
-    void delete(String fileType, String filename);
+    boolean delete(String fileType, String filename);
+
+    boolean fileExists(String cars, String fileName);
 }
 

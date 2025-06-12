@@ -32,7 +32,7 @@ import java.util.UUID;
  * Manages the lifecycle of rentals, including creation, retrieval, updates,
  * and status changes. This version uses a builder with an 'applyTo'
  * method to update managed JPA entities, preserving the entity's immutable public API.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Updated: 2024-06-07
  */
@@ -249,7 +249,8 @@ public class RentalServiceImpl implements IRentalService {
         log.info("Completing rental UUID: {}", rentalUuid);
         Rental rental = read(rentalUuid);
         if (rental == null) throw new ResourceNotFoundException("Rental not found: " + rentalUuid);
-        if (rental.getStatus() != RentalStatus.ACTIVE) throw new IllegalStateException("Only an ACTIVE rental can be completed.");
+        if (rental.getStatus() != RentalStatus.ACTIVE)
+            throw new IllegalStateException("Only an ACTIVE rental can be completed.");
 
         Car car = rental.getCar();
         if (car != null) {
@@ -275,7 +276,8 @@ public class RentalServiceImpl implements IRentalService {
         log.info("Cancelling rental UUID: {}", rentalUuid);
         Rental rental = read(rentalUuid);
         if (rental == null) throw new ResourceNotFoundException("Rental not found: " + rentalUuid);
-        if (rental.getStatus() == RentalStatus.COMPLETED) throw new IllegalStateException("Cannot cancel a completed rental.");
+        if (rental.getStatus() == RentalStatus.COMPLETED)
+            throw new IllegalStateException("Cannot cancel a completed rental.");
         if (rental.getStatus() == RentalStatus.CANCELLED) return rental;
 
         Car car = rental.getCar();
@@ -310,14 +312,52 @@ public class RentalServiceImpl implements IRentalService {
         return rental;
     }
 
-    @Override public List<Rental> getAll() { return rentalRepository.findAllByDeletedFalse(); }
-    @Override public boolean isCurrentlyRenting(User user) { if(user==null || user.getId()==null) return false; return !rentalRepository.findByUserIdAndStatusAndReturnedDateIsNullAndDeletedFalse(user.getId(), RentalStatus.ACTIVE).isEmpty(); }
-    @Override public Rental getCurrentRental(User user) { if(user==null || user.getId()==null) return null; return rentalRepository.findByUserIdAndStatusAndReturnedDateIsNullAndDeletedFalse(user.getId(), RentalStatus.ACTIVE).stream().findFirst().orElse(null); }
-    @Override public boolean existsById(Integer id) { return rentalRepository.existsByIdAndDeletedFalse(id); }
-    @Override public List<Rental> getRentalHistoryByUser(User user) { if(user==null || user.getId()==null) return Collections.emptyList(); return rentalRepository.findByUserIdAndDeletedFalse(user.getId()); }
-    @Override public List<Rental> findRentalsDueToday() { LocalDateTime start = LocalDate.now().atStartOfDay(); LocalDateTime end = LocalDate.now().atTime(23, 59, 59); return rentalRepository.findByExpectedReturnDateBetweenAndStatusAndReturnedDateIsNullAndDeletedFalse(start, end, RentalStatus.ACTIVE); }
-    @Override public List<Rental> findOverdueRentals() { return rentalRepository.findByExpectedReturnDateBeforeAndStatusAndReturnedDateIsNullAndDeletedFalse(LocalDateTime.now(), RentalStatus.ACTIVE); }
-    @Override public List<Rental> findRentalsDueOnDate(LocalDate date) { LocalDateTime start = date.atStartOfDay(); LocalDateTime end = date.atTime(23, 59, 59); return rentalRepository.findByExpectedReturnDateBetweenAndStatusAndReturnedDateIsNullAndDeletedFalse(start, end, RentalStatus.ACTIVE); }
+    @Override
+    public List<Rental> getAll() {
+        return rentalRepository.findAllByDeletedFalse();
+    }
+
+    @Override
+    public boolean isCurrentlyRenting(User user) {
+        if (user == null || user.getId() == null) return false;
+        return !rentalRepository.findByUserIdAndStatusAndReturnedDateIsNullAndDeletedFalse(user.getId(), RentalStatus.ACTIVE).isEmpty();
+    }
+
+    @Override
+    public Rental getCurrentRental(User user) {
+        if (user == null || user.getId() == null) return null;
+        return rentalRepository.findByUserIdAndStatusAndReturnedDateIsNullAndDeletedFalse(user.getId(), RentalStatus.ACTIVE).stream().findFirst().orElse(null);
+    }
+
+    @Override
+    public boolean existsById(Integer id) {
+        return rentalRepository.existsByIdAndDeletedFalse(id);
+    }
+
+    @Override
+    public List<Rental> getRentalHistoryByUser(User user) {
+        if (user == null || user.getId() == null) return Collections.emptyList();
+        return rentalRepository.findByUserIdAndDeletedFalse(user.getId());
+    }
+
+    @Override
+    public List<Rental> findRentalsDueToday() {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = LocalDate.now().atTime(23, 59, 59);
+        return rentalRepository.findByExpectedReturnDateBetweenAndStatusAndReturnedDateIsNullAndDeletedFalse(start, end, RentalStatus.ACTIVE);
+    }
+
+    @Override
+    public List<Rental> findOverdueRentals() {
+        return rentalRepository.findByExpectedReturnDateBeforeAndStatusAndReturnedDateIsNullAndDeletedFalse(LocalDateTime.now(), RentalStatus.ACTIVE);
+    }
+
+    @Override
+    public List<Rental> findRentalsDueOnDate(LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.atTime(23, 59, 59);
+        return rentalRepository.findByExpectedReturnDateBetweenAndStatusAndReturnedDateIsNullAndDeletedFalse(start, end, RentalStatus.ACTIVE);
+    }
 
     /**
      * Finds all rentals that are currently considered "active".
@@ -326,7 +366,7 @@ public class RentalServiceImpl implements IRentalService {
      * representation of all cars currently in possession of a customer.
      *
      * @return A List of {@link Rental} entities that are currently active.
-     *         Returns an empty list if no active rentals are found.
+     * Returns an empty list if no active rentals are found.
      */
     @Override
     public List<Rental> findActiveRentals() {
@@ -336,7 +376,10 @@ public class RentalServiceImpl implements IRentalService {
         return activeRentals;
     }
 
-    @Override public List<Rental> findByUserIdAndReturnedDateIsNullAndDeletedFalse(Integer userId) { return rentalRepository.findByUserIdAndReturnedDateIsNullAndDeletedFalse(userId); }
+    @Override
+    public List<Rental> findByUserIdAndReturnedDateIsNullAndDeletedFalse(Integer userId) {
+        return rentalRepository.findByUserIdAndReturnedDateIsNullAndDeletedFalse(userId);
+    }
 
     private void updateCarAvailabilityOnStatusChange(Car car, RentalStatus oldStatus, RentalStatus newStatus) {
         if (car == null) return;

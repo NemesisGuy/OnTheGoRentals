@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -16,11 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-// Removed unused CORS imports to keep the file clean
-// import org.springframework.web.cors.CorsConfiguration;
-// import org.springframework.web.cors.CorsConfigurationSource;
-// import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-// import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -31,13 +25,15 @@ import static org.springframework.security.config.Customizer.withDefaults;
  * CORS (Cross-Origin Resource Sharing) is configured to be handled by an upstream
  * reverse proxy (e.g., Nginx, Cloudflare) and is intentionally NOT configured here
  * to prevent header conflicts.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Updated: 2024-06-10
  */
 @Configuration
 @EnableWebSecurity
+/*
 @EnableMethodSecurity // Enables method-level security like @PreAuthorize
+*/
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
 
@@ -74,6 +70,7 @@ public class SpringSecurityConfig {
                         .requestMatchers("/api/v1/bookings/available-cars").permitAll()
                         .requestMatchers("/actuator/**", "/metrics", "/metrics/**").permitAll()
 
+                        .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN") // Admin endpoints require specific roles
                         // All other requests must be authenticated
                         .anyRequest().authenticated()
                 )

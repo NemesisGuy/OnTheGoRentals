@@ -3,7 +3,7 @@ package za.ac.cput.api.advice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
-import org.springframework.core.io.Resource; // Import the Resource class
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -11,7 +11,7 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import za.ac.cput.api.response.ApiResponse;
-import za.ac.cput.controllers.FileController; // It's good practice to be specific
+import za.ac.cput.controllers.FileController;
 import za.ac.cput.utils.SecurityUtils;
 
 /**

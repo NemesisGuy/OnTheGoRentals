@@ -15,7 +15,7 @@ import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.enums.AuthProvider;
 import za.ac.cput.repository.IRoleRepository;
-import za.ac.cput.repository.IUserRepository;
+import za.ac.cput.repository.UserRepository;
 import za.ac.cput.security.JwtUtilities;
 import za.ac.cput.service.IRefreshTokenService;
 
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 public class GoogleOAuth2UserService {
 
-    private final IUserRepository IUserRepository;
+    private final UserRepository UserRepository;
     private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder; // For generating a dummy password for OAuth users
     private final JwtUtilities jwtUtilities;
@@ -42,10 +42,10 @@ public class GoogleOAuth2UserService {
 
     // The google.oauth2.audience should be your Google Client ID
     public GoogleOAuth2UserService(@Value("${spring.security.oauth2.client.registration.google.client-id}") String googleClientId,
-                                   IUserRepository IUserRepository, IRoleRepository roleRepository,
+                                   UserRepository UserRepository, IRoleRepository roleRepository,
                                    PasswordEncoder passwordEncoder, JwtUtilities jwtUtilities,
                                    IRefreshTokenService refreshTokenService) {
-        this.IUserRepository = IUserRepository;
+        this.UserRepository = UserRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtilities = jwtUtilities;
@@ -77,7 +77,7 @@ public class GoogleOAuth2UserService {
                 throw new IllegalArgumentException("Google email not verified.");
             }
 
-            Optional<User> userOptional = IUserRepository.findByEmail(email); // Prioritize email
+            Optional<User> userOptional = UserRepository.findByEmail(email); // Prioritize email
             User user;
 
             if (userOptional.isPresent()) {
@@ -94,7 +94,7 @@ public class GoogleOAuth2UserService {
                         user.setLastName(extractLastName(name, extractFirstName(name)));
                  /*   if (user.getProfileImageUrl() == null || user.getProfileImageUrl().isEmpty())
                         user.setProfileImageUrl(pictureUrl);*/
-                    IUserRepository.save(user);
+                    UserRepository.save(user);
                 } else if (user.getAuthProvider() == AuthProvider.GOOGLE && (user.getGoogleId() == null || !user.getGoogleId().equals(googleUserId))) {
                     // Email exists, registered with Google, but Google ID mismatch (highly unlikely if email is verified unique)
                     // Handle this edge case, maybe log an error or throw exception
@@ -107,7 +107,7 @@ public class GoogleOAuth2UserService {
                 user.setEmail(email);
                 user.setFirstName(extractFirstName(name));
                 user.setLastName(extractLastName(name, extractFirstName(name)));
-            /*    user.setProfileImageUrl(pictureUrl);*/
+                /*    user.setProfileImageUrl(pictureUrl);*/
                 user.setAuthProvider(AuthProvider.GOOGLE);
                 user.setGoogleId(googleUserId);
                 // OAuth2 users usually don't have a password managed by our system
@@ -116,7 +116,7 @@ public class GoogleOAuth2UserService {
                 user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
                 Role userRole = roleRepository.findByRoleName(RoleName.USER);
                 user.setRoles(Collections.singletonList(userRole));
-                IUserRepository.save(user);
+                UserRepository.save(user);
             }
 
             // Generate your application's tokens
