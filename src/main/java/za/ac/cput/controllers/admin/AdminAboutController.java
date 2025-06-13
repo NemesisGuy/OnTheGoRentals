@@ -1,5 +1,8 @@
 package za.ac.cput.controllers.admin;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +39,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/admin/about-us")
 // @CrossOrigin(...) // Prefer global CORS configuration
 // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPERADMIN')") // Apply security if all endpoints are admin-only
+@Api(value = "Admin About Us Management", tags = "Admin About Us Management")
 public class AdminAboutController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminAboutController.class);
@@ -62,7 +66,9 @@ public class AdminAboutController {
      * @return A ResponseEntity containing the created {@link AboutUsResponseDTO} and HTTP status CREATED.
      */
     @PostMapping
-    public ResponseEntity<AboutUsResponseDTO> createAboutUs(@Valid @RequestBody AboutUsCreateDTO createDto) {
+    @ApiOperation(value = "Create new About Us content", notes = "Allows administrators to create a new 'About Us' information entry.")
+    public ResponseEntity<AboutUsResponseDTO> createAboutUs(
+            @ApiParam(value = "Data for the new About Us entry", required = true) @Valid @RequestBody AboutUsCreateDTO createDto) {
         log.info("Admin request to create new About Us content with DTO: {}", createDto);
         AboutUs aboutUsToCreate = AboutUsMapper.toEntity(createDto);
         log.debug("Mapped DTO to AboutUs entity for creation: {}", aboutUsToCreate);
@@ -80,7 +86,9 @@ public class AdminAboutController {
      * @throws ResourceNotFoundException if the "About Us" entry with the given UUID is not found (handled by service).
      */
     @GetMapping("/{aboutUsUuid}")
-    public ResponseEntity<AboutUsResponseDTO> getAboutUsByUuid(@PathVariable UUID aboutUsUuid) {
+    @ApiOperation(value = "Get About Us content by UUID", notes = "Retrieves a specific 'About Us' entry by its UUID.")
+    public ResponseEntity<AboutUsResponseDTO> getAboutUsByUuid(
+            @ApiParam(value = "UUID of the About Us entry to retrieve", required = true) @PathVariable UUID aboutUsUuid) {
         log.info("Admin request to get About Us content by UUID: {}", aboutUsUuid);
         AboutUs aboutUsEntity = aboutUsService.read(aboutUsUuid);
         // The aboutUsService.read(UUID) method is expected to throw ResourceNotFoundException if not found.
@@ -97,9 +105,10 @@ public class AdminAboutController {
      * @throws ResourceNotFoundException if the "About Us" entry with the given UUID is not found (handled by service).
      */
     @PutMapping("/{aboutUsUuid}")
+    @ApiOperation(value = "Update About Us content", notes = "Updates an existing 'About Us' entry identified by its UUID.")
     public ResponseEntity<AboutUsResponseDTO> updateAboutUs(
-            @PathVariable UUID aboutUsUuid,
-            @Valid @RequestBody AboutUsUpdateDTO updateDto
+            @ApiParam(value = "UUID of the About Us entry to update", required = true) @PathVariable UUID aboutUsUuid,
+            @ApiParam(value = "Updated data for the About Us entry", required = true) @Valid @RequestBody AboutUsUpdateDTO updateDto
     ) {
         log.info("Admin request to update About Us content with UUID: {}. Update DTO: {}", aboutUsUuid, updateDto);
         AboutUs existingAboutUs = aboutUsService.read(aboutUsUuid); // Fetches current entity to ensure it exists and get its internal ID
@@ -122,6 +131,7 @@ public class AdminAboutController {
      * @return A ResponseEntity containing a list of {@link AboutUsResponseDTO}s, or no content if none exist.
      */
     @GetMapping
+    @ApiOperation(value = "Get all About Us entries", notes = "Retrieves all 'About Us' entries, potentially including historical or soft-deleted ones based on service implementation.")
     public ResponseEntity<List<AboutUsResponseDTO>> getAllAboutUsEntries() {
         log.info("Admin request to get all About Us entries.");
         List<AboutUs> aboutUsList = aboutUsService.getAll();
@@ -144,7 +154,9 @@ public class AdminAboutController {
      * @throws ResourceNotFoundException if the "About Us" entry with the given UUID is not found (when reading it).
      */
     @DeleteMapping("/{aboutUsUuid}")
-    public ResponseEntity<Void> deleteAboutUs(@PathVariable UUID aboutUsUuid) {
+    @ApiOperation(value = "Delete About Us content", notes = "Soft-deletes an 'About Us' entry identified by its UUID.")
+    public ResponseEntity<Void> deleteAboutUs(
+            @ApiParam(value = "UUID of the About Us entry to delete", required = true) @PathVariable UUID aboutUsUuid) {
         log.info("Admin request to delete About Us content with UUID: {}", aboutUsUuid);
         AboutUs aboutUsToDelete = aboutUsService.read(aboutUsUuid); // Fetch entity to get its internal ID
         log.debug("Found About Us entry with ID: {} (UUID: {}) for deletion.", aboutUsToDelete.getId(), aboutUsUuid);

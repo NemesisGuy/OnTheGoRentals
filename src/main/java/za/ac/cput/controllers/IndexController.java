@@ -1,5 +1,7 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 // TODO: Consider removing this class if it was only for testing purposes, as per original TODO.
 @RestController
+@Api(value = "Index/Greeting", tags = "Index/Greeting", description = "Provides a simple greeting message with a visitor counter.")
 public class IndexController {
 
     private static final Logger log = LoggerFactory.getLogger(IndexController.class);
@@ -33,6 +36,9 @@ public class IndexController {
      * @return A {@link Message} object containing the greeting and visitor count.
      */
     @GetMapping({"/", "/home", "/index", "/api/home", "/api/hello", "/api/index", "/api/greeting"})
+    @ApiOperation(value = "Get Greeting Message",
+            notes = "Returns a greeting message along with an incrementing visitor count. This endpoint is publicly accessible.",
+            response = IndexController.Message.class)
     public Message greeting() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         long visitorNumber = counter.incrementAndGet();

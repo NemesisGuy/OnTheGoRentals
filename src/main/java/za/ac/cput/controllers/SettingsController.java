@@ -1,5 +1,7 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import za.ac.cput.utils.SecurityUtils;
  */
 @RestController
 @RequestMapping("/api/v1/settings") // Standardized API path
+@Api(value = "Application Settings", tags = "Application Settings")
 public class SettingsController {
 
     private static final Logger log = LoggerFactory.getLogger(SettingsController.class);
@@ -47,6 +50,9 @@ public class SettingsController {
      * @return A ResponseEntity containing the {@link Settings} object if found, or 404 Not Found.
      */
     @GetMapping // Changed from /read to be more RESTful for a singleton resource
+    @ApiOperation(value = "Get application settings",
+            notes = "Retrieves the application settings. Assumes a single settings entry identified by a fixed ID (e.g., 1).",
+            response = Settings.class)
     public ResponseEntity<Settings> getSettings() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         final int SETTINGS_ID = 1; // Assuming a fixed ID for the settings record

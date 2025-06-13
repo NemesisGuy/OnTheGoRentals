@@ -1,5 +1,8 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +45,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/bookings")
 // @CrossOrigin(...) // Prefer global CORS configuration
+@Api(value = "Booking Management", tags = "Booking Management")
 public class BookingController {
 
     private static final Logger log = LoggerFactory.getLogger(BookingController.class);
@@ -80,7 +84,9 @@ public class BookingController {
      * @throws CarNotAvailableException  if the specified car is not available for booking.
      */
     @PostMapping
-    public ResponseEntity<BookingResponseDTO> createBooking(@Valid @RequestBody BookingRequestDTO bookingRequestDTO) {
+    @ApiOperation(value = "Create a new booking", notes = "Allows an authenticated user to create a new booking.")
+    public ResponseEntity<BookingResponseDTO> createBooking(
+            @ApiParam(value = "Booking request data", required = true) @Valid @RequestBody BookingRequestDTO bookingRequestDTO) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to create a new booking with DTO: {}", requesterId, bookingRequestDTO);
 
@@ -130,7 +136,9 @@ public class BookingController {
      * @return A ResponseEntity containing the {@link BookingResponseDTO} if found, or 404 Not Found.
      */
     @GetMapping("/{bookingUuid}")
-    public ResponseEntity<BookingResponseDTO> getBookingByUuid(@PathVariable UUID bookingUuid) {
+    @ApiOperation(value = "Get a booking by UUID", notes = "Retrieves a specific booking by its UUID.")
+    public ResponseEntity<BookingResponseDTO> getBookingByUuid(
+            @ApiParam(value = "UUID of the booking to retrieve", required = true) @PathVariable UUID bookingUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get booking by UUID: {}", requesterId, bookingUuid);
 
@@ -160,6 +168,7 @@ public class BookingController {
      * @return A ResponseEntity containing a list of {@link BookingResponseDTO}s, or 204 No Content if none exist.
      */
     @GetMapping("/my-bookings")
+    @ApiOperation(value = "Get current user's bookings", notes = "Retrieves all bookings for the currently authenticated user.")
     public ResponseEntity<List<BookingResponseDTO>> getCurrentUserBookings() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get their bookings.", requesterId);
@@ -195,9 +204,10 @@ public class BookingController {
      * @throws CarNotAvailableException  if a new car specified for the update is not available.
      */
     @PutMapping("/{bookingUuid}")
+    @ApiOperation(value = "Update an existing booking", notes = "Allows an authenticated user to update their existing booking.")
     public ResponseEntity<BookingResponseDTO> updateBooking(
-            @PathVariable UUID bookingUuid,
-            @Valid @RequestBody BookingRequestDTO bookingRequestDTO // Consider a specific BookingUpdateDTO
+            @ApiParam(value = "UUID of the booking to update", required = true) @PathVariable UUID bookingUuid,
+            @ApiParam(value = "Booking update data", required = true) @Valid @RequestBody BookingRequestDTO bookingRequestDTO // Consider a specific BookingUpdateDTO
     ) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to update booking UUID: {} with DTO: {}", requesterId, bookingUuid, bookingRequestDTO);
@@ -276,7 +286,9 @@ public class BookingController {
      * @return A ResponseEntity containing the {@link BookingResponseDTO} of the confirmed booking.
      */
     @PostMapping("/{bookingUuid}/confirm")
-    public ResponseEntity<BookingResponseDTO> confirmBooking(@PathVariable UUID bookingUuid) {
+    @ApiOperation(value = "Confirm a booking", notes = "Allows an authenticated user to confirm their booking.")
+    public ResponseEntity<BookingResponseDTO> confirmBooking(
+            @ApiParam(value = "UUID of the booking to confirm", required = true) @PathVariable UUID bookingUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to confirm booking UUID: {}", requesterId, bookingUuid);
 
@@ -307,7 +319,9 @@ public class BookingController {
      * @return A ResponseEntity containing the {@link BookingResponseDTO} of the cancelled booking.
      */
     @PostMapping("/{bookingUuid}/cancel")
-    public ResponseEntity<BookingResponseDTO> cancelBooking(@PathVariable UUID bookingUuid) {
+    @ApiOperation(value = "Cancel a booking", notes = "Allows an authenticated user to cancel their booking.")
+    public ResponseEntity<BookingResponseDTO> cancelBooking(
+            @ApiParam(value = "UUID of the booking to cancel", required = true) @PathVariable UUID bookingUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to cancel booking UUID: {}", requesterId, bookingUuid);
 
@@ -341,6 +355,7 @@ public class BookingController {
      * @return A ResponseEntity containing a list of {@link CarResponseDTO}s, or 204 No Content if no cars are available.
      */
     @GetMapping("/available-cars")
+    @ApiOperation(value = "Get available cars for booking", notes = "Retrieves a list of all cars currently available for booking.")
     public ResponseEntity<List<CarResponseDTO>> getAvailableCarsForBooking() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get available cars for booking.", requesterId);
@@ -362,6 +377,7 @@ public class BookingController {
      * @throws ResourceNotFoundException if the user's profile cannot be found.
      */
     @GetMapping("/user-profile")
+    @ApiOperation(value = "Get current user profile", notes = "Retrieves the profile of the currently authenticated user.")
     public ResponseEntity<UserResponseDTO> getCurrentUserProfileForBooking() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get their user profile (for booking context).", requesterId);

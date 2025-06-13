@@ -1,5 +1,8 @@
 package za.ac.cput.controllers.admin;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +38,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/admin/bookings")
 // @CrossOrigin(...) // Prefer global CORS configuration
 // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPERADMIN')") // Class-level security
+@Api(value = "Admin Booking Management", tags = "Admin Booking Management")
 public class AdminBookingController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminBookingController.class);
@@ -71,6 +75,7 @@ public class AdminBookingController {
      * @return A ResponseEntity containing a list of {@link BookingResponseDTO} or no content if none exist.
      */
     @GetMapping
+    @ApiOperation(value = "Get all bookings (Admin)", notes = "Retrieves all bookings in the system.")
     public ResponseEntity<List<BookingResponseDTO>> getAllBookings() {
         log.info("Admin request to get all bookings.");
         List<Booking> bookings = bookingService.getAll();
@@ -92,7 +97,9 @@ public class AdminBookingController {
      * @throws ResourceNotFoundException if the specified User, Car, or Driver (if provided) is not found.
      */
     @PostMapping
-    public ResponseEntity<BookingResponseDTO> createBookingByAdmin(@Valid @RequestBody BookingRequestDTO createDto) {
+    @ApiOperation(value = "Create a new booking (Admin)", notes = "Allows an administrator to create a new booking, specifying user, car, and driver.")
+    public ResponseEntity<BookingResponseDTO> createBookingByAdmin(
+            @ApiParam(value = "Booking creation data", required = true) @Valid @RequestBody BookingRequestDTO createDto) {
         log.info("Admin request to create a new booking with DTO: {}", createDto);
 
         log.debug("Fetching user with UUID: {}", createDto.getUserUuid());
@@ -142,7 +149,9 @@ public class AdminBookingController {
      * @throws ResourceNotFoundException if the booking with the given UUID is not found.
      */
     @GetMapping("/{bookingUuid}")
-    public ResponseEntity<BookingResponseDTO> getBookingByUuid_Admin(@PathVariable UUID bookingUuid) {
+    @ApiOperation(value = "Get booking by UUID (Admin)", notes = "Retrieves a specific booking by its UUID for administrative purposes.")
+    public ResponseEntity<BookingResponseDTO> getBookingByUuid_Admin(
+            @ApiParam(value = "UUID of the booking to retrieve", required = true) @PathVariable UUID bookingUuid) {
         log.info("Admin request to get booking by UUID: {}", bookingUuid);
         Booking bookingEntity = bookingService.read(bookingUuid);
         // Assuming bookingService.read(UUID) throws ResourceNotFoundException if not found.
@@ -160,9 +169,10 @@ public class AdminBookingController {
      * @throws ResourceNotFoundException if the booking or any referenced User, Car, or Driver (if changed) is not found.
      */
     @PutMapping("/{bookingUuid}")
+    @ApiOperation(value = "Update a booking (Admin)", notes = "Allows an administrator to update an existing booking.")
     public ResponseEntity<BookingResponseDTO> updateBookingByAdmin(
-            @PathVariable UUID bookingUuid,
-            @Valid @RequestBody BookingUpdateDTO updateDto
+            @ApiParam(value = "UUID of the booking to update", required = true) @PathVariable UUID bookingUuid,
+            @ApiParam(value = "Booking update data", required = true) @Valid @RequestBody BookingUpdateDTO updateDto
     ) {
         log.info("Admin request to update booking with UUID: {}. Update DTO: {}", bookingUuid, updateDto);
         Booking existingBooking = bookingService.read(bookingUuid);
@@ -246,7 +256,9 @@ public class AdminBookingController {
      * @throws ResourceNotFoundException if the booking service indicates the resource was not found prior to deletion.
      */
     @DeleteMapping("/{bookingUuid}")
-    public ResponseEntity<Void> deleteBookingByAdmin(@PathVariable UUID bookingUuid) {
+    @ApiOperation(value = "Delete a booking (Admin)", notes = "Allows an administrator to soft-delete a booking by its UUID.")
+    public ResponseEntity<Void> deleteBookingByAdmin(
+            @ApiParam(value = "UUID of the booking to delete", required = true) @PathVariable UUID bookingUuid) {
         log.info("Admin request to delete booking with UUID: {}", bookingUuid);
         Booking existingBooking = bookingService.read(bookingUuid); // Fetch current entity to get its internal ID
         log.debug("Found booking with ID: {} for UUID: {} to be deleted.", existingBooking.getId(), bookingUuid);
@@ -275,7 +287,9 @@ public class AdminBookingController {
      * @throws ResourceNotFoundException if the booking is not found.
      */
     @PostMapping("/{bookingUuid}/confirm")
-    public ResponseEntity<BookingResponseDTO> confirmBookingByAdmin(@PathVariable UUID bookingUuid) {
+    @ApiOperation(value = "Confirm a booking (Admin)", notes = "Allows an administrator to confirm a booking.")
+    public ResponseEntity<BookingResponseDTO> confirmBookingByAdmin(
+            @ApiParam(value = "UUID of the booking to confirm", required = true) @PathVariable UUID bookingUuid) {
         log.info("Admin request to confirm booking with UUID: {}", bookingUuid);
         Booking existingBooking = bookingService.read(bookingUuid);
         log.debug("Found booking with ID: {} (UUID: {}) for confirmation.", existingBooking.getId(), bookingUuid);
@@ -302,7 +316,9 @@ public class AdminBookingController {
      * @throws ResourceNotFoundException if the booking is not found.
      */
     @PostMapping("/{bookingUuid}/cancel")
-    public ResponseEntity<BookingResponseDTO> cancelBookingByAdmin(@PathVariable UUID bookingUuid) {
+    @ApiOperation(value = "Cancel a booking (Admin)", notes = "Allows an administrator to cancel a booking.")
+    public ResponseEntity<BookingResponseDTO> cancelBookingByAdmin(
+            @ApiParam(value = "UUID of the booking to cancel", required = true) @PathVariable UUID bookingUuid) {
         log.info("Admin request to cancel booking with UUID: {}", bookingUuid);
         Booking existingBooking = bookingService.read(bookingUuid);
         log.debug("Found booking with ID: {} (UUID: {}) for cancellation.", existingBooking.getId(), bookingUuid);
@@ -325,6 +341,7 @@ public class AdminBookingController {
      * @return ResponseEntity with a list of BookingResponseDTOs due for collection today.
      */
     @GetMapping("/collections-due-today")
+    @ApiOperation(value = "Get bookings for collection today (Admin/Staff)", notes = "Retrieves bookings that are confirmed and scheduled for collection today.")
     // @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<List<BookingResponseDTO>> getBookingsForCollectionToday() {
         String requesterId = SecurityUtils.getRequesterIdentifier();

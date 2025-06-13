@@ -1,5 +1,8 @@
 package za.ac.cput.controllers.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/admin/drivers")
 // @CrossOrigin(...) // Prefer global CORS configuration
 // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPERADMIN')")
+@Tag(name = "Admin Driver Management", description = "Endpoints for administrators to manage driver information.")
 public class AdminDriverController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminDriverController.class);
@@ -57,7 +61,9 @@ public class AdminDriverController {
      * @return A ResponseEntity containing the created {@link DriverResponseDTO} and HTTP status CREATED.
      */
     @PostMapping
-    public ResponseEntity<DriverResponseDTO> createDriver(@Valid @RequestBody DriverCreateDTO driverCreateDTO) {
+    @Operation(summary = "Create a new driver", description = "Allows an administrator to add a new driver to the system.")
+    public ResponseEntity<DriverResponseDTO> createDriver(
+            @Parameter(description = "Data for the new driver", required = true) @Valid @RequestBody DriverCreateDTO driverCreateDTO) {
         log.info("Admin request to create a new driver with DTO: {}", driverCreateDTO);
         Driver driverToCreate = DriverMapper.toEntity(driverCreateDTO);
         log.debug("Mapped DTO to Driver entity for creation: {}", driverToCreate);
@@ -76,7 +82,9 @@ public class AdminDriverController {
      * @throws ResourceNotFoundException if the driver with the given UUID is not found (handled by service).
      */
     @GetMapping("/{driverUuid}")
-    public ResponseEntity<DriverResponseDTO> getDriverByUuid(@PathVariable UUID driverUuid) {
+    @Operation(summary = "Get driver by UUID", description = "Retrieves a specific driver by their UUID.")
+    public ResponseEntity<DriverResponseDTO> getDriverByUuid(
+            @Parameter(description = "UUID of the driver to retrieve", required = true) @PathVariable UUID driverUuid) {
         log.info("Admin request to get driver by UUID: {}", driverUuid);
         Driver driverEntity = driverService.read(driverUuid);
         // The driverService.read(UUID) method is expected to throw ResourceNotFoundException if not found.
@@ -93,9 +101,10 @@ public class AdminDriverController {
      * @throws ResourceNotFoundException if the driver with the given UUID is not found (handled by service).
      */
     @PutMapping("/{driverUuid}")
+    @Operation(summary = "Update an existing driver", description = "Allows an administrator to update the details of an existing driver.")
     public ResponseEntity<DriverResponseDTO> updateDriver(
-            @PathVariable UUID driverUuid,
-            @Valid @RequestBody DriverUpdateDTO driverUpdateDTO
+            @Parameter(description = "UUID of the driver to update", required = true) @PathVariable UUID driverUuid,
+            @Parameter(description = "Updated data for the driver", required = true) @Valid @RequestBody DriverUpdateDTO driverUpdateDTO
     ) {
         log.info("Admin request to update driver with UUID: {}. Update DTO: {}", driverUuid, driverUpdateDTO);
         Driver existingDriver = driverService.read(driverUuid);
@@ -119,7 +128,9 @@ public class AdminDriverController {
      * @throws ResourceNotFoundException if the driver with the given UUID is not found (when reading it).
      */
     @DeleteMapping("/{driverUuid}")
-    public ResponseEntity<Void> deleteDriver(@PathVariable UUID driverUuid) {
+    @Operation(summary = "Delete a driver", description = "Allows an administrator to soft-delete a driver by their UUID.")
+    public ResponseEntity<Void> deleteDriver(
+            @Parameter(description = "UUID of the driver to delete", required = true) @PathVariable UUID driverUuid) {
         log.info("Admin request to delete driver with UUID: {}", driverUuid);
         // First read to ensure it exists and to get the internal ID for the service's delete(id) method.
         Driver driverToDelete = driverService.read(driverUuid);
@@ -149,6 +160,7 @@ public class AdminDriverController {
      * @return A ResponseEntity containing a list of {@link DriverResponseDTO}s, or no content if none exist.
      */
     @GetMapping
+    @Operation(summary = "Get all drivers", description = "Retrieves a list of all drivers for administrative view.")
     public ResponseEntity<List<DriverResponseDTO>> getAllDrivers() {
         log.info("Admin request to get all drivers.");
         List<Driver> drivers = driverService.getAll();
