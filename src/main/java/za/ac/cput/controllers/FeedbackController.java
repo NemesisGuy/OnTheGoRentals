@@ -1,5 +1,8 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/feedback")
 // @CrossOrigin(...) // Prefer global CORS configuration
+@Api(value = "Feedback Management", tags = "Feedback Management")
 public class FeedbackController {
 
     private static final Logger log = LoggerFactory.getLogger(FeedbackController.class);
@@ -56,7 +60,9 @@ public class FeedbackController {
      * @return A ResponseEntity containing the created {@link FeedbackResponseDTO} and HTTP status 201 Created.
      */
     @PostMapping
-    public ResponseEntity<FeedbackResponseDTO> createFeedback(@Valid @RequestBody FeedbackCreateDTO feedbackCreateDTO) {
+    @ApiOperation(value = "Submit new feedback", notes = "Allows users to submit new feedback. Intended for public access.")
+    public ResponseEntity<FeedbackResponseDTO> createFeedback(
+            @ApiParam(value = "Feedback submission data", required = true) @Valid @RequestBody FeedbackCreateDTO feedbackCreateDTO) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to create new feedback with DTO: {}", requesterId, feedbackCreateDTO);
 
@@ -78,6 +84,7 @@ public class FeedbackController {
      * @return A ResponseEntity containing a list of {@link FeedbackResponseDTO}s, or 204 No Content if none exist.
      */
     @GetMapping
+    @ApiOperation(value = "Get all feedback", notes = "Retrieves all non-deleted feedback submissions. Access should be configured (e.g., admin-only).")
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example if admin-only
     public ResponseEntity<List<FeedbackResponseDTO>> getAllFeedback() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
@@ -105,8 +112,10 @@ public class FeedbackController {
      * @throws ResourceNotFoundException if the feedback with the given UUID is not found (handled by service).
      */
     @GetMapping("/{feedbackUuid}")
+    @ApiOperation(value = "Get feedback by UUID", notes = "Retrieves a specific feedback entry by its UUID. Typically restricted to administrators.")
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example security
-    public ResponseEntity<FeedbackResponseDTO> getFeedbackByUuid(@PathVariable UUID feedbackUuid) {
+    public ResponseEntity<FeedbackResponseDTO> getFeedbackByUuid(
+            @ApiParam(value = "UUID of the feedback to retrieve", required = true) @PathVariable UUID feedbackUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get feedback by UUID: {}", requesterId, feedbackUuid);
         // Add authorization check here
@@ -143,8 +152,10 @@ public class FeedbackController {
      * @throws ResourceNotFoundException if the feedback with the given UUID is not found (when reading it).
      */
     @DeleteMapping("/{feedbackUuid}")
+    @ApiOperation(value = "Delete feedback by UUID", notes = "Soft-deletes a feedback entry by its UUID. Typically restricted to administrators.")
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example security
-    public ResponseEntity<Void> deleteFeedback(@PathVariable UUID feedbackUuid) {
+    public ResponseEntity<Void> deleteFeedback(
+            @ApiParam(value = "UUID of the feedback to delete", required = true) @PathVariable UUID feedbackUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to delete feedback with UUID: {}", requesterId, feedbackUuid);
         // Add authorization check here

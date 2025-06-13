@@ -1,5 +1,8 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +38,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/faqs")
 // @CrossOrigin(...) // Prefer global CORS configuration
+@Api(value = "FAQ Management", tags = "FAQ Management")
 public class FaqController {
 
     private static final Logger log = LoggerFactory.getLogger(FaqController.class);
@@ -58,6 +62,7 @@ public class FaqController {
      * @return A ResponseEntity containing a list of {@link FaqResponseDTO}s, or 204 No Content if none exist.
      */
     @GetMapping
+    @ApiOperation(value = "Get all FAQs", notes = "Retrieves all non-deleted FAQs. Intended for public access.")
     public ResponseEntity<List<FaqResponseDTO>> getAllFaqs() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get all FAQs.", requesterId);
@@ -81,7 +86,9 @@ public class FaqController {
      * @throws ResourceNotFoundException if the FAQ with the given UUID is not found (handled by service).
      */
     @GetMapping("/{faqUuid}")
-    public ResponseEntity<FaqResponseDTO> getFaqByUuid(@PathVariable UUID faqUuid) {
+    @ApiOperation(value = "Get FAQ by UUID", notes = "Retrieves a specific FAQ by its UUID. Intended for public access.")
+    public ResponseEntity<FaqResponseDTO> getFaqByUuid(
+            @ApiParam(value = "UUID of the FAQ to retrieve", required = true) @PathVariable UUID faqUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get FAQ by UUID: {}", requesterId, faqUuid);
 
@@ -104,8 +111,10 @@ public class FaqController {
      * @return A ResponseEntity containing the created {@link FaqResponseDTO} and HTTP status 201 Created.
      */
     @PostMapping
+    @ApiOperation(value = "Create a new FAQ", notes = "Creates a new FAQ. Typically restricted to administrators.")
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example security
-    public ResponseEntity<FaqResponseDTO> createFaq(@Valid @RequestBody FaqCreateDTO faqCreateDTO) {
+    public ResponseEntity<FaqResponseDTO> createFaq(
+            @ApiParam(value = "FAQ creation data", required = true) @Valid @RequestBody FaqCreateDTO faqCreateDTO) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to create a new FAQ with DTO: {}", requesterId, faqCreateDTO);
         // Add authorization check here if not using @PreAuthorize
@@ -134,10 +143,11 @@ public class FaqController {
      * @throws ResourceNotFoundException if the FAQ with the given UUID is not found (handled by service).
      */
     @PutMapping("/{faqUuid}")
+    @ApiOperation(value = "Update an existing FAQ", notes = "Updates an existing FAQ identified by its UUID. Typically restricted to administrators.")
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example security
     public ResponseEntity<FaqResponseDTO> updateFaq(
-            @PathVariable UUID faqUuid,
-            @Valid @RequestBody FaqUpdateDTO faqUpdateDTO
+            @ApiParam(value = "UUID of the FAQ to update", required = true) @PathVariable UUID faqUuid,
+            @ApiParam(value = "FAQ update data", required = true) @Valid @RequestBody FaqUpdateDTO faqUpdateDTO
     ) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to update FAQ with UUID: {}. Update DTO: {}",
@@ -168,8 +178,10 @@ public class FaqController {
      * @throws ResourceNotFoundException if the FAQ with the given UUID is not found (when reading it).
      */
     @DeleteMapping("/{faqUuid}")
+    @ApiOperation(value = "Delete an FAQ by UUID", notes = "Soft-deletes an FAQ by its UUID. Typically restricted to administrators.")
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example security
-    public ResponseEntity<Void> deleteFaq(@PathVariable UUID faqUuid) {
+    public ResponseEntity<Void> deleteFaq(
+            @ApiParam(value = "UUID of the FAQ to delete", required = true) @PathVariable UUID faqUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to delete FAQ with UUID: {}", requesterId, faqUuid);
         // Add authorization check here if not using @PreAuthorize

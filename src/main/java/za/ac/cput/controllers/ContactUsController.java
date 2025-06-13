@@ -1,5 +1,8 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +33,7 @@ import za.ac.cput.utils.SecurityUtils;
 @RestController
 @RequestMapping("/api/v1/contact-us") // Public API path for contact submissions
 // @CrossOrigin(...) // Prefer global CORS configuration
+@Api(value = "Contact Us Management", tags = "Contact Us Management")
 public class ContactUsController {
 
     private static final Logger log = LoggerFactory.getLogger(ContactUsController.class);
@@ -54,8 +58,9 @@ public class ContactUsController {
      * @return A ResponseEntity containing the created {@link ContactUsResponseDTO} with an HTTP 201 Created status.
      */
     @PostMapping
+    @ApiOperation(value = "Submit a contact us form", notes = "Allows any user to submit a contact request.")
     public ResponseEntity<ContactUsResponseDTO> createContactSubmission(
-            @Valid @RequestBody ContactUsCreateDTO contactUsCreateDTO
+            @ApiParam(value = "Contact us form data", required = true) @Valid @RequestBody ContactUsCreateDTO contactUsCreateDTO
     ) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Received new contact us submission with DTO: {}", requesterId, contactUsCreateDTO);

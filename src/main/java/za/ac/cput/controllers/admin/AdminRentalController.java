@@ -1,5 +1,8 @@
 package za.ac.cput.controllers.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +41,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/admin/rentals")
 // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPERADMIN')")
+@Tag(name = "Admin Rental Management", description = "Endpoints for administrators to manage all aspects of rentals.")
 public class AdminRentalController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminRentalController.class);
@@ -62,7 +66,15 @@ public class AdminRentalController {
     // --- GET all, POST create, GET by UUID methods ---
     // (These remain largely the same, ensure createRentalByAdmin maps expectedReturnedDate from RentalRequestDTO)
 // In AdminRentalController.java (or StaffOperationsController)
+
+    /**
+     * Retrieves rentals that are due for return today.
+     * Intended for staff/admin use to manage daily operations.
+     *
+     * @return ResponseEntity with a list of RentalResponseDTOs due for return today, or no content if none.
+     */
     @GetMapping("/returns-due-today")
+    @Operation(summary = "Get rentals due for return today", description = "Retrieves active rentals scheduled to be returned today.")
     // @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<List<RentalResponseDTO>> getRentalsDueForReturnToday() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
@@ -75,7 +87,14 @@ public class AdminRentalController {
         return ResponseEntity.ok(RentalMapper.toDtoList(rentals, fileStorageService));
     }
 
+    /**
+     * Retrieves rentals that are currently overdue.
+     * Intended for staff/admin use to follow up on late returns.
+     *
+     * @return ResponseEntity with a list of overdue RentalResponseDTOs, or no content if none.
+     */
     @GetMapping("/overdue-rentals")
+    @Operation(summary = "Get overdue rentals", description = "Retrieves rentals that have passed their expected return date and are not yet returned.")
     // @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<List<RentalResponseDTO>> getOverdueRentals() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
@@ -88,7 +107,13 @@ public class AdminRentalController {
         return ResponseEntity.ok(RentalMapper.toDtoList(rentals , fileStorageService));
     }
 
+    /**
+     * Retrieves all currently active rentals.
+     *
+     * @return ResponseEntity with a list of active RentalResponseDTOs, or no content if none.
+     */
     @GetMapping("/active")
+    @Operation(summary = "Get all active rentals", description = "Retrieves all rentals that are currently in an ACTIVE status.")
     public ResponseEntity<List<RentalResponseDTO>> getActiveRentals() {
         String adminId = SecurityUtils.getRequesterIdentifier();
         log.info("Admin [{}]: Request to get all active rentals.", adminId);
@@ -102,8 +127,17 @@ public class AdminRentalController {
         return ResponseEntity.ok(dtoList);
     }
 
+    /**
+     * Creates a new rental by an administrator.
+     * Admin can specify user, car, driver, and other rental details.
+     *
+     * @param createDto The DTO containing data for the new rental.
+     * @return A ResponseEntity containing the created RentalResponseDTO and HTTP status CREATED.
+     */
     @PostMapping
-    public ResponseEntity<RentalResponseDTO> createRentalByAdmin(@Valid @RequestBody RentalRequestDTO createDto) {
+    @Operation(summary = "Create a rental (Admin)", description = "Allows an administrator to create a new rental, specifying user, car, and driver.")
+    public ResponseEntity<RentalResponseDTO> createRentalByAdmin(
+            @Parameter(description = "Data for the new rental", required = true) @Valid @RequestBody RentalRequestDTO createDto) {
         String adminId = SecurityUtils.getRequesterIdentifier();
         log.info("Admin [{}]: Request to create a new rental with DTO: {}", adminId, createDto);
 
@@ -122,7 +156,13 @@ public class AdminRentalController {
         return new ResponseEntity<>(RentalMapper.toDto(createdEntity , fileStorageService), HttpStatus.CREATED);
     }
 
+    /**
+     * Retrieves all rentals for administrative view.
+     *
+     * @return ResponseEntity with a list of all RentalResponseDTOs, or no content if none.
+     */
     @GetMapping
+    @Operation(summary = "Get all rentals (Admin)", description = "Retrieves a list of all rentals in the system.")
     public ResponseEntity<List<RentalResponseDTO>> getAllRentalsForAdmin() {
         String adminId = SecurityUtils.getRequesterIdentifier();
         log.info("Admin [{}]: Request to get all rentals.", adminId);
@@ -136,8 +176,16 @@ public class AdminRentalController {
         return ResponseEntity.ok(dtoList);
     }
 
+    /**
+     * Retrieves a specific rental by its UUID for administrative purposes.
+     *
+     * @param rentalUuid The UUID of the rental to retrieve.
+     * @return A ResponseEntity containing the RentalResponseDTO if found.
+     */
     @GetMapping("/{rentalUuid}")
-    public ResponseEntity<RentalResponseDTO> getRentalByUuidAdmin(@PathVariable UUID rentalUuid) {
+    @Operation(summary = "Get rental by UUID (Admin)", description = "Retrieves a specific rental by its UUID.")
+    public ResponseEntity<RentalResponseDTO> getRentalByUuidAdmin(
+            @Parameter(description = "UUID of the rental to retrieve", required = true) @PathVariable UUID rentalUuid) {
         String adminId = SecurityUtils.getRequesterIdentifier();
         log.info("Admin [{}]: Request to get rental by UUID: {}", adminId, rentalUuid);
         Rental rentalEntity = rentalService.read(rentalUuid);
@@ -157,9 +205,11 @@ public class AdminRentalController {
      * @throws CarNotAvailableException  if a newly assigned car is not available.
      */
     @PutMapping("/{rentalUuid}")
+    @Operation(summary = "Update a rental (Admin)",
+               description = "Allows an administrator to update specific fields of an existing rental, such as dates, car, driver, or status.")
     public ResponseEntity<RentalResponseDTO> updateRentalByAdmin(
-            @PathVariable UUID rentalUuid,
-            @Valid @RequestBody RentalUpdateDTO updateDto // <--- CHANGE DTO TYPE HERE
+            @Parameter(description = "UUID of the rental to update", required = true) @PathVariable UUID rentalUuid,
+            @Parameter(description = "Data for updating the rental", required = true) @Valid @RequestBody RentalUpdateDTO updateDto // <--- CHANGE DTO TYPE HERE
     ) {
         String adminId = SecurityUtils.getRequesterIdentifier();
         log.info("Admin [{}]: Request to update rental UUID: {} with AdminRentalUpdateDTO: {}", adminId, rentalUuid, updateDto);
@@ -282,8 +332,17 @@ public class AdminRentalController {
     }
 
     // ... DELETE and other action methods (confirm, cancel, complete) ...
+
+    /**
+     * Deletes a rental by its UUID (Admin action).
+     *
+     * @param rentalUuid The UUID of the rental to delete.
+     * @return ResponseEntity with no content if successful, or not found.
+     */
     @DeleteMapping("/{rentalUuid}")
-    public ResponseEntity<Void> deleteRentalByAdmin(@PathVariable UUID rentalUuid) {
+    @Operation(summary = "Delete a rental (Admin)", description = "Allows an administrator to soft-delete a rental by its UUID.")
+    public ResponseEntity<Void> deleteRentalByAdmin(
+            @Parameter(description = "UUID of the rental to delete", required = true) @PathVariable UUID rentalUuid) {
         String adminId = SecurityUtils.getRequesterIdentifier();
         log.info("Admin [{}]: Request to delete rental with UUID: {}", adminId, rentalUuid);
         Rental existingRental = rentalService.read(rentalUuid);
@@ -298,8 +357,16 @@ public class AdminRentalController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Confirms a rental (Admin action).
+     *
+     * @param rentalUuid The UUID of the rental to confirm.
+     * @return ResponseEntity with the confirmed RentalResponseDTO.
+     */
     @PostMapping("/{rentalUuid}/confirm")
-    public ResponseEntity<RentalResponseDTO> confirmRentalByAdmin(@PathVariable UUID rentalUuid) {
+    @Operation(summary = "Confirm a rental (Admin)", description = "Allows an administrator to confirm a rental.")
+    public ResponseEntity<RentalResponseDTO> confirmRentalByAdmin(
+            @Parameter(description = "UUID of the rental to confirm", required = true) @PathVariable UUID rentalUuid) {
         String adminId = SecurityUtils.getRequesterIdentifier();
         log.info("Admin [{}]: Request to confirm rental with UUID: {}", adminId, rentalUuid);
         Rental confirmedRental = rentalService.confirmRentalByUuid(rentalUuid);
@@ -307,8 +374,16 @@ public class AdminRentalController {
         return ResponseEntity.ok(RentalMapper.toDto(confirmedRental , fileStorageService));
     }
 
+    /**
+     * Cancels a rental (Admin action).
+     *
+     * @param rentalUuid The UUID of the rental to cancel.
+     * @return ResponseEntity with the cancelled RentalResponseDTO.
+     */
     @PostMapping("/{rentalUuid}/cancel")
-    public ResponseEntity<RentalResponseDTO> cancelRentalByAdmin(@PathVariable UUID rentalUuid) {
+    @Operation(summary = "Cancel a rental (Admin)", description = "Allows an administrator to cancel a rental.")
+    public ResponseEntity<RentalResponseDTO> cancelRentalByAdmin(
+            @Parameter(description = "UUID of the rental to cancel", required = true) @PathVariable UUID rentalUuid) {
         String adminId = SecurityUtils.getRequesterIdentifier();
         log.info("Admin [{}]: Request to cancel rental with UUID: {}", adminId, rentalUuid);
         Rental cancelledRental = rentalService.cancelRentalByUuid(rentalUuid);
@@ -316,10 +391,18 @@ public class AdminRentalController {
         return ResponseEntity.ok(RentalMapper.toDto(cancelledRental , fileStorageService));
     }
 
+    /**
+     * Completes a rental, optionally applying a fine (Admin action).
+     *
+     * @param rentalUuid The UUID of the rental to complete.
+     * @param fineAmount Optional fine amount to apply.
+     * @return ResponseEntity with the completed RentalResponseDTO.
+     */
     @PostMapping("/{rentalUuid}/complete")
+    @Operation(summary = "Complete a rental (Admin)", description = "Allows an administrator to mark a rental as completed, optionally applying a fine.")
     public ResponseEntity<RentalResponseDTO> completeRentalByAdmin(
-            @PathVariable UUID rentalUuid,
-            @RequestParam(required = false, defaultValue = "0.0") double fineAmount
+            @Parameter(description = "UUID of the rental to complete", required = true) @PathVariable UUID rentalUuid,
+            @Parameter(description = "Fine amount to apply (optional, defaults to 0.0)") @RequestParam(required = false, defaultValue = "0.0") double fineAmount
     ) {
         String adminId = SecurityUtils.getRequesterIdentifier();
         log.info("Admin [{}]: Request to complete rental with UUID: {}, Fine amount: {}", adminId, rentalUuid, fineAmount);

@@ -1,5 +1,8 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +38,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/drivers")
 // @CrossOrigin(...) // Prefer global CORS configuration
 // @PreAuthorize(...) // Add if specific authorization is needed for the whole controller or per method
+@Api(value = "Driver Management", tags = "Driver Management")
 public class DriverController {
 
     private static final Logger log = LoggerFactory.getLogger(DriverController.class);
@@ -60,7 +64,9 @@ public class DriverController {
      * @return A ResponseEntity containing the created {@link DriverResponseDTO} and HTTP status CREATED.
      */
     @PostMapping
-    public ResponseEntity<DriverResponseDTO> createDriver(@Valid @RequestBody DriverCreateDTO driverCreateDTO) {
+    @ApiOperation(value = "Create a new driver", notes = "Creates a new driver. Access control should be managed by Spring Security.")
+    public ResponseEntity<DriverResponseDTO> createDriver(
+            @ApiParam(value = "Driver creation data", required = true) @Valid @RequestBody DriverCreateDTO driverCreateDTO) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to create a new driver with DTO: {}", requesterId, driverCreateDTO);
 
@@ -83,7 +89,9 @@ public class DriverController {
      * @throws ResourceNotFoundException if the driver with the given UUID is not found (handled by service).
      */
     @GetMapping("/{driverUuid}")
-    public ResponseEntity<DriverResponseDTO> getDriverByUuid(@PathVariable UUID driverUuid) {
+    @ApiOperation(value = "Get driver by UUID", notes = "Retrieves a specific driver by their UUID.")
+    public ResponseEntity<DriverResponseDTO> getDriverByUuid(
+            @ApiParam(value = "UUID of the driver to retrieve", required = true) @PathVariable UUID driverUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get driver by UUID: {}", requesterId, driverUuid);
 
@@ -105,9 +113,10 @@ public class DriverController {
      * @throws ResourceNotFoundException if the driver with the given UUID is not found (handled by service).
      */
     @PutMapping("/{driverUuid}")
+    @ApiOperation(value = "Update an existing driver", notes = "Updates an existing driver identified by their UUID.")
     public ResponseEntity<DriverResponseDTO> updateDriver(
-            @PathVariable UUID driverUuid,
-            @Valid @RequestBody DriverUpdateDTO driverUpdateDTO
+            @ApiParam(value = "UUID of the driver to update", required = true) @PathVariable UUID driverUuid,
+            @ApiParam(value = "Driver update data", required = true) @Valid @RequestBody DriverUpdateDTO driverUpdateDTO
     ) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to update driver with UUID: {}. Update DTO: {}",
@@ -141,7 +150,9 @@ public class DriverController {
      * @throws ResourceNotFoundException if the driver with the given UUID is not found (when reading it).
      */
     @DeleteMapping("/{driverUuid}")
-    public ResponseEntity<Void> deleteDriver(@PathVariable UUID driverUuid) {
+    @ApiOperation(value = "Delete a driver by UUID", notes = "Soft-deletes a driver by their UUID.")
+    public ResponseEntity<Void> deleteDriver(
+            @ApiParam(value = "UUID of the driver to delete", required = true) @PathVariable UUID driverUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to delete driver with UUID: {}", requesterId, driverUuid);
 
@@ -172,6 +183,7 @@ public class DriverController {
      * @return A ResponseEntity containing a list of {@link DriverResponseDTO}s. Returns 204 No Content if no drivers exist.
      */
     @GetMapping
+    @ApiOperation(value = "Get all drivers", notes = "Retrieves a list of all drivers.")
     public ResponseEntity<List<DriverResponseDTO>> getAllDrivers() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get all drivers.", requesterId);

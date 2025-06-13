@@ -1,5 +1,8 @@
 package za.ac.cput.controllers.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +41,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/admin/damage-reports")
 // @CrossOrigin(...) // Prefer global CORS configuration
 // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPERADMIN')")
+@Tag(name = "Admin Damage Report Management", description = "Endpoints for administrators to manage damage reports associated with rentals.")
 public class AdminDamageReportController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminDamageReportController.class);
@@ -69,7 +73,9 @@ public class AdminDamageReportController {
      * @throws ResourceNotFoundException if the associated Rental with the given UUID is not found.
      */
     @PostMapping
-    public ResponseEntity<DamageReportResponseDTO> createDamageReport(@Valid @RequestBody DamageReportCreateDTO createDto) {
+    @Operation(summary = "Create a new damage report", description = "Allows an administrator to create a new damage report, associating it with an existing rental.")
+    public ResponseEntity<DamageReportResponseDTO> createDamageReport(
+            @Parameter(description = "Data for the new damage report, including the rental UUID it's associated with.", required = true) @Valid @RequestBody DamageReportCreateDTO createDto) {
         log.info("Admin request to create a new damage report with DTO: {}", createDto);
 
         log.debug("Fetching rental with UUID: {} for damage report.", createDto.getRentalUuid());
@@ -94,7 +100,9 @@ public class AdminDamageReportController {
      * @throws ResourceNotFoundException if the damage report with the given UUID is not found (handled by service).
      */
     @GetMapping("/{reportUuid}")
-    public ResponseEntity<DamageReportResponseDTO> getDamageReportByUuid(@PathVariable UUID reportUuid) {
+    @Operation(summary = "Get damage report by UUID", description = "Retrieves a specific damage report by its UUID.")
+    public ResponseEntity<DamageReportResponseDTO> getDamageReportByUuid(
+            @Parameter(description = "UUID of the damage report to retrieve.", required = true) @PathVariable UUID reportUuid) {
         log.info("Admin request to get damage report by UUID: {}", reportUuid);
         DamageReport reportEntity = damageReportService.read(reportUuid);
         // The damageReportService.read(UUID) method is expected to throw ResourceNotFoundException if not found.
@@ -112,9 +120,10 @@ public class AdminDamageReportController {
      * @throws ResourceNotFoundException if the damage report with the given UUID is not found (handled by service).
      */
     @PutMapping("/{reportUuid}")
+    @Operation(summary = "Update an existing damage report", description = "Allows an administrator to update the details of an existing damage report.")
     public ResponseEntity<DamageReportResponseDTO> updateDamageReport(
-            @PathVariable UUID reportUuid,
-            @Valid @RequestBody DamageReportUpdateDTO updateDto
+            @Parameter(description = "UUID of the damage report to update.", required = true) @PathVariable UUID reportUuid,
+            @Parameter(description = "Data for updating the damage report.", required = true) @Valid @RequestBody DamageReportUpdateDTO updateDto
     ) {
         log.info("Admin request to update damage report with UUID: {}. Update DTO: {}", reportUuid, updateDto);
         DamageReport existingReport = damageReportService.read(reportUuid);
@@ -139,6 +148,7 @@ public class AdminDamageReportController {
      * @return A ResponseEntity containing a list of {@link DamageReportResponseDTO}s, or no content if none exist.
      */
     @GetMapping
+    @Operation(summary = "Get all damage reports", description = "Retrieves all damage reports in the system for administrative review.")
     public ResponseEntity<List<DamageReportResponseDTO>> getAllDamageReports() {
         log.info("Admin request to get all damage reports.");
         List<DamageReport> reportList = damageReportService.getAll();
@@ -161,7 +171,9 @@ public class AdminDamageReportController {
      * @throws ResourceNotFoundException if the damage report with the given UUID is not found (when reading it).
      */
     @DeleteMapping("/{reportUuid}")
-    public ResponseEntity<Void> deleteDamageReport(@PathVariable UUID reportUuid) {
+    @Operation(summary = "Delete a damage report", description = "Allows an administrator to soft-delete a damage report by its UUID.")
+    public ResponseEntity<Void> deleteDamageReport(
+            @Parameter(description = "UUID of the damage report to delete.", required = true) @PathVariable UUID reportUuid) {
         log.info("Admin request to delete damage report with UUID: {}", reportUuid);
         DamageReport existingReport = damageReportService.read(reportUuid);
         log.debug("Found damage report with ID: {} (UUID: {}) for deletion.", existingReport.getId(), reportUuid);

@@ -1,5 +1,8 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +38,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/help-topics")
 // @CrossOrigin(...) // Prefer global CORS configuration
+@Api(value = "Help Center Management", tags = "Help Center Management")
 public class HelpCenterController {
 
     private static final Logger log = LoggerFactory.getLogger(HelpCenterController.class);
@@ -59,8 +63,9 @@ public class HelpCenterController {
      * @return A ResponseEntity containing a list of {@link HelpCenterResponseDTO}s, or 204 No Content if none match.
      */
     @GetMapping
+    @ApiOperation(value = "Get all help topics", notes = "Retrieves all non-deleted help topics, optionally filtered by category. Intended for public access.")
     public ResponseEntity<List<HelpCenterResponseDTO>> getAllHelpTopics(
-            @RequestParam(required = false) String category
+            @ApiParam(value = "Optional category name to filter help topics by (case-sensitive).") @RequestParam(required = false) String category
     ) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         List<HelpCenter> helpTopics;
@@ -92,7 +97,9 @@ public class HelpCenterController {
      * @throws ResourceNotFoundException if the help topic with the given UUID is not found (handled by service).
      */
     @GetMapping("/{topicUuid}")
-    public ResponseEntity<HelpCenterResponseDTO> getHelpTopicByUuid(@PathVariable UUID topicUuid) {
+    @ApiOperation(value = "Get help topic by UUID", notes = "Retrieves a specific help topic by its UUID. Intended for public access.")
+    public ResponseEntity<HelpCenterResponseDTO> getHelpTopicByUuid(
+            @ApiParam(value = "UUID of the help topic to retrieve", required = true) @PathVariable UUID topicUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get help topic by UUID: {}", requesterId, topicUuid);
 
@@ -114,8 +121,10 @@ public class HelpCenterController {
      * @return A ResponseEntity containing the created {@link HelpCenterResponseDTO} and HTTP status 201 Created.
      */
     @PostMapping
+    @ApiOperation(value = "Create a new help topic", notes = "Creates a new help topic. Typically restricted to administrators.")
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example security
-    public ResponseEntity<HelpCenterResponseDTO> createHelpTopic(@Valid @RequestBody HelpCenterCreateDTO createDto) {
+    public ResponseEntity<HelpCenterResponseDTO> createHelpTopic(
+            @ApiParam(value = "Help topic creation data", required = true) @Valid @RequestBody HelpCenterCreateDTO createDto) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to create a new help topic with DTO: {}", requesterId, createDto);
         // Add authorization check here
@@ -140,10 +149,11 @@ public class HelpCenterController {
      * @throws ResourceNotFoundException if the help topic with the given UUID is not found (handled by service).
      */
     @PutMapping("/{topicUuid}")
+    @ApiOperation(value = "Update an existing help topic", notes = "Updates an existing help topic by its UUID. Typically restricted to administrators.")
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example security
     public ResponseEntity<HelpCenterResponseDTO> updateHelpTopic(
-            @PathVariable UUID topicUuid,
-            @Valid @RequestBody HelpCenterUpdateDTO updateDto
+            @ApiParam(value = "UUID of the help topic to update", required = true) @PathVariable UUID topicUuid,
+            @ApiParam(value = "Help topic update data", required = true) @Valid @RequestBody HelpCenterUpdateDTO updateDto
     ) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to update help topic with UUID: {}. Update DTO: {}",
@@ -174,8 +184,10 @@ public class HelpCenterController {
      * @throws ResourceNotFoundException if the help topic with the given UUID is not found (when reading it).
      */
     @DeleteMapping("/{topicUuid}")
+    @ApiOperation(value = "Delete a help topic by UUID", notes = "Soft-deletes a help topic by its UUID. Typically restricted to administrators.")
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example security
-    public ResponseEntity<Void> deleteHelpTopic(@PathVariable UUID topicUuid) {
+    public ResponseEntity<Void> deleteHelpTopic(
+            @ApiParam(value = "UUID of the help topic to delete", required = true) @PathVariable UUID topicUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to delete help topic with UUID: {}", requesterId, topicUuid);
         // Add authorization check here

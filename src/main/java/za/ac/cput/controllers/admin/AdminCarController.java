@@ -1,5 +1,7 @@
 package za.ac.cput.controllers.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -40,8 +42,16 @@ public class AdminCarController {
         log.info("AdminCarController initialized.");
     }
 
+    /**
+     * Creates a new car.
+     *
+     * @param carCreateDTO The DTO containing data for the new car.
+     * @return A ResponseEntity containing the created CarResponseDTO and HTTP status CREATED.
+     */
     @PostMapping
-    public ResponseEntity<CarResponseDTO> createCar(@Valid @RequestBody CarCreateDTO carCreateDTO) {
+    @Operation(summary = "Create a new car", description = "Allows administrators to add a new car to the inventory.")
+    public ResponseEntity<CarResponseDTO> createCar(
+            @Parameter(description = "Car creation data", required = true) @Valid @RequestBody CarCreateDTO carCreateDTO) {
         log.info("Admin request to create a new car with DTO: {}", carCreateDTO);
         Car carToCreate = CarMapper.toEntity(carCreateDTO);
         Car createdCar = carService.create(carToCreate);
@@ -49,7 +59,13 @@ public class AdminCarController {
         return new ResponseEntity<>(CarMapper.toDto(createdCar), HttpStatus.CREATED);
     }
 
+    /**
+     * Retrieves all cars for administrative purposes.
+     *
+     * @return A ResponseEntity containing a list of CarResponseDTOs, or no content if none exist.
+     */
     @GetMapping
+    @Operation(summary = "Get all cars (Admin)", description = "Retrieves a list of all cars in the system.")
     public ResponseEntity<List<CarResponseDTO>> getAllCarsForAdmin() {
         log.info("Admin request to get all cars.");
         List<Car> cars = carService.getAll();
@@ -60,17 +76,33 @@ public class AdminCarController {
         return ResponseEntity.ok(dtos);
     }
 
+    /**
+     * Retrieves a specific car by its UUID for administrative purposes.
+     *
+     * @param carUuid The UUID of the car to retrieve.
+     * @return A ResponseEntity containing the CarResponseDTO if found.
+     */
     @GetMapping("/{carUuid}")
-    public ResponseEntity<CarResponseDTO> getCarByUuidAdmin(@PathVariable UUID carUuid) {
+    @Operation(summary = "Get car by UUID (Admin)", description = "Retrieves a specific car by its UUID.")
+    public ResponseEntity<CarResponseDTO> getCarByUuidAdmin(
+            @Parameter(description = "UUID of the car to retrieve", required = true) @PathVariable UUID carUuid) {
         log.info("Admin request to get car by UUID: {}", carUuid);
         Car car = carService.read(carUuid);
         return ResponseEntity.ok(CarMapper.toDto(car));
     }
 
+    /**
+     * Updates an existing car.
+     *
+     * @param carUuid      The UUID of the car to update.
+     * @param carUpdateDTO The DTO containing updated data for the car.
+     * @return A ResponseEntity containing the updated CarResponseDTO.
+     */
     @PutMapping("/{carUuid}")
+    @Operation(summary = "Update an existing car", description = "Updates the details of an existing car identified by its UUID.")
     public ResponseEntity<CarResponseDTO> updateCar(
-            @PathVariable UUID carUuid,
-            @Valid @RequestBody CarUpdateDTO carUpdateDTO) {
+            @Parameter(description = "UUID of the car to update", required = true) @PathVariable UUID carUuid,
+            @Parameter(description = "Car update data", required = true) @Valid @RequestBody CarUpdateDTO carUpdateDTO) {
         log.info("Admin request to update car with UUID: {}. Update DTO: {}", carUuid, carUpdateDTO);
         Car existingCar = carService.read(carUuid);
         Car carWithUpdates = CarMapper.applyUpdateDtoToEntity(carUpdateDTO, existingCar);
@@ -79,8 +111,16 @@ public class AdminCarController {
         return ResponseEntity.ok(CarMapper.toDto(updatedCar));
     }
 
+    /**
+     * Soft-deletes a car by its UUID.
+     *
+     * @param carUuid The UUID of the car to delete.
+     * @return A ResponseEntity with no content if successful.
+     */
     @DeleteMapping("/{carUuid}")
-    public ResponseEntity<Void> deleteCar(@PathVariable UUID carUuid) {
+    @Operation(summary = "Delete a car", description = "Soft-deletes a car identified by its UUID.")
+    public ResponseEntity<Void> deleteCar(
+            @Parameter(description = "UUID of the car to delete", required = true) @PathVariable UUID carUuid) {
         log.info("Admin request to delete car with UUID: {}", carUuid);
         Car carToDelete = carService.read(carUuid);
         carService.delete(carToDelete.getId());
@@ -127,9 +167,10 @@ public class AdminCarController {
      * @return The updated car DTO with the full list of image URLs.
      */
     @PostMapping("/{carUuid}/images")
+    @Operation(summary = "Upload images for a car", description = "Uploads one or more images and associates them with an existing car.")
     public ResponseEntity<CarResponseDTO> uploadCarImages(
-            @PathVariable UUID carUuid,
-            @RequestParam("images") List<MultipartFile> files) {
+            @Parameter(description = "UUID of the car to add images to", required = true) @PathVariable UUID carUuid,
+            @Parameter(description = "List of image files to upload", required = true) @RequestParam("images") List<MultipartFile> files) {
 
         log.info("Request to upload {} image(s) for car UUID: {}", files.size(), carUuid);
         if (files.isEmpty() || files.stream().allMatch(MultipartFile::isEmpty)) {
@@ -144,10 +185,18 @@ public class AdminCarController {
         return ResponseEntity.ok(CarMapper.toDto(updatedCar));
     }
 
+    /**
+     * Deletes a specific image associated with a car.
+     *
+     * @param carUuid   The UUID of the car.
+     * @param imageUuid The UUID of the image to delete.
+     * @return A ResponseEntity with no content if successful, or not found if the image or car doesn't exist.
+     */
     @DeleteMapping("/{carUuid}/images/{imageUuid}")
+    @Operation(summary = "Delete a car image", description = "Deletes a specific image associated with a car, identified by their UUIDs.")
     public ResponseEntity<Void> deleteCarImage(
-            @PathVariable UUID carUuid,
-            @PathVariable UUID imageUuid) {
+            @Parameter(description = "UUID of the car", required = true) @PathVariable UUID carUuid,
+            @Parameter(description = "UUID of the image to delete", required = true) @PathVariable UUID imageUuid) {
         log.info("Request to delete image UUID {} from car UUID {}", imageUuid, carUuid);
         Car existingCar = carService.read(carUuid);
 
@@ -175,14 +224,20 @@ public class AdminCarController {
         }
     }
 
+    /**
+     * Retrieves a list of all cars currently available for booking (Admin view).
+     *
+     * @return A ResponseEntity containing a list of available CarResponseDTOs.
+     */
     @GetMapping("/list/available")
+    @Operation(summary = "Get available cars (Admin)", description = "Retrieves a list of all cars currently marked as available.")
     public ResponseEntity<List<CarResponseDTO>> getAvailableCarsForAdmin() {
         log.info("Admin request to get all available cars.");
         List<Car> availableCars = carService.getAvailableCars();
         if (availableCars.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        List<CarResponseDTO> dtos = CarMapper.toDtoList(availableCars);
+        List<CarResponseDTO> dtos = CarMapper.toDtoList(availableCars); // Corrected variable name from 'cars' to 'availableCars'
         return ResponseEntity.ok(dtos);
     }
 

@@ -1,5 +1,8 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,7 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/api/v1/cars")
+@Api(value = "Car Management", tags = "Car Management")
 public class CarController {
 
     private static final Logger log = LoggerFactory.getLogger(CarController.class);
@@ -53,6 +57,7 @@ public class CarController {
      * The path "/list/available" cannot be confused with "/{uuid}".
      */
     @GetMapping("/list/available")
+    @ApiOperation(value = "Get all available cars (Admin)", notes = "Retrieves a list of all cars currently marked as available. This is a dedicated endpoint for clarity.")
     public ResponseEntity<List<CarResponseDTO>> getAvailableCarsAdmin() {
         log.info("Admin request to get all available cars.");
         List<Car> availableCars = carService.findAllAvailableAndNonDeleted();
@@ -69,6 +74,7 @@ public class CarController {
      * @return A ResponseEntity containing a list of available {@link CarResponseDTO}s.
      */
     @GetMapping("/available")
+    @ApiOperation(value = "Get available cars", notes = "Retrieves a list of all cars currently marked as available.")
     public ResponseEntity<List<CarResponseDTO>> getAvailableCars() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get all available cars.", requesterId);
@@ -93,7 +99,9 @@ public class CarController {
      * @return A ResponseEntity containing a list of available {@link CarResponseDTO}s.
      */
     @GetMapping("/available/price-group/{groupString}")
-    public ResponseEntity<List<CarResponseDTO>> getAvailableCarsByPriceGroup(@PathVariable String groupString) {
+    @ApiOperation(value = "Get available cars by price group", notes = "Retrieves a list of available cars filtered by a specific price group.")
+    public ResponseEntity<List<CarResponseDTO>> getAvailableCarsByPriceGroup(
+            @ApiParam(value = "Price group string (e.g., 'LUXURY', 'ECONOMY')", required = true) @PathVariable String groupString) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get available cars by price group: '{}'", requesterId, groupString);
         PriceGroup priceGroupEnum = parsePriceGroup(groupString, requesterId);
@@ -118,8 +126,9 @@ public class CarController {
      * @return A ResponseEntity containing a list of {@link CarResponseDTO}s.
      */
     @GetMapping(value = {"/price-group", "/price-group/{groupString}"})
+    @ApiOperation(value = "Get all cars, optionally filtered by price group", notes = "Retrieves a list of all cars. If a price group is provided, the list is filtered by that group.")
     public ResponseEntity<List<CarResponseDTO>> getAllCarsByPriceGroupOptional(
-            @PathVariable(required = false) String groupString) {
+            @ApiParam(value = "Optional price group string (e.g., 'LUXURY', 'ECONOMY', 'all')") @PathVariable(required = false) String groupString) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         List<Car> cars;
 
@@ -151,7 +160,9 @@ public class CarController {
      * @return A ResponseEntity containing the {@link CarResponseDTO}.
      */
     @GetMapping("/{carUuid}")
-    public ResponseEntity<CarResponseDTO> getCarByUuid(@PathVariable UUID carUuid) {
+    @ApiOperation(value = "Get car by UUID", notes = "Retrieves a specific car by its UUID.")
+    public ResponseEntity<CarResponseDTO> getCarByUuid(
+            @ApiParam(value = "UUID of the car to retrieve", required = true) @PathVariable UUID carUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get car by UUID: {}", requesterId, carUuid);
 
@@ -170,6 +181,7 @@ public class CarController {
      * @return A ResponseEntity containing a list of all {@link CarResponseDTO}s.
      */
     @GetMapping
+    @ApiOperation(value = "Get all cars", notes = "Retrieves a list of all cars in the system.")
     public ResponseEntity<List<CarResponseDTO>> getAllCars() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get all cars (unfiltered).", requesterId);

@@ -1,5 +1,8 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +42,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/rentals")
 // @CrossOrigin(...) // Prefer global CORS configuration
+@Api(value = "Rental Management", tags = "Rental Management")
 public class RentalController {
 
     private static final Logger log = LoggerFactory.getLogger(RentalController.class);
@@ -77,7 +81,9 @@ public class RentalController {
      * @throws CarNotAvailableException  if the specified car is not available.
      */
     @PostMapping
-    public ResponseEntity<RentalResponseDTO> createRental(@Valid @RequestBody RentalRequestDTO rentalRequestDTO) {
+    @ApiOperation(value = "Create a new rental", notes = "Creates a new rental for the currently authenticated user.")
+    public ResponseEntity<RentalResponseDTO> createRental(
+            @ApiParam(value = "Rental request data", required = true) @Valid @RequestBody RentalRequestDTO rentalRequestDTO) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to create a new rental with DTO: {}", requesterId, rentalRequestDTO);
 
@@ -135,7 +141,9 @@ public class RentalController {
      * @throws ResourceNotFoundException if the rental with the given UUID is not found.
      */
     @GetMapping("/{rentalUuid}")
-    public ResponseEntity<RentalResponseDTO> getRentalByUuid(@PathVariable UUID rentalUuid) {
+    @ApiOperation(value = "Get rental by UUID", notes = "Retrieves a specific rental by its UUID. Access control should be handled.")
+    public ResponseEntity<RentalResponseDTO> getRentalByUuid(
+            @ApiParam(value = "UUID of the rental to retrieve", required = true) @PathVariable UUID rentalUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get rental by UUID: {}", requesterId, rentalUuid);
 
@@ -166,6 +174,7 @@ public class RentalController {
      * @return A ResponseEntity containing a list of {@link RentalResponseDTO}s, or 204 No Content if none exist.
      */
     @GetMapping("/my-rentals")
+    @ApiOperation(value = "Get current user's rentals", notes = "Retrieves all rentals for the currently authenticated user.")
     public ResponseEntity<List<RentalResponseDTO>> getCurrentUserRentals() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get their rentals.", requesterId);
@@ -201,9 +210,10 @@ public class RentalController {
      * @throws ResourceNotFoundException if the rental or related entities (if changed) are not found.
      */
     @PutMapping("/{rentalUuid}")
+    @ApiOperation(value = "Update an existing rental (Admin/Staff)", notes = "Updates an existing rental. Typically restricted to admin/staff.")
     public ResponseEntity<RentalResponseDTO> updateRentalByAdmin(
-            @PathVariable UUID rentalUuid,
-            @Valid @RequestBody RentalUpdateDTO rentalUpdateDTO // Using the simpler RentalUpdateDTO
+            @ApiParam(value = "UUID of the rental to update", required = true) @PathVariable UUID rentalUuid,
+            @ApiParam(value = "Rental update data", required = true) @Valid @RequestBody RentalUpdateDTO rentalUpdateDTO // Using the simpler RentalUpdateDTO
     ) {
         String adminId = SecurityUtils.getRequesterIdentifier();
         log.info("Admin [{}]: Request to update rental UUID: {} with RentalUpdateDTO: {}", adminId, rentalUuid, rentalUpdateDTO);
@@ -312,7 +322,9 @@ public class RentalController {
      * @return A ResponseEntity containing the {@link RentalResponseDTO} of the confirmed rental.
      */
     @PostMapping("/{rentalUuid}/confirm")
-    public ResponseEntity<RentalResponseDTO> confirmRental(@PathVariable UUID rentalUuid) {
+    @ApiOperation(value = "Confirm a rental", notes = "Allows the authenticated user (or admin/staff) to confirm a rental.")
+    public ResponseEntity<RentalResponseDTO> confirmRental(
+            @ApiParam(value = "UUID of the rental to confirm", required = true) @PathVariable UUID rentalUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to confirm rental UUID: {}", requesterId, rentalUuid);
 
@@ -339,7 +351,9 @@ public class RentalController {
      * @return A ResponseEntity containing the {@link RentalResponseDTO} of the cancelled rental.
      */
     @PostMapping("/{rentalUuid}/cancel")
-    public ResponseEntity<RentalResponseDTO> cancelRental(@PathVariable UUID rentalUuid) {
+    @ApiOperation(value = "Cancel a rental", notes = "Allows the authenticated user (or admin/staff) to cancel a rental.")
+    public ResponseEntity<RentalResponseDTO> cancelRental(
+            @ApiParam(value = "UUID of the rental to cancel", required = true) @PathVariable UUID rentalUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to cancel rental UUID: {}", requesterId, rentalUuid);
 
@@ -366,10 +380,11 @@ public class RentalController {
      * @return A ResponseEntity containing the {@link RentalResponseDTO} of the completed rental.
      */
     @PostMapping("/{rentalUuid}/complete")
+    @ApiOperation(value = "Complete a rental (Admin/Staff)", notes = "Allows admin/staff to mark a rental as completed, optionally applying a fine.")
     // @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')") // Example security
     public ResponseEntity<RentalResponseDTO> completeRental(
-            @PathVariable UUID rentalUuid,
-            @RequestParam(required = false, defaultValue = "0.0") double fineAmount
+            @ApiParam(value = "UUID of the rental to complete", required = true) @PathVariable UUID rentalUuid,
+            @ApiParam(value = "Amount of any fine to be applied (optional, defaults to 0.0)") @RequestParam(required = false, defaultValue = "0.0") double fineAmount
     ) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to complete rental UUID: {}, Fine amount: {}", requesterId, rentalUuid, fineAmount);
@@ -391,9 +406,10 @@ public class RentalController {
      * @return A ResponseEntity containing the created {@link RentalResponseDTO}.
      */
     @PostMapping("/from-booking/{bookingUuid}")
+    @ApiOperation(value = "Create rental from booking", notes = "Creates a new Rental record from an existing, confirmed Booking.")
     public ResponseEntity<RentalResponseDTO> createRentalFromBooking(
-            @PathVariable UUID bookingUuid,
-            @Valid @RequestBody RentalFromBookingRequestDTO dto) {
+            @ApiParam(value = "UUID of the confirmed Booking to convert", required = true) @PathVariable UUID bookingUuid,
+            @ApiParam(value = "Additional details required at pickup", required = true) @Valid @RequestBody RentalFromBookingRequestDTO dto) {
 
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to create rental from Booking UUID: {}", requesterId, bookingUuid);

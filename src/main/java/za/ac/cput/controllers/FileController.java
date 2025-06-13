@@ -1,5 +1,8 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/v1/files")
+@Api(value = "File Serving", tags = "File Serving", description = "Provides endpoints for serving static files like images.")
 public class FileController {
 
     private static final Logger log = LoggerFactory.getLogger(FileController.class);
@@ -43,7 +47,12 @@ public class FileController {
      * or a 404 Not Found status if the file does not exist.
      */
     @GetMapping("/{folder}/{filename:.+}")
-    public ResponseEntity<Resource> serveFile(@PathVariable String folder, @PathVariable String filename) {
+    @ApiOperation(value = "Serve a file",
+            notes = "Serves a file (e.g., image) from the storage system. The path combines a folder and filename.",
+            response = Resource.class)
+    public ResponseEntity<Resource> serveFile(
+            @ApiParam(value = "The folder where the file is located (e.g., 'cars', 'selfies')", required = true) @PathVariable String folder,
+            @ApiParam(value = "The name of the file including its extension (e.g., 'image.jpg')", required = true) @PathVariable String filename) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
 
         // --- THE FIX IS HERE ---

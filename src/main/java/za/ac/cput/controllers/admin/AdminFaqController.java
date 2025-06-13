@@ -1,5 +1,8 @@
 package za.ac.cput.controllers.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/admin/faqs")
 // @CrossOrigin(...) // Prefer global CORS configuration
 // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPERADMIN')")
+@Tag(name = "Admin FAQ Management", description = "Endpoints for administrators to manage FAQ entries.")
 public class AdminFaqController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminFaqController.class);
@@ -57,7 +61,9 @@ public class AdminFaqController {
      * @return A ResponseEntity containing the created {@link FaqResponseDTO} and HTTP status CREATED.
      */
     @PostMapping
-    public ResponseEntity<FaqResponseDTO> createFaq(@Valid @RequestBody FaqCreateDTO faqCreateDTO) {
+    @Operation(summary = "Create a new FAQ", description = "Allows an administrator to add a new FAQ to the system.")
+    public ResponseEntity<FaqResponseDTO> createFaq(
+            @Parameter(description = "Data for the new FAQ", required = true) @Valid @RequestBody FaqCreateDTO faqCreateDTO) {
         log.info("Admin request to create a new FAQ with DTO: {}", faqCreateDTO);
         Faq faqToCreate = FaqMapper.toEntity(faqCreateDTO);
         log.debug("Mapped DTO to Faq entity for creation: {}", faqToCreate);
@@ -76,7 +82,9 @@ public class AdminFaqController {
      * @throws ResourceNotFoundException if the FAQ with the given UUID is not found (handled by service).
      */
     @GetMapping("/{faqUuid}")
-    public ResponseEntity<FaqResponseDTO> getFaqByUuid(@PathVariable UUID faqUuid) {
+    @Operation(summary = "Get FAQ by UUID", description = "Retrieves a specific FAQ by its UUID.")
+    public ResponseEntity<FaqResponseDTO> getFaqByUuid(
+            @Parameter(description = "UUID of the FAQ to retrieve", required = true) @PathVariable UUID faqUuid) {
         log.info("Admin request to get FAQ by UUID: {}", faqUuid);
         Faq faqEntity = faqService.read(faqUuid);
         // The faqService.read(UUID) method is expected to throw ResourceNotFoundException if not found.
@@ -93,9 +101,10 @@ public class AdminFaqController {
      * @throws ResourceNotFoundException if the FAQ with the given UUID is not found (handled by service).
      */
     @PutMapping("/{faqUuid}")
+    @Operation(summary = "Update an existing FAQ", description = "Allows an administrator to update the details of an existing FAQ.")
     public ResponseEntity<FaqResponseDTO> updateFaq(
-            @PathVariable UUID faqUuid,
-            @Valid @RequestBody FaqUpdateDTO faqUpdateDTO
+            @Parameter(description = "UUID of the FAQ to update", required = true) @PathVariable UUID faqUuid,
+            @Parameter(description = "Updated data for the FAQ", required = true) @Valid @RequestBody FaqUpdateDTO faqUpdateDTO
     ) {
         log.info("Admin request to update FAQ with UUID: {}. Update DTO: {}", faqUuid, faqUpdateDTO);
         Faq existingFaq = faqService.read(faqUuid);
@@ -117,6 +126,7 @@ public class AdminFaqController {
      * @return A ResponseEntity containing a list of {@link FaqResponseDTO}s, or no content if none exist.
      */
     @GetMapping
+    @Operation(summary = "Get all FAQs (Admin)", description = "Retrieves a list of all FAQs for administrative view.")
     public ResponseEntity<List<FaqResponseDTO>> getAllFaqsForAdmin() {
         log.info("Admin request to get all FAQs.");
         List<Faq> faqs = faqService.getAll();
@@ -139,7 +149,9 @@ public class AdminFaqController {
      * @throws ResourceNotFoundException if the FAQ with the given UUID is not found (when reading it).
      */
     @DeleteMapping("/{faqUuid}")
-    public ResponseEntity<Void> deleteFaq(@PathVariable UUID faqUuid) {
+    @Operation(summary = "Delete an FAQ", description = "Allows an administrator to soft-delete an FAQ by its UUID.")
+    public ResponseEntity<Void> deleteFaq(
+            @Parameter(description = "UUID of the FAQ to delete", required = true) @PathVariable UUID faqUuid) {
         log.info("Admin request to delete FAQ with UUID: {}", faqUuid);
         Faq faqToDelete = faqService.read(faqUuid);
         log.debug("Found FAQ with ID: {} (UUID: {}) for deletion.", faqToDelete.getId(), faqToDelete.getUuid());

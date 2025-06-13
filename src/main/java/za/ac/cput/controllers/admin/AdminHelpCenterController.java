@@ -1,5 +1,8 @@
 package za.ac.cput.controllers.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/admin/help-topics")
 // @CrossOrigin(...) // Prefer global CORS configuration
 // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPERADMIN')")
+@Tag(name = "Admin Help Center Management", description = "Endpoints for administrators to manage Help Center topics/articles.")
 public class AdminHelpCenterController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminHelpCenterController.class);
@@ -57,7 +61,9 @@ public class AdminHelpCenterController {
      * @return A ResponseEntity containing the created {@link HelpCenterResponseDTO} and HTTP status CREATED.
      */
     @PostMapping
-    public ResponseEntity<HelpCenterResponseDTO> createHelpTopic(@Valid @RequestBody HelpCenterCreateDTO createDto) {
+    @Operation(summary = "Create a new help topic", description = "Allows an administrator to add a new help topic to the system.")
+    public ResponseEntity<HelpCenterResponseDTO> createHelpTopic(
+            @Parameter(description = "Data for the new help topic", required = true) @Valid @RequestBody HelpCenterCreateDTO createDto) {
         log.info("Admin request to create a new help topic with DTO: {}", createDto);
         HelpCenter topicToCreate = HelpCenterMapper.toEntity(createDto);
         log.debug("Mapped DTO to HelpCenter entity for creation: {}", topicToCreate);
@@ -76,7 +82,9 @@ public class AdminHelpCenterController {
      * @throws ResourceNotFoundException if the help topic with the given UUID is not found (handled by service).
      */
     @GetMapping("/{topicUuid}")
-    public ResponseEntity<HelpCenterResponseDTO> getHelpTopicByUuid(@PathVariable UUID topicUuid) {
+    @Operation(summary = "Get help topic by UUID", description = "Retrieves a specific help topic by its UUID.")
+    public ResponseEntity<HelpCenterResponseDTO> getHelpTopicByUuid(
+            @Parameter(description = "UUID of the help topic to retrieve", required = true) @PathVariable UUID topicUuid) {
         log.info("Admin request to get help topic by UUID: {}", topicUuid);
         HelpCenter topicEntity = helpCenterService.read(topicUuid);
         // The helpCenterService.read(UUID) method is expected to throw ResourceNotFoundException if not found.
@@ -93,9 +101,10 @@ public class AdminHelpCenterController {
      * @throws ResourceNotFoundException if the help topic with the given UUID is not found (handled by service).
      */
     @PutMapping("/{topicUuid}")
+    @Operation(summary = "Update an existing help topic", description = "Allows an administrator to update the details of an existing help topic.")
     public ResponseEntity<HelpCenterResponseDTO> updateHelpTopic(
-            @PathVariable UUID topicUuid,
-            @Valid @RequestBody HelpCenterUpdateDTO updateDto
+            @Parameter(description = "UUID of the help topic to update", required = true) @PathVariable UUID topicUuid,
+            @Parameter(description = "Updated data for the help topic", required = true) @Valid @RequestBody HelpCenterUpdateDTO updateDto
     ) {
         log.info("Admin request to update help topic with UUID: {}. Update DTO: {}", topicUuid, updateDto);
         HelpCenter existingTopic = helpCenterService.read(topicUuid);
@@ -117,6 +126,7 @@ public class AdminHelpCenterController {
      * @return A ResponseEntity containing a list of {@link HelpCenterResponseDTO}s, or no content if none exist.
      */
     @GetMapping
+    @Operation(summary = "Get all help topics (Admin)", description = "Retrieves a list of all help topics for administrative view.")
     public ResponseEntity<List<HelpCenterResponseDTO>> getAllHelpTopicsForAdmin() {
         log.info("Admin request to get all help topics.");
         List<HelpCenter> topics = helpCenterService.getAll();
@@ -139,7 +149,9 @@ public class AdminHelpCenterController {
      * @throws ResourceNotFoundException if the help topic with the given UUID is not found (when reading it).
      */
     @DeleteMapping("/{topicUuid}")
-    public ResponseEntity<Void> deleteHelpTopic(@PathVariable UUID topicUuid) {
+    @Operation(summary = "Delete a help topic", description = "Allows an administrator to soft-delete a help topic by its UUID.")
+    public ResponseEntity<Void> deleteHelpTopic(
+            @Parameter(description = "UUID of the help topic to delete", required = true) @PathVariable UUID topicUuid) {
         log.info("Admin request to delete help topic with UUID: {}", topicUuid);
         HelpCenter topicToDelete = helpCenterService.read(topicUuid);
         log.debug("Found help topic with ID: {} (UUID: {}) for deletion.", topicToDelete.getId(), topicToDelete.getUuid());

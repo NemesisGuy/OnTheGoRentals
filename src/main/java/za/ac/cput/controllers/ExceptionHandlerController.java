@@ -1,5 +1,8 @@
 package za.ac.cput.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,7 @@ import za.ac.cput.utils.SecurityUtils;
  * Updated: 2025-05-28
  */
 @RestControllerAdvice(basePackages = "za.ac.cput.controllers") // Ensure this targets the correct controller packages
+@Api(value = "API Exception Handling", tags = "API Exception Handling", description = "Centralized exception handling for REST API errors, providing standardized error responses.")
 public class ExceptionHandlerController {
 
     private static final Logger log = LoggerFactory.getLogger(ExceptionHandlerController.class);
@@ -34,7 +38,9 @@ public class ExceptionHandlerController {
      * @return A ResponseEntity containing the error message and HTTP status.
      */
     @ExceptionHandler(CarNotAvailableException.class)
-    public ResponseEntity<String> handleCarNotAvailableException(CarNotAvailableException ex) {
+    @ApiOperation(value = "Handle Car Not Available Error", notes = "Returns a 400 Bad Request when a car is not available for booking.", response = String.class)
+    public ResponseEntity<String> handleCarNotAvailableException(
+            @ApiParam(value = "The caught CarNotAvailableException", required = true) CarNotAvailableException ex) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.warn("Requester [{}]: CarNotAvailableException caught: {}", requesterId, ex.getMessage(), ex); // Log with exception for stack trace
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -48,7 +54,9 @@ public class ExceptionHandlerController {
      * @return A ResponseEntity containing the error message and HTTP status.
      */
     @ExceptionHandler(UserCantRentMoreThanOneCarException.class)
-    public ResponseEntity<String> handleUserCantRentMoreThanOneCarException(UserCantRentMoreThanOneCarException ex) {
+    @ApiOperation(value = "Handle User Cannot Rent Multiple Cars Error", notes = "Returns a 400 Bad Request when a user attempts to rent more than one car if disallowed.", response = String.class)
+    public ResponseEntity<String> handleUserCantRentMoreThanOneCarException(
+            @ApiParam(value = "The caught UserCantRentMoreThanOneCarException", required = true) UserCantRentMoreThanOneCarException ex) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.warn("Requester [{}]: UserCantRentMoreThanOneCarException caught: {}", requesterId, ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -62,7 +70,9 @@ public class ExceptionHandlerController {
      * @return A ResponseEntity containing the error message and HTTP status.
      */
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
+    @ApiOperation(value = "Handle Resource Not Found Error", notes = "Returns a 404 Not Found when a requested resource does not exist.", response = String.class)
+    public ResponseEntity<String> handleResourceNotFoundException(
+            @ApiParam(value = "The caught ResourceNotFoundException", required = true) ResourceNotFoundException ex) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.warn("Requester [{}]: ResourceNotFoundException caught: {}", requesterId, ex.getMessage()); // Stack trace might be less critical for 404s but can be added
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
@@ -76,7 +86,9 @@ public class ExceptionHandlerController {
      * @return A ResponseEntity containing the error message and HTTP status.
      */
     @ExceptionHandler(RoleNotFoundException.class)
-    public ResponseEntity<String> handleRoleNotFoundException(RoleNotFoundException ex) {
+    @ApiOperation(value = "Handle Role Not Found Error", notes = "Returns a 404 Not Found when a specified role does not exist.", response = String.class)
+    public ResponseEntity<String> handleRoleNotFoundException(
+            @ApiParam(value = "The caught RoleNotFoundException", required = true) RoleNotFoundException ex) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.warn("Requester [{}]: RoleNotFoundException caught: {}", requesterId, ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
@@ -90,7 +102,9 @@ public class ExceptionHandlerController {
      * @return A ResponseEntity containing the error message and HTTP status.
      */
     @ExceptionHandler(UnauthorisedException.class)
-    public ResponseEntity<String> handleUnauthorisedException(UnauthorisedException ex) {
+    @ApiOperation(value = "Handle Unauthorised Access Error", notes = "Returns a 401 Unauthorized when an action is attempted without proper authorization.", response = String.class)
+    public ResponseEntity<String> handleUnauthorisedException(
+            @ApiParam(value = "The caught UnauthorisedException", required = true) UnauthorisedException ex) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.warn("Requester [{}]: UnauthorisedException caught: {}", requesterId, ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
