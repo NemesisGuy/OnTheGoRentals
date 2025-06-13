@@ -17,10 +17,7 @@ import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.enums.BookingStatus;
 import za.ac.cput.domain.mapper.BookingMapper;
 import za.ac.cput.exception.ResourceNotFoundException;
-import za.ac.cput.service.IBookingService;
-import za.ac.cput.service.ICarService;
-import za.ac.cput.service.IDriverService;
-import za.ac.cput.service.IUserService;
+import za.ac.cput.service.*;
 import za.ac.cput.utils.SecurityUtils;
 
 import java.util.List;
@@ -46,6 +43,7 @@ public class AdminBookingController {
     private final IUserService userService;
     private final ICarService carService;
     private final IDriverService driverService;
+    private final IFileStorageService fileStorageService;
 
     /**
      * Constructs an AdminBookingController with necessary service dependencies.
@@ -57,11 +55,12 @@ public class AdminBookingController {
      */
     @Autowired
     public AdminBookingController(IBookingService bookingService, IUserService userService,
-                                  ICarService carService, IDriverService driverService) {
+                                  ICarService carService, IDriverService driverService, IFileStorageService fileStorageService) {
         this.bookingService = bookingService;
         this.userService = userService;
         this.carService = carService;
         this.driverService = driverService;
+        this.fileStorageService = fileStorageService;
         log.info("AdminBookingController initialized.");
     }
 
@@ -79,7 +78,7 @@ public class AdminBookingController {
             log.info("No bookings found.");
             return ResponseEntity.noContent().build();
         }
-        List<BookingResponseDTO> bookingResponseDTOS = BookingMapper.toDtoList(bookings);
+        List<BookingResponseDTO> bookingResponseDTOS = BookingMapper.toDtoList(bookings,fileStorageService);
         log.info("Successfully retrieved {} bookings.", bookingResponseDTOS.size());
         return ResponseEntity.ok(bookingResponseDTOS);
     }
@@ -132,7 +131,7 @@ public class AdminBookingController {
 
         Booking createdEntity = bookingService.create(bookingToCreate);
         log.info("Successfully created booking with ID: {} and UUID: {}", createdEntity.getId(), createdEntity.getUuid());
-        return new ResponseEntity<>(BookingMapper.toDto(createdEntity), HttpStatus.CREATED);
+        return new ResponseEntity<>(BookingMapper.toDto(createdEntity , fileStorageService), HttpStatus.CREATED);
     }
 
     /**
@@ -149,7 +148,7 @@ public class AdminBookingController {
         // Assuming bookingService.read(UUID) throws ResourceNotFoundException if not found.
         // If not, add: if (bookingEntity == null) throw new ResourceNotFoundException(...);
         log.info("Successfully retrieved booking with ID: {} for UUID: {}", bookingEntity.getId(), bookingUuid);
-        return ResponseEntity.ok(BookingMapper.toDto(bookingEntity));
+        return ResponseEntity.ok(BookingMapper.toDto(bookingEntity, fileStorageService));
     }
 
     /**
@@ -235,7 +234,7 @@ public class AdminBookingController {
         Booking persistedBooking = bookingService.update(bookingWithUpdates); // Service.update takes entity
         log.info("Successfully updated booking with ID: {} and UUID: {}", persistedBooking.getId(), persistedBooking.getId());
 
-        return ResponseEntity.ok(BookingMapper.toDto(persistedBooking));
+        return ResponseEntity.ok(BookingMapper.toDto(persistedBooking, fileStorageService));
     }
 
     /**
@@ -291,7 +290,7 @@ public class AdminBookingController {
 
         Booking updatedBooking = bookingService.update(bookingToUpdate); // Service.update takes the entity
         log.info("Successfully confirmed booking with ID: {} (UUID: {}).", updatedBooking.getId(), bookingUuid);
-        BookingResponseDTO confirmedDto = BookingMapper.toDto(updatedBooking);
+        BookingResponseDTO confirmedDto = BookingMapper.toDto(updatedBooking, fileStorageService);
         return ResponseEntity.ok(confirmedDto);
     }
 
@@ -315,7 +314,7 @@ public class AdminBookingController {
 
         Booking updatedBooking = bookingService.update(bookingToUpdate); // Service.update takes the entity
         log.info("Successfully canceled booking with ID: {} (UUID: {}).", updatedBooking.getId(), bookingUuid);
-        BookingResponseDTO canceledDto = BookingMapper.toDto(updatedBooking);
+        BookingResponseDTO canceledDto = BookingMapper.toDto(updatedBooking, fileStorageService);
         return ResponseEntity.ok(canceledDto);
     }
 
@@ -335,7 +334,7 @@ public class AdminBookingController {
             log.info("Staff/Admin [{}]: No bookings due for collection today.", requesterId);
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(BookingMapper.toDtoList(bookings));
+        return ResponseEntity.ok(BookingMapper.toDtoList(bookings, fileStorageService));
     }
 
 }

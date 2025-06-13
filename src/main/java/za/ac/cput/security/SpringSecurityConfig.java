@@ -68,6 +68,13 @@ public class SpringSecurityConfig {
                         .requestMatchers("/api/v1/faq/**").permitAll()
                         .requestMatchers("/api/v1/contact-us").permitAll()
                         .requestMatchers("/api/v1/bookings/available-cars").permitAll()
+                        // 🔓 Permit Swagger endpoints
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+
+
+
                         .requestMatchers("/actuator/**", "/metrics", "/metrics/**").permitAll()
 
                         .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN") // Admin endpoints require specific roles

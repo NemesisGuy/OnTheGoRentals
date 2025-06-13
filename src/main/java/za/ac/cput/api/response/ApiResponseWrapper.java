@@ -21,7 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor // For Jackson deserialization and general flexibility
-public class ApiResponse<T> {
+public class ApiResponseWrapper<T> {
     private T data;
     private List<FieldErrorDto> errors;
     private String status; // e.g., "success", "fail", "error"
@@ -31,7 +31,7 @@ public class ApiResponse<T> {
      *
      * @param data The data payload of the response.
      */
-    public ApiResponse(T data) {
+    public ApiResponseWrapper(T data) {
         this.data = data;
         this.status = "success"; // Convention for successful responses
         this.errors = Collections.emptyList(); // No errors for a successful response
@@ -42,7 +42,7 @@ public class ApiResponse<T> {
      *
      * @param errors A list of {@link FieldErrorDto} detailing the errors.
      */
-    public ApiResponse(List<FieldErrorDto> errors) {
+    public ApiResponseWrapper(List<FieldErrorDto> errors) {
         this.data = null; // No data payload for an error response
         this.status = "fail"; // Convention for responses with errors (e.g., validation, not found)
         // Could also be "error" for unexpected server errors.
@@ -55,7 +55,7 @@ public class ApiResponse<T> {
      * @param errors A list of {@link FieldErrorDto} detailing the errors.
      * @param status A custom status string (e.g., "error" for server errors).
      */
-    public ApiResponse(List<FieldErrorDto> errors, String status) {
+    public ApiResponseWrapper(List<FieldErrorDto> errors, String status) {
         this.data = null;
         this.status = status;
         this.errors = (errors != null) ? errors : Collections.emptyList();

@@ -105,7 +105,7 @@ This is the easiest way to get the backend server running along with a MySQL dat
     Ensure your `.env` file correctly points to your MySQL instance and defines other necessary variables like `JWT_SECRET`.
     ```bash
     # (Assuming you are in the project root)
-    docker-compose -f docker/docker-compose.yaml up -d 
+    docker-compose -f docker/docker-compose-old.yaml up -d 
     ```
     *(You might need to run `docker network create app-network` if it doesn't exist)*
 
@@ -151,6 +151,25 @@ Once the backend (and frontend) are running:
 *   **Users** can register for an account, log in, browse available cars, make bookings, and view their rental history.
 *   **Administrators** can log in with admin credentials to access the admin dashboard for managing users, cars, rentals, and site content.
     *   Default user accounts (e.g., `user@gmail.com`, `admin@gmail.com`, `superadmin@gmail.com`) are typically created via data seeding during application startup if they don't already exist. The default password pattern before hashing is `rolename + "password"` (e.g., 'adminpassword'). These passwords will be hashed by the system. Please refer to `DefaultDataInitializer.java` for the exact logic.
+
+### API Documentation with Swagger
+
+The API is documented using Swagger/OpenAPI. Once the application is running, you can access the Swagger UI at:
+
+```
+http://localhost:8080/swagger-ui.html
+```
+
+This interactive documentation allows you to:
+* Explore all available API endpoints
+* View request/response models
+* Test API endpoints directly from the browser
+* Authenticate with JWT tokens to test secured endpoints
+
+The raw OpenAPI specification is available at:
+```
+http://localhost:8080/api-docs
+```
 
 For detailed information on API endpoints, request/response formats, and authentication mechanisms, please refer to our [API Endpoints Documentation](docs/API_ENDPOINTS.md).
 

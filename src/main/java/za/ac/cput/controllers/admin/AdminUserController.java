@@ -1,5 +1,12 @@
 package za.ac.cput.controllers.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +25,7 @@ import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.exception.BadRequestException;
 import za.ac.cput.repository.IRoleRepository;
 import za.ac.cput.service.FileStorageService;
+import za.ac.cput.service.IFileStorageService;
 import za.ac.cput.service.IRoleService;
 import za.ac.cput.service.IUserService;
 
@@ -34,6 +42,7 @@ import java.util.UUID;
  * Author: Peter Buckingham (220165289)
  * Updated: 2024-06-07
  */
+@Tag(name = "Admin - User Management", description = "APIs for administrators to manage users")
 @RestController
 @RequestMapping("/api/v1/admin/users")
 public class AdminUserController {
@@ -43,7 +52,7 @@ public class AdminUserController {
     private final IUserService userService;
     private final IRoleService roleService;
     private final IRoleRepository roleRepository;
-    private final FileStorageService fileStorageService;
+    private final IFileStorageService fileStorageService;
 
     /**
      * Constructs an AdminUserController with necessary service and repository dependencies.
@@ -54,7 +63,7 @@ public class AdminUserController {
      * @param fileStorageService The service for handling file uploads.
      */
     @Autowired
-    public AdminUserController(IUserService userService, IRoleService roleService, IRoleRepository roleRepository, FileStorageService fileStorageService) {
+    public AdminUserController(IUserService userService, IRoleService roleService, IRoleRepository roleRepository, IFileStorageService fileStorageService) {
         this.userService = userService;
         this.roleService = roleService;
         this.roleRepository = roleRepository;
@@ -67,6 +76,16 @@ public class AdminUserController {
      *
      * @return A ResponseEntity containing a list of {@link UserResponseDTO}s.
      */
+    @Operation(
+        summary = "Get all users",
+        description = "Retrieves a list of all users in the system for administrative purposes"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved list of users",
+            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllUsersAdmin() {
         log.info("Admin request to get all users.");
@@ -75,7 +94,7 @@ public class AdminUserController {
             log.info("No users found.");
             return ResponseEntity.ok(List.of());
         }
-        List<UserResponseDTO> dtoList = UserMapper.toDtoList(users);
+        List<UserResponseDTO> dtoList = UserMapper.toDtoList(users, fileStorageService);
         log.info("Successfully retrieved {} users.", dtoList.size());
         return ResponseEntity.ok(dtoList);
     }
@@ -86,12 +105,23 @@ public class AdminUserController {
      * @param userUuid The UUID of the user to retrieve.
      * @return A ResponseEntity containing the {@link UserResponseDTO}.
      */
+    @Operation(
+        summary = "Get user by UUID",
+        description = "Retrieves a specific user by their UUID for administrative purposes"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved user",
+            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/{userUuid}")
     public ResponseEntity<UserResponseDTO> getUserByUuidAdmin(@PathVariable UUID userUuid) {
         log.info("Admin request to get user by UUID: {}", userUuid);
         User user = userService.read(userUuid);
         log.info("Successfully retrieved user with ID: {} for UUID: {}", user.getId(), user.getUuid());
-        return ResponseEntity.ok(UserMapper.toDto(user));
+        return ResponseEntity.ok(UserMapper.toDto(user, fileStorageService));
     }
 
     /**
@@ -100,6 +130,18 @@ public class AdminUserController {
      * @param userCreateDto The DTO containing details for the new user.
      * @return A ResponseEntity containing the created {@link UserResponseDTO}.
      */
+    @Operation(
+        summary = "Create a new user",
+        description = "Creates a new user with the provided details"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "User created successfully",
+            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+        @ApiResponse(responseCode = "409", description = "Email already in use"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUserByAdmin(@Valid @RequestBody UserCreateDTO userCreateDto) {
         log.info("Admin request to create a new user with DTO: {}", userCreateDto);
@@ -107,7 +149,7 @@ public class AdminUserController {
         User userToCreate = UserMapper.toEntity(userCreateDto);
         User createdUser = userService.createUser(userToCreate, resolvedRoles);
         log.info("Successfully created user with ID: {} and UUID: {}", createdUser.getId(), createdUser.getUuid());
-        return new ResponseEntity<>(UserMapper.toDto(createdUser), HttpStatus.CREATED);
+        return new ResponseEntity<>(UserMapper.toDto(createdUser, fileStorageService), HttpStatus.CREATED);
     }
 
     /**
@@ -117,6 +159,18 @@ public class AdminUserController {
      * @param userUpdateDto The DTO containing the fields to update.
      * @return A ResponseEntity containing the updated {@link UserResponseDTO}.
      */
+    @Operation(
+        summary = "Update a user",
+        description = "Updates an existing user with the provided details"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "User updated successfully",
+            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PutMapping("/{userUuid}")
     public ResponseEntity<UserResponseDTO> updateUserByAdmin(
             @PathVariable UUID userUuid,
@@ -129,7 +183,7 @@ public class AdminUserController {
         // The service handles password encoding and role updates if necessary
         User persistedUser = userService.update(existingUser.getId(), userWithUpdates);
         log.info("Successfully updated user with ID: {} and UUID: {}", persistedUser.getId(), persistedUser.getUuid());
-        return ResponseEntity.ok(UserMapper.toDto(persistedUser));
+        return ResponseEntity.ok(UserMapper.toDto(persistedUser, fileStorageService));
     }
 
     /**
@@ -139,6 +193,18 @@ public class AdminUserController {
      * @param file     The image file sent as multipart/form-data.
      * @return A ResponseEntity containing the updated {@link UserResponseDTO} with the new image URL.
      */
+    @Operation(
+        summary = "Upload user profile image",
+        description = "Uploads or replaces the profile image for a specific user"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Profile image uploaded successfully",
+            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid file or empty file"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/{userUuid}/profile-image")
     public ResponseEntity<UserResponseDTO> uploadUserProfileImageByAdmin(
             @PathVariable UUID userUuid,
@@ -151,7 +217,7 @@ public class AdminUserController {
 
         User existingUser = userService.read(userUuid);
 
-        String filename = fileStorageService.save(ImageType.SELFIE.getFolder(), file);
+        String filename = fileStorageService.save(file,ImageType.SELFIE.getFolder());
 
         User.UserBuilder builder = existingUser.toBuilder()
                 .profileImageFileName(filename)
@@ -161,7 +227,7 @@ public class AdminUserController {
         User updatedUser = userService.update(existingUser.getId(), builder.build());
 
         log.info("Admin successfully uploaded profile image '{}' for user UUID [{}].", filename, userUuid);
-        return ResponseEntity.ok(UserMapper.toDto(updatedUser));
+        return ResponseEntity.ok(UserMapper.toDto(updatedUser, fileStorageService));
     }
 
     /**
@@ -170,6 +236,16 @@ public class AdminUserController {
      * @param userUuid The UUID of the user to delete.
      * @return A ResponseEntity with no content.
      */
+    @Operation(
+        summary = "Delete a user",
+        description = "Soft-deletes a user by their UUID"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "User deleted successfully"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @DeleteMapping("/{userUuid}")
     public ResponseEntity<Void> deleteUserByAdmin(@PathVariable UUID userUuid) {
         log.info("Admin request to delete user with UUID: {}", userUuid);
@@ -184,6 +260,17 @@ public class AdminUserController {
      *
      * @return A ResponseEntity containing a list of {@link Role} entities.
      */
+    @Operation(
+        summary = "Get all roles",
+        description = "Retrieves a list of all available roles in the system"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved list of roles",
+            content = @Content(schema = @Schema(implementation = Role.class))),
+        @ApiResponse(responseCode = "204", description = "No roles found"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/roles")
     public ResponseEntity<List<Role>> getAllRoles() {
         log.info("Admin request to get all available roles.");

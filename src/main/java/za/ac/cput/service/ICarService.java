@@ -1,5 +1,6 @@
 package za.ac.cput.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.enums.PriceGroup;
 
@@ -119,4 +120,6 @@ public interface ICarService extends IService<Car, Integer> {
     List<Car> findAllAvailableByPriceGroup(PriceGroup priceGroup);
 
     List<Car> getAvailableCars();
+    Car addImagesToCar(UUID carUuid, List<MultipartFile> files);
+
 }

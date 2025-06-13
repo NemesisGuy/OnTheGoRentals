@@ -10,16 +10,17 @@ import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.entity.Driver;
 import za.ac.cput.domain.entity.Rental;
 import za.ac.cput.domain.entity.security.User;
+import za.ac.cput.service.IFileStorageService;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class RentalMapper {
 
-    public static RentalResponseDTO toDto(Rental rental) {
+    public static RentalResponseDTO toDto(Rental rental, IFileStorageService fileStorageService) {
         if (rental == null) return null;
 
-        UserResponseDTO userDto = (rental.getUser() != null) ? UserMapper.toDto(rental.getUser()) : null;
+        UserResponseDTO userDto = (rental.getUser() != null) ? UserMapper.toDto(rental.getUser(), fileStorageService) : null;
         CarResponseDTO carDto = (rental.getCar() != null) ? CarMapper.toDto(rental.getCar()) : null;
         DriverResponseDTO driverDto = (rental.getDriver() != null) ? DriverMapper.toDto(rental.getDriver()) : null;
 
@@ -38,9 +39,11 @@ public class RentalMapper {
                 .build();
     }
 
-    public static List<RentalResponseDTO> toDtoList(List<Rental> rentals) {
-        if (rentals == null) return null;
-        return rentals.stream().map(RentalMapper::toDto).collect(Collectors.toList());
+    public static List<RentalResponseDTO> toDtoList(List<Rental> rentals, IFileStorageService fileStorageService) {
+        return rentals.stream()
+                // Pass the service down for each conversion
+                .map(rental -> toDto(rental, fileStorageService))
+                .collect(Collectors.toList());
     }
 
     public static Rental toEntity(RentalRequestDTO createDto, User userEntity, Car carEntity, Driver driverEntity) {

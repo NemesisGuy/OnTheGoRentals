@@ -5,11 +5,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import za.ac.cput.domain.entity.Car;
+import za.ac.cput.domain.entity.CarImage;
+import za.ac.cput.domain.enums.ImageType;
 import za.ac.cput.domain.enums.PriceGroup;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.CarRepository;
 import za.ac.cput.service.ICarService;
+import za.ac.cput.service.IFileStorageService;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,10 +35,12 @@ public class CarServiceImpl implements ICarService {
 
     private static final Logger log = LoggerFactory.getLogger(CarServiceImpl.class);
     private final CarRepository carRepository;
+    private final IFileStorageService fileStorageService; // Assuming this is injected for image handling
 
     @Autowired
-    public CarServiceImpl(CarRepository carRepository) {
+    public CarServiceImpl(CarRepository carRepository , IFileStorageService fileStorageService) {
         this.carRepository = carRepository;
+        this.fileStorageService = fileStorageService; // Injecting the file storage service
         log.info("CarServiceImpl initialized.");
     }
 
@@ -209,4 +215,40 @@ public class CarServiceImpl implements ICarService {
         log.debug("Fetching all available and non-deleted cars.");
         return carRepository.findAllByAvailableTrueAndDeletedFalse();
     }
+
+    @Override
+    @Transactional // This makes the entire method an "all or nothing" operation.
+    public Car addImagesToCar(UUID carUuid, List<MultipartFile> files) {
+        // 1. Find the car entity. Throws an exception if not found.
+        Car existingCar = carRepository.findByUuid(carUuid)
+                .orElseThrow(() -> new ResourceNotFoundException("Car not found with UUID: " + carUuid));
+
+        // 2. Loop through the files and process each one.
+        for (MultipartFile file : files) {
+            if (file == null || file.isEmpty()) continue;
+
+            // Save the physical file using the storage service.
+            String fileKey = fileStorageService.save(file, ImageType.CAR.getFolder());
+            String filename = fileKey.substring(fileKey.lastIndexOf("/") + 1);
+
+            // Create the new CarImage entity.
+            CarImage newImage = CarImage.builder()
+                    .fileName(filename)
+                    .imageType(ImageType.CAR.getFolder())
+                    .car(existingCar) // Associate it with the car.
+                    .build();
+
+            // Add the new image to the car's list of images.
+            // Because of the CascadeType.ALL setting on the Car's 'images' field,
+            // this new CarImage will be saved automatically when the car is saved.
+            existingCar.getImages().add(newImage);
+        }
+
+        // 3. Save the updated car entity. The @Transactional annotation ensures
+        // that all changes (including the new CarImage entities) are saved together.
+        // If any file fails to save, the transaction will roll back, and no changes
+        // will be made to the database.
+        return carRepository.save(existingCar);
+    }
+
 }

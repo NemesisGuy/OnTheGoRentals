@@ -1,0 +1,129 @@
+version: '3.8'
+
+# This Docker Compose file sets up a complete, multi-service environment for local demonstration.
+# All configuration and secrets are sourced from the accompanying .env file.
+
+services:
+  # 1. MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: demo-mysql-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE_NAME}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--password=${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # 2. MinIO S3-Compatible Object Storage Service
+  minio:
+    image: minio/minio:latest
+    container_name: demo-minio-server
+    command: server /data --console-address ":9001"
+    ports:
+      - "9002:9000" # API Port
+      - "9003:9001" # Console/UI Port
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio-data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
+  # 3. Spring Boot Backend Service
+  backend:
+    # IMPORTANT: Replace this with the name of the Docker image you built for your backend.
+    image: nemesisguy/on-the-go-rentals-backend:latest
+    container_name: demo-backend-app
+    restart: unless-stopped
+    environment:
+      # Spring Profile Selection
+      - SPRING_PROFILES_ACTIVE=storage-minio
+
+      # Database Connection (uses service name 'mysql')
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${MYSQL_DATABASE_NAME}?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+      # MinIO Connection (uses service name 'minio')
+      - MINIO_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
+
+      # JWT Configuration
+      - JWT_SECRET=${JWT_SECRET_KEY}
+      - JWT_EXPIRATION=${JWT_ACCESS_TOKEN_EXPIRATION_MS}
+      - JWT_REFRESH_TOKEN.EXPIRATION-MS=${JWT_REFRESH_TOKEN_EXPIRATION_MS}
+
+      # Google OAuth2 Configuration
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    ports:
+      - "8087:8080"
+    networks:
+      - app-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  # 4. Vue.js Frontend Service (served by Nginx)
+  frontend:
+    # IMPORTANT: Replace this with the name of the Docker image you built for your frontend.
+    image: nemesisguy/on-the-go-rentals-frontend:latest
+    container_name: demo-frontend-app
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      # This URL is what the browser uses to talk to the backend.
+      - BACKEND_API_BASE_URL=${PUBLIC_BACKEND_URL}
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+  # 5. phpMyAdmin Database Management Tool
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: demo-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql # Refers to the mysql service name
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "8085:80"
+    networks:
+      - app-network
+    depends_on:
+      - mysql
+
+# Define the persistent volumes
+volumes:
+  mysql-data: {}
+  minio-data: {}
+
+# Define the shared network
+networks:
+  app-network:
+    driver: bridge

@@ -6,47 +6,66 @@ import za.ac.cput.domain.dto.response.DamageReportResponseDTO;
 import za.ac.cput.domain.dto.response.RentalResponseDTO;
 import za.ac.cput.domain.entity.DamageReport;
 import za.ac.cput.domain.entity.Rental;
+import za.ac.cput.service.IFileStorageService; // Import the required service interface
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class DamageReportMapper {
 
-    public static DamageReportResponseDTO toDto(DamageReport damageReport) {
+    /**
+     * Converts a DamageReport entity to its DTO representation.
+     * This now requires an IFileStorageService to correctly map the nested Rental DTO.
+     *
+     * @param damageReport       The DamageReport entity.
+     * @param fileStorageService The service for generating image URLs.
+     * @return A DamageReportResponseDTO.
+     */
+    public static DamageReportResponseDTO toDto(DamageReport damageReport, IFileStorageService fileStorageService) {
         if (damageReport == null) return null;
 
+        // === THE FIX IS HERE ===
+        // Pass the fileStorageService down to the RentalMapper
         RentalResponseDTO rentalDto = (damageReport.getRental() != null) ?
-                RentalMapper.toDto(damageReport.getRental()) : null;
+                RentalMapper.toDto(damageReport.getRental(), fileStorageService) : null;
 
         return DamageReportResponseDTO.builder()
-                .uuid(damageReport.getUuid()) // Use DamageReport's UUID
+                .uuid(damageReport.getUuid())
                 .rental(rentalDto)
                 .description(damageReport.getDescription())
                 .dateAndTime(damageReport.getDateAndTime())
                 .location(damageReport.getLocation())
                 .repairCost(damageReport.getRepairCost())
-                // .createdAt(damageReport.getCreatedAt()) // Add if in ResponseDTO
                 .build();
     }
 
-    public static List<DamageReportResponseDTO> toDtoList(List<DamageReport> damageReports) {
+    /**
+     * Converts a list of DamageReport entities to a list of DTOs.
+     *
+     * @param damageReports      The list of DamageReport entities.
+     * @param fileStorageService The service for generating image URLs.
+     * @return A list of DamageReportResponseDTOs.
+     */
+    public static List<DamageReportResponseDTO> toDtoList(List<DamageReport> damageReports, IFileStorageService fileStorageService) {
         if (damageReports == null) return null;
-        return damageReports.stream().map(DamageReportMapper::toDto).collect(Collectors.toList());
+        // Use a lambda to pass the service to each toDto call
+        return damageReports.stream()
+                .map(report -> DamageReportMapper.toDto(report, fileStorageService))
+                .collect(Collectors.toList());
     }
 
+    // These methods do not need the file service, so their signatures remain unchanged.
     public static DamageReport toEntity(DamageReportCreateDTO createDto, Rental rentalEntity) {
         if (createDto == null) return null;
         if (rentalEntity == null) {
             throw new IllegalArgumentException("Rental entity is required to create a damage report.");
         }
-        // Using DamageReport's static Builder class
         return new DamageReport.Builder()
-                .setRental(rentalEntity) // Set the fetched Rental entity
+                .setRental(rentalEntity)
                 .setDescription(createDto.getDescription())
-                .setDateAndTime(createDto.getDateAndTime()) // Mapper takes what DTO provides
+                .setDateAndTime(createDto.getDateAndTime())
                 .setLocation(createDto.getLocation())
                 .setRepairCost(createDto.getRepairCost())
-                // uuid, id, createdAt, deleted are handled by entity @PrePersist or defaults
                 .build();
     }
 
@@ -57,14 +76,11 @@ public class DamageReportMapper {
 
         DamageReport.Builder builder = new DamageReport.Builder().copy(existingReport);
 
-        // Only update fields if they are provided in the DTO
         if (updateDto.getDescription() != null) builder.setDescription(updateDto.getDescription());
         if (updateDto.getDateAndTime() != null) builder.setDateAndTime(updateDto.getDateAndTime());
         if (updateDto.getLocation() != null) builder.setLocation(updateDto.getLocation());
         if (updateDto.getRepairCost() != null) builder.setRepairCost(updateDto.getRepairCost());
-        // The associated Rental usually doesn't change for an existing damage report.
-        // id, uuid, createdAt, deleted are preserved from existingReport by .copy()
 
-        return builder.build(); // Returns a new DamageReport instance
+        return builder.build();
     }
 }

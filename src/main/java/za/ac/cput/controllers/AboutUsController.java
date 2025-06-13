@@ -1,5 +1,12 @@
 package za.ac.cput.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +39,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1/about-us") // Assuming v1 is standard for public APIs too
+@Tag(name = "About Us", description = "Endpoints for retrieving company information and history.")
 public class AboutUsController {
 
     private static final Logger log = LoggerFactory.getLogger(AboutUsController.class);
@@ -55,8 +63,18 @@ public class AboutUsController {
      * @param id The internal integer ID of the "About Us" entry to retrieve.
      * @return A ResponseEntity containing the {@link AboutUsResponseDTO} if found, or 404 Not Found.
      */
+    @Operation(
+            summary = "Get About Us by ID",
+            description = "Retrieves a specific About Us entry by its internal ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "About Us entry found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AboutUsResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "About Us entry not found", content = @Content)
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<AboutUsResponseDTO> read(@PathVariable int id) {
+    public ResponseEntity<AboutUsResponseDTO> read(
+            @Parameter(description = "ID of the About Us entry to retrieve") @PathVariable int id) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to read About Us content by ID: {}", requesterId, id);
 
@@ -78,6 +96,15 @@ public class AboutUsController {
      *
      * @return A ResponseEntity containing a list of {@link AboutUsResponseDTO}s, or 204 No Content if none exist.
      */
+    @Operation(
+            summary = "Get all About Us entries",
+            description = "Retrieves all About Us entries in the system."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "About Us entries found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AboutUsResponseDTO.class))),
+            @ApiResponse(responseCode = "204", description = "No About Us entries exist", content = @Content)
+    })
     @GetMapping
     public ResponseEntity<List<AboutUsResponseDTO>> getAll() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
@@ -101,6 +128,15 @@ public class AboutUsController {
      *
      * @return A ResponseEntity containing the {@link AboutUsResponseDTO} of the latest entry, or 404 Not Found if no entries exist.
      */
+    @Operation(
+            summary = "Get latest About Us entry",
+            description = "Retrieves the most recent About Us entry in the system."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Latest About Us entry found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AboutUsResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "No About Us entries exist", content = @Content)
+    })
     @GetMapping("/latest")
     public ResponseEntity<AboutUsResponseDTO> getLatest() {
         String requesterId = SecurityUtils.getRequesterIdentifier();

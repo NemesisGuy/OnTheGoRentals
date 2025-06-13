@@ -10,7 +10,9 @@ import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.entity.Driver;
 import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.domain.enums.BookingStatus;
+import za.ac.cput.service.IFileStorageService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,14 +24,15 @@ public class BookingMapper {
      * @param booking The Booking entity.
      * @return The corresponding BookingResponseDTO, or null if the booking entity is null.
      */
-    public static BookingResponseDTO toDto(Booking booking) {
+    public static BookingResponseDTO toDto(Booking booking, IFileStorageService fileStorageService) {
         if (booking == null) {
             return null;
         }
 
+
         UserResponseDTO userDto = null;
         if (booking.getUser() != null) {
-            userDto = UserMapper.toDto(booking.getUser()); // Uses UserMapper
+            userDto = UserMapper.toDto(booking.getUser(), fileStorageService); // Uses UserMapper
         }
 
         CarResponseDTO carDto = null;
@@ -175,12 +178,13 @@ public class BookingMapper {
      * @param bookings List of Booking entities.
      * @return List of BookingResponseDTOs.
      */
-    public static List<BookingResponseDTO> toDtoList(List<Booking> bookings) {
+    public static List<BookingResponseDTO> toDtoList(List<Booking> bookings, IFileStorageService fileStorageService) {
         if (bookings == null) {
-            return null;
+            return Collections.emptyList();
         }
         return bookings.stream()
-                .map(BookingMapper::toDto)
+                // Pass the service down for each conversion
+                .map(booking -> toDto(booking, fileStorageService))
                 .collect(Collectors.toList());
     }
 

@@ -21,6 +21,7 @@ import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.IBookingService;
 import za.ac.cput.service.ICarService;
+import za.ac.cput.service.IFileStorageService;
 import za.ac.cput.service.IUserService;
 import za.ac.cput.utils.SecurityUtils;
 
@@ -48,6 +49,8 @@ public class BookingController {
     private final IBookingService bookingService; // Use interface
     private final ICarService carService;
     private final IUserService userService;
+    private final IFileStorageService fileStorageService;
+
     // private final JwtUtilities jwtUtilities; // Removed as not directly used in these methods
 
     /**
@@ -58,10 +61,11 @@ public class BookingController {
      * @param userService    The user service.
      */
     @Autowired
-    public BookingController(IBookingService bookingService, ICarService carService, IUserService userService) {
+    public BookingController(IBookingService bookingService, ICarService carService, IUserService userService , IFileStorageService fileStorageService) {
         this.bookingService = bookingService;
         this.carService = carService;
         this.userService = userService;
+        this.fileStorageService = fileStorageService;
         // this.jwtUtilities = jwtUtilities; // Removed
         log.info("BookingController initialized.");
     }
@@ -114,7 +118,7 @@ public class BookingController {
         // in a transactional way to ensure data consistency.
         // e.g., carToBook.setAvailable(false); carService.update(carToBook.getId(), carToBook);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(BookingMapper.toDto(createdBookingEntity));
+        return ResponseEntity.status(HttpStatus.CREATED).body(BookingMapper.toDto(createdBookingEntity, fileStorageService));
     }
 
     /**
@@ -147,7 +151,7 @@ public class BookingController {
 
         log.info("Requester [{}]: Successfully retrieved booking with ID: {} for UUID: {}",
                 requesterId, bookingEntity.getId(), bookingEntity.getUuid());
-        return ResponseEntity.ok(BookingMapper.toDto(bookingEntity));
+        return ResponseEntity.ok(BookingMapper.toDto(bookingEntity, fileStorageService));
     }
 
     /**
@@ -177,7 +181,7 @@ public class BookingController {
             return ResponseEntity.noContent().build();
         }
         log.info("Requester [{}]: Successfully retrieved {} bookings for this user.", requesterId, bookings.size());
-        return ResponseEntity.ok(BookingMapper.toDtoList(bookings));
+        return ResponseEntity.ok(BookingMapper.toDtoList(bookings, fileStorageService));
     }
 
     /**
@@ -253,7 +257,7 @@ public class BookingController {
 
         if (!entityChanged) {
             log.info("Requester [{}]: No changes detected for booking UUID: {}. Returning existing booking.", requesterId, bookingUuid);
-            return ResponseEntity.ok(BookingMapper.toDto(existingBooking));
+            return ResponseEntity.ok(BookingMapper.toDto(existingBooking, fileStorageService));
         }
 
         Booking bookingWithUpdates = builder.build();
@@ -262,7 +266,7 @@ public class BookingController {
         Booking updatedBookingEntity = bookingService.update(bookingWithUpdates); // Service takes the full entity
         log.info("Requester [{}]: Successfully updated booking with ID: {} and UUID: {}",
                 requesterId, updatedBookingEntity.getId(), updatedBookingEntity.getUuid());
-        return ResponseEntity.ok(BookingMapper.toDto(updatedBookingEntity));
+        return ResponseEntity.ok(BookingMapper.toDto(updatedBookingEntity , fileStorageService));
     }
 
     /**
@@ -293,7 +297,7 @@ public class BookingController {
         Booking confirmedBookingEntity = bookingService.confirmBooking(bookingToConfirm.getId());
         log.info("Requester [{}]: Successfully confirmed booking with ID: {} and UUID: {}",
                 requesterId, confirmedBookingEntity.getId(), confirmedBookingEntity.getUuid());
-        return ResponseEntity.ok(BookingMapper.toDto(confirmedBookingEntity));
+        return ResponseEntity.ok(BookingMapper.toDto(confirmedBookingEntity , fileStorageService));
     }
 
     /**
@@ -324,7 +328,7 @@ public class BookingController {
         Booking canceledBookingEntity = bookingService.cancelBooking(bookingToCancel.getId());
         log.info("Requester [{}]: Successfully cancelled booking with ID: {} and UUID: {}",
                 requesterId, canceledBookingEntity.getId(), canceledBookingEntity.getUuid());
-        return ResponseEntity.ok(BookingMapper.toDto(canceledBookingEntity));
+        return ResponseEntity.ok(BookingMapper.toDto(canceledBookingEntity , fileStorageService));
     }
 
 
@@ -374,6 +378,6 @@ public class BookingController {
         }
         log.info("Requester [{}]: Successfully retrieved user profile with ID: {} and UUID: {}",
                 requesterId, user.getId(), user.getUuid());
-        return ResponseEntity.ok(UserMapper.toDto(user));
+        return ResponseEntity.ok(UserMapper.toDto(user , fileStorageService));
     }
 }

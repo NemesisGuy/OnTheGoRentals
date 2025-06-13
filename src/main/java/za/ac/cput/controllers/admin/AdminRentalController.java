@@ -18,10 +18,7 @@ import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.domain.mapper.RentalMapper;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.ResourceNotFoundException;
-import za.ac.cput.service.ICarService;
-import za.ac.cput.service.IDriverService;
-import za.ac.cput.service.IRentalService;
-import za.ac.cput.service.IUserService;
+import za.ac.cput.service.*;
 import za.ac.cput.utils.SecurityUtils;
 
 import java.util.List;
@@ -49,14 +46,16 @@ public class AdminRentalController {
     private final IUserService userService;
     private final ICarService carService;
     private final IDriverService driverService;
+    private final IFileStorageService fileStorageService;
 
     @Autowired
     public AdminRentalController(IRentalService rentalService, IUserService userService,
-                                 ICarService carService, IDriverService driverService) {
+                                 ICarService carService, IDriverService driverService, IFileStorageService fileStorageService) {
         this.rentalService = rentalService;
         this.userService = userService;
         this.carService = carService;
         this.driverService = driverService;
+        this.fileStorageService = fileStorageService;
         log.info("AdminRentalController initialized.");
     }
 
@@ -73,7 +72,7 @@ public class AdminRentalController {
             log.info("Staff/Admin [{}]: No rentals due for return today.", requesterId);
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(RentalMapper.toDtoList(rentals));
+        return ResponseEntity.ok(RentalMapper.toDtoList(rentals, fileStorageService));
     }
 
     @GetMapping("/overdue-rentals")
@@ -86,7 +85,7 @@ public class AdminRentalController {
             log.info("Staff/Admin [{}]: No overdue rentals.", requesterId);
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(RentalMapper.toDtoList(rentals));
+        return ResponseEntity.ok(RentalMapper.toDtoList(rentals , fileStorageService));
     }
 
     @GetMapping("/active")
@@ -98,7 +97,7 @@ public class AdminRentalController {
             log.info("Admin [{}]: No active rentals found.", adminId);
             return ResponseEntity.noContent().build();
         }
-        List<RentalResponseDTO> dtoList = RentalMapper.toDtoList(activeRentals);
+        List<RentalResponseDTO> dtoList = RentalMapper.toDtoList(activeRentals , fileStorageService);
         log.info("Admin [{}]: Successfully retrieved {} active rentals.", adminId, dtoList.size());
         return ResponseEntity.ok(dtoList);
     }
@@ -120,7 +119,7 @@ public class AdminRentalController {
 
         Rental createdEntity = rentalService.create(rentalToCreate);
         log.info("Admin [{}]: Successfully created rental with ID: {} and UUID: {}", adminId, createdEntity.getId(), createdEntity.getUuid());
-        return new ResponseEntity<>(RentalMapper.toDto(createdEntity), HttpStatus.CREATED);
+        return new ResponseEntity<>(RentalMapper.toDto(createdEntity , fileStorageService), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -132,7 +131,7 @@ public class AdminRentalController {
             log.info("Admin [{}]: No rentals found.", adminId);
             return ResponseEntity.noContent().build();
         }
-        List<RentalResponseDTO> dtoList = RentalMapper.toDtoList(rentals);
+        List<RentalResponseDTO> dtoList = RentalMapper.toDtoList(rentals , fileStorageService);
         log.info("Admin [{}]: Successfully retrieved {} rentals.", adminId, dtoList.size());
         return ResponseEntity.ok(dtoList);
     }
@@ -143,7 +142,7 @@ public class AdminRentalController {
         log.info("Admin [{}]: Request to get rental by UUID: {}", adminId, rentalUuid);
         Rental rentalEntity = rentalService.read(rentalUuid);
         log.info("Admin [{}]: Successfully retrieved rental with ID: {} for UUID: {}", adminId, rentalEntity.getId(), rentalEntity.getUuid());
-        return ResponseEntity.ok(RentalMapper.toDto(rentalEntity));
+        return ResponseEntity.ok(RentalMapper.toDto(rentalEntity , fileStorageService));
     }
 
     /**
@@ -271,7 +270,7 @@ public class AdminRentalController {
 
         if (!changed) {
             log.info("Admin [{}]: No updatable fields provided in DTO or values are the same for rental UUID: {}. No update performed.", adminId, rentalUuid);
-            return ResponseEntity.ok(RentalMapper.toDto(existingRental));
+            return ResponseEntity.ok(RentalMapper.toDto(existingRental , fileStorageService));
         }
 
         Rental rentalWithUpdates = rentalBuilder.build();
@@ -279,7 +278,7 @@ public class AdminRentalController {
         // Car availability logic on update should be in rentalService.update
 
         log.info("Admin [{}]: Successfully updated rental ID: {}, UUID: {}", adminId, persistedRental.getId(), persistedRental.getUuid());
-        return ResponseEntity.ok(RentalMapper.toDto(persistedRental));
+        return ResponseEntity.ok(RentalMapper.toDto(persistedRental , fileStorageService));
     }
 
     // ... DELETE and other action methods (confirm, cancel, complete) ...
@@ -305,7 +304,7 @@ public class AdminRentalController {
         log.info("Admin [{}]: Request to confirm rental with UUID: {}", adminId, rentalUuid);
         Rental confirmedRental = rentalService.confirmRentalByUuid(rentalUuid);
         log.info("Admin [{}]: Successfully confirmed rental with ID: {} and UUID: {}", adminId, confirmedRental.getId(), confirmedRental.getUuid());
-        return ResponseEntity.ok(RentalMapper.toDto(confirmedRental));
+        return ResponseEntity.ok(RentalMapper.toDto(confirmedRental , fileStorageService));
     }
 
     @PostMapping("/{rentalUuid}/cancel")
@@ -314,7 +313,7 @@ public class AdminRentalController {
         log.info("Admin [{}]: Request to cancel rental with UUID: {}", adminId, rentalUuid);
         Rental cancelledRental = rentalService.cancelRentalByUuid(rentalUuid);
         log.info("Admin [{}]: Successfully cancelled rental with ID: {} and UUID: {}", adminId, cancelledRental.getId(), cancelledRental.getUuid());
-        return ResponseEntity.ok(RentalMapper.toDto(cancelledRental));
+        return ResponseEntity.ok(RentalMapper.toDto(cancelledRental , fileStorageService));
     }
 
     @PostMapping("/{rentalUuid}/complete")
@@ -326,7 +325,7 @@ public class AdminRentalController {
         log.info("Admin [{}]: Request to complete rental with UUID: {}, Fine amount: {}", adminId, rentalUuid, fineAmount);
         Rental completedRental = rentalService.completeRentalByUuid(rentalUuid, fineAmount);
         log.info("Admin [{}]: Successfully completed rental with ID: {} and UUID: {}. Fine applied: {}", adminId, completedRental.getId(), completedRental.getUuid(), fineAmount);
-        return ResponseEntity.ok(RentalMapper.toDto(completedRental));
+        return ResponseEntity.ok(RentalMapper.toDto(completedRental , fileStorageService));
     }
 
 

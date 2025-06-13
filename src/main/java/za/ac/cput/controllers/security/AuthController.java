@@ -1,5 +1,14 @@
 package za.ac.cput.controllers.security;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -10,7 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import za.ac.cput.api.response.ApiResponse;
+import za.ac.cput.api.response.ApiResponseWrapper;
 import za.ac.cput.domain.dto.request.LoginDto;
 import za.ac.cput.domain.dto.request.RegisterDto;
 import za.ac.cput.domain.dto.response.AuthResponseDto;
@@ -21,70 +30,54 @@ import za.ac.cput.service.IAuthService;
 import za.ac.cput.service.impl.AuthServiceImpl;
 import za.ac.cput.utils.SecurityUtils;
 
-/**
- * AuthController.java
- * Controller for handling user authentication and authorization processes.
- * Utilizes {@link IAuthService} for core authentication logic.
- * Includes endpoints for user registration, login, token refresh, and logout.
- * <p>
- * Author: [Original Author Name - Please specify if known]
- * Date: [Original Date - Please specify if known]
- * Updated by: Peter Buckingham
- * Updated: 2025-05-28
- */
 @RestController
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Authentication", description = "Endpoints for user registration, login, logout, and token management.")
 public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
-    private final IAuthService authService; // Inject IAuthService
+    private final IAuthService authService;
 
-    @Value("${jwt.expiration}") // To populate AuthResponseDto
+    @Value("${jwt.expiration}")
     private Long accessTokenExpirationMs;
 
-    /**
-     * Constructs an AuthController with the necessary Authentication service.
-     *
-     * @param authService The service implementation for authentication operations.
-     */
     @Autowired
     public AuthController(IAuthService authService) {
         this.authService = authService;
         log.info("AuthController initialized with IAuthService.");
     }
 
-    /**
-     * Registers a new user in the system.
-     *
-     * @param registerDto The {@link RegisterDto} containing user registration details.
-     * @return A ResponseEntity containing an {@link AuthResponseDto} with the access token
-     * and user information upon successful registration. Cookies for refresh token
-     * are set by the AuthService via HttpServletResponse.
-     */
+    @Operation(
+            summary = "Register a new user",
+            description = "Creates a new user account with the default 'USER' role and automatically logs them in. " +
+                    "Returns a JWT access token in the response body and sets a refresh token in an HTTP-only cookie."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User registered and logged in successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid registration data provided", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Conflict: User with the provided email already exists", content = @Content)
+    })
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDto> register(
             @Valid @RequestBody RegisterDto registerDto,
-            HttpServletResponse httpServletResponse // Pass to service for cookie setting
+            HttpServletResponse httpServletResponse
     ) {
-        String requesterId = SecurityUtils.getRequesterIdentifier(); // Will be GUEST
+        String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to register new user with email: {}", requesterId, registerDto.getEmail());
 
-        // AuthService's registerUser method now handles User creation, password encoding, default role assignment.
-        // We call loginUser afterwards to get tokens and set cookies, simulating an auto-login after registration.
         User registeredUser = authService.registerUser(
                 registerDto.getFirstName(),
                 registerDto.getLastName(),
                 registerDto.getEmail(),
                 registerDto.getPassword(),
-                RoleName.USER // Default role for new registrations
+                RoleName.USER
         );
-
         log.info("Requester [{}]: User '{}' registered successfully. Proceeding to log in.", requesterId, registeredUser.getEmail());
 
-        // After successful registration, automatically log the user in to get tokens/cookies
         AuthServiceImpl.AuthDetails authDetails = authService.loginUser(
-                registeredUser.getEmail(), // Use registered email
-                registerDto.getPassword(), // Use plain password from DTO for login
+                registeredUser.getEmail(),
+                registerDto.getPassword(),
                 httpServletResponse
         );
 
@@ -101,20 +94,23 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authResponseDto);
     }
 
-    /**
-     * Authenticates an existing user and provides authentication tokens.
-     * Access token is returned in the response body; refresh token is set as an HTTP-only cookie.
-     *
-     * @param loginDto            The {@link LoginDto} containing user login credentials.
-     * @param httpServletResponse The HttpServletResponse used by the auth service to set the refresh token cookie.
-     * @return A ResponseEntity containing an {@link AuthResponseDto} with the access token and user info.
-     */
+    @Operation(
+            summary = "Authenticate a user",
+            description = "Logs in a user with an email and password. Returns a JWT access token in the response body " +
+                    "and sets a refresh token in an HTTP-only cookie."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid login data", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid credentials", content = @Content)
+    })
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(
             @Valid @RequestBody LoginDto loginDto,
             HttpServletResponse httpServletResponse
     ) {
-        String requesterId = SecurityUtils.getRequesterIdentifier(); // Will be GUEST
+        String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to login user with email: {}", requesterId, loginDto.getEmail());
 
         AuthServiceImpl.AuthDetails authDetails = authService.loginUser(
@@ -136,16 +132,19 @@ public class AuthController {
         return ResponseEntity.ok(authResponseDto);
     }
 
-    /**
-     * Refreshes an access token using a valid refresh token from an HTTP-only cookie.
-     * A new refresh token (and cookie) is also issued (token rotation).
-     *
-     * @param refreshTokenFromCookie The refresh token string retrieved from the cookie.
-     * @param httpServletResponse    The HttpServletResponse used by the auth service to set the new refresh token cookie.
-     * @return A ResponseEntity containing a {@link TokenRefreshResponseDto} with the new access token.
-     */
+    @Operation(
+            summary = "Refresh an access token",
+            description = "Generates a new JWT access token using a valid refresh token from the HTTP-only cookie. " +
+                    "A new refresh token is also issued (token rotation) and set in a new cookie."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Access token refreshed successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TokenRefreshResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: Refresh token is missing, invalid, or expired", content = @Content)
+    })
     @PostMapping("/refresh")
     public ResponseEntity<TokenRefreshResponseDto> refreshToken(
+            @Parameter(description = "The refresh token cookie. Automatically sent by the browser.", in = ParameterIn.COOKIE, name = "${app.security.refresh-cookie.name}")
             @CookieValue(name = "${app.security.refresh-cookie.name}", required = false) String refreshTokenFromCookie,
             HttpServletResponse httpServletResponse
     ) {
@@ -154,10 +153,7 @@ public class AuthController {
 
         if (refreshTokenFromCookie == null || refreshTokenFromCookie.isEmpty()) {
             log.warn("Requester [{}]: Refresh token cookie is missing or empty. Cannot refresh.", requesterId);
-            // Consider returning ApiResponse for consistency, even for direct error responses
-            // return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            //       .body(new ApiResponse<>(List.of(new FieldErrorDto("refreshToken", "Refresh token is missing."))));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Simpler for now
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         log.debug("Requester [{}]: Refresh token received from cookie.", requesterId);
@@ -176,43 +172,34 @@ public class AuthController {
         return ResponseEntity.ok(responseDto);
     }
 
-    /**
-     * Logs out the currently authenticated user.
-     * Invalidates server-side refresh tokens and instructs the client to clear authentication cookies.
-     *
-     * @param httpServletResponse The HttpServletResponse used by the auth service to send cookie clearing headers.
-     * @return A ResponseEntity containing an {@link ApiResponse} with a success message.
-     */
+    @Operation(
+            summary = "Log out the current user",
+            description = "Invalidates the user's session by deleting the refresh token from the database and clearing the authentication cookie.",
+            security = @SecurityRequirement(name = "bearerAuth") // This endpoint requires authentication
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logout successful",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: No active session to log out", content = @Content)
+    })
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<String>> logout(HttpServletResponse httpServletResponse) {
+    public ResponseEntity<ApiResponseWrapper<String>> logout(HttpServletResponse httpServletResponse) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to logout.", requesterId);
         String logoutMessage;
 
         if ("GUEST".equals(requesterId) || !SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
             log.info("Requester [{}]: No active user session to logout or already logged out.", requesterId);
-            authService.clearAuthCookies(httpServletResponse); // Attempt to clear cookies anyway
+            authService.clearAuthCookies(httpServletResponse);
             logoutMessage = "No active user session to logout or already logged out. Cookies cleared if any.";
         } else {
-            // Assuming requesterId is the email/username from SecurityContextHolder
-            // The authService.logoutUser needs the internal integer ID.
-            // If your User entity is the principal, you can get it.
-            // Otherwise, you might need a userService.findByUsername(requesterId) call here if not done in authService.
-            // For simplicity, if authService.logoutUser can take username, that's easier.
-            // Or, if your UserDetails principal is your User entity:
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            int userIdToLogout = -1; // Default to indicate not found
-            if (principal instanceof User) { // Assuming your User entity implements UserDetails
+            int userIdToLogout = -1;
+            if (principal instanceof User) {
                 userIdToLogout = ((User) principal).getId();
-            } else if (principal instanceof org.springframework.security.core.userdetails.User) {
-                // If using Spring's User, and you store your internal ID elsewhere or need to look it up
-                // This might require a call to IUserService:
-                // User appUser = userService.read(requesterId); // Assuming requesterId is email
-                // if (appUser != null) userIdToLogout = appUser.getId();
-                log.warn("Requester [{}]: Principal is Spring's UserDetails, not application User entity. Logout might be incomplete if internal ID is needed by AuthService and not derivable.", requesterId);
-                // For this example, we assume `authService.logoutUser` can handle it, or the SecurityContext will be cleared regardless.
+            } else {
+                log.warn("Requester [{}]: Principal is not an instance of the application User entity. Logout might be incomplete if internal ID is needed.", requesterId);
             }
-
 
             if (userIdToLogout != -1) {
                 boolean logoutSuccess = authService.logoutUser(userIdToLogout, httpServletResponse);
@@ -220,17 +207,16 @@ public class AuthController {
                     logoutMessage = "Logout successful.";
                     log.info("Requester [{}]: Logout process completed for user ID: {}.", requesterId, userIdToLogout);
                 } else {
-                    logoutMessage = "Logout processed with potential issues (e.g., server-side token invalidation). Cookies cleared.";
+                    logoutMessage = "Logout processed with potential issues. Cookies cleared.";
                     log.warn("Requester [{}]: Logout for user ID: {} processed with potential issues.", requesterId, userIdToLogout);
                 }
             } else {
-                // Fallback if we couldn't get a specific user ID but user was authenticated
-                authService.clearAuthCookies(httpServletResponse); // Clear cookies
-                SecurityContextHolder.clearContext(); // Clear context
+                authService.clearAuthCookies(httpServletResponse);
+                SecurityContextHolder.clearContext();
                 logoutMessage = "Authenticated session cleared. Cookies cleared.";
-                log.info("Requester [{}]: Authenticated session cleared (specific user ID not resolved for service logout). Cookies cleared.", requesterId);
+                log.info("Requester [{}]: Authenticated session cleared (specific user ID not resolved). Cookies cleared.", requesterId);
             }
         }
-        return ResponseEntity.ok(new ApiResponse<>(logoutMessage));
+        return ResponseEntity.ok(new ApiResponseWrapper<>(logoutMessage));
     }
 }

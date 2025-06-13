@@ -19,10 +19,7 @@ import za.ac.cput.domain.enums.RentalStatus;
 import za.ac.cput.domain.mapper.RentalMapper;
 import za.ac.cput.exception.CarNotAvailableException;
 import za.ac.cput.exception.ResourceNotFoundException;
-import za.ac.cput.service.ICarService;
-import za.ac.cput.service.IDriverService;
-import za.ac.cput.service.IRentalService;
-import za.ac.cput.service.IUserService;
+import za.ac.cput.service.*;
 import za.ac.cput.utils.SecurityUtils;
 
 import java.util.List;
@@ -50,6 +47,7 @@ public class RentalController {
     private final IUserService userService;
     private final ICarService carService;
     private final IDriverService driverService;
+    private final IFileStorageService fileStorageService;
 
     /**
      * Constructs a RentalController with necessary service dependencies.
@@ -61,11 +59,12 @@ public class RentalController {
      */
     @Autowired
     public RentalController(IRentalService rentalService, IUserService userService,
-                            ICarService carService, IDriverService driverService) {
+                            ICarService carService, IDriverService driverService , IFileStorageService fileStorageService) {
         this.rentalService = rentalService;
         this.userService = userService;
         this.carService = carService;
         this.driverService = driverService;
+        this.fileStorageService = fileStorageService;
         log.info("RentalController initialized.");
     }
 
@@ -123,7 +122,7 @@ public class RentalController {
         Rental createdRentalEntity = rentalService.create(rentalToCreate);
         log.info("Requester [{}]: Successfully created rental with ID: {} and UUID: {}",
                 requesterId, createdRentalEntity.getId(), createdRentalEntity.getUuid());
-        return ResponseEntity.status(HttpStatus.CREATED).body(RentalMapper.toDto(createdRentalEntity));
+        return ResponseEntity.status(HttpStatus.CREATED).body(RentalMapper.toDto(createdRentalEntity, fileStorageService ));
     }
 
     /**
@@ -158,7 +157,7 @@ public class RentalController {
 
         log.info("Requester [{}]: Successfully retrieved rental with ID: {} for UUID: {}",
                 requesterId, rentalEntity.getId(), rentalEntity.getUuid());
-        return ResponseEntity.ok(RentalMapper.toDto(rentalEntity));
+        return ResponseEntity.ok(RentalMapper.toDto(rentalEntity , fileStorageService));
     }
 
     /**
@@ -188,7 +187,7 @@ public class RentalController {
             return ResponseEntity.noContent().build();
         }
         log.info("Requester [{}]: Successfully retrieved {} rentals for this user.", requesterId, userRentals.size());
-        return ResponseEntity.ok(RentalMapper.toDtoList(userRentals));
+        return ResponseEntity.ok(RentalMapper.toDtoList(userRentals , fileStorageService));
     }
 
     /**
@@ -294,7 +293,7 @@ public class RentalController {
 
         if (!changed) {
             log.info("Admin [{}]: No updatable fields provided in RentalUpdateDTO or values are the same for rental UUID: {}. No update performed.", adminId, rentalUuid);
-            return ResponseEntity.ok(RentalMapper.toDto(existingRental));
+            return ResponseEntity.ok(RentalMapper.toDto(existingRental , fileStorageService));
         }
 
         Rental rentalWithUpdates = rentalBuilder.build();
@@ -303,7 +302,7 @@ public class RentalController {
         Rental persistedRental = rentalService.update(rentalWithUpdates);
 
         log.info("Admin [{}]: Successfully updated rental ID: {}, UUID: {}", adminId, persistedRental.getId(), persistedRental.getUuid());
-        return ResponseEntity.ok(RentalMapper.toDto(persistedRental));
+        return ResponseEntity.ok(RentalMapper.toDto(persistedRental , fileStorageService));
     }
 
     /**
@@ -330,7 +329,7 @@ public class RentalController {
         Rental confirmedRental = rentalService.confirmRentalByUuid(rentalUuid);
         log.info("Requester [{}]: Successfully confirmed rental with ID: {} and UUID: {}",
                 requesterId, confirmedRental.getId(), confirmedRental.getUuid());
-        return ResponseEntity.ok(RentalMapper.toDto(confirmedRental));
+        return ResponseEntity.ok(RentalMapper.toDto(confirmedRental , fileStorageService));
     }
 
     /**
@@ -355,7 +354,7 @@ public class RentalController {
         Rental cancelledRental = rentalService.cancelRentalByUuid(rentalUuid);
         log.info("Requester [{}]: Successfully cancelled rental with ID: {} and UUID: {}",
                 requesterId, cancelledRental.getId(), cancelledRental.getUuid());
-        return ResponseEntity.ok(RentalMapper.toDto(cancelledRental));
+        return ResponseEntity.ok(RentalMapper.toDto(cancelledRental , fileStorageService));
     }
 
     /**
@@ -379,7 +378,7 @@ public class RentalController {
         Rental completedRental = rentalService.completeRentalByUuid(rentalUuid, fineAmount);
         log.info("Requester [{}]: Successfully completed rental with ID: {} and UUID: {}. Fine applied: {}",
                 requesterId, completedRental.getId(), completedRental.getUuid(), fineAmount);
-        return ResponseEntity.ok(RentalMapper.toDto(completedRental));
+        return ResponseEntity.ok(RentalMapper.toDto(completedRental , fileStorageService));
     }
 
     /**
@@ -409,7 +408,7 @@ public class RentalController {
 
         log.info("Requester [{}]: Successfully processed Booking UUID {} into Rental UUID {}",
                 requesterId, bookingUuid, createdRental.getUuid());
-        return new ResponseEntity<>(RentalMapper.toDto(createdRental), HttpStatus.CREATED);
+        return new ResponseEntity<>(RentalMapper.toDto(createdRental , fileStorageService), HttpStatus.CREATED);
     }
 
 }

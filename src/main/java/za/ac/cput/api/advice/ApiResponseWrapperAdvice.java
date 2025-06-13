@@ -10,14 +10,14 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
-import za.ac.cput.api.response.ApiResponse;
+import za.ac.cput.api.response.ApiResponseWrapper;
 import za.ac.cput.controllers.FileController;
 import za.ac.cput.utils.SecurityUtils;
 
 /**
  * ApiResponseWrapperAdvice.java
  * A {@link ResponseBodyAdvice} that intercepts and wraps successful responses
- * from controllers in a standard {@link ApiResponse} envelope.
+ * from controllers in a standard {@link ApiResponseWrapper} envelope.
  * It is configured to exclude file streaming endpoints.
  * <p>
  * Author: Peter Buckingham (220165289)
@@ -58,7 +58,7 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
         }
 
         // Avoid wrapping if the return type is already ApiResponse
-        if (ApiResponse.class.isAssignableFrom(returnType.getParameterType())) {
+        if (ApiResponseWrapper.class.isAssignableFrom(returnType.getParameterType())) {
             log.trace("Skipping ApiResponse wrapping: Return type is already ApiResponse.");
             return false;
         }
@@ -93,7 +93,7 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
         String requesterId = SecurityUtils.getRequesterIdentifier();
 
         // This check is a safeguard, but supports() should have already filtered out this case.
-        if (body instanceof ApiResponse) {
+        if (body instanceof ApiResponseWrapper) {
             log.debug("Requester [{}]: Body is already an ApiResponse. Returning as is for path: {}", requesterId, request.getURI().getPath());
             return body;
         }
@@ -101,6 +101,6 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
         log.debug("Requester [{}]: Wrapping successful response body in ApiResponse for path: {}. Body type: {}",
                 requesterId, request.getURI().getPath(), body != null ? body.getClass().getName() : "null");
 
-        return new ApiResponse<>(body);
+        return new ApiResponseWrapper<>(body);
     }
 }

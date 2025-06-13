@@ -15,6 +15,7 @@ import za.ac.cput.domain.entity.Rental;
 import za.ac.cput.domain.mapper.DamageReportMapper;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.IDamageReportService;
+import za.ac.cput.service.IFileStorageService;
 import za.ac.cput.service.IRentalService;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class AdminDamageReportController {
     private static final Logger log = LoggerFactory.getLogger(AdminDamageReportController.class);
     private final IDamageReportService damageReportService;
     private final IRentalService rentalService;
+    private  final IFileStorageService fileStorageService;
 
     /**
      * Constructs an AdminDamageReportController with necessary service dependencies.
@@ -50,9 +52,11 @@ public class AdminDamageReportController {
      * @param rentalService       The service for rental operations (to fetch associated rentals).
      */
     @Autowired
-    public AdminDamageReportController(IDamageReportService damageReportService, IRentalService rentalService) {
+    public AdminDamageReportController(IDamageReportService damageReportService, IRentalService rentalService,
+                                       IFileStorageService fileStorageService)  {
         this.damageReportService = damageReportService;
         this.rentalService = rentalService;
+        this.fileStorageService = fileStorageService; // Assuming fileStorageService is used for image handling
         log.info("AdminDamageReportController initialized.");
     }
 
@@ -79,7 +83,7 @@ public class AdminDamageReportController {
         DamageReport createdEntity = damageReportService.create(reportToCreate);
         // Assuming 'getReportId()' or 'getUuid()' is the method in DamageReport to get its UUID. Adjust if different.
         log.info("Successfully created damage report with ID: {} and UUID: {}", createdEntity.getId(), createdEntity.getUuid());
-        return new ResponseEntity<>(DamageReportMapper.toDto(createdEntity), HttpStatus.CREATED);
+        return new ResponseEntity<>(DamageReportMapper.toDto(createdEntity , fileStorageService ), HttpStatus.CREATED);
     }
 
     /**
@@ -95,7 +99,7 @@ public class AdminDamageReportController {
         DamageReport reportEntity = damageReportService.read(reportUuid);
         // The damageReportService.read(UUID) method is expected to throw ResourceNotFoundException if not found.
         log.info("Successfully retrieved damage report with ID: {} for UUID: {}", reportEntity.getId(), reportUuid);
-        return ResponseEntity.ok(DamageReportMapper.toDto(reportEntity));
+        return ResponseEntity.ok(DamageReportMapper.toDto(reportEntity, fileStorageService));
     }
 
     /**
@@ -124,7 +128,7 @@ public class AdminDamageReportController {
 
         DamageReport persistedReport = damageReportService.update(reportWithUpdates);
         log.info("Successfully updated damage report with ID: {} and UUID: {}", persistedReport.getId(), persistedReport.getUuid());
-        return ResponseEntity.ok(DamageReportMapper.toDto(persistedReport));
+        return ResponseEntity.ok(DamageReportMapper.toDto(persistedReport, fileStorageService));
     }
 
     /**
@@ -142,7 +146,7 @@ public class AdminDamageReportController {
             log.info("No damage reports found.");
             return ResponseEntity.noContent().build();
         }
-        List<DamageReportResponseDTO> dtoList = DamageReportMapper.toDtoList(reportList);
+        List<DamageReportResponseDTO> dtoList = DamageReportMapper.toDtoList(reportList, fileStorageService);
         log.info("Successfully retrieved {} damage reports.", dtoList.size());
         return ResponseEntity.ok(dtoList);
     }
