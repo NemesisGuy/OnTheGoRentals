@@ -1,11 +1,10 @@
 package za.ac.cput.domain.mapper;
 
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import za.ac.cput.domain.dto.request.CarCreateDTO;
 import za.ac.cput.domain.dto.request.CarUpdateDTO;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
 import za.ac.cput.domain.entity.Car;
-import za.ac.cput.domain.entity.CarImage;
+import za.ac.cput.service.IFileStorageService;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,66 +22,55 @@ import java.util.stream.Collectors;
 public class CarMapper {
 
     /**
-     * Converts a {@link Car} entity to a {@link CarResponseDTO}.
-     * This method iterates over the car's list of associated {@link CarImage} entities
-     * and constructs a full, accessible URL for each one.
+     * Converts a Car entity to a CarResponseDTO, including generating URLs for its images.
      *
-     * @param car The {@link Car} entity to convert.
-     * @return The resulting {@link CarResponseDTO}, or null if the input is null.
+     * @param car                The Car entity to convert.
+     * @param fileStorageService The service for generating image URLs.
+     * @return A CarResponseDTO.
      */
-    public static CarResponseDTO toDto(Car car) {
+    public static CarResponseDTO toDto(Car car, IFileStorageService fileStorageService) {
         if (car == null) {
             return null;
         }
 
-        // Base mapping from entity to DTO
-        CarResponseDTO dtoBuilder = CarResponseDTO.builder()
+        List<String> imageUrls = Collections.emptyList();
+        // The service must be provided to generate image URLs.
+        if (fileStorageService != null && car.getImages() != null && !car.getImages().isEmpty()) {
+            imageUrls = car.getImages().stream()
+                    .map(image -> {
+                        String key = image.getImageType() + "/" + image.getFileName();
+                        return fileStorageService.getUrl(key).toString();
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        return CarResponseDTO.builder()
                 .uuid(car.getUuid())
                 .make(car.getMake())
                 .model(car.getModel())
                 .year(car.getYear())
+                .licensePlate(car.getLicensePlate())
                 .category(car.getCategory())
                 .priceGroup(car.getPriceGroup())
-                .licensePlate(car.getLicensePlate())
-                .available(car.isAvailable())
                 .vin(car.getVin())
+                .available(car.isAvailable())
+                .imageUrls(imageUrls)
                 .build();
-
-        // NEW LOGIC: Build a list of image URLs from the car's images collection
-        if (car.getImages() != null && !car.getImages().isEmpty()) {
-            List<String> imageUrls = car.getImages().stream()
-                    .map(image -> ServletUriComponentsBuilder
-                            .fromCurrentContextPath()       // Gets base URL (e.g., http://localhost:8080)
-                            .path("/api/v1/files/")         // Appends the file controller's path
-                            .path(image.getImageType() + "/") // Appends the folder (e.g., "cars/")
-                            .path(image.getFileName())        // Appends the filename
-                            .toUriString())
-                    .collect(Collectors.toList());
-
-            dtoBuilder.setImageUrls(imageUrls);
-        } else {
-            // Ensure the list is empty and not null if there are no images
-            dtoBuilder.setImageUrls((Collections.emptyList()));
-        }
-
-        // Note: The old single imageFileName and imageType fields are no longer mapped from the Car.
-        // They should be removed from the CarResponseDTO class for a cleaner API.
-
-        return dtoBuilder;
     }
 
     /**
-     * Converts a list of {@link Car} entities to a list of {@link CarResponseDTO}s.
+     * Converts a list of Car entities to a list of CarResponseDTOs.
      *
-     * @param cars The list of {@link Car} entities.
-     * @return A list of {@link CarResponseDTO}s.
+     * @param cars               The list of Car entities.
+     * @param fileStorageService The service for generating image URLs for each car.
+     * @return A list of CarResponseDTOs.
      */
-    public static List<CarResponseDTO> toDtoList(List<Car> cars) {
+    public static List<CarResponseDTO> toDtoList(List<Car> cars, IFileStorageService fileStorageService) {
         if (cars == null) {
             return Collections.emptyList();
         }
         return cars.stream()
-                .map(CarMapper::toDto)
+                .map(car -> toDto(car, fileStorageService))
                 .collect(Collectors.toList());
     }
 

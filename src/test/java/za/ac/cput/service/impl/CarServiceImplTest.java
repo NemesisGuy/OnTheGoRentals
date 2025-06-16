@@ -11,19 +11,18 @@ import za.ac.cput.domain.enums.PriceGroup;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.CarRepository;
 
-import java.time.LocalDateTime; // For audit fields if needed in builder
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link CarServiceImpl}.
- *
+ * <p>
  * Author: Peter Buckingham
  * Updated: 2025-05-30
  */
@@ -206,6 +205,7 @@ class CarServiceImplTest {
                 car.isDeleted() && !car.isAvailable() && car.getId() == sampleCar1.getId()
         ));
     }
+
     // ... (other tests for read, getAll, specific finders remain largely the same, ensure .build() is used)
     // ... (and ensure mocks return Optional where repository methods return Optional)
     @Test
@@ -251,6 +251,7 @@ class CarServiceImplTest {
                 car.isDeleted() && !car.isAvailable() && car.getUuid().equals(sampleUuid1)
         ));
     }
+
     @Test
     void getAll_shouldReturnListOfNonDeletedCars() {
         when(carRepository.findByDeletedFalse()).thenReturn(List.of(sampleCar1, sampleCar2));

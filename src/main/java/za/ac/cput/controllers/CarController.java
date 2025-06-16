@@ -1,8 +1,10 @@
 package za.ac.cput.controllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import za.ac.cput.domain.enums.PriceGroup;
 import za.ac.cput.domain.mapper.CarMapper;
 import za.ac.cput.exception.BadRequestException;
 import za.ac.cput.service.ICarService;
+import za.ac.cput.service.IFileStorageService;
 import za.ac.cput.utils.SecurityUtils;
 
 import java.util.List;
@@ -26,185 +29,131 @@ import java.util.UUID;
 /**
  * CarController.java
  * Controller for public access to car information.
- * Provides endpoints to list all cars, filter by price group,
- * list available cars, and retrieve details of a specific car by UUID.
- * DTO conversion, including image URL generation, is handled by the {@link CarMapper}.
- * <p>
- * Author: Peter Buckingham (220165289)
- * Updated: 2024-06-07
+ * Provides endpoints to list all cars, list available cars, filter by price group,
+ * and retrieve details of a specific car by UUID.
+ *
+ * @author Peter Buckingham (220165289)
+ * @version 2.0
  */
 @RestController
 @RequestMapping("/api/v1/cars")
-@Api(value = "Car Management", tags = "Car Management")
+@Tag(name = "Public Car Information", description = "Endpoints for public users to browse and view car inventory.")
 public class CarController {
 
     private static final Logger log = LoggerFactory.getLogger(CarController.class);
     private final ICarService carService;
+    private final IFileStorageService fileStorageService;
 
     /**
-     * Constructs the CarController with the necessary car service.
+     * Constructs the CarController with the necessary services.
      *
-     * @param carService The service for car data operations.
+     * @param carService         The service for car data operations.
+     * @param fileStorageService The service for generating image URLs.
      */
     @Autowired
-    public CarController(ICarService carService) {
+    public CarController(ICarService carService, IFileStorageService fileStorageService) {
         this.carService = carService;
+        this.fileStorageService = fileStorageService;
         log.info("CarController initialized.");
     }
 
     /**
-     * NEW: A dedicated, unambiguous endpoint for fetching available cars.
-     * The path "/list/available" cannot be confused with "/{uuid}".
+     * Retrieves a list of all cars in the system.
+     *
+     * @return A ResponseEntity containing a list of all car DTOs.
      */
-    @GetMapping("/list/available")
-    @ApiOperation(value = "Get all available cars (Admin)", notes = "Retrieves a list of all cars currently marked as available. This is a dedicated endpoint for clarity.")
-    public ResponseEntity<List<CarResponseDTO>> getAvailableCarsAdmin() {
-        log.info("Admin request to get all available cars.");
-        List<Car> availableCars = carService.findAllAvailableAndNonDeleted();
-        if (availableCars.isEmpty()) {
+    @Operation(summary = "Get all cars", description = "Retrieves a list of all cars in the system, including unavailable ones.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved car list"),
+            @ApiResponse(responseCode = "204", description = "No cars found in the system")
+    })
+    @GetMapping
+    public ResponseEntity<List<CarResponseDTO>> getAllCars() {
+        String requesterId = SecurityUtils.getRequesterIdentifier();
+        log.info("Requester [{}]: Request to get all cars (unfiltered).", requesterId);
+        List<Car> cars = carService.getAll();
+        if (cars.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(CarMapper.toDtoList(availableCars));
+        return ResponseEntity.ok(CarMapper.toDtoList(cars, fileStorageService));
     }
 
-
     /**
-     * Retrieves a list of all cars currently marked as available.
+     * Retrieves a list of all cars currently marked as available for booking.
      *
-     * @return A ResponseEntity containing a list of available {@link CarResponseDTO}s.
+     * @return A ResponseEntity containing a list of available car DTOs.
      */
+    @Operation(summary = "Get available cars", description = "Retrieves a list of all cars currently marked as available.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved available cars"),
+            @ApiResponse(responseCode = "204", description = "No cars are currently available")
+    })
     @GetMapping("/available")
-    @ApiOperation(value = "Get available cars", notes = "Retrieves a list of all cars currently marked as available.")
     public ResponseEntity<List<CarResponseDTO>> getAvailableCars() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get all available cars.", requesterId);
 
         List<Car> availableCars = carService.findAllAvailableAndNonDeleted();
         if (availableCars.isEmpty()) {
-            log.info("Requester [{}]: No cars are currently available.", requesterId);
             return ResponseEntity.noContent().build();
         }
-
-        // Use the mapper to convert the list of entities to DTOs
-        List<CarResponseDTO> carDTOs = CarMapper.toDtoList(availableCars);
-
-        log.info("Requester [{}]: Successfully retrieved {} available cars.", requesterId, carDTOs.size());
-        return ResponseEntity.ok(carDTOs);
+        return ResponseEntity.ok(CarMapper.toDtoList(availableCars, fileStorageService));
     }
 
     /**
-     * Retrieves a list of available cars filtered by a specific price group string.
+     * Retrieves a list of available cars filtered by a specific price group.
      *
-     * @param groupString The price group string (e.g., "luxury", "ECONOMY").
-     * @return A ResponseEntity containing a list of available {@link CarResponseDTO}s.
+     * @param groupString The price group string (e.g., "LUXURY", "economy"). Case-insensitive.
+     * @return A ResponseEntity containing a list of matching available car DTOs.
      */
+    @Operation(summary = "Get available cars by price group", description = "Retrieves available cars filtered by a specific price group.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved cars for the price group"),
+            @ApiResponse(responseCode = "204", description = "No available cars found for the specified price group"),
+            @ApiResponse(responseCode = "400", description = "Invalid price group provided")
+    })
     @GetMapping("/available/price-group/{groupString}")
-    @ApiOperation(value = "Get available cars by price group", notes = "Retrieves a list of available cars filtered by a specific price group.")
     public ResponseEntity<List<CarResponseDTO>> getAvailableCarsByPriceGroup(
-            @ApiParam(value = "Price group string (e.g., 'LUXURY', 'ECONOMY')", required = true) @PathVariable String groupString) {
+            @Parameter(description = "Price group string (e.g., 'LUXURY', 'ECONOMY'). Case-insensitive.", required = true) @PathVariable String groupString) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get available cars by price group: '{}'", requesterId, groupString);
         PriceGroup priceGroupEnum = parsePriceGroup(groupString, requesterId);
 
         List<Car> cars = carService.getAvailableCarsByPrice(priceGroupEnum);
         if (cars.isEmpty()) {
-            log.info("Requester [{}]: No available cars found for price group: {}", requesterId, priceGroupEnum);
             return ResponseEntity.noContent().build();
         }
-
-        // Use the mapper to convert the list of entities to DTOs
-        List<CarResponseDTO> carDTOs = CarMapper.toDtoList(cars);
-
-        log.info("Requester [{}]: Successfully retrieved {} available cars for price group: {}", requesterId, carDTOs.size(), priceGroupEnum);
-        return ResponseEntity.ok(carDTOs);
-    }
-
-    /**
-     * Retrieves a list of all cars, optionally filtered by price group.
-     *
-     * @param groupString Optional price group string.
-     * @return A ResponseEntity containing a list of {@link CarResponseDTO}s.
-     */
-    @GetMapping(value = {"/price-group", "/price-group/{groupString}"})
-    @ApiOperation(value = "Get all cars, optionally filtered by price group", notes = "Retrieves a list of all cars. If a price group is provided, the list is filtered by that group.")
-    public ResponseEntity<List<CarResponseDTO>> getAllCarsByPriceGroupOptional(
-            @ApiParam(value = "Optional price group string (e.g., 'LUXURY', 'ECONOMY', 'all')") @PathVariable(required = false) String groupString) {
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        List<Car> cars;
-
-        if (groupString == null || groupString.trim().isEmpty() || "all".equalsIgnoreCase(groupString.trim())) {
-            log.info("Requester [{}]: Request to get all cars (no filter).", requesterId);
-            cars = carService.getAll();
-        } else {
-            log.info("Requester [{}]: Request to get cars by price group: '{}'", requesterId, groupString);
-            PriceGroup priceGroupEnum = parsePriceGroup(groupString, requesterId);
-            cars = carService.getCarsByPriceGroup(priceGroupEnum);
-        }
-
-        if (cars.isEmpty()) {
-            log.info("Requester [{}]: No cars found for the specified criteria.", requesterId);
-            return ResponseEntity.noContent().build();
-        }
-
-        // Use the mapper to convert the list of entities to DTOs
-        List<CarResponseDTO> carDTOs = CarMapper.toDtoList(cars);
-
-        log.info("Requester [{}]: Successfully retrieved {} cars.", requesterId, carDTOs.size());
-        return ResponseEntity.ok(carDTOs);
+        return ResponseEntity.ok(CarMapper.toDtoList(cars, fileStorageService));
     }
 
     /**
      * Retrieves a specific car by its UUID.
      *
      * @param carUuid The UUID of the car to retrieve.
-     * @return A ResponseEntity containing the {@link CarResponseDTO}.
+     * @return A ResponseEntity containing the car's DTO.
      */
+    @Operation(summary = "Get car by UUID", description = "Retrieves a specific car by its unique identifier (UUID).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the car"),
+            @ApiResponse(responseCode = "404", description = "Car with the specified UUID was not found")
+    })
     @GetMapping("/{carUuid}")
-    @ApiOperation(value = "Get car by UUID", notes = "Retrieves a specific car by its UUID.")
     public ResponseEntity<CarResponseDTO> getCarByUuid(
-            @ApiParam(value = "UUID of the car to retrieve", required = true) @PathVariable UUID carUuid) {
+            @Parameter(description = "UUID of the car to retrieve", required = true) @PathVariable UUID carUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get car by UUID: {}", requesterId, carUuid);
 
-        // The service throws ResourceNotFoundException if not found, which is handled globally.
-        Car car = carService.read(carUuid);
-
-        log.info("Requester [{}]: Successfully retrieved car ID: {}", requesterId, car.getId());
-
-        // Use the mapper to convert the single entity to a DTO
-        return ResponseEntity.ok(CarMapper.toDto(car));
+        Car car = carService.read(carUuid); // Throws ResourceNotFoundException if not found
+        return ResponseEntity.ok(CarMapper.toDto(car, fileStorageService));
     }
 
     /**
-     * Retrieves a list of all cars in the system.
-     *
-     * @return A ResponseEntity containing a list of all {@link CarResponseDTO}s.
-     */
-    @GetMapping
-    @ApiOperation(value = "Get all cars", notes = "Retrieves a list of all cars in the system.")
-    public ResponseEntity<List<CarResponseDTO>> getAllCars() {
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Request to get all cars (unfiltered).", requesterId);
-        List<Car> cars = carService.getAll();
-        if (cars.isEmpty()) {
-            log.info("Requester [{}]: No cars found in the system.", requesterId);
-            return ResponseEntity.noContent().build();
-        }
-
-        // Use the mapper to convert the list of entities to DTOs
-        List<CarResponseDTO> carDTOs = CarMapper.toDtoList(cars);
-
-        log.info("Requester [{}]: Successfully retrieved {} cars.", requesterId, carDTOs.size());
-        return ResponseEntity.ok(carDTOs);
-    }
-
-    /**
-     * Helper method to parse a string into a PriceGroup enum.
+     * Helper method to parse a string into a PriceGroup enum, handling case-insensitivity and errors.
      *
      * @param groupString The string to parse.
-     * @param requesterId The identifier of the requester for logging.
-     * @return The corresponding {@link PriceGroup} enum.
-     * @throws BadRequestException if the string is not a valid price group.
+     * @param requesterId The identifier of the requester for logging purposes.
+     * @return The corresponding PriceGroup enum.
+     * @throws BadRequestException if the string does not match any valid price group.
      */
     private PriceGroup parsePriceGroup(String groupString, String requesterId) {
         try {
@@ -214,6 +163,4 @@ public class CarController {
             throw new BadRequestException("Invalid price group value: '" + groupString + "'.");
         }
     }
-
-    // The buildDtoWithImageUrl helper method has been removed.
 }

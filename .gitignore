@@ -78,3 +78,6 @@ mysql-db.properties
 # Specific upload directories
 uploads/cars/
 uploads/selfies/
+
+# Ignore local environment files
+.env

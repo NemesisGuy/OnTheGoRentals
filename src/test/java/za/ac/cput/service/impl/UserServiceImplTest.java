@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import za.ac.cput.domain.entity.security.Role;
 import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
@@ -17,12 +16,8 @@ import za.ac.cput.repository.IRoleRepository;
 import za.ac.cput.repository.UserRepository;
 import za.ac.cput.service.IRefreshTokenService;
 
-import java.time.LocalDateTime; // For simulating audit fields
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,7 +28,7 @@ import static org.mockito.Mockito.*;
  * Unit tests for {@link UserServiceImpl}.
  * This class tests the CRUD operations and other user management logic,
  * ensuring correct interaction with mocked dependencies.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-29 (Updated for comprehensive tests and mock refinements)
  */

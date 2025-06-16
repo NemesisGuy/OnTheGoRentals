@@ -21,35 +21,51 @@ import java.util.UUID;
 public interface ICarService extends IService<Car, Integer> {
 
     /**
-     * {@inheritDoc}
+     * Creates a new car in the system.
+     * * @param car The {@link Car} entity to create.
+     * * @return The created {@link Car} entity, with its ID populated.
+     * * This method is responsible for persisting a new car entity to the database.
      */
     @Override
     Car create(Car car);
 
     /**
-     * {@inheritDoc}
+     * Reads a car by its ID.
+     * * @param id The ID of the car to retrieve.
+     * * @return The {@link Car} entity if found, or {@code null} if not found or soft-deleted.
+     * * This method retrieves a car entity from the database based on its ID.
      */
     @Override
     Car read(Integer id);
 
     /**
-     * {@inheritDoc}
+     * Updates an existing car in the system.
+     * * @param car The {@link Car} entity with updated information.
+     * * @return The updated {@link Car} entity.
+     * * This method is responsible for updating an existing car entity in the database.
      */
     @Override
     Car update(Car car);
 
     /**
-     * {@inheritDoc}
+     * Deletes a car by its ID.
+     * * This method performs a soft delete, marking the car as deleted without removing it from the database.
+     * * @param id The ID of the car to delete.
+     * * @return {@code true} if the car was found and soft-deleted, {@code false} otherwise.
      */
     @Override
     boolean delete(Integer id);
 
     /**
      * Soft-deletes a car by its UUID.
+     * * This method marks the car as deleted without physically removing it from the database.
      *
      * @param uuid The UUID of the car to delete.
      * @return {@code true} if the car was found and soft-deleted, {@code false} otherwise.
+     * * This method is used to remove a car from active listings without losing its data.
+     * * @deprecated Use {@link #delete(Integer)} for consistency with other entities.
      */
+    @Deprecated
     boolean delete(UUID uuid);
 
     /**
@@ -119,7 +135,22 @@ public interface ICarService extends IService<Car, Integer> {
     @Deprecated
     List<Car> findAllAvailableByPriceGroup(PriceGroup priceGroup);
 
+    /**
+     * Retrieves a list of all available cars in the system.
+     * This method is typically used to show cars that are currently not rented out.
+     *
+     * @return A list of all available {@link Car} entities. Can be empty.
+     */
     List<Car> getAvailableCars();
+
+    /**
+     * Adds images to a car identified by its UUID.
+     * This method handles the uploading of multiple image files associated with a specific car.
+     *
+     * @param carUuid The UUID of the car to which images will be added.
+     * @param files   A list of image files to upload.
+     * @return The updated {@link Car} entity with the new images added.
+     */
     Car addImagesToCar(UUID carUuid, List<MultipartFile> files);
 
 }

@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
  * OpenApiConfig.java
  * Configuration class for Swagger/OpenAPI documentation.
  * This class defines the API information, security schemes, and other configuration options.
- * 
+ * <p>
  * Author: Peter Buckingham
  * Date: 2024-06-15
  */

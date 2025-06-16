@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils; // For setting @Value fields
+import org.springframework.test.util.ReflectionTestUtils;
 import za.ac.cput.domain.entity.security.RefreshToken;
 import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.exception.ResourceNotFoundException;
@@ -26,23 +26,20 @@ import static org.mockito.Mockito.*;
  * Unit tests for {@link RefreshTokenServiceImpl}.
  * Tests the lifecycle management of refresh tokens, including creation,
  * verification, and deletion, with mocked repository dependencies.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-30
  */
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenServiceImplTest {
 
+    private final Long refreshTokenDurationMs = 604800000L; // 7 days, example value
     @Mock
     private IRefreshTokenRepository refreshTokenRepository;
     @Mock
     private UserRepository userRepository;
-
     @InjectMocks
     private RefreshTokenServiceImpl refreshTokenService;
-
-    private final Long refreshTokenDurationMs = 604800000L; // 7 days, example value
-
     private User sampleUser;
     private RefreshToken sampleRefreshToken;
 

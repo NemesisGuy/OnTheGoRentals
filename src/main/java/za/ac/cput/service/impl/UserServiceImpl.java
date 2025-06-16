@@ -19,6 +19,7 @@ import za.ac.cput.service.IUserService;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * UserServiceImpl.java
@@ -175,8 +176,28 @@ public class UserServiceImpl implements IUserService {
         }
 
         // --- Other fields ---
-        if (userUpdates.getRoles() != null) {
-            // Handle role updates if necessary
+        if (userUpdates.getRoles() != null && !userUpdates.getRoles().isEmpty()) {
+            log.debug("User ID {}: Updating roles.", userId);
+
+            List<Role> newRoles = userUpdates.getRoles().stream()
+                    .map(tempRole -> {
+                        // Get the enum name from the temporary role object passed by the mapper.
+                        RoleName roleNameEnum = tempRole.getRoleNameEnum();
+
+                        // Find the managed Role entity in the database. This returns Role or null.
+                        Role foundRole = roleRepository.findByRoleName(roleNameEnum);
+
+                        // Manually check for null and throw if the role doesn't exist in the DB.
+                        if (foundRole == null) {
+                            throw new ResourceNotFoundException("Role not found: " + roleNameEnum.name());
+                        }
+                        return foundRole;
+                    })
+                    .collect(Collectors.toList());
+
+            // Replace the existing roles with the new set of managed roles.
+            existingUser.setRoles(newRoles);
+            needsSave = true;
         }
 
         if (needsSave) {

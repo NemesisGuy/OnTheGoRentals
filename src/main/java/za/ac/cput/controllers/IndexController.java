@@ -1,7 +1,11 @@
 package za.ac.cput.controllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,20 +17,16 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * IndexController.java
  * A simple controller providing a basic greeting message with a visitor counter.
- * This was primarily for testing purposes and might be removed in production.
- * <p>
- * Author: Peter Buckingham (220165289)
- * Date: 05 April 2023
- * Updated by: Peter Buckingham
- * Updated: 2025-05-28
+ * This can be used for health checks or as a simple landing page for the API.
+ *
+ * @author Peter Buckingham (220165289)
+ * @version 2.0
  */
-// TODO: Consider removing this class if it was only for testing purposes, as per original TODO.
 @RestController
-@Api(value = "Index/Greeting", tags = "Index/Greeting", description = "Provides a simple greeting message with a visitor counter.")
+@Tag(name = "Index / Greeting", description = "Provides a simple greeting message and API health check.")
 public class IndexController {
 
     private static final Logger log = LoggerFactory.getLogger(IndexController.class);
-    private static final String TEMPLATE = "Hello, %s!"; // Renamed for clarity, though not used in current output
     private final AtomicLong counter = new AtomicLong();
 
     /**
@@ -35,14 +35,16 @@ public class IndexController {
      *
      * @return A {@link Message} object containing the greeting and visitor count.
      */
+    @Operation(summary = "Get Greeting Message", description = "Returns a greeting message with a visitor count. Useful as a simple API health check.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Greeting message returned successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class)))
+    })
     @GetMapping({"/", "/home", "/index", "/api/home", "/api/hello", "/api/index", "/api/greeting"})
-    @ApiOperation(value = "Get Greeting Message",
-            notes = "Returns a greeting message along with an incrementing visitor count. This endpoint is publicly accessible.",
-            response = IndexController.Message.class)
     public Message greeting() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         long visitorNumber = counter.incrementAndGet();
-        String messageContent = "Congratulations you are visitor number: ";
+        String messageContent = "Congratulations, you are visitor number: ";
 
         log.info("Requester [{}]: Greeting endpoint accessed. Visitor number: {}", requesterId, visitorNumber);
 
@@ -50,10 +52,11 @@ public class IndexController {
     }
 
     /**
-     * Record representing a simple message with an ID.
+     * A record representing a simple message with an ID.
+     * This is used as the JSON response body for the greeting endpoint.
      *
      * @param content The message content.
-     * @param id      A unique identifier for the message (visitor count in this case).
+     * @param id      A unique identifier for the message (the visitor count in this case).
      */
     public record Message(String content, long id) {
     }

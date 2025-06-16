@@ -1,7 +1,6 @@
 package za.ac.cput.controllers.admin;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,7 +23,6 @@ import za.ac.cput.domain.enums.ImageType;
 import za.ac.cput.domain.mapper.UserMapper;
 import za.ac.cput.exception.BadRequestException;
 import za.ac.cput.repository.IRoleRepository;
-import za.ac.cput.service.FileStorageService;
 import za.ac.cput.service.IFileStorageService;
 import za.ac.cput.service.IRoleService;
 import za.ac.cput.service.IUserService;
@@ -77,14 +75,14 @@ public class AdminUserController {
      * @return A ResponseEntity containing a list of {@link UserResponseDTO}s.
      */
     @Operation(
-        summary = "Get all users",
-        description = "Retrieves a list of all users in the system for administrative purposes"
+            summary = "Get all users",
+            description = "Retrieves a list of all users in the system for administrative purposes"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved list of users",
-            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
-        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list of users",
+                    content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllUsersAdmin() {
@@ -106,15 +104,15 @@ public class AdminUserController {
      * @return A ResponseEntity containing the {@link UserResponseDTO}.
      */
     @Operation(
-        summary = "Get user by UUID",
-        description = "Retrieves a specific user by their UUID for administrative purposes"
+            summary = "Get user by UUID",
+            description = "Retrieves a specific user by their UUID for administrative purposes"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved user",
-            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
-        @ApiResponse(responseCode = "404", description = "User not found"),
-        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user",
+                    content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{userUuid}")
     public ResponseEntity<UserResponseDTO> getUserByUuidAdmin(@PathVariable UUID userUuid) {
@@ -131,16 +129,16 @@ public class AdminUserController {
      * @return A ResponseEntity containing the created {@link UserResponseDTO}.
      */
     @Operation(
-        summary = "Create a new user",
-        description = "Creates a new user with the provided details"
+            summary = "Create a new user",
+            description = "Creates a new user with the provided details"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "User created successfully",
-            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid input data"),
-        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
-        @ApiResponse(responseCode = "409", description = "Email already in use"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "201", description = "User created successfully",
+                    content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+            @ApiResponse(responseCode = "409", description = "Email already in use"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUserByAdmin(@Valid @RequestBody UserCreateDTO userCreateDto) {
@@ -160,16 +158,16 @@ public class AdminUserController {
      * @return A ResponseEntity containing the updated {@link UserResponseDTO}.
      */
     @Operation(
-        summary = "Update a user",
-        description = "Updates an existing user with the provided details"
+            summary = "Update a user",
+            description = "Updates an existing user with the provided details"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "User updated successfully",
-            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid input data"),
-        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
-        @ApiResponse(responseCode = "404", description = "User not found"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "200", description = "User updated successfully",
+                    content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping("/{userUuid}")
     public ResponseEntity<UserResponseDTO> updateUserByAdmin(
@@ -194,16 +192,16 @@ public class AdminUserController {
      * @return A ResponseEntity containing the updated {@link UserResponseDTO} with the new image URL.
      */
     @Operation(
-        summary = "Upload user profile image",
-        description = "Uploads or replaces the profile image for a specific user"
+            summary = "Upload user profile image",
+            description = "Uploads or replaces the profile image for a specific user"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Profile image uploaded successfully",
-            content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid file or empty file"),
-        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
-        @ApiResponse(responseCode = "404", description = "User not found"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "200", description = "Profile image uploaded successfully",
+                    content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid file or empty file"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/{userUuid}/profile-image")
     public ResponseEntity<UserResponseDTO> uploadUserProfileImageByAdmin(
@@ -217,7 +215,7 @@ public class AdminUserController {
 
         User existingUser = userService.read(userUuid);
 
-        String filename = fileStorageService.save(file,ImageType.SELFIE.getFolder());
+        String filename = fileStorageService.save(file, ImageType.SELFIE.getFolder());
 
         User.UserBuilder builder = existingUser.toBuilder()
                 .profileImageFileName(filename)
@@ -237,14 +235,14 @@ public class AdminUserController {
      * @return A ResponseEntity with no content.
      */
     @Operation(
-        summary = "Delete a user",
-        description = "Soft-deletes a user by their UUID"
+            summary = "Delete a user",
+            description = "Soft-deletes a user by their UUID"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "User deleted successfully"),
-        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
-        @ApiResponse(responseCode = "404", description = "User not found"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "204", description = "User deleted successfully"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{userUuid}")
     public ResponseEntity<Void> deleteUserByAdmin(@PathVariable UUID userUuid) {
@@ -261,15 +259,15 @@ public class AdminUserController {
      * @return A ResponseEntity containing a list of {@link Role} entities.
      */
     @Operation(
-        summary = "Get all roles",
-        description = "Retrieves a list of all available roles in the system"
+            summary = "Get all roles",
+            description = "Retrieves a list of all available roles in the system"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved list of roles",
-            content = @Content(schema = @Schema(implementation = Role.class))),
-        @ApiResponse(responseCode = "204", description = "No roles found"),
-        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list of roles",
+                    content = @Content(schema = @Schema(implementation = Role.class))),
+            @ApiResponse(responseCode = "204", description = "No roles found"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/roles")
     public ResponseEntity<List<Role>> getAllRoles() {

@@ -1,8 +1,5 @@
 package za.ac.cput.controllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,98 +12,91 @@ import za.ac.cput.utils.SecurityUtils;
 /**
  * ExceptionHandlerController.java
  * A {@link RestControllerAdvice} component that provides centralized exception handling
- * for specific custom exceptions thrown by REST controllers.
- * These handlers currently return plain text error messages with appropriate HTTP status codes.
- * For more structured JSON error responses, see {@link za.ac.cput.api.advice.GlobalExceptionHandler}.
- * <p>
- * Author: Peter Buckingham (220165289)
- * Date: [Original Date - If known, otherwise assume similar to ErrorController]
- * Updated by: Peter Buckingham
- * Updated: 2025-05-28
+ * for specific custom exceptions thrown by REST controllers. This class intercepts exceptions
+ * and returns standardized, plain-text error messages with appropriate HTTP status codes.
+ *
+ * @author Peter Buckingham (220165289)
+ * @version 2.0
  */
-@RestControllerAdvice(basePackages = "za.ac.cput.controllers") // Ensure this targets the correct controller packages
-@Api(value = "API Exception Handling", tags = "API Exception Handling", description = "Centralized exception handling for REST API errors, providing standardized error responses.")
+@RestControllerAdvice(basePackages = "za.ac.cput.controllers")
 public class ExceptionHandlerController {
 
     private static final Logger log = LoggerFactory.getLogger(ExceptionHandlerController.class);
 
     /**
      * Handles {@link CarNotAvailableException}.
-     * Responds with HTTP 400 Bad Request and the exception message.
+     * This is triggered when a user tries to book a car that is not currently available.
+     * Responds with HTTP 409 Conflict, as this is a business rule conflict.
      *
      * @param ex The caught {@link CarNotAvailableException}.
-     * @return A ResponseEntity containing the error message and HTTP status.
+     * @return A ResponseEntity containing the error message and HTTP status 409.
      */
     @ExceptionHandler(CarNotAvailableException.class)
-    @ApiOperation(value = "Handle Car Not Available Error", notes = "Returns a 400 Bad Request when a car is not available for booking.", response = String.class)
-    public ResponseEntity<String> handleCarNotAvailableException(
-            @ApiParam(value = "The caught CarNotAvailableException", required = true) CarNotAvailableException ex) {
+    public ResponseEntity<String> handleCarNotAvailableException(CarNotAvailableException ex) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.warn("Requester [{}]: CarNotAvailableException caught: {}", requesterId, ex.getMessage(), ex); // Log with exception for stack trace
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        log.warn("Requester [{}]: CarNotAvailableException caught: {}", requesterId, ex.getMessage());
+        // Using 409 Conflict is more semantically correct for a business rule violation.
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     /**
      * Handles {@link UserCantRentMoreThanOneCarException}.
-     * Responds with HTTP 400 Bad Request and the exception message.
+     * This is triggered when a user who already has an active rental tries to book another car.
+     * Responds with HTTP 409 Conflict.
      *
      * @param ex The caught {@link UserCantRentMoreThanOneCarException}.
-     * @return A ResponseEntity containing the error message and HTTP status.
+     * @return A ResponseEntity containing the error message and HTTP status 409.
      */
     @ExceptionHandler(UserCantRentMoreThanOneCarException.class)
-    @ApiOperation(value = "Handle User Cannot Rent Multiple Cars Error", notes = "Returns a 400 Bad Request when a user attempts to rent more than one car if disallowed.", response = String.class)
-    public ResponseEntity<String> handleUserCantRentMoreThanOneCarException(
-            @ApiParam(value = "The caught UserCantRentMoreThanOneCarException", required = true) UserCantRentMoreThanOneCarException ex) {
+    public ResponseEntity<String> handleUserCantRentMoreThanOneCarException(UserCantRentMoreThanOneCarException ex) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.warn("Requester [{}]: UserCantRentMoreThanOneCarException caught: {}", requesterId, ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        log.warn("Requester [{}]: UserCantRentMoreThanOneCarException caught: {}", requesterId, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     /**
      * Handles {@link ResourceNotFoundException}.
-     * Responds with HTTP 404 Not Found and the exception message.
+     * This is a generic handler for any time a requested entity (like a Car, User, or Booking) is not found.
+     * Responds with HTTP 404 Not Found.
      *
      * @param ex The caught {@link ResourceNotFoundException}.
-     * @return A ResponseEntity containing the error message and HTTP status.
+     * @return A ResponseEntity containing the error message and HTTP status 404.
      */
     @ExceptionHandler(ResourceNotFoundException.class)
-    @ApiOperation(value = "Handle Resource Not Found Error", notes = "Returns a 404 Not Found when a requested resource does not exist.", response = String.class)
-    public ResponseEntity<String> handleResourceNotFoundException(
-            @ApiParam(value = "The caught ResourceNotFoundException", required = true) ResourceNotFoundException ex) {
+    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.warn("Requester [{}]: ResourceNotFoundException caught: {}", requesterId, ex.getMessage()); // Stack trace might be less critical for 404s but can be added
+        log.warn("Requester [{}]: ResourceNotFoundException caught: {}", requesterId, ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     /**
      * Handles {@link RoleNotFoundException}.
-     * Responds with HTTP 404 Not Found and the exception message.
+     * This is triggered during user management if a specified role does not exist.
+     * Responds with HTTP 404 Not Found.
      *
      * @param ex The caught {@link RoleNotFoundException}.
-     * @return A ResponseEntity containing the error message and HTTP status.
+     * @return A ResponseEntity containing the error message and HTTP status 404.
      */
     @ExceptionHandler(RoleNotFoundException.class)
-    @ApiOperation(value = "Handle Role Not Found Error", notes = "Returns a 404 Not Found when a specified role does not exist.", response = String.class)
-    public ResponseEntity<String> handleRoleNotFoundException(
-            @ApiParam(value = "The caught RoleNotFoundException", required = true) RoleNotFoundException ex) {
+    public ResponseEntity<String> handleRoleNotFoundException(RoleNotFoundException ex) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.warn("Requester [{}]: RoleNotFoundException caught: {}", requesterId, ex.getMessage(), ex);
+        log.warn("Requester [{}]: RoleNotFoundException caught: {}", requesterId, ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     /**
      * Handles {@link UnauthorisedException}.
-     * Responds with HTTP 401 Unauthorized and the exception message.
+     * This is a custom exception for business-level authorization failures.
+     * Responds with HTTP 403 Forbidden.
      *
      * @param ex The caught {@link UnauthorisedException}.
-     * @return A ResponseEntity containing the error message and HTTP status.
+     * @return A ResponseEntity containing the error message and HTTP status 403.
      */
     @ExceptionHandler(UnauthorisedException.class)
-    @ApiOperation(value = "Handle Unauthorised Access Error", notes = "Returns a 401 Unauthorized when an action is attempted without proper authorization.", response = String.class)
-    public ResponseEntity<String> handleUnauthorisedException(
-            @ApiParam(value = "The caught UnauthorisedException", required = true) UnauthorisedException ex) {
+    public ResponseEntity<String> handleUnauthorisedException(UnauthorisedException ex) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.warn("Requester [{}]: UnauthorisedException caught: {}", requesterId, ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+        log.warn("Requester [{}]: UnauthorisedException caught: {}", requesterId, ex.getMessage());
+        // 403 Forbidden is more appropriate for when the user is known but lacks permission.
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
     }
 }

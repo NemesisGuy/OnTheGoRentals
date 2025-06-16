@@ -16,9 +16,17 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 
+/**
+ * OAuth2Controller.java
+ * Controller for handling third-party authentication using OAuth2 providers like Google.
+ * This controller provides an endpoint to process an ID token sent from the client.
+ *
+ * @author Peter Buckingham (220165289)
+ * @version 1.0
+ */
 @RestController
-@RequestMapping("/api/oauth2")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/v1/oauth2") // Standardized path
+@CrossOrigin(origins = "*") // Note: For production, restrict this to your frontend's domain.
 @Tag(name = "OAuth2 Authentication", description = "Endpoints for third-party authentication using OAuth2 providers like Google.")
 public class OAuth2Controller {
 
@@ -28,46 +36,45 @@ public class OAuth2Controller {
         this.googleOAuth2UserService = googleOAuth2UserService;
     }
 
-    // Endpoint to receive Google ID token from client (if client handles code exchange)
+    /**
+     * Authenticates a user with a Google ID token provided by the client.
+     * Upon successful validation of the Google token, this endpoint will either find an existing user
+     * or create a new one, and then return the application's own JWT access token for the user's session.
+     *
+     * @param payload A JSON object containing the Google ID token, e.g., { "idToken": "..." }.
+     * @return A ResponseEntity containing an {@link AuthResponseDto} with the application's JWT access token.
+     */
     @Operation(
             summary = "Login with Google",
-            description = "Authenticates a user with a Google ID token and returns a JWT access token."
+            description = "Authenticates a user by validating a Google ID token sent from the client. Returns an application-specific JWT upon success."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Authentication successful",
+            @ApiResponse(responseCode = "200", description = "Authentication successful, JWT returned",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request - Invalid or missing ID token", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error - Error processing the token", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Bad Request - The provided ID token is invalid, malformed, or missing"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error - Could not process the token due to a server-side issue")
     })
     @PostMapping("/google/login")
     public ResponseEntity<AuthResponseDto> loginWithGoogle(
-            @Parameter(description = "Payload containing the Google ID token", required = true)
+            @Parameter(description = "A JSON payload containing the Google ID token. e.g., {\"idToken\": \"your_token_here\"}", required = true)
             @RequestBody Map<String, String> payload) {
+
         String idTokenString = payload.get("idToken");
         if (idTokenString == null || idTokenString.isEmpty()) {
-            return ResponseEntity.badRequest().body(null); // Or an error DTO
+            return ResponseEntity.badRequest().build();
         }
+
         try {
             AuthResponseDto authResponseDto = googleOAuth2UserService.processGoogleIdToken(idTokenString);
             return ResponseEntity.ok(authResponseDto);
         } catch (GeneralSecurityException | IOException e) {
-            // Log error
-            return ResponseEntity.status(500).body(null); // Or an error DTO
+            // Log the exception for debugging server-side issues (e.g., cannot reach Google's certs)
+            // log.error("Error processing Google ID token: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).build();
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null); // Invalid token
+            // This is often thrown for an invalid token format or signature.
+            // log.warn("Invalid Google ID token received: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
-
-    // Alternative: Endpoint to receive authorization code from client (server exchanges code)
-    // This requires more setup with OAuth2RestTemplate or WebClient for code exchange.
-    // The idToken flow is simpler if the client library can provide the idToken.
-    /*
-    @PostMapping("/google/code")
-    public ResponseEntity<AuthResponseDto> handleGoogleAuthCode(@RequestBody Map<String, String> payload) {
-        String authCode = payload.get("authCode");
-        String redirectUri = payload.get("redirectUri"); // Client must send the redirect_uri used
-        // ... logic to exchange authCode for tokens with Google ...
-        // ... then call processGoogleIdToken with the id_token received from Google ...
-    }
-    */
 }

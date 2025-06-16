@@ -154,5 +154,11 @@ public interface IRentalService extends IService<Rental, Integer> {
      */
     List<Rental> findRentalsDueOnDate(LocalDate specificDate);
 
+    /**
+     * Retrieves a list of all active rentals that have not been returned yet.
+     * This includes rentals that are currently ongoing and have not reached their expected return date.
+     *
+     * @return A list of active {@link Rental} entities.
+     */
     List<Rental> findActiveRentals();
 }

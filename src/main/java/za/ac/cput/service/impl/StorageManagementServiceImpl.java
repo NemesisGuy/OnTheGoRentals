@@ -4,8 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.entity.CarImage;
-import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.repository.ICarImageRepository;
 import za.ac.cput.repository.UserRepository;
 import za.ac.cput.service.IFileStorageService;

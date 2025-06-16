@@ -224,7 +224,8 @@ class DriverServiceImplTest {
         when(driverRepository.findByIdAndDeletedFalse(sampleDriver.getId())).thenReturn(Optional.of(sampleDriver));
         doAnswer(invocation -> {
             Driver arg = invocation.getArgument(0);
-            assertTrue(arg.isDeleted()); return arg;
+            assertTrue(arg.isDeleted());
+            return arg;
         }).when(driverRepository).save(any(Driver.class));
 
 
@@ -250,7 +251,8 @@ class DriverServiceImplTest {
         when(driverRepository.findByUuidAndDeletedFalse(commonUuid)).thenReturn(Optional.of(sampleDriver));
         doAnswer(invocation -> {
             Driver arg = invocation.getArgument(0);
-            assertTrue(arg.isDeleted()); return arg;
+            assertTrue(arg.isDeleted());
+            return arg;
         }).when(driverRepository).save(any(Driver.class));
 
         boolean result = driverService.delete(commonUuid);

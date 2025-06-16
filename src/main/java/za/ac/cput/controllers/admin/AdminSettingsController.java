@@ -52,7 +52,7 @@ public class AdminSettingsController {
     @Operation(summary = "Get all settings entries", description = "Retrieves a list of all settings entries in the system.")
     public ResponseEntity<List<Settings>> getAll() {
         log.info("Admin request to get all settings entries.");
-        List<Settings> allSettings = settingsService.getAll(); // Service directly returns List<Settings>
+        List<Settings> allSettings = (List<Settings>) settingsService.getAll(); // Service directly returns List<Settings>
         return ResponseEntity.ok(allSettings);
     }
 

@@ -14,16 +14,15 @@ import za.ac.cput.repository.IRoleRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-// No 'java.util.Optional' import needed for repository mocks if it returns Role directly
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any; // For any(RoleName.class)
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link RoleServiceImpl}.
  * Assumes IRoleRepository.findByRoleName(RoleName) returns a Role object or null.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-30
  */

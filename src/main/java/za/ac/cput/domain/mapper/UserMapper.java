@@ -3,7 +3,10 @@ package za.ac.cput.domain.mapper;
 import za.ac.cput.domain.dto.request.UserCreateDTO;
 import za.ac.cput.domain.dto.request.UserUpdateDTO;
 import za.ac.cput.domain.dto.response.UserResponseDTO;
+import za.ac.cput.domain.entity.security.Role;
+import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
+import za.ac.cput.exception.BadRequestException;
 import za.ac.cput.service.IFileStorageService;
 
 import java.util.Collections;
@@ -14,7 +17,7 @@ import java.util.stream.Collectors;
  * UserMapper.java
  * A stateless utility class for mapping between User domain entities and their DTOs.
  * The `toDto` methods require an IFileStorageService instance to correctly resolve image URLs.
- *
+ * <p>
  * Author: Peter Buckingham (220165289)
  * Updated: 2025-06-13
  */
@@ -34,7 +37,7 @@ public class UserMapper {
         }
 
         String profileImageUrl = null;
-        // The service is passed in, so we can use it here.
+        // The service is passed, so we can use it here.
         // We also check if the service is null, allowing this method to be used in contexts
         // where URL generation is not necessary.
         if (fileStorageService != null && user.getProfileImageFileName() != null && !user.getProfileImageFileName().isBlank()) {
@@ -122,6 +125,23 @@ public class UserMapper {
         }
         if (updateDto.getDeleted() != null) {
             updatePayload.setDeleted(updateDto.getDeleted());
+        }
+        if (updateDto.getRoleNames() != null) {
+            List<Role> pseudoRoles = updateDto.getRoleNames().stream()
+                    .map(roleNameString -> {
+                        try {
+                            // Convert the string from the DTO into a RoleName enum.
+                            RoleName roleEnum = RoleName.valueOf(roleNameString.trim().toUpperCase());
+                            Role tempRole = new Role();
+                            tempRole.setRoleName(roleEnum); // Assume setter is setName() for the RoleName field
+                            return tempRole;
+                        } catch (IllegalArgumentException e) {
+                            // If the string is not a valid enum constant, throw a clear error.
+                            throw new BadRequestException("Invalid role name provided: '" + roleNameString + "'");
+                        }
+                    })
+                    .collect(Collectors.toList());
+            updatePayload.setRoles(pseudoRoles);
         }
 
         return updatePayload;

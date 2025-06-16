@@ -146,7 +146,11 @@ public class LocalFileStorageService implements IFileStorageService {
                     List<Path> files = walk.filter(Files::isRegularFile).collect(Collectors.toList());
                     totalFileCount += files.size();
                     totalSizeInBytes += files.stream().mapToLong(p -> {
-                        try { return Files.size(p); } catch (IOException e) { return 0L; }
+                        try {
+                            return Files.size(p);
+                        } catch (IOException e) {
+                            return 0L;
+                        }
                     }).sum();
                 } catch (IOException e) {
                     log.error("Could not scan folder '{}' for stats", folder, e);
@@ -167,7 +171,11 @@ public class LocalFileStorageService implements IFileStorageService {
             if (Files.exists(folderPath) && Files.isDirectory(folderPath)) {
                 try (Stream<Path> walk = Files.walk(folderPath)) {
                     folderSize = walk.filter(Files::isRegularFile).mapToLong(p -> {
-                        try { return Files.size(p); } catch (IOException e) { return 0L; }
+                        try {
+                            return Files.size(p);
+                        } catch (IOException e) {
+                            return 0L;
+                        }
                     }).sum();
                 } catch (IOException e) {
                     log.error("Could not scan folder '{}' for usage", folder, e);

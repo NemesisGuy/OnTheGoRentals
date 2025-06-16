@@ -1,8 +1,12 @@
 package za.ac.cput.controllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +19,6 @@ import za.ac.cput.domain.dto.request.DriverUpdateDTO;
 import za.ac.cput.domain.dto.response.DriverResponseDTO;
 import za.ac.cput.domain.entity.Driver;
 import za.ac.cput.domain.mapper.DriverMapper;
-import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.IDriverService;
 import za.ac.cput.utils.SecurityUtils;
 
@@ -24,21 +27,15 @@ import java.util.UUID;
 
 /**
  * DriverController.java
- * Controller for managing Driver entities.
- * This controller provides CRUD operations for drivers.
- * The specific access control (e.g., public, authenticated user, specific role)
- * for these operations would be defined by Spring Security configurations.
- * <p>
- * Author: Peter Buckingham
- * Date: 20/10/2023
- * Updated by: Peter Buckingham
- * Updated: 2025-05-28
+ * Controller for managing Driver entities. This controller provides CRUD operations for drivers.
+ * Access control for these operations should be defined by Spring Security configurations.
+ *
+ * @author Peter Buckingham
+ * @version 2.0
  */
 @RestController
 @RequestMapping("/api/v1/drivers")
-// @CrossOrigin(...) // Prefer global CORS configuration
-// @PreAuthorize(...) // Add if specific authorization is needed for the whole controller or per method
-@Api(value = "Driver Management", tags = "Driver Management")
+@Tag(name = "Driver Management", description = "Endpoints for creating and managing driver information.")
 public class DriverController {
 
     private static final Logger log = LoggerFactory.getLogger(DriverController.class);
@@ -56,145 +53,123 @@ public class DriverController {
     }
 
     /**
-     * Creates a new driver.
-     * The requester's identity is logged. Access control for this operation
-     * should be managed by Spring Security (e.g., requiring admin or a specific role).
+     * Creates a new driver. Access control for this operation should be managed by Spring Security
+     * (e.g., requiring an admin role).
      *
-     * @param driverCreateDTO The {@link DriverCreateDTO} containing the data for the new driver.
-     * @return A ResponseEntity containing the created {@link DriverResponseDTO} and HTTP status CREATED.
+     * @param driverCreateDTO The DTO containing the data for the new driver.
+     * @return A ResponseEntity containing the created driver's DTO and HTTP status 201 CREATED.
      */
+    @Operation(summary = "Create a new driver", description = "Creates a new driver in the system. Requires appropriate admin privileges.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Driver created successfully", content = @Content(schema = @Schema(implementation = DriverResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid driver data provided"),
+            @ApiResponse(responseCode = "403", description = "User not authorized to create a driver")
+    })
     @PostMapping
-    @ApiOperation(value = "Create a new driver", notes = "Creates a new driver. Access control should be managed by Spring Security.")
     public ResponseEntity<DriverResponseDTO> createDriver(
-            @ApiParam(value = "Driver creation data", required = true) @Valid @RequestBody DriverCreateDTO driverCreateDTO) {
+            @Valid @RequestBody DriverCreateDTO driverCreateDTO) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to create a new driver with DTO: {}", requesterId, driverCreateDTO);
 
         Driver driverToCreate = DriverMapper.toEntity(driverCreateDTO);
-        log.debug("Requester [{}]: Mapped DTO to Driver entity for creation: {}", requesterId, driverToCreate);
-
         Driver createdDriverEntity = driverService.create(driverToCreate);
-        log.info("Requester [{}]: Successfully created driver with ID: {} and UUID: {}",
-                requesterId, createdDriverEntity.getId(), createdDriverEntity.getUuid());
-        DriverResponseDTO responseDto = DriverMapper.toDto(createdDriverEntity);
-        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+
+        log.info("Requester [{}]: Successfully created driver with UUID: {}", requesterId, createdDriverEntity.getUuid());
+        return new ResponseEntity<>(DriverMapper.toDto(createdDriverEntity), HttpStatus.CREATED);
     }
 
     /**
      * Retrieves a specific driver by their UUID.
-     * This endpoint might be public or require authentication depending on security configuration.
      *
      * @param driverUuid The UUID of the driver to retrieve.
-     * @return A ResponseEntity containing the {@link DriverResponseDTO} if found.
-     * @throws ResourceNotFoundException if the driver with the given UUID is not found (handled by service).
+     * @return A ResponseEntity containing the driver's DTO if found.
      */
+    @Operation(summary = "Get driver by UUID", description = "Retrieves a specific driver by their unique identifier.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Driver found", content = @Content(schema = @Schema(implementation = DriverResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Driver not found with the specified UUID")
+    })
     @GetMapping("/{driverUuid}")
-    @ApiOperation(value = "Get driver by UUID", notes = "Retrieves a specific driver by their UUID.")
     public ResponseEntity<DriverResponseDTO> getDriverByUuid(
-            @ApiParam(value = "UUID of the driver to retrieve", required = true) @PathVariable UUID driverUuid) {
+            @Parameter(description = "UUID of the driver to retrieve", required = true) @PathVariable UUID driverUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get driver by UUID: {}", requesterId, driverUuid);
 
-        // driverService.read(UUID) is expected to throw ResourceNotFoundException if not found.
-        Driver driverEntity = driverService.read(driverUuid);
-        log.info("Requester [{}]: Successfully retrieved driver with ID: {} for UUID: {}",
-                requesterId, driverEntity.getId(), driverEntity.getUuid());
-        DriverResponseDTO responseDto = DriverMapper.toDto(driverEntity);
-        return ResponseEntity.ok(responseDto);
+        Driver driverEntity = driverService.read(driverUuid); // Service should throw ResourceNotFoundException
+        return ResponseEntity.ok(DriverMapper.toDto(driverEntity));
     }
 
     /**
-     * Updates an existing driver identified by their UUID.
-     * Access control for this operation should be managed by Spring Security.
+     * Retrieves a list of all drivers in the system.
      *
-     * @param driverUuid      The UUID of the driver to update.
-     * @param driverUpdateDTO The {@link DriverUpdateDTO} containing the updated data for the driver.
-     * @return A ResponseEntity containing the updated {@link DriverResponseDTO}.
-     * @throws ResourceNotFoundException if the driver with the given UUID is not found (handled by service).
+     * @return A ResponseEntity containing a list of all driver DTOs, or 204 No Content if none exist.
      */
-    @PutMapping("/{driverUuid}")
-    @ApiOperation(value = "Update an existing driver", notes = "Updates an existing driver identified by their UUID.")
-    public ResponseEntity<DriverResponseDTO> updateDriver(
-            @ApiParam(value = "UUID of the driver to update", required = true) @PathVariable UUID driverUuid,
-            @ApiParam(value = "Driver update data", required = true) @Valid @RequestBody DriverUpdateDTO driverUpdateDTO
-    ) {
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Attempting to update driver with UUID: {}. Update DTO: {}",
-                requesterId, driverUuid, driverUpdateDTO);
-
-        // Fetch existing entity; service.read(UUID) should throw if not found.
-        Driver existingDriver = driverService.read(driverUuid);
-        log.debug("Requester [{}]: Found existing driver ID: {}, UUID: {} for update.",
-                requesterId, existingDriver.getId(), existingDriver.getUuid());
-
-        // Apply DTO changes to the entity
-        Driver driverWithUpdates = DriverMapper.applyUpdateDtoToEntity(driverUpdateDTO, existingDriver);
-        log.debug("Requester [{}]: Mapped DTO to update Driver entity: {}", requesterId, driverWithUpdates);
-
-
-        Driver updatedDriverEntity = driverService.update(driverWithUpdates); // Service saves the modified entity (which has ID)
-        log.info("Requester [{}]: Successfully updated driver with ID: {} and UUID: {}",
-                requesterId, updatedDriverEntity.getId(), updatedDriverEntity.getUuid());
-        DriverResponseDTO responseDto = DriverMapper.toDto(updatedDriverEntity);
-        return ResponseEntity.ok(responseDto);
-    }
-
-    /**
-     * Soft-deletes a driver by their UUID.
-     * Access control for this operation should be managed by Spring Security.
-     * The controller first retrieves the driver by UUID to obtain their internal integer ID,
-     * which is then passed to the service's delete method.
-     *
-     * @param driverUuid The UUID of the driver to delete.
-     * @return A ResponseEntity with no content if successful, or 404 Not Found if the driver doesn't exist or couldn't be deleted.
-     * @throws ResourceNotFoundException if the driver with the given UUID is not found (when reading it).
-     */
-    @DeleteMapping("/{driverUuid}")
-    @ApiOperation(value = "Delete a driver by UUID", notes = "Soft-deletes a driver by their UUID.")
-    public ResponseEntity<Void> deleteDriver(
-            @ApiParam(value = "UUID of the driver to delete", required = true) @PathVariable UUID driverUuid) {
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Attempting to delete driver with UUID: {}", requesterId, driverUuid);
-
-        // Service's read(UUID) should throw ResourceNotFoundException if not found.
-        Driver driverToDelete = driverService.read(driverUuid);
-        log.debug("Requester [{}]: Found driver ID: {} (UUID: {}) for deletion.",
-                requesterId, driverToDelete.getId(), driverToDelete.getUuid());
-
-        // Service handles logic using the internal ID.
-        boolean deleted = driverService.delete(driverToDelete.getId());
-        if (!deleted) {
-            // This case is generally hit if the service's delete(id) method returns false
-            // for a reason other than "not found by id" (since read(uuid) should have caught that).
-            // e.g., business rule preventing deletion, or already deleted.
-            log.warn("Requester [{}]: Driver with ID: {} (UUID: {}) could not be deleted by service, or was already marked as deleted.",
-                    requesterId, driverToDelete.getId(), driverToDelete.getUuid());
-            return ResponseEntity.notFound().build();
-        }
-        log.info("Requester [{}]: Successfully soft-deleted driver with ID: {} (UUID: {}).",
-                requesterId, driverToDelete.getId(), driverToDelete.getUuid());
-        return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Retrieves a list of all drivers.
-     * This endpoint might be public or require authentication depending on security configuration.
-     *
-     * @return A ResponseEntity containing a list of {@link DriverResponseDTO}s. Returns 204 No Content if no drivers exist.
-     */
+    @Operation(summary = "Get all drivers", description = "Retrieves a list of all drivers.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list of drivers"),
+            @ApiResponse(responseCode = "204", description = "No drivers found in the system")
+    })
     @GetMapping
-    @ApiOperation(value = "Get all drivers", notes = "Retrieves a list of all drivers.")
     public ResponseEntity<List<DriverResponseDTO>> getAllDrivers() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get all drivers.", requesterId);
 
         List<Driver> drivers = driverService.getAll();
         if (drivers.isEmpty()) {
-            log.info("Requester [{}]: No drivers found.", requesterId);
             return ResponseEntity.noContent().build();
         }
-        List<DriverResponseDTO> driverDTOs = DriverMapper.toDtoList(drivers);
-        log.info("Requester [{}]: Successfully retrieved {} drivers.", requesterId, driverDTOs.size());
-        return ResponseEntity.ok(driverDTOs);
+        return ResponseEntity.ok(DriverMapper.toDtoList(drivers));
+    }
+
+    /**
+     * Updates an existing driver identified by their UUID.
+     *
+     * @param driverUuid      The UUID of the driver to update.
+     * @param driverUpdateDTO The DTO containing the updated data.
+     * @return A ResponseEntity containing the updated driver's DTO.
+     */
+    @Operation(summary = "Update an existing driver", description = "Updates the details of an existing driver by their UUID. Requires admin privileges.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Driver updated successfully", content = @Content(schema = @Schema(implementation = DriverResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid update data provided"),
+            @ApiResponse(responseCode = "404", description = "Driver not found with the specified UUID")
+    })
+    @PutMapping("/{driverUuid}")
+    public ResponseEntity<DriverResponseDTO> updateDriver(
+            @Parameter(description = "UUID of the driver to update", required = true) @PathVariable UUID driverUuid,
+            @Valid @RequestBody DriverUpdateDTO driverUpdateDTO) {
+        String requesterId = SecurityUtils.getRequesterIdentifier();
+        log.info("Requester [{}]: Attempting to update driver with UUID: {}", requesterId, driverUuid);
+
+        Driver existingDriver = driverService.read(driverUuid);
+        Driver driverWithUpdates = DriverMapper.applyUpdateDtoToEntity(driverUpdateDTO, existingDriver);
+        Driver updatedDriverEntity = driverService.update(driverWithUpdates);
+
+        log.info("Requester [{}]: Successfully updated driver with UUID: {}", requesterId, updatedDriverEntity.getUuid());
+        return ResponseEntity.ok(DriverMapper.toDto(updatedDriverEntity));
+    }
+
+    /**
+     * Soft-deletes a driver by their UUID.
+     *
+     * @param driverUuid The UUID of the driver to delete.
+     * @return A ResponseEntity with status 204 No Content if successful.
+     */
+    @Operation(summary = "Delete a driver by UUID", description = "Soft-deletes a driver by their UUID. Requires admin privileges.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Driver deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Driver not found with the specified UUID")
+    })
+    @DeleteMapping("/{driverUuid}")
+    public ResponseEntity<Void> deleteDriver(
+            @Parameter(description = "UUID of the driver to delete", required = true) @PathVariable UUID driverUuid) {
+        String requesterId = SecurityUtils.getRequesterIdentifier();
+        log.warn("ADMIN ACTION: Requester [{}] attempting to delete driver with UUID: {}", requesterId, driverUuid);
+
+        Driver driverToDelete = driverService.read(driverUuid);
+        driverService.delete(driverToDelete.getId());
+
+        log.info("Requester [{}]: Successfully soft-deleted driver with UUID: {}.", requesterId, driverUuid);
+        return ResponseEntity.noContent().build();
     }
 }

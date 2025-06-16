@@ -6,7 +6,7 @@ import za.ac.cput.domain.dto.response.DamageReportResponseDTO;
 import za.ac.cput.domain.dto.response.RentalResponseDTO;
 import za.ac.cput.domain.entity.DamageReport;
 import za.ac.cput.domain.entity.Rental;
-import za.ac.cput.service.IFileStorageService; // Import the required service interface
+import za.ac.cput.service.IFileStorageService;
 
 import java.util.List;
 import java.util.stream.Collectors;

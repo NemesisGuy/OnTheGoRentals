@@ -38,7 +38,7 @@ public class CarServiceImpl implements ICarService {
     private final IFileStorageService fileStorageService; // Assuming this is injected for image handling
 
     @Autowired
-    public CarServiceImpl(CarRepository carRepository , IFileStorageService fileStorageService) {
+    public CarServiceImpl(CarRepository carRepository, IFileStorageService fileStorageService) {
         this.carRepository = carRepository;
         this.fileStorageService = fileStorageService; // Injecting the file storage service
         log.info("CarServiceImpl initialized.");

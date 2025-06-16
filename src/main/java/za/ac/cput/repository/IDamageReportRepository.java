@@ -17,9 +17,26 @@ import java.util.UUID;
 @Repository
 public interface IDamageReportRepository extends JpaRepository<DamageReport, Integer> {
 
+    /**
+     * Finds all non-deleted damage reports.
+     *
+     * @return A list of all non-deleted {@link DamageReport} entities.
+     */
     List<DamageReport> findByDeletedFalse();
-
+    /**
+     * Finds a damage report by its internal integer ID, ensuring it is not deleted.
+     *
+     * @param integer The internal integer ID of the damage report.
+     * @return An {@link Optional} containing the {@link DamageReport} if found and not deleted,
+     * otherwise an empty Optional.
+     */
     Optional<DamageReport> findByIdAndDeletedFalse(Integer integer);
-
+    /**
+     * Finds a damage report by its UUID, ensuring it is not deleted.
+     *
+     * @param uuid The UUID of the damage report.
+     * @return An {@link Optional} containing the {@link DamageReport} if found and not deleted,
+     * otherwise an empty Optional.
+     */
     Optional<DamageReport> findByUuidAndDeletedFalse(UUID uuid);
 }

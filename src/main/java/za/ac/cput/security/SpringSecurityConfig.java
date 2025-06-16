@@ -74,7 +74,6 @@ public class SpringSecurityConfig {
                         .requestMatchers("/swagger-ui.html").permitAll()
 
 
-
                         .requestMatchers("/actuator/**", "/metrics", "/metrics/**").permitAll()
 
                         .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN") // Admin endpoints require specific roles

@@ -104,5 +104,11 @@ public interface IBookingService {
      */
     List<Booking> getAll();
 
+    /**
+     * Retrieves all bookings that are scheduled for collection today.
+     * This is useful for operations that need to process today's bookings.
+     *
+     * @return A list of {@link Booking} entities that are scheduled for collection today.
+     */
     List<Booking> findBookingsForCollectionToday();
 }

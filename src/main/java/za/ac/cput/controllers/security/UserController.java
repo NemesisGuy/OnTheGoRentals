@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,13 @@ import za.ac.cput.utils.SecurityUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * UserController.java
+ * Controller for authenticated users to manage their own profile and related data.
+ *
+ * @author Peter Buckingham (220165289)
+ * @version 2.0
+ */
 @RestController
 @RequestMapping("/api/v1/users/me")
 @Tag(name = "User Profile", description = "Endpoints for authenticated users to manage their own profile and related data.")
@@ -44,6 +52,13 @@ public class UserController {
     private final IRentalService rentalService;
     private final IFileStorageService fileStorageService;
 
+    /**
+     * Constructs the controller with necessary service dependencies.
+     *
+     * @param userService        The service for user-related operations.
+     * @param rentalService      The service for rental history lookups.
+     * @param fileStorageService The service for handling file storage.
+     */
     @Autowired
     public UserController(IUserService userService, IRentalService rentalService, IFileStorageService fileStorageService) {
         this.userService = userService;
@@ -52,32 +67,54 @@ public class UserController {
         log.info("UserController initialized.");
     }
 
+    /**
+     * Retrieves the profile of the currently authenticated user.
+     *
+     * @return A ResponseEntity containing the user's profile DTO.
+     */
+    @Operation(summary = "Get current user profile", description = "Retrieves the profile information of the currently authenticated user.")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "Profile retrieved successfully", content = @Content(schema = @Schema(implementation = UserResponseDTO.class))))
     @GetMapping("/profile")
     public ResponseEntity<UserResponseDTO> getCurrentUserProfile() {
         String userEmail = SecurityUtils.getRequesterIdentifier();
         log.info("User [{}] requesting their profile.", userEmail);
-
         User user = userService.read(userEmail);
-        // Use the injected mapper instance to call the method
         return ResponseEntity.ok(UserMapper.toDto(user, fileStorageService));
     }
 
+    /**
+     * Updates the profile of the currently authenticated user.
+     *
+     * @param userUpdateDTO The DTO containing the fields to update.
+     * @return A ResponseEntity containing the updated user profile DTO.
+     */
+    @Operation(summary = "Update current user profile", description = "Updates the profile information (e.g., name, email) of the currently authenticated user.")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "Profile updated successfully", content = @Content(schema = @Schema(implementation = UserResponseDTO.class))))
     @PutMapping("/profile")
     public ResponseEntity<UserResponseDTO> updateCurrentUserProfile(@Valid @RequestBody UserUpdateDTO userUpdateDTO) {
         String userEmail = SecurityUtils.getRequesterIdentifier();
         log.info("User [{}] requesting to update their profile with DTO: {}", userEmail, userUpdateDTO);
 
         User currentUser = userService.read(userEmail);
-        // The applyUpdateDtoToEntity method is static and can be called directly
         User userWithUpdates = UserMapper.applyUpdateDtoToEntity(userUpdateDTO, currentUser);
-
         User updatedUser = userService.update(currentUser.getId(), userWithUpdates);
-        // Use the injected mapper instance for the response
         return ResponseEntity.ok(UserMapper.toDto(updatedUser, fileStorageService));
     }
 
-    @PostMapping("/profile-image")
-    public ResponseEntity<UserResponseDTO> uploadProfileImage(@RequestParam("file") MultipartFile file) {
+    /**
+     * Uploads or replaces the profile image for the currently authenticated user.
+     *
+     * @param file The image file sent as multipart/form-data.
+     * @return A ResponseEntity containing the updated user profile DTO with the new image URL.
+     */
+    @Operation(summary = "Upload profile image", description = "Uploads or replaces the profile image for the currently authenticated user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Profile image uploaded successfully", content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "No file provided or file is empty")
+    })
+    @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserResponseDTO> uploadProfileImage(
+            @Parameter(description = "Profile image file to upload", required = true) @RequestParam("file") MultipartFile file) {
         String userEmail = SecurityUtils.getRequesterIdentifier();
         log.info("User [{}] is uploading a profile image.", userEmail);
 
@@ -90,20 +127,27 @@ public class UserController {
         String filename = fileKey.substring(fileKey.lastIndexOf("/") + 1);
 
         User imageUpdatePayload = currentUser.toBuilder()
-                .password(null)
+                .password(null) // Ensure password is not part of this update
                 .profileImageFileName(filename)
                 .profileImageType(ImageType.SELFIE.getFolder())
                 .profileImageUploadedAt(LocalDateTime.now())
                 .build();
 
         User updatedUser = userService.update(currentUser.getId(), imageUpdatePayload);
-
         log.info("Successfully uploaded profile image '{}' for user [{}].", filename, userEmail);
-        // Use the injected mapper instance for the final response
         return ResponseEntity.ok(UserMapper.toDto(updatedUser, fileStorageService));
-
     }
 
+    /**
+     * Retrieves the rental history for the currently authenticated user.
+     *
+     * @return A ResponseEntity containing a list of the user's past and current rentals.
+     */
+    @Operation(summary = "Get user rental history", description = "Retrieves the rental history for the currently authenticated user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Rental history retrieved successfully"),
+            @ApiResponse(responseCode = "204", description = "No rental history found for this user")
+    })
     @GetMapping("/rental-history")
     public ResponseEntity<List<RentalResponseDTO>> getCurrentUserRentalHistory() {
         String userEmail = SecurityUtils.getRequesterIdentifier();
@@ -117,7 +161,6 @@ public class UserController {
             return ResponseEntity.noContent().build();
         }
         log.info("Successfully retrieved {} rental history entries for user [{}].", rentalHistory.size(), userEmail);
-        // RentalMapper can remain static if it doesn't need external services
         return ResponseEntity.ok(RentalMapper.toDtoList(rentalHistory, fileStorageService));
     }
 }

@@ -37,7 +37,7 @@ public class BookingMapper {
 
         CarResponseDTO carDto = null;
         if (booking.getCar() != null) {
-            carDto = CarMapper.toDto(booking.getCar()); // Uses CarMapper
+            carDto = CarMapper.toDto(booking.getCar(), fileStorageService); // Uses CarMapper
         }
 
         return BookingResponseDTO.builder()

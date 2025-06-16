@@ -360,22 +360,22 @@ class BookingServiceImplTest {
         assertThrows(CarNotAvailableException.class, () -> bookingService.update(updates));
     }
 
-  /*  // --- Delete Tests ---
-    @Test
-    void delete_shouldSoftDelete_whenBookingExistsAndCancellable() {
-        // Make sure sampleBooking is in a state that allows deletion (e.g., CONFIRMED)
-        Booking bookingToDelete = new Booking.Builder().copy(sampleBooking).setStatus(BookingStatus.CONFIRMED).build();
-        Booking deletedStateBooking = new Booking.Builder().copy(bookingToDelete)
-                .setDeleted(true).setStatus(BookingStatus.ADMIN_CANCELLED).build();
+    /*  // --- Delete Tests ---
+      @Test
+      void delete_shouldSoftDelete_whenBookingExistsAndCancellable() {
+          // Make sure sampleBooking is in a state that allows deletion (e.g., CONFIRMED)
+          Booking bookingToDelete = new Booking.Builder().copy(sampleBooking).setStatus(BookingStatus.CONFIRMED).build();
+          Booking deletedStateBooking = new Booking.Builder().copy(bookingToDelete)
+                  .setDeleted(true).setStatus(BookingStatus.ADMIN_CANCELLED).build();
 
-        when(bookingRepository.findByIdAndDeletedFalse(1)).thenReturn(Optional.of(bookingToDelete));
-        when(bookingRepository.save(any(Booking.class))).thenReturn(deletedStateBooking);
+          when(bookingRepository.findByIdAndDeletedFalse(1)).thenReturn(Optional.of(bookingToDelete));
+          when(bookingRepository.save(any(Booking.class))).thenReturn(deletedStateBooking);
 
-        boolean result = bookingService.delete(1);
-        assertTrue(result);
-        verify(bookingRepository).save(argThat(b -> b.isDeleted() && b.getStatus() == BookingStatus.ADMIN_CANCELLED));
-    }
-*/
+          boolean result = bookingService.delete(1);
+          assertTrue(result);
+          verify(bookingRepository).save(argThat(b -> b.isDeleted() && b.getStatus() == BookingStatus.ADMIN_CANCELLED));
+      }
+  */
     @Test
     void delete_shouldThrowIllegalState_whenBookingIsRentalInitiated() {
         Booking rentalInitiatedBooking = new Booking.Builder().copy(sampleBooking).setStatus(BookingStatus.RENTAL_INITIATED).build();

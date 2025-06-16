@@ -1,8 +1,12 @@
 package za.ac.cput.controllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +19,6 @@ import za.ac.cput.domain.dto.request.FaqUpdateDTO;
 import za.ac.cput.domain.dto.response.FaqResponseDTO;
 import za.ac.cput.domain.entity.Faq;
 import za.ac.cput.domain.mapper.FaqMapper;
-import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.service.IFaqService;
 import za.ac.cput.utils.SecurityUtils;
 
@@ -25,20 +28,14 @@ import java.util.UUID;
 /**
  * FaqController.java
  * This controller manages FAQ (Frequently Asked Questions) entries.
- * It provides public endpoints for retrieving FAQs and potentially administrative
- * endpoints for creating, updating, and deleting FAQs.
- * For production, CRUD operations (POST, PUT, DELETE) should be secured
- * and likely moved to a dedicated AdminFaqController.
- * <p>
- * Author: Aqeel Hanslo (219374422)
- * Date: 29 August 2023
- * Updated by: Peter Buckingham
- * Updated: 2025-05-28
+ * It provides public endpoints for retrieving FAQs and administrative endpoints for CRUD operations.
+ *
+ * @author Aqeel Hanslo (219374422)
+ * @version 2.0
  */
 @RestController
 @RequestMapping("/api/v1/faqs")
-// @CrossOrigin(...) // Prefer global CORS configuration
-@Api(value = "FAQ Management", tags = "FAQ Management")
+@Tag(name = "FAQ Management", description = "Endpoints for viewing and managing Frequently Asked Questions (FAQs).")
 public class FaqController {
 
     private static final Logger log = LoggerFactory.getLogger(FaqController.class);
@@ -56,148 +53,124 @@ public class FaqController {
     }
 
     /**
-     * Retrieves all non-deleted FAQs.
-     * This endpoint is intended for public access.
+     * Retrieves all non-deleted FAQs. This endpoint is intended for public access.
      *
-     * @return A ResponseEntity containing a list of {@link FaqResponseDTO}s, or 204 No Content if none exist.
+     * @return A ResponseEntity containing a list of FAQ DTOs, or 204 No Content if none exist.
      */
+    @Operation(summary = "Get all FAQs", description = "Retrieves a list of all publicly visible FAQs.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved FAQs"),
+            @ApiResponse(responseCode = "204", description = "No FAQs are available")
+    })
     @GetMapping
-    @ApiOperation(value = "Get all FAQs", notes = "Retrieves all non-deleted FAQs. Intended for public access.")
     public ResponseEntity<List<FaqResponseDTO>> getAllFaqs() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get all FAQs.", requesterId);
 
         List<Faq> allFaqs = faqService.getAll();
         if (allFaqs.isEmpty()) {
-            log.info("Requester [{}]: No FAQs found.", requesterId);
             return ResponseEntity.noContent().build();
         }
-        List<FaqResponseDTO> faqDTOs = FaqMapper.toDtoList(allFaqs);
-        log.info("Requester [{}]: Successfully retrieved {} FAQs.", requesterId, faqDTOs.size());
-        return ResponseEntity.ok(faqDTOs);
+        return ResponseEntity.ok(FaqMapper.toDtoList(allFaqs));
     }
 
     /**
-     * Retrieves a specific FAQ by its UUID.
-     * This endpoint is intended for public access.
+     * Retrieves a specific FAQ by its UUID. This endpoint is intended for public access.
      *
      * @param faqUuid The UUID of the FAQ to retrieve.
-     * @return A ResponseEntity containing the {@link FaqResponseDTO} if found.
-     * @throws ResourceNotFoundException if the FAQ with the given UUID is not found (handled by service).
+     * @return A ResponseEntity containing the FAQ DTO if found.
      */
+    @Operation(summary = "Get FAQ by UUID", description = "Retrieves a specific FAQ by its unique identifier.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "FAQ found", content = @Content(schema = @Schema(implementation = FaqResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "FAQ not found with the specified UUID")
+    })
     @GetMapping("/{faqUuid}")
-    @ApiOperation(value = "Get FAQ by UUID", notes = "Retrieves a specific FAQ by its UUID. Intended for public access.")
     public ResponseEntity<FaqResponseDTO> getFaqByUuid(
-            @ApiParam(value = "UUID of the FAQ to retrieve", required = true) @PathVariable UUID faqUuid) {
+            @Parameter(description = "UUID of the FAQ to retrieve", required = true) @PathVariable UUID faqUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get FAQ by UUID: {}", requesterId, faqUuid);
 
-        // faqService.read(UUID) is expected to throw ResourceNotFoundException if not found.
-        Faq faqEntity = faqService.read(faqUuid);
-        log.info("Requester [{}]: Successfully retrieved FAQ with ID: {} for UUID: {}",
-                requesterId, faqEntity.getId(), faqEntity.getUuid());
+        Faq faqEntity = faqService.read(faqUuid); // Service should throw ResourceNotFoundException
         return ResponseEntity.ok(FaqMapper.toDto(faqEntity));
     }
 
-    // --- Endpoints typically requiring Admin role ---
-    // For production, these should be secured (e.g., @PreAuthorize("hasRole('ADMIN')"))
-    // or moved to a separate AdminFaqController under an /admin path.
-
     /**
-     * Creates a new FAQ.
-     * This operation is typically restricted to administrators.
+     * Creates a new FAQ. This operation should be restricted to administrators.
      *
-     * @param faqCreateDTO The {@link FaqCreateDTO} containing data for the new FAQ.
-     * @return A ResponseEntity containing the created {@link FaqResponseDTO} and HTTP status 201 Created.
+     * @param faqCreateDTO The DTO containing data for the new FAQ.
+     * @return A ResponseEntity containing the created FAQ DTO and HTTP status 201 Created.
      */
+    @Operation(summary = "Create a new FAQ (Admin)", description = "Creates a new FAQ. Requires admin privileges.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "FAQ created successfully", content = @Content(schema = @Schema(implementation = FaqResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid FAQ data provided"),
+            @ApiResponse(responseCode = "403", description = "User not authorized to create FAQs")
+    })
     @PostMapping
-    @ApiOperation(value = "Create a new FAQ", notes = "Creates a new FAQ. Typically restricted to administrators.")
-    // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example security
     public ResponseEntity<FaqResponseDTO> createFaq(
-            @ApiParam(value = "FAQ creation data", required = true) @Valid @RequestBody FaqCreateDTO faqCreateDTO) {
+            @Valid @RequestBody FaqCreateDTO faqCreateDTO) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Attempting to create a new FAQ with DTO: {}", requesterId, faqCreateDTO);
-        // Add authorization check here if not using @PreAuthorize
-        // if (!isRequesterAdmin(requesterId)) {
-        //     log.warn("Requester [{}]: Attempted to create FAQ without admin privileges.", requesterId);
-        //     return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        // }
 
         Faq faqToCreate = FaqMapper.toEntity(faqCreateDTO);
-        log.debug("Requester [{}]: Mapped DTO to Faq entity for creation: {}", requesterId, faqToCreate);
-
         Faq createdFaqEntity = faqService.create(faqToCreate);
-        log.info("Requester [{}]: Successfully created FAQ with ID: {} and UUID: {}",
-                requesterId, createdFaqEntity.getId(), createdFaqEntity.getUuid());
-        FaqResponseDTO responseDto = FaqMapper.toDto(createdFaqEntity);
-        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+
+        log.info("Requester [{}]: Successfully created FAQ with UUID: {}", requesterId, createdFaqEntity.getUuid());
+        return new ResponseEntity<>(FaqMapper.toDto(createdFaqEntity), HttpStatus.CREATED);
     }
 
     /**
-     * Updates an existing FAQ identified by its UUID.
-     * This operation is typically restricted to administrators.
+     * Updates an existing FAQ identified by its UUID. This operation should be restricted to administrators.
      *
      * @param faqUuid      The UUID of the FAQ to update.
-     * @param faqUpdateDTO The {@link FaqUpdateDTO} containing the fields to update.
-     * @return A ResponseEntity containing the updated {@link FaqResponseDTO}.
-     * @throws ResourceNotFoundException if the FAQ with the given UUID is not found (handled by service).
+     * @param faqUpdateDTO The DTO containing the fields to update.
+     * @return A ResponseEntity containing the updated FAQ DTO.
      */
+    @Operation(summary = "Update an existing FAQ (Admin)", description = "Updates an existing FAQ by its UUID. Requires admin privileges.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "FAQ updated successfully", content = @Content(schema = @Schema(implementation = FaqResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid update data provided"),
+            @ApiResponse(responseCode = "403", description = "User not authorized to update FAQs"),
+            @ApiResponse(responseCode = "404", description = "FAQ not found with the specified UUID")
+    })
     @PutMapping("/{faqUuid}")
-    @ApiOperation(value = "Update an existing FAQ", notes = "Updates an existing FAQ identified by its UUID. Typically restricted to administrators.")
-    // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example security
     public ResponseEntity<FaqResponseDTO> updateFaq(
-            @ApiParam(value = "UUID of the FAQ to update", required = true) @PathVariable UUID faqUuid,
-            @ApiParam(value = "FAQ update data", required = true) @Valid @RequestBody FaqUpdateDTO faqUpdateDTO
-    ) {
+            @Parameter(description = "UUID of the FAQ to update", required = true) @PathVariable UUID faqUuid,
+            @Valid @RequestBody FaqUpdateDTO faqUpdateDTO) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Attempting to update FAQ with UUID: {}. Update DTO: {}",
-                requesterId, faqUuid, faqUpdateDTO);
-        // Add authorization check here if not using @PreAuthorize
+        log.info("Requester [{}]: Attempting to update FAQ with UUID: {}", requesterId, faqUuid);
 
         Faq existingFaq = faqService.read(faqUuid);
-        log.debug("Requester [{}]: Found existing FAQ ID: {}, UUID: {} for update.",
-                requesterId, existingFaq.getId(), existingFaq.getUuid());
-
         Faq faqWithUpdates = FaqMapper.applyUpdateDtoToEntity(faqUpdateDTO, existingFaq);
-        log.debug("Requester [{}]: Mapped DTO to update Faq entity: {}", requesterId, faqWithUpdates);
+        Faq updatedFaq = faqService.update(faqWithUpdates);
 
-        Faq persistedUpdatedFaq = faqService.update(faqWithUpdates);
-        log.info("Requester [{}]: Successfully updated FAQ with ID: {} and UUID: {}",
-                requesterId, persistedUpdatedFaq.getId(), persistedUpdatedFaq.getUuid());
-        return ResponseEntity.ok(FaqMapper.toDto(persistedUpdatedFaq));
+        log.info("Requester [{}]: Successfully updated FAQ with UUID: {}", requesterId, updatedFaq.getUuid());
+        return ResponseEntity.ok(FaqMapper.toDto(updatedFaq));
     }
 
     /**
-     * Soft-deletes an FAQ by its UUID.
-     * This operation is typically restricted to administrators.
-     * The controller first retrieves the FAQ by UUID to obtain its internal integer ID,
-     * which is then passed to the service's delete method.
+     * Soft-deletes an FAQ by its UUID. This operation should be restricted to administrators.
      *
      * @param faqUuid The UUID of the FAQ to delete.
-     * @return A ResponseEntity with status 204 No Content if successful, or 404 Not Found.
-     * @throws ResourceNotFoundException if the FAQ with the given UUID is not found (when reading it).
+     * @return A ResponseEntity with status 204 No Content if successful.
      */
+    @Operation(summary = "Delete an FAQ by UUID (Admin)", description = "Soft-deletes an FAQ by its UUID. Requires admin privileges.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "FAQ deleted successfully"),
+            @ApiResponse(responseCode = "403", description = "User not authorized to delete FAQs"),
+            @ApiResponse(responseCode = "404", description = "FAQ not found with the specified UUID")
+    })
     @DeleteMapping("/{faqUuid}")
-    @ApiOperation(value = "Delete an FAQ by UUID", notes = "Soft-deletes an FAQ by its UUID. Typically restricted to administrators.")
-    // @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')") // Example security
     public ResponseEntity<Void> deleteFaq(
-            @ApiParam(value = "UUID of the FAQ to delete", required = true) @PathVariable UUID faqUuid) {
+            @Parameter(description = "UUID of the FAQ to delete", required = true) @PathVariable UUID faqUuid) {
         String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Attempting to delete FAQ with UUID: {}", requesterId, faqUuid);
-        // Add authorization check here if not using @PreAuthorize
+        log.warn("ADMIN ACTION: Requester [{}] attempting to delete FAQ with UUID: {}", requesterId, faqUuid);
 
         Faq faqToDelete = faqService.read(faqUuid);
-        log.debug("Requester [{}]: Found FAQ ID: {} (UUID: {}) for deletion.",
-                requesterId, faqToDelete.getId(), faqToDelete.getUuid());
+        faqService.delete(faqToDelete.getId());
 
-        boolean deleted = faqService.delete(faqToDelete.getId());
-        if (!deleted) {
-            log.warn("Requester [{}]: FAQ with ID: {} (UUID: {}) could not be deleted by service, or was already marked as deleted.",
-                    requesterId, faqToDelete.getId(), faqToDelete.getUuid());
-            return ResponseEntity.notFound().build();
-        }
-        log.info("Requester [{}]: Successfully soft-deleted FAQ with ID: {} (UUID: {}).",
-                requesterId, faqToDelete.getId(), faqToDelete.getUuid());
+        log.info("Requester [{}]: Successfully soft-deleted FAQ with UUID: {}.", requesterId, faqUuid);
         return ResponseEntity.noContent().build();
     }
 }

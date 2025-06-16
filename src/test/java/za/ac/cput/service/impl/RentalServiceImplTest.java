@@ -43,7 +43,7 @@ import static org.mockito.Mockito.*;
  * Tests rental lifecycle management, including creation, updates, status changes,
  * and interactions with related services and repositories.
  * Assumes entities are modified via Builder pattern returning new instances for updates.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-30
  *//*

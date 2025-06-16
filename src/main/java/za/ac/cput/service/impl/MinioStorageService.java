@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import za.ac.cput.service.IFileStorageService;
 
 import java.io.InputStream;
-import java.net.URI; // <-- Import the modern URI class
+import java.net.URI;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;

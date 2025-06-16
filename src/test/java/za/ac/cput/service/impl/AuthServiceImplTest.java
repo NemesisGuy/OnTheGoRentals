@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,40 +18,40 @@ import za.ac.cput.domain.entity.security.RefreshToken;
 import za.ac.cput.domain.entity.security.Role;
 import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
-import za.ac.cput.domain.enums.AuthProvider;
-import za.ac.cput.exception.EmailAlreadyExistsException;
 import za.ac.cput.exception.TokenRefreshException;
 import za.ac.cput.repository.IRoleRepository;
 import za.ac.cput.security.JwtUtilities;
-import za.ac.cput.service.IAuthService;
 import za.ac.cput.service.IRefreshTokenService;
 import za.ac.cput.service.IUserService;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.contains;
 
 /**
  * Unit tests for {@link AuthServiceImpl}.
  * Tests authentication-related logic including registration, login, token refresh, and logout.
  * All external dependencies are mocked.
- *
+ * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-30
  */
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
 
+    // Values to mimic those from @Value annotations
+    private final Long refreshTokenDurationMs = 604800000L; // 7 days
+    private final String refreshTokenCookieName = "myAppRefreshToken";
+    private final String refreshTokenCookiePath = "/api/v1/auth";
+    private final boolean secureCookie = true;
     @Mock
     private IUserService userService;
     @Mock
@@ -69,20 +68,11 @@ class AuthServiceImplTest {
     private HttpServletResponse httpServletResponse; // For cookie setting
     @Mock
     private Authentication authentication; // For mocking Authentication object
-
     @InjectMocks
     private AuthServiceImpl authService;
-
     private User sampleUser;
     private Role sampleRoleUser;
     private RefreshToken sampleRefreshToken;
-
-    // Values to mimic those from @Value annotations
-    private final Long refreshTokenDurationMs = 604800000L; // 7 days
-    private final String refreshTokenCookieName = "myAppRefreshToken";
-    private final String refreshTokenCookiePath = "/api/v1/auth";
-    private final boolean secureCookie = true;
-
 
     @BeforeEach
     void setUp() {
@@ -349,7 +339,7 @@ class AuthServiceImplTest {
                         cookieString.contains("Max-Age=0") &&
                         cookieString.contains("Path=" + refreshTokenCookiePath) &&
                         cookieString.contains("HttpOnly") &&
-                        (secureCookie ? cookieString.contains("Secure") : !cookieString.contains("Secure")) &&
+                        (secureCookie == cookieString.contains("Secure")) &&
                         cookieString.contains("SameSite=Lax")
         ));
     }

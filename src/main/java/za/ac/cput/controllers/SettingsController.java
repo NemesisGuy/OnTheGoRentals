@@ -1,87 +1,79 @@
-package za.ac.cput.controllers;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import za.ac.cput.domain.entity.settings.Settings;
-import za.ac.cput.service.ISettingsService;
-import za.ac.cput.utils.SecurityUtils;
-
-/**
- * SettingsController.java
- * Controller for retrieving application settings.
- * Currently provides an endpoint to read a specific settings entry (e.g., by ID 1).
- * <p>
- * Author: Peter Buckingham (220165289)
- * Date: [Original Date - If known]
- * Updated by: Peter Buckingham
- * Updated: 2025-05-28
- */
-@RestController
-@RequestMapping("/api/v1/settings") // Standardized API path
-@Api(value = "Application Settings", tags = "Application Settings")
-public class SettingsController {
-
-    private static final Logger log = LoggerFactory.getLogger(SettingsController.class);
-    private final ISettingsService settingsService; // Use interface
-
-    /**
-     * Constructs a SettingsController with the necessary Settings service.
-     *
-     * @param settingsService The service implementation for settings operations.
-     */
-    @Autowired
-    public SettingsController(ISettingsService settingsService) {
-        this.settingsService = settingsService;
-        log.info("SettingsController initialized.");
-    }
-
-    /**
-     * Retrieves the application settings.
-     * Assumes there's a single settings entry identified by a fixed ID (e.g., 1).
-     * This endpoint is typically public or accessible to authenticated users.
-     *
-     * @return A ResponseEntity containing the {@link Settings} object if found, or 404 Not Found.
-     */
-    @GetMapping // Changed from /read to be more RESTful for a singleton resource
-    @ApiOperation(value = "Get application settings",
-            notes = "Retrieves the application settings. Assumes a single settings entry identified by a fixed ID (e.g., 1).",
-            response = Settings.class)
-    public ResponseEntity<Settings> getSettings() {
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        final int SETTINGS_ID = 1; // Assuming a fixed ID for the settings record
-        log.info("Requester [{}]: Request to get application settings (ID: {}).", requesterId, SETTINGS_ID);
-
-        Settings settings = settingsService.read(SETTINGS_ID);
-        if (settings == null) {
-            log.warn("Requester [{}]: Application settings (ID: {}) not found.", requesterId, SETTINGS_ID);
-            // throw new ResourceNotFoundException("Application settings not found with ID: " + SETTINGS_ID);
-            return ResponseEntity.notFound().build(); // Return 404 if settings are not configured
-        }
-
-        log.info("Requester [{}]: Successfully retrieved application settings (ID: {}).", requesterId, SETTINGS_ID);
-        return ResponseEntity.ok(settings);
-    }
-
-    // If settings can be updated, you would add a PUT endpoint:
-    /*
-    @PutMapping
-    // @PreAuthorize("hasRole('ADMIN')") // Typically admin-only
-    public ResponseEntity<Settings> updateSettings(@RequestBody Settings newSettings) {
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        final int SETTINGS_ID = 1;
-        log.info("Requester [{}]: Attempting to update application settings (ID: {}) with: {}", requesterId, SETTINGS_ID, newSettings);
-        // Ensure newSettings doesn't try to change the ID if it's fixed.
-        newSettings.setId(SETTINGS_ID); // Or however your Settings entity manages its ID
-        Settings updatedSettings = settingsService.update(newSettings); // Assuming service.update(Settings)
-        log.info("Requester [{}]: Successfully updated application settings (ID: {}).", requesterId, SETTINGS_ID);
-        return ResponseEntity.ok(updatedSettings);
-    }
-    */
-}
+//package za.ac.cput.controllers;
+//
+//import io.swagger.v3.oas.annotations.Operation;
+//import io.swagger.v3.oas.annotations.media.Content;
+//import io.swagger.v3.oas.annotations.media.Schema;
+//import io.swagger.v3.oas.annotations.responses.ApiResponse;
+//import io.swagger.v3.oas.annotations.responses.ApiResponses;
+//import io.swagger.v3.oas.annotations.tags.Tag;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RestController;
+//import za.ac.cput.domain.dto.response.SettingsResponseDTO;
+//import za.ac.cput.domain.entity.settings.Settings;
+//import za.ac.cput.domain.mapper.SettingsMapper;
+//import za.ac.cput.service.ISettingsService;
+//import za.ac.cput.utils.SecurityUtils;
+//
+/// **
+// * SettingsController.java
+// * Controller for retrieving application-wide settings.
+// * This endpoint is typically public or accessible to authenticated users to configure frontend behavior.
+// *
+// * @author Peter Buckingham (220165289)
+// * @version 2.0
+// */
+//@RestController
+//@RequestMapping("/api/v1/settings")
+//@Tag(name = "Application Settings", description = "Endpoint for retrieving public application settings.")
+//public class SettingsController {
+//
+//    private static final Logger log = LoggerFactory.getLogger(SettingsController.class);
+//    private final ISettingsService settingsService;
+//
+//    /**
+//     * Constructs a SettingsController with the necessary Settings service.
+//     *
+//     * @param settingsService The service implementation for settings operations.
+//     */
+//    @Autowired
+//    public SettingsController(ISettingsService settingsService) {
+//        this.settingsService = settingsService;
+//        log.info("SettingsController initialized.");
+//    }
+//
+//    /**
+//     * Retrieves the application's public settings.
+//     * This implementation assumes there is a single settings entry in the database, identified by a fixed ID.
+//     *
+//     * @return A ResponseEntity containing the {@link SettingsResponseDTO} if found, or 404 Not Found if not configured.
+//     */
+//    @Operation(summary = "Get application settings", description = "Retrieves the public application settings, assuming a single configuration entry.")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Settings retrieved successfully",
+//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = SettingsResponseDTO.class))),
+//            @ApiResponse(responseCode = "404", description = "Application settings have not been configured in the database")
+//    })
+//    @GetMapping
+//    public ResponseEntity<SettingsResponseDTO> getSettings() {
+//        String requesterId = SecurityUtils.getRequesterIdentifier();
+//        final int SETTINGS_ID = 1; // Assuming a fixed ID for the singleton settings record
+//        log.info("Requester [{}]: Request to get application settings (ID: {}).", requesterId, SETTINGS_ID);
+//
+//        Settings settings = settingsService.read(SETTINGS_ID);
+//        if (settings == null) {
+//            log.warn("Application settings (ID: {}) not found. The settings table might be empty.", SETTINGS_ID);
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        log.info("Requester [{}]: Successfully retrieved application settings (ID: {}).", requesterId, SETTINGS_ID);
+//        return ResponseEntity.ok(SettingsMapper.toDto(settings));
+//    }
+//
+//    // Note: An admin-level endpoint for updating settings would typically be in a separate AdminSettingsController
+//    // and would accept a SettingsUpdateDTO.
+//}
