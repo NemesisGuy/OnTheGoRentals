@@ -24,6 +24,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Service implementation for storing files on the local filesystem.
+ * This service is activated only when the 'storage-local' Spring profile is active.
+ * It handles file operations within a configured base directory and includes security
+ * checks to prevent directory traversal and disallowed file types.
+ */
 @Service
 @Profile("storage-local")
 public class LocalFileStorageService implements IFileStorageService {
@@ -36,6 +42,12 @@ public class LocalFileStorageService implements IFileStorageService {
 
     private Path storageBasePath;
 
+    /**
+     * Initializes the service after construction. It resolves the base storage directory
+     * from the application properties and creates it if it doesn't already exist.
+     *
+     * @throws RuntimeException if the storage directory cannot be created.
+     */
     @PostConstruct
     public void init() {
         storageBasePath = Paths.get(baseDir).toAbsolutePath().normalize();
@@ -47,6 +59,21 @@ public class LocalFileStorageService implements IFileStorageService {
         }
     }
 
+    /**
+     * Saves a multipart file to a specified subdirectory on the local filesystem.
+     * This method performs several security checks:
+     * - Rejects empty files.
+     * - Validates the directory name against invalid characters.
+     * - Enforces a whitelist of allowed MIME types.
+     * - Prevents directory traversal attacks.
+     * A unique filename is generated using UUID to avoid collisions.
+     *
+     * @param file      The {@link MultipartFile} to be saved.
+     * @param directory The target subdirectory (e.g., "cars", "selfies") under the base storage path.
+     * @return The key (relative path, e.g., "cars/uuid.jpg") under which the file was saved.
+     * @throws RuntimeException  if the file is empty or cannot be stored.
+     * @throws SecurityException if the directory name is invalid or the file type is not allowed.
+     */
     @Override
     public String save(MultipartFile file, String directory) {
         if (file.isEmpty() || file.getOriginalFilename() == null) {
@@ -57,7 +84,7 @@ public class LocalFileStorageService implements IFileStorageService {
         }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_MIME_TYPES.contains(contentType.toLowerCase())) {
-            throw new SecurityException("File type not allowed.");
+            throw new SecurityException("File type not allowed. Provided: " + contentType);
         }
 
         String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
@@ -80,11 +107,21 @@ public class LocalFileStorageService implements IFileStorageService {
         }
     }
 
+    /**
+     * Loads a file from the local filesystem as a Spring {@link Resource}.
+     * This is the primary method used by the `FileController` to stream file content to the client.
+     * It includes a check to ensure the requested file path is within the base storage directory.
+     *
+     * @param key The key (relative path) of the file to load (e.g., "cars/uuid.jpg").
+     * @return An {@link Optional} containing the {@link Resource} if the file exists and is readable,
+     *         or an empty Optional otherwise.
+     */
     @Override
     public Optional<Resource> loadAsResource(String key) {
         try {
             Path filePath = this.storageBasePath.resolve(key).normalize();
             if (!filePath.startsWith(this.storageBasePath)) {
+                log.warn("Attempt to access file outside base directory blocked: {}", key);
                 return Optional.empty();
             }
             Resource resource = new UrlResource(filePath.toUri());
@@ -94,6 +131,12 @@ public class LocalFileStorageService implements IFileStorageService {
         }
     }
 
+    /**
+     * Checks if a file with the given key exists on the local filesystem.
+     *
+     * @param key The key (relative path) of the file to check.
+     * @return {@code true} if the file exists as a regular file, {@code false} otherwise.
+     */
     @Override
     public boolean fileExists(String key) {
         if (key == null || key.isBlank()) return false;
@@ -105,12 +148,20 @@ public class LocalFileStorageService implements IFileStorageService {
         }
     }
 
+    /**
+     * Deletes a file from the local filesystem based on its key.
+     * This operation is idempotent; if the file doesn't exist, it succeeds without error.
+     *
+     * @param key The key (relative path) of the file to delete.
+     * @return {@code true} if the deletion was successful or the file didn't exist; {@code false} on error or if access is denied.
+     */
     @Override
     public boolean delete(String key) {
         if (key == null || key.isBlank()) return true;
         try {
             Path filePath = this.storageBasePath.resolve(key).normalize();
             if (!filePath.startsWith(this.storageBasePath)) {
+                log.warn("Attempt to delete file outside base directory blocked: {}", key);
                 return false;
             }
             return Files.deleteIfExists(filePath);
@@ -120,6 +171,16 @@ public class LocalFileStorageService implements IFileStorageService {
         }
     }
 
+    /**
+     * Constructs a URL that points to the application's own {@code FileController}.
+     * This follows the "backend as a file proxy" pattern, ensuring that all file access
+     * goes through the application's security and logic layer, rather than exposing direct
+     * filesystem links.
+     *
+     * @param key The key (relative path) of the file.
+     * @return A {@link URL} pointing to the API endpoint for serving the file (e.g., "http://host/api/v1/files/cars/uuid.jpg").
+     * @throws RuntimeException if the URL cannot be constructed.
+     */
     @Override
     public URL getUrl(String key) {
         try {
@@ -133,6 +194,12 @@ public class LocalFileStorageService implements IFileStorageService {
         }
     }
 
+    /**
+     * Calculates statistics for the local storage directory, including total file count and size
+     * across a predefined set of subdirectories.
+     *
+     * @return A {@link Map} containing 'totalFileCount' and 'totalSizeFormatted'.
+     */
     public Map<String, Object> getStats() {
         Map<String, Object> stats = new HashMap<>();
         long totalFileCount = 0;
@@ -162,6 +229,11 @@ public class LocalFileStorageService implements IFileStorageService {
         return stats;
     }
 
+    /**
+     * Calculates the total storage usage for a predefined set of subdirectories.
+     *
+     * @return A {@link Map} where keys are folder names and values are their total size in bytes.
+     */
     public Map<String, Long> getUsagePerFolder() {
         Map<String, Long> usageMap = new HashMap<>();
         List<String> foldersToScan = List.of("cars", "selfies", "docs");
@@ -186,11 +258,16 @@ public class LocalFileStorageService implements IFileStorageService {
         return usageMap;
     }
 
+    /**
+     * Formats a size in bytes into a human-readable string (e.g., "1.5 MB").
+     *
+     * @param size The size in bytes.
+     * @return A formatted string representation of the size.
+     */
     private String formatSize(long size) {
         if (size <= 0) return "0 B";
         final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
-
 }

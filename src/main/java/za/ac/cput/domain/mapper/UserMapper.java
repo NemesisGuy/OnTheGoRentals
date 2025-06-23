@@ -16,35 +16,30 @@ import java.util.stream.Collectors;
 /**
  * UserMapper.java
  * A stateless utility class for mapping between User domain entities and their DTOs.
- * The `toDto` methods require an IFileStorageService instance to correctly resolve image URLs.
- * <p>
- * Author: Peter Buckingham (220165289)
- * Updated: 2025-06-13
+ *
+ * @author Peter Buckingham (220165289)
+ * @version 2.1
  */
 public class UserMapper {
 
     /**
      * Converts a User entity to a UserResponseDTO.
-     * This method requires an IFileStorageService instance to generate the profile image URL.
+     * This method requires the public API URL to correctly resolve image URLs.
      *
      * @param user               The User entity to convert.
-     * @param fileStorageService The service instance to use for URL generation. Can be null if URL generation is not needed.
+     * @param fileStorageService The storage service (can be null if not needed).
+     * @param publicApiUrl       The base public URL of the API.
      * @return A UserResponseDTO.
      */
-    public static UserResponseDTO toDto(User user, IFileStorageService fileStorageService) {
+    public static UserResponseDTO toDto(User user, IFileStorageService fileStorageService, String publicApiUrl) {
         if (user == null) {
             return null;
         }
 
         String profileImageUrl = null;
-        // The service is passed, so we can use it here.
-        // We also check if the service is null, allowing this method to be used in contexts
-        // where URL generation is not necessary.
-        if (fileStorageService != null && user.getProfileImageFileName() != null && !user.getProfileImageFileName().isBlank()) {
-            // Construct the key (e.g., "selfies/some-image.jpg")
+        if (publicApiUrl != null && user.getProfileImageFileName() != null && !user.getProfileImageFileName().isBlank()) {
             String key = user.getProfileImageType() + "/" + user.getProfileImageFileName();
-            // Use the provided storage service to get the correct URL (local or MinIO pre-signed)
-            profileImageUrl = fileStorageService.getUrl(key).toString();
+            profileImageUrl = publicApiUrl + "/api/v1/files/" + key;
         }
 
         return UserResponseDTO.builder()
@@ -54,10 +49,9 @@ public class UserMapper {
                 .email(user.getEmail())
                 .profileImageUrl(profileImageUrl)
                 .roles(user.getRoles() != null ?
-                        user.getRoles().stream()
-                                .map(role -> role.getRoleName()) // Convert enum to String
-                                .collect(Collectors.toList()) :    // Collect to a List<String>
-                        Collections.emptyList())                   // Use emptyList() for the else case
+                        // THE FIX IS HERE: Correctly get the string name of the enum
+                        user.getRoles().stream().map(role -> role.getRoleName()).collect(Collectors.toList()) :
+                        Collections.emptyList())
                 .build();
     }
 
@@ -65,24 +59,21 @@ public class UserMapper {
      * Converts a list of User entities to a list of UserResponseDTOs.
      *
      * @param users              The list of User entities.
-     * @param fileStorageService The service instance to use for URL generation for each user.
+     * @param fileStorageService The storage service.
+     * @param publicApiUrl       The base public URL of the API.
      * @return A list of UserResponseDTOs.
      */
-    public static List<UserResponseDTO> toDtoList(List<User> users, IFileStorageService fileStorageService) {
+    public static List<UserResponseDTO> toDtoList(List<User> users, IFileStorageService fileStorageService, String publicApiUrl) {
         if (users == null) {
             return Collections.emptyList();
         }
         return users.stream()
-                .map(user -> toDto(user, fileStorageService)) // Pass the service for each conversion
+                .map(user -> toDto(user, fileStorageService, publicApiUrl))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Converts a UserCreateDTO to a new User entity, ready for persistence.
-     * This method does not require external services.
-     *
-     * @param createDto The DTO for creating a user.
-     * @return A new User entity.
+     * Converts a UserCreateDTO to a new User entity.
      */
     public static User toEntity(UserCreateDTO createDto) {
         if (createDto == null) return null;
@@ -96,54 +87,34 @@ public class UserMapper {
 
     /**
      * Applies updates from a UserUpdateDTO to a new, "sparse" User object.
-     * This method creates a payload containing ONLY the fields that were provided in the DTO.
-     *
-     * @param updateDto    The DTO containing the update data.
-     * @param existingUser The existing User entity (unused in this implementation but good practice for context).
-     * @return A new User instance containing only the fields to be updated.
      */
     public static User applyUpdateDtoToEntity(UserUpdateDTO updateDto, User existingUser) {
         if (updateDto == null) {
             throw new IllegalArgumentException("Update DTO must not be null.");
         }
-
-        // Create a new, empty User object to act as a "sparse" payload.
         User updatePayload = new User();
-
-        // Only set fields on the payload if they exist in the DTO.
-        if (updateDto.getFirstName() != null) {
-            updatePayload.setFirstName(updateDto.getFirstName());
-        }
-        if (updateDto.getLastName() != null) {
-            updatePayload.setLastName(updateDto.getLastName());
-        }
-        if (updateDto.getEmail() != null) {
-            updatePayload.setEmail(updateDto.getEmail());
-        }
+        if (updateDto.getFirstName() != null) updatePayload.setFirstName(updateDto.getFirstName());
+        if (updateDto.getLastName() != null) updatePayload.setLastName(updateDto.getLastName());
+        if (updateDto.getEmail() != null) updatePayload.setEmail(updateDto.getEmail());
         if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
             updatePayload.setPassword(updateDto.getPassword());
         }
-        if (updateDto.getDeleted() != null) {
-            updatePayload.setDeleted(updateDto.getDeleted());
-        }
+        if (updateDto.getDeleted() != null) updatePayload.setDeleted(updateDto.getDeleted());
         if (updateDto.getRoleNames() != null) {
             List<Role> pseudoRoles = updateDto.getRoleNames().stream()
                     .map(roleNameString -> {
                         try {
-                            // Convert the string from the DTO into a RoleName enum.
                             RoleName roleEnum = RoleName.valueOf(roleNameString.trim().toUpperCase());
                             Role tempRole = new Role();
-                            tempRole.setRoleName(roleEnum); // Assume setter is setName() for the RoleName field
+                            tempRole.setRoleName(roleEnum);
                             return tempRole;
                         } catch (IllegalArgumentException e) {
-                            // If the string is not a valid enum constant, throw a clear error.
                             throw new BadRequestException("Invalid role name provided: '" + roleNameString + "'");
                         }
                     })
                     .collect(Collectors.toList());
             updatePayload.setRoles(pseudoRoles);
         }
-
         return updatePayload;
     }
 }

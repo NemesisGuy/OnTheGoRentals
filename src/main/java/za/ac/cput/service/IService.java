@@ -1,5 +1,7 @@
 package za.ac.cput.service;
 
+import java.util.List;
+
 /**
  * IService.java
  * A generic interface defining common CRUD (Create, Read, Update, Delete) operations.
@@ -49,4 +51,10 @@ public interface IService<T, ID> {
      * (e.g., if the entity was not found).
      */
     boolean delete(ID id);
+    /**
+     * Retrieves all entities.
+     *
+     * @return A list of all entities managed by the service.
+     */
+    List<T> getAll();
 }

@@ -12,34 +12,35 @@ import java.util.stream.Collectors;
 
 /**
  * CarMapper.java
- * A utility class for mapping between Car domain entities and DTOs.
- * This version is updated to handle a one-to-many relationship with CarImage entities,
- * building a list of full image URLs for the response.
- * <p>
- * Author: Peter Buckingham (220165289)
- * Updated: 2024-06-07
+ * A stateless utility class for mapping between Car domain entities and DTOs.
+ * The `toDto` methods require the public API URL to correctly resolve image URLs.
+ *
+ * @author Peter Buckingham (220165289)
+ * @version 3.0
  */
 public class CarMapper {
 
     /**
-     * Converts a Car entity to a CarResponseDTO, including generating URLs for its images.
+     * Converts a Car entity to a CarResponseDTO, including generating fully qualified URLs for its images.
      *
      * @param car                The Car entity to convert.
-     * @param fileStorageService The service for generating image URLs.
+     * @param fileStorageService The service for file operations (can be null if not needed).
+     * @param publicApiUrl       The base public URL of the API (e.g., "https://otgrapi.nemesisnet.co.za").
      * @return A CarResponseDTO.
      */
-    public static CarResponseDTO toDto(Car car, IFileStorageService fileStorageService) {
+    public static CarResponseDTO toDto(Car car, IFileStorageService fileStorageService, String publicApiUrl) {
         if (car == null) {
             return null;
         }
 
         List<String> imageUrls = Collections.emptyList();
-        // The service must be provided to generate image URLs.
-        if (fileStorageService != null && car.getImages() != null && !car.getImages().isEmpty()) {
+        // The publicApiUrl must be provided to generate image URLs.
+        if (publicApiUrl != null && !publicApiUrl.isBlank() && car.getImages() != null && !car.getImages().isEmpty()) {
             imageUrls = car.getImages().stream()
                     .map(image -> {
                         String key = image.getImageType() + "/" + image.getFileName();
-                        return fileStorageService.getUrl(key).toString();
+                        // THE FIX: Construct a URL to our own API proxy, not MinIO directly.
+                        return publicApiUrl + "/api/v1/files/" + key;
                     })
                     .collect(Collectors.toList());
         }
@@ -62,29 +63,24 @@ public class CarMapper {
      * Converts a list of Car entities to a list of CarResponseDTOs.
      *
      * @param cars               The list of Car entities.
-     * @param fileStorageService The service for generating image URLs for each car.
+     * @param fileStorageService The service for file operations.
+     * @param publicApiUrl       The base public URL of the API.
      * @return A list of CarResponseDTOs.
      */
-    public static List<CarResponseDTO> toDtoList(List<Car> cars, IFileStorageService fileStorageService) {
+    public static List<CarResponseDTO> toDtoList(List<Car> cars, IFileStorageService fileStorageService, String publicApiUrl) {
         if (cars == null) {
             return Collections.emptyList();
         }
         return cars.stream()
-                .map(car -> toDto(car, fileStorageService))
+                .map(car -> toDto(car, fileStorageService, publicApiUrl))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Converts a {@link CarCreateDTO} to a {@link Car} entity.
-     *
-     * @param createDto The DTO with creation data.
-     * @return The resulting {@link Car} entity.
+     * Converts a CarCreateDTO to a new Car entity.
      */
     public static Car toEntity(CarCreateDTO createDto) {
-        if (createDto == null) {
-            return null;
-        }
-        // The builder now uses the class-level @Builder annotation from Car
+        if (createDto == null) return null;
         return new Car.Builder()
                 .setMake(createDto.getMake())
                 .setModel(createDto.getModel())
@@ -94,27 +90,17 @@ public class CarMapper {
                 .setLicensePlate(createDto.getLicensePlate())
                 .setVin(createDto.getVin())
                 .setAvailable(createDto.getAvailable() != null ? createDto.getAvailable() : true)
-                .setDeleted(false)
                 .build();
     }
 
     /**
-     * Applies updates from a {@link CarUpdateDTO} to an existing {@link Car} entity.
-     * This method uses the Car's own builder pattern with the 'applyTo' method.
-     *
-     * @param updateDto   The DTO containing the update data.
-     * @param existingCar The existing {@link Car} entity to be updated.
-     * @return The same existingCar instance, now modified with the new state.
+     * Applies updates from a CarUpdateDTO to an existing Car entity.
      */
     public static Car applyUpdateDtoToEntity(CarUpdateDTO updateDto, Car existingCar) {
         if (updateDto == null || existingCar == null) {
             throw new IllegalArgumentException("Update DTO and existing Car entity must not be null.");
         }
-
-        // Create a builder initialized with the existing car's state
         Car.Builder builder = new Car.Builder().copy(existingCar);
-
-        // Apply updates from the DTO to the builder
         if (updateDto.getMake() != null) builder.setMake(updateDto.getMake());
         if (updateDto.getModel() != null) builder.setModel(updateDto.getModel());
         if (updateDto.getYear() != null) builder.setYear(updateDto.getYear());
@@ -123,8 +109,6 @@ public class CarMapper {
         if (updateDto.getLicensePlate() != null) builder.setLicensePlate(updateDto.getLicensePlate());
         if (updateDto.getAvailable() != null) builder.setAvailable(updateDto.getAvailable());
         if (updateDto.getVin() != null) builder.setVin(updateDto.getVin());
-
-        // Apply the builder's state back to the managed entity
         return builder.applyTo(existingCar);
     }
 }

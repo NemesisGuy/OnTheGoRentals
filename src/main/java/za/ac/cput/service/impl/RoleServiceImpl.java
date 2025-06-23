@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * RoleServiceImpl.java
  * Implementation of the {@link IRoleService} interface.
  * Provides services for finding roles and resolving role names to {@link Role} entities.
- * Assumes IRoleRepository.findByRoleName(RoleName) returns a Role object or null.
+ * This service acts as a bridge between string-based role representations (e.g., from DTOs)
+ * and the persisted {@code Role} entities used within the application's security context.
  * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-28
@@ -33,12 +33,25 @@ public class RoleServiceImpl implements IRoleService {
     private static final Logger log = LoggerFactory.getLogger(RoleServiceImpl.class);
     private final IRoleRepository roleRepository;
 
+    /**
+     * Constructs the RoleServiceImpl with the required repository dependency.
+     *
+     * @param roleRepository The repository for accessing {@link Role} data, injected by Spring.
+     */
     @Autowired
     public RoleServiceImpl(IRoleRepository roleRepository) {
         this.roleRepository = roleRepository;
         log.info("RoleServiceImpl initialized.");
     }
 
+    /**
+     * Finds a single {@link Role} entity by its corresponding {@link RoleName} enum.
+     *
+     * @param roleNameEnum The enum constant representing the desired role (e.g., RoleName.USER).
+     * @return The persisted {@link Role} entity.
+     * @throws IllegalArgumentException if the provided {@code roleNameEnum} is null.
+     * @throws ResourceNotFoundException if no role with the given name exists in the database.
+     */
     @Override
     public Role findByRoleName(RoleName roleNameEnum) {
         log.debug("Attempting to find role by RoleName enum: {}", roleNameEnum);
@@ -47,7 +60,6 @@ public class RoleServiceImpl implements IRoleService {
             throw new IllegalArgumentException("Role name enum cannot be null.");
         }
 
-        // Directly use the RoleName enum with the repository method
         Role role = roleRepository.findByRoleName(roleNameEnum);
 
         if (role == null) {
@@ -58,6 +70,15 @@ public class RoleServiceImpl implements IRoleService {
         return role;
     }
 
+    /**
+     * Resolves a list of role name strings into a list of managed {@link Role} entities.
+     * This method is marked as read-only for performance optimization. It safely handles invalid
+     * or non-existent role names by logging a warning and skipping them.
+     *
+     * @param roleNameStrings A list of strings representing the role names to resolve (e.g., ["USER", "ADMIN"]).
+     * @return A {@link List} of the corresponding persisted {@link Role} entities. Returns an empty list
+     *         if the input is null, empty, or contains no valid/existing role names.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Role> resolveRoles(List<String> roleNameStrings) {
@@ -75,9 +96,8 @@ public class RoleServiceImpl implements IRoleService {
             }
             try {
                 String processedRoleNameStr = roleNameStr.trim().toUpperCase();
-                RoleName roleEnum = RoleName.valueOf(processedRoleNameStr); // Convert String to RoleName enum
+                RoleName roleEnum = RoleName.valueOf(processedRoleNameStr);
 
-                // Find in DB by the RoleName enum; expects Role or null
                 Role role = roleRepository.findByRoleName(roleEnum);
 
                 if (role == null) {
@@ -100,6 +120,14 @@ public class RoleServiceImpl implements IRoleService {
         return resolvedRoles;
     }
 
+    /**
+     * Converts a list of {@link Role} entities back into a list of their string names.
+     * This is the inverse operation of {@link #resolveRoles(List)}.
+     *
+     * @param roles A list of {@link Role} entities.
+     * @return A {@link List} of string representations of the role names. Returns an empty list
+     *         if the input is null or empty.
+     */
     @Override
     public List<String> getRoleNames(List<Role> roles) {
         if (roles == null || roles.isEmpty()) {
@@ -107,7 +135,7 @@ public class RoleServiceImpl implements IRoleService {
             return Collections.emptyList();
         }
         List<String> roleNameStrings = roles.stream()
-                .map(Role::getRoleName) // Assuming Role.getRoleName() returns String
+                .map(Role::getRoleName)   // This correctly returns the RoleName enum instance
                 .collect(Collectors.toList());
         log.debug("Extracted role names from Role entities: {}", roleNameStrings);
         return roleNameStrings;

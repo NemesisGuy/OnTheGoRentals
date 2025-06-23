@@ -13,8 +13,8 @@ import java.util.List;
  * It includes fields for the actual data payload, a list of errors (if any),
  * and a status indicator ("success" or "fail").
  * <p>
- * Author: Peter Buckingham (220165289) // Assuming based on context
- * Date: [Date of creation - e.g., 2025-05-28]
+ * Author: Peter Buckingham (220165289)
+ * Date: 2025-05-18
  * Updated by: Peter Buckingham
  * Updated: 2025-05-28
  */

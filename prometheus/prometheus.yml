@@ -1,0 +1,13 @@
+# Global configuration for Prometheus
+global:
+  scrape_interval: 15s # How frequently to scrape targets
+  evaluation_interval: 15s # How frequently to evaluate rules
+
+# A list of scrape configurations
+scrape_configs:
+  - job_name: 'on-the-go-rentals-backend'
+    # The metrics endpoint that Spring Boot Actuator provides
+    metrics_path: '/actuator/prometheus'
+    # The list of targets to scrape. We use the Docker Compose service name and internal port.
+    static_configs:
+      - targets: ['backend:8080']

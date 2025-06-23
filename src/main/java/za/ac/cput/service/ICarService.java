@@ -1,5 +1,6 @@
 package za.ac.cput.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.enums.PriceGroup;
@@ -74,16 +75,17 @@ public interface ICarService extends IService<Car, Integer> {
      * @return A list of all non-deleted {@link Car} entities. Can be empty.
      */
     List<Car> getAll();
+/*
 
-    /**
+    */
+/**
      * Retrieves a list of all cars currently marked as available for rental.
      * This typically means cars that are not soft-deleted and have their 'available' flag set to true.
      *
      * @return A list of available {@link Car} entities. Can be empty.
-     * @deprecated Prefer {@link #findAllAvailableAndNonDeleted()} for clarity.
+     * @deprecated Prefer {@link # findAllAvailableAndNonDeleted()} for clarity.
      */
-    @Deprecated
-    List<Car> getAllAvailableCars();
+
 
     /**
      * Retrieves a car by its UUID.
@@ -94,19 +96,15 @@ public interface ICarService extends IService<Car, Integer> {
     Car read(UUID uuid);
 
     /**
-     * Retrieves a list of non-deleted cars belonging to a specific price group.
+     * Retrieves a list of all available (and non-deleted) cars.
+     * This method is used to fetch cars that are currently available for rental.
      *
-     * @param priceGroup The {@link PriceGroup} to filter by.
-     * @return A list of {@link Car} entities matching the price group. Can be empty.
+     * @return A list of available {@link Car} entities. Can be empty.
      */
-    List<Car> getCarsByPriceGroup(PriceGroup priceGroup);
+    @Transactional(readOnly = true)
+    List<Car> getAllAvailableCars();
 
-    /**
-     * Retrieves a list of all cars that are not soft-deleted and are currently marked as available.
-     *
-     * @return A list of available and non-deleted {@link Car} entities. Can be empty.
-     */
-    List<Car> findAllAvailableAndNonDeleted();
+
 
     /**
      * Retrieves a list of available (and non-deleted) cars belonging to a specific price group.
@@ -124,24 +122,7 @@ public interface ICarService extends IService<Car, Integer> {
      */
     List<Car> findAllAvailableByCategory(String category);
 
-    /**
-     * Retrieves a list of available (and non-deleted) cars belonging to a specific price group.
-     * This seems to be a duplicate of {@link #getAvailableCarsByPrice(PriceGroup)}.
-     *
-     * @param priceGroup The {@link PriceGroup} to filter by.
-     * @return A list of available {@link Car} entities matching the price group. Can be empty.
-     * @deprecated Prefer {@link #getAvailableCarsByPrice(PriceGroup)} if functionality is identical.
-     */
-    @Deprecated
-    List<Car> findAllAvailableByPriceGroup(PriceGroup priceGroup);
 
-    /**
-     * Retrieves a list of all available cars in the system.
-     * This method is typically used to show cars that are currently not rented out.
-     *
-     * @return A list of all available {@link Car} entities. Can be empty.
-     */
-    List<Car> getAvailableCars();
 
     /**
      * Adds images to a car identified by its UUID.

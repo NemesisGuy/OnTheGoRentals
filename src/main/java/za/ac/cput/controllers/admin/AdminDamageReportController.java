@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,8 @@ import java.util.UUID;
  *
  * @author Cwenga Dlova (214310671)
  * @version 2.0
+ * @Updated by: Peter Buckingham (220165289)
+ *
  */
 @RestController
 @RequestMapping("/api/v1/admin/damage-reports")
@@ -44,6 +47,7 @@ public class AdminDamageReportController {
     private final IDamageReportService damageReportService;
     private final IRentalService rentalService;
     private final IFileStorageService fileStorageService;
+    private final String publicApiUrl;
 
     /**
      * Constructs an AdminDamageReportController with necessary service dependencies.
@@ -53,10 +57,12 @@ public class AdminDamageReportController {
      * @param fileStorageService  The service for generating image URLs for nested DTOs.
      */
     @Autowired
-    public AdminDamageReportController(IDamageReportService damageReportService, IRentalService rentalService, IFileStorageService fileStorageService) {
+    public AdminDamageReportController(IDamageReportService damageReportService, IRentalService rentalService, IFileStorageService fileStorageService,
+                                       @Value("${app.public-api-url}") String publicApiUrl) {
         this.damageReportService = damageReportService;
         this.rentalService = rentalService;
         this.fileStorageService = fileStorageService;
+        this.publicApiUrl = publicApiUrl; // Initialize the public API URL
         log.info("AdminDamageReportController initialized.");
     }
 
@@ -81,7 +87,7 @@ public class AdminDamageReportController {
         DamageReport createdReport = damageReportService.create(reportToCreate);
 
         log.info("Successfully created damage report with UUID: {}", createdReport.getUuid());
-        return new ResponseEntity<>(DamageReportMapper.toDto(createdReport, fileStorageService), HttpStatus.CREATED);
+        return new ResponseEntity<>(DamageReportMapper.toDto(createdReport, fileStorageService, publicApiUrl), HttpStatus.CREATED);
     }
 
     /**
@@ -101,7 +107,7 @@ public class AdminDamageReportController {
         if (reportList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(DamageReportMapper.toDtoList(reportList, fileStorageService));
+        return ResponseEntity.ok(DamageReportMapper.toDtoList(reportList, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -120,7 +126,7 @@ public class AdminDamageReportController {
             @Parameter(description = "UUID of the damage report to retrieve.", required = true) @PathVariable UUID reportUuid) {
         log.info("Admin request to get damage report by UUID: {}", reportUuid);
         DamageReport reportEntity = damageReportService.read(reportUuid);
-        return ResponseEntity.ok(DamageReportMapper.toDto(reportEntity, fileStorageService));
+        return ResponseEntity.ok(DamageReportMapper.toDto(reportEntity, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -145,7 +151,7 @@ public class AdminDamageReportController {
         DamageReport reportWithUpdates = DamageReportMapper.applyUpdateDtoToEntity(updateDto, existingReport);
         DamageReport persistedReport = damageReportService.update(reportWithUpdates);
         log.info("Successfully updated damage report with UUID: {}", persistedReport.getUuid());
-        return ResponseEntity.ok(DamageReportMapper.toDto(persistedReport, fileStorageService));
+        return ResponseEntity.ok(DamageReportMapper.toDto(persistedReport, fileStorageService, publicApiUrl));
     }
 
     /**

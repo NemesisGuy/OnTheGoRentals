@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +49,8 @@ public class AdminBookingController {
     private final ICarService carService;
     private final IDriverService driverService;
     private final IFileStorageService fileStorageService;
+    private final String publicApiUrl; // <-- Add this field
+
 
     /**
      * Constructs an AdminBookingController with necessary service dependencies.
@@ -60,12 +63,15 @@ public class AdminBookingController {
      */
     @Autowired
     public AdminBookingController(IBookingService bookingService, IUserService userService,
-                                  ICarService carService, IDriverService driverService, IFileStorageService fileStorageService) {
+                                  ICarService carService, IDriverService driverService, IFileStorageService fileStorageService,
+                                  @Value("${app.public-api-url}") String publicApiUrl
+    ) {
         this.bookingService = bookingService;
         this.userService = userService;
         this.carService = carService;
         this.driverService = driverService;
         this.fileStorageService = fileStorageService;
+        this.publicApiUrl = publicApiUrl; // Initialize the public API URL
         log.info("AdminBookingController initialized.");
     }
 
@@ -86,7 +92,7 @@ public class AdminBookingController {
         if (bookings.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(BookingMapper.toDtoList(bookings, fileStorageService));
+        return ResponseEntity.ok(BookingMapper.toDtoList(bookings, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -113,7 +119,7 @@ public class AdminBookingController {
 
         Booking bookingToCreate = BookingMapper.toEntity(createDto, userEntity, carEntity, driverEntity);
         Booking createdEntity = bookingService.create(bookingToCreate);
-        return new ResponseEntity<>(BookingMapper.toDto(createdEntity, fileStorageService), HttpStatus.CREATED);
+        return new ResponseEntity<>(BookingMapper.toDto(createdEntity, fileStorageService, publicApiUrl), HttpStatus.CREATED);
     }
 
     /**
@@ -132,7 +138,7 @@ public class AdminBookingController {
             @Parameter(description = "UUID of the booking to retrieve", required = true) @PathVariable UUID bookingUuid) {
         log.info("Admin request to get booking by UUID: {}", bookingUuid);
         Booking bookingEntity = bookingService.read(bookingUuid);
-        return ResponseEntity.ok(BookingMapper.toDto(bookingEntity, fileStorageService));
+        return ResponseEntity.ok(BookingMapper.toDto(bookingEntity, fileStorageService , publicApiUrl));
     }
 
     /**
@@ -187,7 +193,7 @@ public class AdminBookingController {
         log.info("Admin [{}]: Successfully updated booking with UUID: {}", requesterId, persistedBooking.getUuid());
 
         // 5. Map the final entity back to a DTO for the response.
-        return ResponseEntity.ok(BookingMapper.toDto(persistedBooking, fileStorageService));
+        return ResponseEntity.ok(BookingMapper.toDto(persistedBooking, fileStorageService , publicApiUrl));
     }
 
     /**
@@ -228,6 +234,6 @@ public class AdminBookingController {
         if (bookings.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(BookingMapper.toDtoList(bookings, fileStorageService));
+        return ResponseEntity.ok(BookingMapper.toDtoList(bookings, fileStorageService , publicApiUrl));
     }
 }

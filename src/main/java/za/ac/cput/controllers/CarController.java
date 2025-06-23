@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +44,8 @@ public class CarController {
     private static final Logger log = LoggerFactory.getLogger(CarController.class);
     private final ICarService carService;
     private final IFileStorageService fileStorageService;
+    private final String publicApiUrl; // <-- Add this field
+
 
     /**
      * Constructs the CarController with the necessary services.
@@ -51,9 +54,13 @@ public class CarController {
      * @param fileStorageService The service for generating image URLs.
      */
     @Autowired
-    public CarController(ICarService carService, IFileStorageService fileStorageService) {
+    public CarController(ICarService carService,
+                         IFileStorageService fileStorageService,
+                         @Value("${app.public-api-url}") String publicApiUrl // <-- Inject the property
+    ) {
         this.carService = carService;
         this.fileStorageService = fileStorageService;
+        this.publicApiUrl = publicApiUrl;
         log.info("CarController initialized.");
     }
 
@@ -75,7 +82,7 @@ public class CarController {
         if (cars.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(CarMapper.toDtoList(cars, fileStorageService));
+        return ResponseEntity.ok(CarMapper.toDtoList(cars, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -93,11 +100,11 @@ public class CarController {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get all available cars.", requesterId);
 
-        List<Car> availableCars = carService.findAllAvailableAndNonDeleted();
+        List<Car> availableCars = carService.getAllAvailableCars();
         if (availableCars.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(CarMapper.toDtoList(availableCars, fileStorageService));
+        return ResponseEntity.ok(CarMapper.toDtoList(availableCars, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -123,7 +130,7 @@ public class CarController {
         if (cars.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(CarMapper.toDtoList(cars, fileStorageService));
+        return ResponseEntity.ok(CarMapper.toDtoList(cars, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -144,7 +151,7 @@ public class CarController {
         log.info("Requester [{}]: Request to get car by UUID: {}", requesterId, carUuid);
 
         Car car = carService.read(carUuid); // Throws ResourceNotFoundException if not found
-        return ResponseEntity.ok(CarMapper.toDto(car, fileStorageService));
+        return ResponseEntity.ok(CarMapper.toDto(car, fileStorageService, publicApiUrl));
     }
 
     /**

@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +47,7 @@ public class AdminRentalController {
     private final ICarService carService;
     private final IDriverService driverService;
     private final IFileStorageService fileStorageService;
+    private final String publicApiUrl;
 
     /**
      * Constructs an AdminRentalController with necessary service dependencies.
@@ -58,12 +60,14 @@ public class AdminRentalController {
      */
     @Autowired
     public AdminRentalController(IRentalService rentalService, IUserService userService,
-                                 ICarService carService, IDriverService driverService, IFileStorageService fileStorageService) {
+                                 ICarService carService, IDriverService driverService, IFileStorageService fileStorageService,
+                                 @Value("${app.public-api-url}") String publicApiUrl) {
         this.rentalService = rentalService;
         this.userService = userService;
         this.carService = carService;
         this.driverService = driverService;
         this.fileStorageService = fileStorageService;
+        this.publicApiUrl = publicApiUrl;
         log.info("AdminRentalController initialized.");
     }
 
@@ -89,7 +93,7 @@ public class AdminRentalController {
 
         Rental rentalToCreate = RentalMapper.toEntity(createDto, userEntity, carEntity, driverEntity);
         Rental createdEntity = rentalService.create(rentalToCreate);
-        return new ResponseEntity<>(RentalMapper.toDto(createdEntity, fileStorageService), HttpStatus.CREATED);
+        return new ResponseEntity<>(RentalMapper.toDto(createdEntity, fileStorageService , publicApiUrl), HttpStatus.CREATED);
     }
 
     /**
@@ -110,7 +114,7 @@ public class AdminRentalController {
         if (rentals.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(RentalMapper.toDtoList(rentals, fileStorageService));
+        return ResponseEntity.ok(RentalMapper.toDtoList(rentals, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -128,7 +132,7 @@ public class AdminRentalController {
         if (activeRentals.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(RentalMapper.toDtoList(activeRentals, fileStorageService));
+        return ResponseEntity.ok(RentalMapper.toDtoList(activeRentals, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -146,7 +150,7 @@ public class AdminRentalController {
         if (rentals.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(RentalMapper.toDtoList(rentals, fileStorageService));
+        return ResponseEntity.ok(RentalMapper.toDtoList(rentals, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -164,7 +168,7 @@ public class AdminRentalController {
         if (rentals.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(RentalMapper.toDtoList(rentals, fileStorageService));
+        return ResponseEntity.ok(RentalMapper.toDtoList(rentals, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -180,7 +184,7 @@ public class AdminRentalController {
         String adminId = SecurityUtils.getRequesterIdentifier();
         log.info("Admin [{}]: Request to get rental by UUID: {}", adminId, rentalUuid);
         Rental rentalEntity = rentalService.read(rentalUuid);
-        return ResponseEntity.ok(RentalMapper.toDto(rentalEntity, fileStorageService));
+        return ResponseEntity.ok(RentalMapper.toDto(rentalEntity, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -209,7 +213,7 @@ public class AdminRentalController {
         Rental rentalWithUpdates = RentalMapper.applyUpdateDtoToEntity(updateDto, existingRental, userEntity, carEntity, driverEntity);
         Rental persistedRental = rentalService.update(rentalWithUpdates);
 
-        return ResponseEntity.ok(RentalMapper.toDto(persistedRental, fileStorageService));
+        return ResponseEntity.ok(RentalMapper.toDto(persistedRental, fileStorageService, publicApiUrl   ));
     }
 
     /**

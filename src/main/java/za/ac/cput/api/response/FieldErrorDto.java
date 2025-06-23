@@ -9,8 +9,8 @@ import lombok.Setter;
  * A Data Transfer Object representing a specific field error, typically used
  * in API error responses to detail validation failures or other contextual errors.
  * <p>
- * Author: Peter Buckingham (220165289) // Assuming based on context
- * Date: [Date of creation - e.g., 2025-05-28]
+ * Author: Peter Buckingham (220165289)
+ * Date: 2025-05-08
  * Updated by: Peter Buckingham
  * Updated: 2025-05-28
  */

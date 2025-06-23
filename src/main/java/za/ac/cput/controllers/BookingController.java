@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +59,7 @@ public class BookingController {
     private final ICarService carService;
     private final IUserService userService;
     private final IFileStorageService fileStorageService;
+    private final String publicApiUrl;
 
     /**
      * Constructs a BookingController with necessary service dependencies.
@@ -68,11 +70,13 @@ public class BookingController {
      * @param fileStorageService The service for generating file URLs.
      */
     @Autowired
-    public BookingController(IBookingService bookingService, ICarService carService, IUserService userService, IFileStorageService fileStorageService) {
+    public BookingController(IBookingService bookingService, ICarService carService, IUserService userService, IFileStorageService fileStorageService,
+                             @Value("${app.public-api-url}") String publicApiUrl) {
         this.bookingService = bookingService;
         this.carService = carService;
         this.userService = userService;
         this.fileStorageService = fileStorageService;
+        this.publicApiUrl = publicApiUrl; // Initialize the public API URL
         log.info("BookingController initialized.");
     }
 
@@ -103,11 +107,11 @@ public class BookingController {
             throw new CarNotAvailableException("Car with UUID: " + carToBook.getUuid() + " is not available for booking.");
         }
 
-        Booking bookingToCreate = BookingMapper.toEntity(bookingRequestDTO, currentUser, carToBook);
+        Booking bookingToCreate = BookingMapper.toEntity(bookingRequestDTO, currentUser, carToBook,null);
         Booking createdBookingEntity = bookingService.create(bookingToCreate);
 
         log.info("Requester [{}]: Successfully created booking with UUID: {}", requesterId, createdBookingEntity.getUuid());
-        return ResponseEntity.status(HttpStatus.CREATED).body(BookingMapper.toDto(createdBookingEntity, fileStorageService));
+        return ResponseEntity.status(HttpStatus.CREATED).body(BookingMapper.toDto(createdBookingEntity, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -136,7 +140,7 @@ public class BookingController {
         }
 
         log.info("Requester [{}]: Successfully retrieved booking UUID: {}", requesterId, bookingEntity.getUuid());
-        return ResponseEntity.ok(BookingMapper.toDto(bookingEntity, fileStorageService));
+        return ResponseEntity.ok(BookingMapper.toDto(bookingEntity, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -159,7 +163,7 @@ public class BookingController {
         if (bookings.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(BookingMapper.toDtoList(bookings, fileStorageService));
+        return ResponseEntity.ok(BookingMapper.toDtoList(bookings, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -196,7 +200,7 @@ public class BookingController {
         Booking updatedBookingEntity = bookingService.update(bookingWithUpdates);
 
         log.info("Requester [{}]: Successfully updated booking UUID: {}", requesterId, updatedBookingEntity.getUuid());
-        return ResponseEntity.ok(BookingMapper.toDto(updatedBookingEntity, fileStorageService));
+        return ResponseEntity.ok(BookingMapper.toDto(updatedBookingEntity, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -224,14 +228,14 @@ public class BookingController {
 
         Booking confirmedBookingEntity = bookingService.confirmBooking(bookingToConfirm.getId());
         log.info("Requester [{}]: Successfully confirmed booking UUID: {}", requesterId, confirmedBookingEntity.getUuid());
-        return ResponseEntity.ok(BookingMapper.toDto(confirmedBookingEntity, fileStorageService));
+        return ResponseEntity.ok(BookingMapper.toDto(confirmedBookingEntity, fileStorageService, publicApiUrl));
     }
 
     /**
      * Cancels a booking for the authenticated user.
      *
      * @param bookingUuid The UUID of the booking to cancel.
-     * @return A ResponseEntity containing the cancelled booking DTO.
+     * @return A ResponseEntity containing the canceled booking DTO.
      */
     @Operation(summary = "Cancel a booking", description = "Allows an authenticated user to cancel their booking.")
     @ApiResponses(value = {
@@ -252,7 +256,7 @@ public class BookingController {
 
         Booking canceledBookingEntity = bookingService.cancelBooking(bookingToCancel.getId());
         log.info("Requester [{}]: Successfully cancelled booking UUID: {}", requesterId, canceledBookingEntity.getUuid());
-        return ResponseEntity.ok(BookingMapper.toDto(canceledBookingEntity, fileStorageService));
+        return ResponseEntity.ok(BookingMapper.toDto(canceledBookingEntity, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -268,11 +272,11 @@ public class BookingController {
     @GetMapping("/available-cars")
     public ResponseEntity<List<CarResponseDTO>> getAvailableCarsForBooking() {
         log.info("Request to get available cars for booking.");
-        List<Car> cars = carService.findAllAvailableAndNonDeleted();
+        List<Car> cars = carService.getAllAvailableCars();
         if (cars.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(CarMapper.toDtoList(cars, fileStorageService));
+        return ResponseEntity.ok(CarMapper.toDtoList(cars, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -291,6 +295,6 @@ public class BookingController {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get their user profile (for booking context).", requesterId);
         User user = userService.read(requesterId);
-        return ResponseEntity.ok(UserMapper.toDto(user, fileStorageService));
+        return ResponseEntity.ok(UserMapper.toDto(user, fileStorageService, publicApiUrl));
     }
 }

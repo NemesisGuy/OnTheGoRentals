@@ -16,18 +16,16 @@ import za.ac.cput.service.ICarService;
 import za.ac.cput.service.IFileStorageService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
- * CarServiceImpl.java
  * Implementation of the {@link ICarService} interface.
- * Provides business logic for managing Car entities.
- * Entities are treated as immutable; updates are performed using a Builder pattern.
+ * Provides transactional business logic for managing Car entities and their associated images.
+ * This service layer enforces business rules, such as soft-deletes and an immutable update pattern.
  * <p>
  * Author: Peter Buckingham (220165289)
  * Updated by: Peter Buckingham
- * Updated: 2025-05-30
+ * Updated: 2025-06-22
  */
 @Service("carServiceImpl")
 @Transactional
@@ -35,220 +33,225 @@ public class CarServiceImpl implements ICarService {
 
     private static final Logger log = LoggerFactory.getLogger(CarServiceImpl.class);
     private final CarRepository carRepository;
-    private final IFileStorageService fileStorageService; // Assuming this is injected for image handling
+    private final IFileStorageService fileStorageService;
 
+    /**
+     * Constructs the CarServiceImpl with its required dependencies.
+     *
+     * @param carRepository      The repository for data access operations on Car entities.
+     * @param fileStorageService The service for handling physical file storage operations (e.g., saving images).
+     */
     @Autowired
     public CarServiceImpl(CarRepository carRepository, IFileStorageService fileStorageService) {
         this.carRepository = carRepository;
-        this.fileStorageService = fileStorageService; // Injecting the file storage service
+        this.fileStorageService = fileStorageService;
         log.info("CarServiceImpl initialized.");
     }
 
+    /**
+     * Persists a new Car entity to the database.
+     * The entity's UUID and timestamps are set automatically via {@link jakarta.persistence.PrePersist} hooks.
+     *
+     * @param car The new {@link Car} entity to create.
+     * @return The saved {@link Car} entity with its database-generated ID and UUID.
+     */
     @Override
     public Car create(Car car) {
         log.info("Attempting to create new car. Make: '{}', Model: '{}'", car.getMake(), car.getModel());
-        // Car's @PrePersist handles UUID, createdAt, updatedAt, deleted=false
         Car savedCar = carRepository.save(car);
         log.info("Successfully created car. ID: {}, UUID: {}, Make: '{}', Model: '{}'",
                 savedCar.getId(), savedCar.getUuid(), savedCar.getMake(), savedCar.getModel());
         return savedCar;
     }
 
+    /**
+     * Retrieves a non-deleted Car by its primary key (internal database ID).
+     *
+     * @param id The internal ID of the car.
+     * @return The found {@link Car}.
+     * @throws ResourceNotFoundException if no car is found with the given ID, or it has been soft-deleted.
+     */
     @Override
+    @Transactional(readOnly = true)
     public Car read(Integer id) {
         log.debug("Attempting to read car by internal ID: {}", id);
-        Optional<Car> optionalCar = carRepository.findByIdAndDeletedFalse(id);
-        if (optionalCar.isPresent()) {
-            Car car = optionalCar.get();
-            log.debug("Car found for ID: {}. UUID: '{}', Make: '{}'", id, car.getUuid(), car.getMake());
-            return car;
-        }
-        log.warn("Car not found or is deleted for ID: {}", id);
-        return null;
-    }
-
-    @Override
-    public Car read(UUID carUuid) {
-        log.debug("Attempting to read car by UUID: '{}'", carUuid);
-        Optional<Car> optionalCar = carRepository.findByUuidAndDeletedFalse(carUuid);
-        if (optionalCar.isPresent()) {
-            Car car = optionalCar.get();
-            log.debug("Car found for UUID: '{}'. ID: {}, Make: '{}'", carUuid, car.getId(), car.getMake());
-            return car;
-        }
-        log.warn("Car not found or is deleted for UUID: '{}'", carUuid);
-        return null;
+        return carRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Car not found or is deleted for ID: " + id));
     }
 
     /**
-     * {@inheritDoc}
-     * The 'carWithUpdates' parameter should be a fully formed Car entity
-     * representing the desired new state, including the correct ID and UUID of the
-     * car to be updated.
+     * Retrieves a non-deleted Car by its public-facing UUID.
+     *
+     * @param carUuid The UUID of the car.
+     * @return The found {@link Car}.
+     * @throws ResourceNotFoundException if no car is found with the given UUID, or it has been soft-deleted.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Car read(UUID carUuid) {
+        log.debug("Attempting to read car by UUID: '{}'", carUuid);
+        return carRepository.findByUuidAndDeletedFalse(carUuid)
+                .orElseThrow(() -> new ResourceNotFoundException("Car not found or is deleted for UUID: " + carUuid));
+    }
+
+    /**
+     * Updates an existing car in the database using an "immutable update" approach.
+     *
+     * @param carWithUpdates A {@link Car} object representing the desired new state. Must contain the ID of the car to update.
+     * @return The updated and persisted {@link Car} entity.
+     * @throws IllegalArgumentException  if the car ID is missing from the input object.
+     * @throws ResourceNotFoundException if no car exists with the provided ID.
      */
     @Override
     public Car update(Car carWithUpdates) {
         Integer carId = carWithUpdates.getId();
-        UUID carUuid = carWithUpdates.getUuid();
-        log.info("Attempting to update car. Provided ID: {}, Provided UUID: '{}'", carId, carUuid);
+        log.info("Attempting to update car with ID: {}", carId);
 
-        if (carId == null || carId == 0) { // ID 0 can mean uninitialized for primitive int
-            log.error("Update failed: Car ID is missing or invalid (0) in the input for update. Cannot identify car to update.");
-            throw new IllegalArgumentException("A valid Car ID must be provided in the car object for an update.");
+        if (carId == 0) {
+            throw new IllegalArgumentException("A valid Car ID must be provided for an update.");
         }
 
-        // Fetch the existing car by its ID to ensure it exists and is not deleted.
         Car existingCar = carRepository.findByIdAndDeletedFalse(carId)
-                .orElseThrow(() -> {
-                    log.warn("Update failed: Car not found or is deleted for ID: {}", carId);
-                    return new ResourceNotFoundException("Car not found with ID: " + carId + " for update.");
-                });
-
-        log.debug("Found existing car for update: ID: {}, UUID: '{}', Current Make: '{}', Model: '{}'",
-                existingCar.getId(), existingCar.getUuid(), existingCar.getMake(), existingCar.getModel());
-
-        // The carWithUpdates object IS the new desired state.
-        // The builder in the controller should have copied existingCar and applied DTO changes.
-        // We must ensure the ID and UUID from the existingCar are preserved on carWithUpdates.
-        // The @PreUpdate in Car entity will set updatedAt.
+                .orElseThrow(() -> new ResourceNotFoundException("Car not found with ID: " + carId + " for update."));
 
         Car entityToSave = new Car.Builder()
-                .copy(carWithUpdates) // This has all the new field values from the DTO
-                .setId(existingCar.getId())       // Ensure ID from DB record is used
-                .setUuid(existingCar.getUuid())     // Ensure UUID from DB record is used (it's updatable=false)
-                .setCreatedAt(existingCar.getCreatedAt()) // Preserve original creation timestamp
-                // deleted flag should not be changed by a general update method
+                .copy(carWithUpdates)
+                .setId(existingCar.getId())
+                .setUuid(existingCar.getUuid())
+                .setCreatedAt(existingCar.getCreatedAt())
                 .setDeleted(existingCar.isDeleted())
-                .build(); // This will also trigger @PreUpdate via the save operation
+                .build();
 
-        log.debug("State of car entity being saved for update: {}", entityToSave);
         Car updatedCar = carRepository.save(entityToSave);
-
-        log.info("Successfully updated car. ID: {}, UUID: '{}', New Make: '{}', New Model: '{}'",
-                updatedCar.getId(), updatedCar.getUuid(), updatedCar.getMake(), updatedCar.getModel());
+        log.info("Successfully updated car. ID: {}", updatedCar.getId());
         return updatedCar;
     }
 
-
+    /**
+     * Soft-deletes a car by its internal ID.
+     * This sets the 'deleted' flag to true and 'available' to false.
+     *
+     * @param id The internal ID of the car to delete.
+     * @return {@code true} if the car was found and soft-deleted, {@code false} otherwise.
+     */
     @Override
     public boolean delete(Integer id) {
         log.info("Attempting to soft-delete car with internal ID: {}", id);
         return carRepository.findByIdAndDeletedFalse(id).map(car -> {
-            log.debug("Found car for soft-deletion: ID: {}, UUID: '{}'", id, car.getUuid());
-            Car deletedCarState = new Car.Builder()
-                    .copy(car)
-                    .setDeleted(true)
-                    .setAvailable(false) // Typically, a deleted car is not available
-                    .build();
-            carRepository.save(deletedCarState);
-            log.info("Successfully soft-deleted car ID: {}", id);
-            return true;
-        }).orElseGet(() -> {
-            log.warn("Soft-delete failed: Car not found or already deleted for ID: {}", id);
-            return false;
-        });
-    }
-
-    @Override
-    public boolean delete(UUID uuid) {
-        log.info("Attempting to soft-delete car with UUID: '{}'", uuid);
-        return carRepository.findByUuidAndDeletedFalse(uuid).map(car -> {
-            log.debug("Found car for soft-deletion: UUID: '{}', ID: {}", uuid, car.getId());
-            Car deletedCarState = new Car.Builder()
+            car = new Car.Builder()
                     .copy(car)
                     .setDeleted(true)
                     .setAvailable(false)
                     .build();
-            carRepository.save(deletedCarState);
-            log.info("Successfully soft-deleted car UUID: '{}'", uuid);
+            carRepository.save(car);
+            log.info("Successfully soft-deleted car ID: {}", id);
             return true;
-        }).orElseGet(() -> {
-            log.warn("Soft-delete failed: Car not found or already deleted for UUID: '{}'", uuid);
-            return false;
-        });
+        }).orElse(false);
     }
 
+    /**
+     * Soft-deletes a car by its public-facing UUID.
+     * This sets the 'deleted' flag to true and 'available' to false.
+     *
+     * @param uuid The UUID of the car to delete.
+     * @return {@code true} if the car was found and soft-deleted, {@code false} otherwise.
+     * @deprecated Use {@link #delete(Integer)} instead for consistency with other services.
+     */
+    @Deprecated
     @Override
+    public boolean delete(UUID uuid) {
+        log.info("Attempting to soft-delete car with UUID: '{}'", uuid);
+        return carRepository.findByUuidAndDeletedFalse(uuid).map(car -> {
+            car = new Car.Builder()
+                    .copy(car)
+                    .setDeleted(true)
+                    .setAvailable(false)
+                    .build();
+            carRepository.save(car);
+            log.info("Successfully soft-deleted car UUID: '{}'", uuid);
+            return true;
+        }).orElse(false);
+    }
+
+    /**
+     * Retrieves a list of all non-deleted cars.
+     *
+     * @return A {@link List} of all active cars.
+     */
+    @Override
+    @Transactional(readOnly = true)
     public List<Car> getAll() {
         log.debug("Fetching all non-deleted cars.");
         return carRepository.findByDeletedFalse();
     }
 
+    /**
+     * Retrieves a list of all non-deleted cars that are currently marked as available.
+     *
+     * @return A {@link List} of available cars.
+     */
+    @Transactional(readOnly = true)
     @Override
     public List<Car> getAllAvailableCars() {
         log.debug("Fetching all cars that are available and not deleted.");
         return carRepository.findAllByAvailableTrueAndDeletedFalse();
     }
 
+    /**
+     * Retrieves a list of available, non-deleted cars, filtered by price group.
+     *
+     * @param priceGroup The {@link PriceGroup} to filter by.
+     * @return A {@link List} of available cars in that price group.
+     */
     @Override
-    public List<Car> getCarsByPriceGroup(PriceGroup priceGroup) {
-        log.debug("Fetching non-deleted cars by price group: {}", priceGroup);
-        return carRepository.findByPriceGroupAndDeletedFalse(priceGroup);
-    }
-
-    @Override
-    public List<Car> findAllAvailableAndNonDeleted() {
-        log.debug("Fetching all available and non-deleted cars.");
-        return carRepository.findAllByAvailableTrueAndDeletedFalse();
-    }
-
-    @Override
+    @Transactional(readOnly = true)
     public List<Car> getAvailableCarsByPrice(PriceGroup priceGroup) {
         log.debug("Fetching available and non-deleted cars by price group: {}", priceGroup);
         return carRepository.findAllByAvailableTrueAndDeletedFalseAndPriceGroup(priceGroup);
     }
 
+    /**
+     * Retrieves a list of available, non-deleted cars, filtered by category string.
+     *
+     * @param category The category name to filter by.
+     * @return A {@link List} of available cars in that category.
+     */
     @Override
+    @Transactional(readOnly = true)
     public List<Car> findAllAvailableByCategory(String category) {
         log.debug("Fetching available and non-deleted cars by category: '{}'", category);
         return carRepository.findAllByAvailableTrueAndDeletedFalseAndCategory(category);
     }
 
+    /**
+     * Adds multiple images to an existing car in a single atomic transaction.
+     *
+     * @param carUuid The UUID of the car to add images to.
+     * @param files   A list of {@link MultipartFile} objects to add.
+     * @return The updated {@link Car} entity with the new images added to its collection.
+     * @throws ResourceNotFoundException if no car is found with the given UUID.
+     */
     @Override
-    public List<Car> findAllAvailableByPriceGroup(PriceGroup priceGroup) {
-        log.warn("Calling findAllAvailableByPriceGroup, which is functionally similar to getAvailableCarsByPrice. Consolidate if possible.");
-        return carRepository.findAllByAvailableTrueAndDeletedFalseAndPriceGroup(priceGroup);
-    }
-
-    @Override
-    public List<Car> getAvailableCars() {
-        log.debug("Fetching all available and non-deleted cars.");
-        return carRepository.findAllByAvailableTrueAndDeletedFalse();
-    }
-
-    @Override
-    @Transactional // This makes the entire method an "all or nothing" operation.
+    @Transactional
     public Car addImagesToCar(UUID carUuid, List<MultipartFile> files) {
-        // 1. Find the car entity. Throws an exception if not found.
         Car existingCar = carRepository.findByUuid(carUuid)
                 .orElseThrow(() -> new ResourceNotFoundException("Car not found with UUID: " + carUuid));
 
-        // 2. Loop through the files and process each one.
         for (MultipartFile file : files) {
             if (file == null || file.isEmpty()) continue;
 
-            // Save the physical file using the storage service.
             String fileKey = fileStorageService.save(file, ImageType.CAR.getFolder());
             String filename = fileKey.substring(fileKey.lastIndexOf("/") + 1);
 
-            // Create the new CarImage entity.
             CarImage newImage = CarImage.builder()
                     .fileName(filename)
                     .imageType(ImageType.CAR.getFolder())
-                    .car(existingCar) // Associate it with the car.
+                    .car(existingCar)
                     .build();
 
-            // Add the new image to the car's list of images.
-            // Because of the CascadeType.ALL setting on the Car's 'images' field,
-            // this new CarImage will be saved automatically when the car is saved.
             existingCar.getImages().add(newImage);
         }
 
-        // 3. Save the updated car entity. The @Transactional annotation ensures
-        // that all changes (including the new CarImage entities) are saved together.
-        // If any file fails to save, the transaction will roll back, and no changes
-        // will be made to the database.
         return carRepository.save(existingCar);
     }
-
 }

@@ -21,13 +21,13 @@ public class DamageReportMapper {
      * @param fileStorageService The service for generating image URLs.
      * @return A DamageReportResponseDTO.
      */
-    public static DamageReportResponseDTO toDto(DamageReport damageReport, IFileStorageService fileStorageService) {
+    public static DamageReportResponseDTO toDto(DamageReport damageReport, IFileStorageService fileStorageService, String publicApiUrl) {
         if (damageReport == null) return null;
 
         // === THE FIX IS HERE ===
         // Pass the fileStorageService down to the RentalMapper
         RentalResponseDTO rentalDto = (damageReport.getRental() != null) ?
-                RentalMapper.toDto(damageReport.getRental(), fileStorageService) : null;
+                RentalMapper.toDto(damageReport.getRental(), fileStorageService, publicApiUrl) : null;
 
         return DamageReportResponseDTO.builder()
                 .uuid(damageReport.getUuid())
@@ -46,11 +46,11 @@ public class DamageReportMapper {
      * @param fileStorageService The service for generating image URLs.
      * @return A list of DamageReportResponseDTOs.
      */
-    public static List<DamageReportResponseDTO> toDtoList(List<DamageReport> damageReports, IFileStorageService fileStorageService) {
+    public static List<DamageReportResponseDTO> toDtoList(List<DamageReport> damageReports, IFileStorageService fileStorageService, String publicApiUrl) {
         if (damageReports == null) return null;
         // Use a lambda to pass the service to each toDto call
         return damageReports.stream()
-                .map(report -> DamageReportMapper.toDto(report, fileStorageService))
+                .map(report -> DamageReportMapper.toDto(report, fileStorageService, publicApiUrl))
                 .collect(Collectors.toList());
     }
 

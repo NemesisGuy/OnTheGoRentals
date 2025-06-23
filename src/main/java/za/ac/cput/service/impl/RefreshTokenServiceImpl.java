@@ -23,8 +23,8 @@ import java.util.UUID;
  * Manages the lifecycle of refresh tokens, including creation, verification,
  * and deletion. Refresh tokens are persisted in the database.
  * <p>
- * Author: [Original Author Name - Please specify if known]
- * Date: [Original Date - Please specify if known]
+ * Author: Peter Buckingham
+ * Date: 2025-04-02
  * Updated by: Peter Buckingham
  * Updated: 2025-05-28
  */

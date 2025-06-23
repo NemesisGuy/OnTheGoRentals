@@ -16,213 +16,98 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * BookingMapper.java
+ * A stateless utility class for mapping between Booking entities and DTOs.
+ * The `toDto` methods require the public API URL to correctly resolve nested image URLs.
+ *
+ * @author Peter Buckingham (220165289)
+ * @version 2.0
+ */
 public class BookingMapper {
 
     /**
-     * Converts a Booking entity to a BookingResponseDTO.
+     * Converts a Booking entity to its DTO representation.
+     * This now requires the public API URL to correctly map the nested User and Car DTOs.
      *
-     * @param booking The Booking entity.
-     * @return The corresponding BookingResponseDTO, or null if the booking entity is null.
+     * @param booking            The Booking entity.
+     * @param fileStorageService The service for file operations.
+     * @param publicApiUrl       The base public URL of the API.
+     * @return A BookingResponseDTO.
      */
-    public static BookingResponseDTO toDto(Booking booking, IFileStorageService fileStorageService) {
-        if (booking == null) {
-            return null;
-        }
+    public static BookingResponseDTO toDto(Booking booking, IFileStorageService fileStorageService, String publicApiUrl) {
+        if (booking == null) return null;
 
-
-        UserResponseDTO userDto = null;
-        if (booking.getUser() != null) {
-            userDto = UserMapper.toDto(booking.getUser(), fileStorageService); // Uses UserMapper
-        }
-
-        CarResponseDTO carDto = null;
-        if (booking.getCar() != null) {
-            carDto = CarMapper.toDto(booking.getCar(), fileStorageService); // Uses CarMapper
-        }
+        // --- THE FIX IS HERE: Pass the publicApiUrl to the nested mappers ---
+        UserResponseDTO userDto = (booking.getUser() != null) ? UserMapper.toDto(booking.getUser(), fileStorageService, publicApiUrl) : null;
+        CarResponseDTO carDto = (booking.getCar() != null) ? CarMapper.toDto(booking.getCar(), fileStorageService, publicApiUrl) : null;
 
         return BookingResponseDTO.builder()
-                .uuid(booking.getUuid()) // UUID of the Booking itself
+                .uuid(booking.getUuid())
                 .user(userDto)
                 .car(carDto)
                 .bookingStartDate(booking.getStartDate())
                 .bookingEndDate(booking.getEndDate())
-                .status(booking.getStatus()) // Assuming Booking entity
+                .status(booking.getStatus())
                 .build();
     }
 
     /**
-     * Converts a BookingRequestDTO (and related fetched entities) to a new Booking entity.
-     * This is typically used when creating a new booking.
+     * Converts a list of Booking entities to a list of DTOs.
      *
-     * @param requestDto The BookingRequestDTO containing data from the client.
-     * @param userEntity The fetched User entity (based on userUuid from DTO).
-     * @param carEntity  The fetched Car entity (based on carUuid from DTO).
-     * @return A new Booking entity populated from the DTO and related entities.
+     * @param bookings           The list of Booking entities.
+     * @param fileStorageService The service for file operations.
+     * @param publicApiUrl       The base public URL of the API.
+     * @return A list of BookingResponseDTOs.
      */
-    public static Booking toEntity(BookingRequestDTO requestDto, User userEntity, Car carEntity) {
-        if (requestDto == null) {
-            return null;
-        }
+    public static List<BookingResponseDTO> toDtoList(List<Booking> bookings, IFileStorageService fileStorageService, String publicApiUrl) {
+        if (bookings == null) return Collections.emptyList();
 
-        return new Booking.Builder()
-                // UUID for the new Booking will be set by @PrePersist in the Booking entity itself.
-
-                .setUser(userEntity)
-                .setCar(carEntity)
-
-                .setStartDate(requestDto.getBookingStartDate())
-                .setEndDate(requestDto.getBookingEndDate())
-
-                // Status for a new booking is typically set by backend business logic.
-                // If the DTO *can* specify an initial status, you'd map it here, converting String to Enum.
-                // For example, if BookingRequestDTO had a 'statusString' field:
-                // if (requestDto.getStatusString() != null) {
-                //     try {
-                //         booking.setStatus(RentalStatus.valueOf(requestDto.getStatusString().toUpperCase()));
-                //     } catch (IllegalArgumentException e) {
-                //         // Handle invalid status, e.g., throw exception or set a default
-                //         booking.setStatus(RentalStatus.PENDING); // Default status
-                //     }
-                // } else {
-                //if null then we set to ACTIVE
-                .setStatus(requestDto.getStatus() != null ? requestDto.getStatus() : BookingStatus.CONFIRMED) // Default to ACTIVE if not specified
-                // }
-
-                .setDeleted(false) // Default for new bookings
-
-                // Other fields like fine, issuerId, receiverId would be set by business logic
-                // in the service layer, not directly from a simple create DTO.
-                .build();
-    }
-
-    public static Booking toEntity(BookingRequestDTO requestDto, User userEntity, Car carEntity, Driver driverEntity) {
-        if (requestDto == null) {
-            return null;
-        }
-
-        return new Booking.Builder()
-                // UUID for the new Booking will be set by @PrePersist in the Booking entity itself.
-
-                .setUser(userEntity)
-                .setCar(carEntity)
-                .setDriver(driverEntity) // Optional, can be null if not provided
-
-                .setStartDate(requestDto.getBookingStartDate())
-                .setEndDate(requestDto.getBookingEndDate())
-
-                // Status for a new booking is typically set by backend business logic.
-                // If the DTO *can* specify an initial status, you'd map it here, converting String to Enum.
-                // For example, if BookingRequestDTO had a 'statusString' field:
-                // if (requestDto.getStatusString() != null) {
-                //     try {
-                //         booking.setStatus(RentalStatus.valueOf(requestDto.getStatusString().toUpperCase()));
-                //     } catch (IllegalArgumentException e) {
-                //         // Handle invalid status, e.g., throw exception or set a default
-                //         booking.setStatus(RentalStatus.PENDING); // Default status
-                //     }
-                // } else {
-                // if null then we set to CONFIRMED
-                .setStatus(requestDto.getStatus() != null ? requestDto.getStatus() : BookingStatus.CONFIRMED) // Default to CONFIRMED if not specified
-                // }
-
-                .setDeleted(false) // Default for new bookings
-
-                // Other fields like fine, issuerId, receiverId would be set by business logic
-                // in the service layer, not directly from a simple create DTO.
-                .build();
-    }
-
-    /**
-     * Updates an existing Booking entity from a BookingRequestDTO (or a specific BookingUpdateDTO).
-     * The Booking entity to update should be fetched from the database first.
-     *
-     * @param updateDto        The DTO containing update information.
-     * @param existingBooking  The existing Booking entity to be updated.
-     * @param updatedCarEntity If the car for the booking can be changed (optional, pass null if not changing).
-     */
-    public static void updateEntityFromDto(BookingRequestDTO updateDto, Booking existingBooking, Car updatedCarEntity) {
-        if (updateDto == null || existingBooking == null) {
-            return;
-        }
-
-        // Typically, user is not changed for an existing booking.
-        // If car can be changed:
-        Booking.Builder builder = new Booking.Builder().copy(existingBooking);
-        if (updatedCarEntity != null) {
-            builder.setCar(updatedCarEntity);
-        }
-
-        if (updateDto.getBookingStartDate() != null) {
-            builder.setStartDate(updateDto.getBookingStartDate());
-        }
-        if (updateDto.getBookingEndDate() != null) {
-            builder.setEndDate(updateDto.getBookingEndDate());
-        }
-
-        // If status can be updated via this DTO
-        // if (updateDto.getStatus() != null) { // Assuming BookingRequestDTO has 'status' as String
-        //     try {
-        //         existingBooking.setStatus(RentalStatus.valueOf(updateDto.getStatus().toUpperCase()));
-        //     } catch (IllegalArgumentException e) {
-        //         // Handle invalid status
-        //         System.err.println("Invalid status string in DTO for update: " + updateDto.getStatus());
-        //     }
-        // }
-        // Other updatable fields...
-    }
-
-
-    /**
-     * Converts a list of Booking entities to a list of BookingResponseDTOs.
-     *
-     * @param bookings List of Booking entities.
-     * @return List of BookingResponseDTOs.
-     */
-    public static List<BookingResponseDTO> toDtoList(List<Booking> bookings, IFileStorageService fileStorageService) {
-        if (bookings == null) {
-            return Collections.emptyList();
-        }
         return bookings.stream()
-                // Pass the service down for each conversion
-                .map(booking -> toDto(booking, fileStorageService))
+                .map(booking -> toDto(booking, fileStorageService, publicApiUrl))
                 .collect(Collectors.toList());
     }
 
-    // For Admin Updating a Booking
-    public static Booking applyUpdateDtoToEntity(
-            BookingUpdateDTO updateDto,
-            Booking existingBooking,
-            User newUserEntity, // Pass if user can be changed by admin
-            Car newCarEntity,     // Pass if car can be changed by admin
-            Driver newDriverEntity // Pass if driver can be changed by admin
-    ) {
+    /**
+     * Converts a BookingRequestDTO to a new Booking entity.
+     */
+    public static Booking toEntity(BookingRequestDTO requestDto, User userEntity, Car carEntity, Driver driverEntity) {
+        if (requestDto == null) return null;
+
+        return new Booking.Builder()
+                .setUser(userEntity)
+                .setCar(carEntity)
+                .setDriver(driverEntity) // This can be null
+                .setStartDate(requestDto.getBookingStartDate())
+                .setEndDate(requestDto.getBookingEndDate())
+                .setStatus(requestDto.getStatus() != null ? requestDto.getStatus() : BookingStatus.CONFIRMED)
+                .build();
+    }
+
+    /**
+     * Applies updates from a BookingUpdateDTO to an existing Booking entity.
+     */
+    public static Booking applyUpdateDtoToEntity(BookingUpdateDTO updateDto, Booking existingBooking, User newUserEntity, Car newCarEntity, Driver newDriverEntity) {
         if (updateDto == null || existingBooking == null) {
             throw new IllegalArgumentException("Update DTO and existing Booking entity must not be null.");
         }
 
         Booking.Builder builder = new Booking.Builder().copy(existingBooking);
 
-        // Only update if DTO field is provided (for partial updates)
-        if (newUserEntity != null) builder.setUser(newUserEntity); // Admin changed user
-        if (newCarEntity != null) builder.setCar(newCarEntity);     // Admin changed car
-        if (newDriverEntity != null || (updateDto.getDriverUuid() == null && existingBooking.getDriver() != null)) {
-            // Handle explicit setting to null if DTO driverUuid is null but existing had one
+        if (newUserEntity != null) builder.setUser(newUserEntity);
+        if (newCarEntity != null) builder.setCar(newCarEntity);
+
+        // Handle setting driver to null explicitly
+        if (updateDto.getDriverUuid() == null && existingBooking.getDriver() != null) {
+            builder.setDriver(null);
+        } else if (newDriverEntity != null) {
             builder.setDriver(newDriverEntity);
         }
-
 
         if (updateDto.getBookingStartDate() != null) builder.setStartDate(updateDto.getBookingStartDate());
         if (updateDto.getBookingEndDate() != null) builder.setEndDate(updateDto.getBookingEndDate());
         if (updateDto.getStatus() != null) builder.setStatus(updateDto.getStatus());
-/*
-        if (updateDto.getIssuerId() != null) builder.(updateDto.getIssuerId());
-*/
-       /* if (updateDto.getReceiverId() != null) builder.receiverId(updateDto.getReceiverId());
-        if (updateDto.getFine() != null) builder.fine(updateDto.getFine());
-        if (updateDto.getActualReturnedDate() != null) builder.setEndDate(updateDto.getActualReturnedDate());*/
 
-        // id, uuid, createdAt are preserved. updatedAt handled by @PreUpdate.
         return builder.build();
     }
-
 }

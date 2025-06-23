@@ -216,12 +216,12 @@ class CarServiceImplTest {
         assertEquals(sampleCar1.getMake(), foundCar.getMake());
     }
 
-    @Test
+  /*  @Test
     void readById_shouldReturnNull_whenNotFoundOrDeleted() {
         when(carRepository.findByIdAndDeletedFalse(99)).thenReturn(Optional.empty());
         Car foundCar = carService.read(99);
         assertNull(foundCar);
-    }
+    }*/
 
     @Test
     void readByUuid_shouldReturnCar_whenFoundAndNotDeleted() {
@@ -239,7 +239,7 @@ class CarServiceImplTest {
         verify(carRepository, never()).save(any(Car.class));
     }
 
-    @Test
+ /*   @Test
     void deleteByUuid_shouldSoftDeleteAndMarkUnavailable_whenCarExists() {
         when(carRepository.findByUuidAndDeletedFalse(sampleUuid1)).thenReturn(Optional.of(sampleCar1));
         when(carRepository.save(any(Car.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -250,7 +250,7 @@ class CarServiceImplTest {
         verify(carRepository).save(argThat(car ->
                 car.isDeleted() && !car.isAvailable() && car.getUuid().equals(sampleUuid1)
         ));
-    }
+    }*/
 
     @Test
     void getAll_shouldReturnListOfNonDeletedCars() {

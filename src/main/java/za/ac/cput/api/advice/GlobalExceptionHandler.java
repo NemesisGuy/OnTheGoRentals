@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
  * for REST controllers. It catches various exceptions and transforms them into a
  * standardized {@link ApiResponseWrapper} format with appropriate HTTP status codes.
  * <p>
- * Author: Peter Buckingham (220165289) // Assuming based on context
- * Date: [Date of creation - e.g., 2025-05-28]
+ * Author: Peter Buckingham (220165289)
+ * Date: 2025-04-08
  * Updated by: Peter Buckingham
  * Updated: 2025-05-28
  */

@@ -76,7 +76,7 @@ public class SpringSecurityConfig {
 
                         .requestMatchers("/actuator/**", "/metrics", "/metrics/**").permitAll()
 
-                        .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN") // Admin endpoints require specific roles
+                        .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN") // Admin endpoints require specific roles
                         // All other requests must be authenticated
                         .anyRequest().authenticated()
                 )
