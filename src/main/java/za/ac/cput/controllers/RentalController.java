@@ -64,7 +64,6 @@ public class RentalController {
      * @param carService         The car service for car lookups.
      * @param driverService      The driver service for driver lookups.
      * @param fileStorageService The service for generating image URLs.
-     *
      */
     @Autowired
     public RentalController(IRentalService rentalService, IUserService userService,
@@ -328,6 +327,6 @@ public class RentalController {
                 dto.getDriverUuid(),
                 dto.getActualPickupTime()
         );
-        return new ResponseEntity<>(RentalMapper.toDto(createdRental, fileStorageService, publicApiUrl ), HttpStatus.CREATED);
+        return new ResponseEntity<>(RentalMapper.toDto(createdRental, fileStorageService, publicApiUrl), HttpStatus.CREATED);
     }
 }

@@ -49,7 +49,7 @@ public class RoleServiceImpl implements IRoleService {
      *
      * @param roleNameEnum The enum constant representing the desired role (e.g., RoleName.USER).
      * @return The persisted {@link Role} entity.
-     * @throws IllegalArgumentException if the provided {@code roleNameEnum} is null.
+     * @throws IllegalArgumentException  if the provided {@code roleNameEnum} is null.
      * @throws ResourceNotFoundException if no role with the given name exists in the database.
      */
     @Override
@@ -77,7 +77,7 @@ public class RoleServiceImpl implements IRoleService {
      *
      * @param roleNameStrings A list of strings representing the role names to resolve (e.g., ["USER", "ADMIN"]).
      * @return A {@link List} of the corresponding persisted {@link Role} entities. Returns an empty list
-     *         if the input is null, empty, or contains no valid/existing role names.
+     * if the input is null, empty, or contains no valid/existing role names.
      */
     @Override
     @Transactional(readOnly = true)
@@ -126,7 +126,7 @@ public class RoleServiceImpl implements IRoleService {
      *
      * @param roles A list of {@link Role} entities.
      * @return A {@link List} of string representations of the role names. Returns an empty list
-     *         if the input is null or empty.
+     * if the input is null or empty.
      */
     @Override
     public List<String> getRoleNames(List<Role> roles) {

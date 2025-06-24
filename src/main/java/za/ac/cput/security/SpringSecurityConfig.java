@@ -15,29 +15,28 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import za.ac.cput.security.oauth.CustomOAuth2UserService;
+import za.ac.cput.security.oauth.OAuth2AuthenticationSuccessHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * SpringSecurityConfig.java
  * Main security configuration for the application.
- * Defines the security filter chain, authentication manager, and password encoder.
- * CORS (Cross-Origin Resource Sharing) is configured to be handled by an upstream
- * reverse proxy (e.g., Nginx, Cloudflare) and is intentionally NOT configured here
- * to prevent header conflicts.
+ * Defines the security filter chain, including JWT and OAuth2 login flows.
  * <p>
  * Author: Peter Buckingham (220165289)
- * Updated: 2024-06-10
+ * Updated: 2025-06-23
  */
 @Configuration
 @EnableWebSecurity
-/*
-@EnableMethodSecurity // Enables method-level security like @PreAuthorize
-*/
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    // --- NEW: Inject the custom OAuth2 handlers ---
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     /**
      * Configures the main security filter chain for the application.
@@ -49,37 +48,43 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // This tells Spring to apply its default CORS filter. However, since we are
-                // removing the CorsConfigurationSource bean below, this filter will have
-                // no configuration and will not add any CORS headers. This is the desired behavior.
                 .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // Allow preflight OPTIONS requests to pass through security filters
+                        // Allow preflight OPTIONS requests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Define all public endpoints
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/cars/**").permitAll()
-                        .requestMatchers("/api/v1/files/**").permitAll()
-                        .requestMatchers("/api/v1/about-us/**").permitAll()
-                        .requestMatchers("/api/v1/help-center/**").permitAll()
-                        .requestMatchers("/api/v1/faq/**").permitAll()
-                        .requestMatchers("/api/v1/contact-us").permitAll()
-                        .requestMatchers("/api/v1/bookings/available-cars").permitAll()
-                        // 🔓 Permit Swagger endpoints
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/swagger-ui.html").permitAll()
+                        // Define all public endpoints, including the new OAuth2 endpoints
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/oauth2/**", // <-- Important for the OAuth2 flow
+                                "/api/v1/cars/**",
+                                "/api/v1/files/**",
+                                "/api/v1/about-us/**",
+                                "/api/v1/help-center/**",
+                                "/api/v1/faq/**",
+                                "/api/v1/contact-us",
+                                "/api/v1/bookings/available-cars",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/actuator/**",
+                                "/metrics",
+                                "/metrics/**"
+                        ).permitAll()
 
-
-                        .requestMatchers("/actuator/**", "/metrics", "/metrics/**").permitAll()
-
-                        .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN") // Admin endpoints require specific roles
-                        // All other requests must be authenticated
+                        .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
                         .anyRequest().authenticated()
                 )
+                // --- START: NEW OAUTH2 LOGIN CONFIGURATION ---
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService) // Step 1: Use our custom service to load user info
+                        )
+                        .successHandler(oAuth2AuthenticationSuccessHandler) // Step 2: Use our custom handler on successful login
+                )
+                // --- END: NEW OAUTH2 LOGIN CONFIGURATION ---
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) ->
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
@@ -108,11 +113,4 @@ public class SpringSecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    /**
-     * The CorsConfigurationSource bean has been REMOVED.
-     * This action delegates all CORS header management to the upstream reverse proxy
-     * (e.g., Nginx, Traefik, or a cloud load balancer), which is the recommended
-     * practice for production environments to avoid conflicts and centralize configuration.
-     */
 }

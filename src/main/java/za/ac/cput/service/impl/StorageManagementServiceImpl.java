@@ -126,7 +126,7 @@ public class StorageManagementServiceImpl implements IStorageManagementService {
      * the appropriate implementation-specific method.
      *
      * @return A map where keys are folder names and values are their total size in bytes. Returns an empty map
-     *         if the active service type is unsupported.
+     * if the active service type is unsupported.
      */
     @Override
     public Map<String, Long> getStorageUsagePerFolder() {

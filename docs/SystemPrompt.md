@@ -1,10 +1,13 @@
 # OnTheGoRentals System Prompt
 
-You are an AI assistant. The following describes the current architecture and key components of a Spring Boot backend application called **"OnTheGoRentals."** Your task is to understand this system to answer questions or help with further development based on this existing structure.
+You are an AI assistant. The following describes the current architecture and key components of a Spring Boot backend
+application called **"OnTheGoRentals."** Your task is to understand this system to answer questions or help with further
+development based on this existing structure.
 
 ## I. Core Technologies
 
-* **Backend:** Java 21, Spring Boot 3.5.0, Spring MVC (REST Controllers), Spring Data JPA (with Hibernate), Spring Security 6.5.0
+* **Backend:** Java 21, Spring Boot 3.5.0, Spring MVC (REST Controllers), Spring Data JPA (with Hibernate), Spring
+  Security 6.5.0
 * **Database:** Relational (e.g., H2 for development, potentially PostgreSQL/MySQL for deployment)
 * **Build Tool:** Maven or Gradle
 * **Utilities:** Lombok for boilerplate code reduction
@@ -14,15 +17,18 @@ You are an AI assistant. The following describes the current architecture and ke
 **OnTheGoRentals** is a car rental management system. It supports:
 
 * **Public users** viewing available cars and information (About Us, FAQs, Help Center)
-* **Authenticated users** making bookings, managing bookings (confirm, cancel), viewing rental history, and managing their profiles
-* **Administrators** managing all aspects of the system: users, roles, cars, bookings, rentals, drivers, damage reports, and static content (About Us, FAQs, Help Center, Contact Us submissions, Settings)
+* **Authenticated users** making bookings, managing bookings (confirm, cancel), viewing rental history, and managing
+  their profiles
+* **Administrators** managing all aspects of the system: users, roles, cars, bookings, rentals, drivers, damage reports,
+  and static content (About Us, FAQs, Help Center, Contact Us submissions, Settings)
 
 ## III. Key Domain Entities (Immutable, using Builders for updates)
 
 ### User
 
 * Implements `UserDetails`
-* Fields: firstName, lastName, email, encodedPassword, UUID, internal ID, deleted, AuthProvider, googleId, profileImageUrl
+* Fields: firstName, lastName, email, encodedPassword, UUID, internal ID, deleted, AuthProvider, googleId,
+  profileImageUrl
 * Associations: Role (ManyToMany), Rental (OneToMany)
 * Uses `@Builder`, with `@PrePersist`/`@PreUpdate` for default values and role assignment
 
@@ -45,7 +51,8 @@ You are an AI assistant. The following describes the current architecture and ke
 
 * Represents active or completed rentals
 * Links: User, Car, optionally Driver
-* Fields: issue date, expected/actual return date, fine amount, `RentalStatus` enum, UUID, internal ID, deleted, issuerId, receiverId
+* Fields: issue date, expected/actual return date, fine amount, `RentalStatus` enum, UUID, internal ID, deleted,
+  issuerId, receiverId
 
 ### Driver
 
@@ -90,7 +97,8 @@ You are an AI assistant. The following describes the current architecture and ke
 * `/help-topics/**`: For listing help topics (optionally by category) and retrieving a specific topic by UUID.
 * `/contact-us`: For submitting contact form messages (POST).
 * `/about-us/**`: For listing all "About Us" entries, retrieving the latest, and a specific entry by its ID.
-* `/feedback`: For submitting feedback (POST). Also includes GET (list/specific) and DELETE operations that currently require authentication.
+* `/feedback`: For submitting feedback (POST). Also includes GET (list/specific) and DELETE operations that currently
+  require authentication.
 
 ### Authentication Endpoints `/auth`
 
@@ -102,11 +110,13 @@ You are an AI assistant. The following describes the current architecture and ke
 
 ### Bookings `/bookings`
 
-* `/my-bookings`, `/user-profile`, `/available-cars`, and operations to create, view, update, confirm, and cancel bookings.
+* `/my-bookings`, `/user-profile`, `/available-cars`, and operations to create, view, update, confirm, and cancel
+  bookings.
 
 ### Admin `/admin/...`
 
-* Management of Users, Cars, Rentals/Bookings, site content (FAQs, HelpTopics, AboutUs, ContactUs submissions, Feedback), and other system entities.
+* Management of Users, Cars, Rentals/Bookings, site content (FAQs, HelpTopics, AboutUs, ContactUs submissions,
+  Feedback), and other system entities.
 * UUIDs used in path variables
 
 ## V. Service Layer

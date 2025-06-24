@@ -1,54 +1,59 @@
 # On-The-Go Rentals
 
-
-[![Latest Release](https://img.shields.io/github/v/release/NemesisGuy/OnTheGoRentals?include_prereleases&label=latest%20beta&color=blue)](https://github.com/NemesisGuy/OnTheGoRentals/releases/latest)
+[![Latest Release](https://img.shields.io/github/v/release/NemesisGuy/OnTheGoRentals?include_prereleases&label=latest%20beta&color=blue&style=for-the-badge)](https://github.com/NemesisGuy/OnTheGoRentals/releases/latest)
 [![Java Version](https://img.shields.io/badge/Java-21-yellow.svg?style=for-the-badge)](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
 [![Spring Boot Version](https://img.shields.io/badge/Spring_Boot-3.5.0-blueviolet.svg?style=for-the-badge)](https://spring.io/projects/spring-boot)
 [![Spring Security Version](https://img.shields.io/badge/Spring_Security-6.5.0-blueviolet.svg?style=for-the-badge)](https://spring.io/projects/spring-security)
 [![JWT Authentication](https://img.shields.io/badge/Authentication-JWT-blue.svg?style=for-the-badge)](https://jwt.io/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg?style=for-the-badge)](docs/LICENSE)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg?style=for-the-badge)](https://example.com/build-status) <!-- Placeholder -->
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg?style=for-the-badge)](https://github.com/NemesisGuy/OnTheGoRentals/actions) <!-- Placeholder for GitHub Actions -->
 [![Docker Version](https://img.shields.io/badge/Docker-Ready-blue.svg?style=for-the-badge)](https://www.docker.com/)
 
 ## Project Description
 
 OnTheGoRentals is a full-stack car rental application designed to provide a seamless experience for users looking to rent vehicles and a comprehensive management platform for administrators. The system features a backend API built with Java Spring Boot and a separate Single Page Application (SPA) frontend developed with Vue.js.
 
-The core purpose is to allow registered users to browse available cars, make bookings, and manage their rental history. Administrators have access to a dedicated dashboard to oversee users, vehicles, rental transactions, site content like FAQs, and more.
+The core purpose is to allow registered users to browse available cars, make bookings, and manage their rental history. Administrators have access to a dedicated dashboard to oversee users, vehicles, rental transactions, site content, and application metrics.
 
 ## Key Features
 
-*   **User Management:** Secure user registration, login/logout functionality, and profile management.
-*   **JWT-Based Authentication:** Robust and stateless authentication using JSON Web Tokens, typically involving short-lived access tokens and refresh tokens managed via cookies.
-*   **Car Fleet Management:** Admins can add, update, and remove car details, including pricing and availability.
-*   **Car Browsing & Search:** Users can browse the car catalog, filter by various criteria (e.g., price group), and view detailed information for each vehicle.
-*   **Rental Booking System:** Users can book available cars for specific periods, view their current and past bookings, and manage them.
+*   **User Management:** Secure user registration, login/logout, and profile management.
+*   **Advanced Authentication:**
+    *   **JWT-Based Security:** Robust authentication using short-lived access tokens and securely-managed refresh tokens (via HttpOnly cookies).
+    *   **Google OAuth2 Login:** Users can register and sign in seamlessly with their Google accounts.
+    *   **Password Reset:** A secure "Forgot Password" flow that uses email verification.
+*   **Car Fleet Management:** Admins can add, update, and remove car details, including images, pricing, and availability.
+*   **Car Browsing & Search:** Users can browse the car catalog and view detailed information for each vehicle.
+*   **Rental Booking System:** Users can book available cars, view their current and past bookings, and manage them.
 *   **Administrative Dashboard:**
+    *   Live analytics dashboard with key performance indicators (KPIs) and data visualizations.
     *   Manage Users (view, create, update, delete, assign roles).
     *   Manage Cars (CRUD operations).
-    *   Manage Rentals (view all bookings, confirm, cancel, mark as complete).
+    *   Manage Rentals and Bookings.
     *   Content Management for FAQs, Help Topics, and About Us sections.
-    *   View and manage user feedback and contact submissions.
-*   **Public Information Endpoints:** API access for FAQs, Help Topics, submitting Feedback, and Contact Us forms.
+*   **Transactional Emails:** The system sends automated HTML emails for critical events like user registration and password resets.
+*   **Monitoring & Observability:** The Docker stack includes a full observability suite with Prometheus for metrics, Grafana for visualization, and Loki for centralized logging.
 
 ## Technology Stack
 
 *   **Backend:**
     *   Java 21
     *   Spring Boot 3.5.0
-    *   Spring Security 6.5.0 (with JWT for authentication)
-    *   Spring Data JPA (for database interaction)
-    *   MySQL (Database)
-    *   Maven (Build Tool)
+    *   Spring Security 6.5.0 (JWT & OAuth2)
+    *   Spring Data JPA / Hibernate
+    *   **Thymeleaf:** For server-side HTML email templating.
+    *   MySQL
+    *   Maven
 *   **Frontend:**
-    *   Vue.js (Developed and maintained in a separate repository: [OnTheGoRentalsFrontend](https://github.com/NemesisGuy/OnTheGoRentalsFrontend))
-*   **API:**
-    *   RESTful API architecture
-    *   Base Path: `/api/v1`
-    *   Secured using JSON Web Tokens (JWT)
-*   **Containerization:**
-    *   Docker
-    *   Docker Compose
+    *   Vue.js 3 (Composition API)
+    *   Maintained in a separate repository: [OnTheGoRentalsFrontend](https://github.com/NemesisGuy/OnTheGoRentalsFrontend)
+*   **API Documentation:**
+    *   OpenAPI 3 via `springdoc-openapi`
+*   **Containerization & DevOps:**
+    *   Docker & Docker Compose
+    *   **Prometheus:** For metrics collection.
+    *   **Grafana:** For metrics visualization and dashboards.
+    *   **Loki & Promtail:** For centralized log aggregation.
 
 For a more detailed architectural overview, please see our [System Overview Document](docs/SystemOverview.md).
 
@@ -61,12 +66,12 @@ To get the OnTheGoRentals system up and running, follow these instructions.
 *   **Java Development Kit (JDK):** Version 21 or later.
 *   **Maven:** Apache Maven build tool.
 *   **Docker:** Docker Desktop or Docker Engine with Docker Compose.
-*   **Node.js & npm/yarn:** Required if you plan to build and run the [frontend application](https://github.com/NemesisGuy/OnTheGoRentalsFrontend) locally.
+*   **Node.js:** Required to run the [frontend application](https://github.com/NemesisGuy/OnTheGoRentalsFrontend).
 *   **Git:** For cloning the repository.
 
-### Backend Setup & Running (Docker - Recommended)
+### Backend Setup & Running (Local Development)
 
-This is the easiest way to get the backend server running along with a MySQL database.
+This method is recommended for active development and debugging within an IDE like IntelliJ IDEA.
 
 1.  **Clone the repository:**
     ```bash
@@ -74,129 +79,87 @@ This is the easiest way to get the backend server running along with a MySQL dat
     cd OnTheGoRentals
     ```
 
-2.  **Configure Environment Variables:**
-    The application uses environment variables for configuration. For local Docker Compose setups, create a `.env` file in the project root directory (where `docker-compose.yaml` is located).
-    Refer to `docker/docker-compose-stack-dploy.yaml` for a comprehensive list of available environment variables.
-    At a minimum, your `.env` file should include:
-    ```env
-    # Database Configuration (ensure these match your MySQL service in docker-compose if you add one, or an external DB)
-    # SPRING_DATASOURCE_URL=jdbc:mysql://your_mysql_host:your_mysql_port/OnTheGoRentalsDatabase?createDatabaseIfNotExist=true
-    # SPRING_DATASOURCE_USERNAME=your_mysql_user
-    # SPRING_DATASOURCE_PASSWORD=your_mysql_password
-
-    # JWT Secret (generate a strong random string)
-    # JWT_SECRET=your-super-strong-jwt-secret-key
-
-    # Example for using the provided docker-compose.yaml which expects an external MySQL or one defined elsewhere:
-    # If you add a MySQL service to the main docker-compose.yaml named 'mysql-db', the URL might be:
-    # SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/OnTheGoRentalsDatabase?createDatabaseIfNotExist=true
-    # SPRING_DATASOURCE_USERNAME=root
-    # SPRING_DATASOURCE_PASSWORD=mysecretpassword
-    # JWT_SECRET=replace_with_a_strong_secret_key_min_64_chars_long_for_HS512
+2.  **Run Dependencies with Docker:** Before running the app locally, start the required services (database, MinIO, etc.) using Docker Compose. This ensures your local app has something to connect to.
+    ```bash
+    # From the project root
+    docker-compose up -d mysql minio
     ```
-    **Important:** The provided `docker/docker-compose.yaml` references a pre-built image `nemesisguy/on-the-go-rentals-backend:latest` and expects the database `mysql-container` to be available on the `app-network`. You might need to adjust this or add a MySQL service definition to your `docker-compose.yaml` for a complete local stack.
 
-3.  **Run with Docker Compose:**
-    If you have a complete `docker-compose.yaml` (including a MySQL service if not using an external one):
+3.  **Configure Local Secrets:**
+    The project uses a `application-secrets.properties` file for local development, which is **not** committed to Git.
+    *   In the `src/main/resources/` directory, create a new file named `application-secrets.properties`.
+    *   Populate it with your local development secrets. This includes database credentials, JWT secrets, and your Google OAuth2 client details. Refer to the example below:
+
+    <details>
+      <summary>Click to see an example `application-secrets.properties` file</summary>
+
+      ```properties
+      # LOCAL DEVELOPMENT SECRETS (src/main/resources/application-secrets.properties)
+      SERVER_PORT=8080
+      
+      # Database (connecting to Docker container on host)
+      DB_URL=jdbc:mysql://localhost:3307/OnTheGoRentalsDatabase?createDatabaseIfNotExist=true&useSSL=false
+      DB_USERNAME=root
+      DB_PASSWORD=my_secret_password
+      
+      # JWT Secret (generate a strong random string)
+      JWT_SECRET=your-super-strong-jwt-secret-key-that-is-very-long
+      
+      # Google OAuth2 Credentials
+      GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET=your-google-client-secret
+      
+      # MinIO (connecting to Docker container on host)
+      MINIO_URL=http://localhost:9012
+      MINIO_ACCESS_KEY=minioadmin
+      MINIO_SECRET_KEY=minioadmin
+      
+      # Email Relay (e.g., Brevo)
+      SPRING_MAIL_USERNAME=your_brevo_login_email@example.com
+      SPRING_MAIL_PASSWORD=your_brevo_smtp_key
+      APP_EMAIL_FROM=your_verified_sender@yourdomain.com
+      
+      # Frontend URL for local dev
+      APP_FRONTEND_URL=http://localhost:5173
+      ```
+    </details>
+
+4.  **Run the Application:**
+    You can now run the `BackendApplication` main method directly from your IDE (e.g., IntelliJ). The application will automatically pick up the configuration from both `application.properties` and your new `application-secrets.properties` file.
+
+### Full Stack Deployment (Docker Compose)
+
+The provided `docker-compose.yml` file will run the entire application stack, including the backend, database, and observability tools.
+
+1.  **Configure Environment Variables:** Before deploying, ensure you have set up the necessary environment variables for your deployment environment (e.g., in Portainer's stack editor). Refer to the `environment` section in the `docker-compose.yml` file for a full list of required variables.
+
+2.  **Run with Docker Compose:**
     ```bash
     docker-compose up -d
     ```
-    If you are using the provided `docker/docker-compose.yaml` which assumes an external MySQL and pre-built image:
-    Ensure your `.env` file correctly points to your MySQL instance and defines other necessary variables like `JWT_SECRET`.
-    ```bash
-    # (Assuming you are in the project root)
-    docker-compose -f docker/docker-compose-old.yaml up -d 
-    ```
-    *(You might need to run `docker network create app-network` if it doesn't exist)*
 
-
-4.  The backend API should now be accessible at `http://localhost:8080`.
-
-### Backend Setup & Running (Local/Manual)
-
-1.  **Clone the repository:** (If not already done)
-    ```bash
-    git clone https://github.com/NemesisGuy/OnTheGoRentals.git
-    cd OnTheGoRentals
-    ```
-
-2.  **Configure `application.properties`:**
-    Located in `src/main/resources/application.properties`.
-    You'll need to set up your database connection details (URL, username, password) and JWT secret.
-    ```properties
-    spring.datasource.url=jdbc:mysql://localhost:3306/OnTheGoRentalsDatabase?createDatabaseIfNotExist=true&useSSL=false
-    spring.datasource.username=your_db_user
-    spring.datasource.password=your_db_password
-    spring.jpa.hibernate.ddl-auto=update # Or 'validate' for production after initial setup
-
-    # JWT Configuration
-    jwt.secret=your-super-strong-jwt-secret-key # Ensure this is a very strong key
-    jwt.accesstoken.expiration=3600000 # 1 hour in milliseconds
-    jwt.refreshtoken.expiration=604800000 # 7 days in milliseconds
-    ```
-
-3.  **Build and Run the application:**
-    ```bash
-    mvn spring-boot:run
-    ```
-    The backend API should now be accessible at `http://localhost:8080`.
+3.  The services will be available at their configured ports:
+    *   **Backend API:** `http://localhost:8087`
+    *   **Frontend UI:** `http://localhost:8081`
+    *   **Grafana:** `http://localhost:3000`
+    *   **Prometheus:** `http://localhost:9090`
 
 ### Frontend Setup
 
-For instructions on setting up and running the Vue.js frontend application, please refer to the README file in the [OnTheGoRentalsFrontend repository](https://github.com/NemesisGuy/OnTheGoRentalsFrontend).
+For instructions on setting up and running the Vue.js frontend, please refer to the README in the [OnTheGoRentalsFrontend repository](https://github.com/NemesisGuy/OnTheGoRentalsFrontend).
 
-## Usage
+## API Documentation with Swagger
 
-Once the backend (and frontend) are running:
-*   **Users** can register for an account, log in, browse available cars, make bookings, and view their rental history.
-*   **Administrators** can log in with admin credentials to access the admin dashboard for managing users, cars, rentals, and site content.
-    *   Default user accounts (e.g., `user@gmail.com`, `admin@gmail.com`, `superadmin@gmail.com`) are typically created via data seeding during application startup if they don't already exist. The default password pattern before hashing is `rolename + "password"` (e.g., 'adminpassword'). These passwords will be hashed by the system. Please refer to `DefaultDataInitializer.java` for the exact logic.
+Once the application is running, you can access the interactive Swagger UI at:
 
-### API Documentation with Swagger
+`http://localhost:8080/swagger-ui.html` (for local dev)
 
-The API is documented using Swagger/OpenAPI. Once the application is running, you can access the Swagger UI at:
-
-```
-http://localhost:8080/swagger-ui.html
-```
-
-This interactive documentation allows you to:
-* Explore all available API endpoints
-* View request/response models
-* Test API endpoints directly from the browser
-* Authenticate with JWT tokens to test secured endpoints
-
-The raw OpenAPI specification is available at:
-```
-http://localhost:8080/api-docs
-```
-
-For detailed information on API endpoints, request/response formats, and authentication mechanisms, please refer to our [API Endpoints Documentation](docs/API_ENDPOINTS.md).
-
-## Running Tests (Backend)
-
-To run the backend unit and integration tests, use the following Maven command:
-
-```bash
-mvn test
-```
+This documentation allows you to explore all API endpoints, view models, and test endpoints directly from the browser.
 
 ## Contributing
 
-We welcome contributions to OnTheGoRentals! Whether it's bug reports, feature suggestions, or code improvements, please read our [Contributing Guidelines](docs/CONTRIBUTING.md) to get started.
+We welcome contributions! Please read our [Contributing Guidelines](docs/CONTRIBUTING.md) to get started.
 
 ## License
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](docs/LICENSE) file for details.
-
-## Lead Author & Maintainer
-
-This project is primarily maintained by:
-
-- **Peter Buckingham (Team Lead)** - [NemesisGuy](https://github.com/NemesisGuy)
-
-Past contributions to the project are acknowledged. For a list of past contributors, please see [PAST_CONTRIBUTORS.md](docs/PAST_CONTRIBUTORS.md).
-
-## Contact / Support
-
-For support requests, questions, or to report issues, please use the **GitHub Issues** section of this repository.

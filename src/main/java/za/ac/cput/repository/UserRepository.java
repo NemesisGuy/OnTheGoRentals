@@ -32,6 +32,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     boolean existsByEmailAndIdNot(String email, int userId);
 
+    Optional<User> findByPasswordResetToken(String token);
+
+
 }
 
 

@@ -36,7 +36,6 @@ import java.util.UUID;
  * @author Cwenga Dlova (214310671)
  * @version 2.0
  * @Updated by: Peter Buckingham (220165289)
- *
  */
 @RestController
 @RequestMapping("/api/v1/admin/damage-reports")

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.security.Role;
 import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
+import za.ac.cput.domain.enums.AuthProvider;
 import za.ac.cput.exception.EmailAlreadyExistsException;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.IRoleRepository;
@@ -268,5 +269,42 @@ public class UserServiceImpl implements IUserService {
         boolean userExists = userRepository.existsByEmail(email);
         log.info("User existence check by email '{}': {}", email, userExists);
         return userExists;
+    }
+
+    /**
+     * Processes the OAuth2 post-login logic.
+     * This method is called after a successful OAuth2 authentication.
+     * It should find an existing user or create a new one based on the provided details.
+     *
+     * @param email     The email address of the authenticated user.
+     * @param firstName The first name of the authenticated user.
+     * @param lastName  The last name of the authenticated user.
+     * @return The {@link User} entity representing the authenticated user.
+     */
+    @Override
+    public User processOAuthPostLogin(String email, String firstName, String lastName) {
+        if (userRepository.existsByEmail(email)) {
+            log.info("OAuth user found in DB: {}", email);
+            // Optionally update user's name if it has changed in Google
+            User existingUser = read(email);
+            existingUser.setFirstName(firstName);
+            existingUser.setLastName(lastName);
+            return userRepository.save(existingUser);
+        } else {
+            log.info("OAuth user not found. Creating new user: {}", email);
+            User newUser = User.builder()
+                    .email(email)
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .password(passwordEncoder.encode(UUID.randomUUID().toString())) // Generate random password
+                    .authProvider(AuthProvider.GOOGLE)
+                    .build();
+
+            // Assign default 'USER' role
+            Role userRole = roleRepository.findByRoleName(RoleName.USER);
+            newUser.setRoles(Collections.singletonList(userRole));
+
+            return userRepository.save(newUser);
+        }
     }
 }

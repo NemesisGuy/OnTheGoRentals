@@ -75,16 +75,16 @@ public interface ICarService extends IService<Car, Integer> {
      * @return A list of all non-deleted {@link Car} entities. Can be empty.
      */
     List<Car> getAll();
-/*
+    /*
 
-    */
-/**
-     * Retrieves a list of all cars currently marked as available for rental.
-     * This typically means cars that are not soft-deleted and have their 'available' flag set to true.
-     *
-     * @return A list of available {@link Car} entities. Can be empty.
-     * @deprecated Prefer {@link # findAllAvailableAndNonDeleted()} for clarity.
      */
+/**
+ * Retrieves a list of all cars currently marked as available for rental.
+ * This typically means cars that are not soft-deleted and have their 'available' flag set to true.
+ *
+ * @return A list of available {@link Car} entities. Can be empty.
+ * @deprecated Prefer {@link # findAllAvailableAndNonDeleted()} for clarity.
+ */
 
 
     /**
@@ -105,7 +105,6 @@ public interface ICarService extends IService<Car, Integer> {
     List<Car> getAllAvailableCars();
 
 
-
     /**
      * Retrieves a list of available (and non-deleted) cars belonging to a specific price group.
      *
@@ -121,7 +120,6 @@ public interface ICarService extends IService<Car, Integer> {
      * @return A list of available {@link Car} entities matching the category. Can be empty.
      */
     List<Car> findAllAvailableByCategory(String category);
-
 
 
     /**

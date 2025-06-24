@@ -58,8 +58,8 @@ public class DamageReportController {
      */
     @Autowired
     public DamageReportController(IDamageReportService damageReportService, IRentalService rentalService, IFileStorageService fileStorageService,
-                                    @Value("${app.public-api-url}") String publicApiUrl
-     ) {
+                                  @Value("${app.public-api-url}") String publicApiUrl
+    ) {
         this.damageReportService = damageReportService;
         this.rentalService = rentalService;
         this.fileStorageService = fileStorageService;
@@ -107,7 +107,7 @@ public class DamageReportController {
             @Parameter(description = "UUID of the damage report to retrieve", required = true) @PathVariable UUID reportUuid) {
         log.info("Request received to get damage report with UUID: {}", reportUuid);
         DamageReport report = damageReportService.read(reportUuid);
-        return ResponseEntity.ok(DamageReportMapper.toDto(report, fileStorageService , publicApiUrl));
+        return ResponseEntity.ok(DamageReportMapper.toDto(report, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -153,7 +153,7 @@ public class DamageReportController {
         DamageReport updatedReport = damageReportService.update(reportWithUpdates);
 
         log.info("Successfully updated damage report with UUID: {}", updatedReport.getUuid());
-        return ResponseEntity.ok(DamageReportMapper.toDto(updatedReport, fileStorageService,publicApiUrl));
+        return ResponseEntity.ok(DamageReportMapper.toDto(updatedReport, fileStorageService, publicApiUrl));
     }
 
     /**

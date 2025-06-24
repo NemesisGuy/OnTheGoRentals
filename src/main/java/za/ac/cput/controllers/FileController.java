@@ -10,11 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.CacheControl;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,7 +58,7 @@ public class FileController {
      * @param folder   The sub-directory within the base storage (e.g., "cars", "selfies").
      * @param filename The name of the file to be served, including its extension.
      * @return A {@link ResponseEntity} containing the file {@link Resource} if found,
-     *         or a 404 Not Found status if the file does not exist.
+     * or a 404 Not Found status if the file does not exist.
      */
     @Operation(summary = "Serve a file by path", description = "Serves a file (e.g., an image) from the storage system. The path combines a folder and filename.")
     @ApiResponses(value = {

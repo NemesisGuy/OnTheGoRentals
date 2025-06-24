@@ -33,10 +33,9 @@ import za.ac.cput.utils.SecurityUtils;
 /**
  * AuthController.java
  * Controller for handling user authentication and authorization processes.
- * Provides endpoints for user registration, login, token refresh, and logout.
  *
  * @author Peter Buckingham
- * @version 2.0
+ * @version 2.1
  */
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -49,24 +48,12 @@ public class AuthController {
     @Value("${jwt.expiration}")
     private Long accessTokenExpirationMs;
 
-    /**
-     * Constructs an AuthController with the necessary Authentication service.
-     *
-     * @param authService The service implementation for authentication operations.
-     */
     @Autowired
     public AuthController(IAuthService authService) {
         this.authService = authService;
-        log.info("AuthController initialized with IAuthService.");
+        log.info("AuthController initialized.");
     }
 
-    /**
-     * Registers a new user account and automatically logs them in.
-     *
-     * @param registerDto         The DTO containing user registration details.
-     * @param httpServletResponse The response object used to set the refresh token cookie.
-     * @return A ResponseEntity containing an AuthResponseDto with the access token upon success.
-     */
     @Operation(summary = "Register a new user", description = "Creates a new user account with the default 'USER' role and automatically logs them in.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User registered and logged in successfully", content = @Content(schema = @Schema(implementation = AuthResponseDto.class))),
@@ -74,52 +61,50 @@ public class AuthController {
     })
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDto> register(@Valid @RequestBody RegisterDto registerDto, HttpServletResponse httpServletResponse) {
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Attempting to register new user with email: {}", requesterId, registerDto.getEmail());
-
+        log.info("Requester [GUEST]: Attempting to register new user with email: {}", registerDto.getEmail());
         User registeredUser = authService.registerUser(registerDto.getFirstName(), registerDto.getLastName(), registerDto.getEmail(), registerDto.getPassword(), RoleName.USER);
         AuthServiceImpl.AuthDetails authDetails = authService.loginUser(registeredUser.getEmail(), registerDto.getPassword(), httpServletResponse);
-
         AuthResponseDto authResponseDto = new AuthResponseDto(authDetails.getAccessToken(), "Bearer", accessTokenExpirationMs, authDetails.getUser().getEmail(), authDetails.getRoleNames());
-
-        log.info("Requester [{}]: Successfully registered and logged in user: {}", requesterId, authDetails.getUser().getEmail());
+        log.info("Requester [GUEST]: Successfully registered and logged in user: {}", authDetails.getUser().getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(authResponseDto);
     }
 
-    /**
-     * Authenticates an existing user and provides authentication tokens.
-     * The access token is returned in the response body; the refresh token is set as an HTTP-only cookie.
-     *
-     * @param loginDto            The DTO containing user login credentials.
-     * @param httpServletResponse The response object used to set the refresh token cookie.
-     * @return A ResponseEntity containing an AuthResponseDto with the access token and user info.
-     */
-    @Operation(summary = "Authenticate a user", description = "Logs in a user with an email and password, returning a JWT and setting a refresh token cookie.")
+    @Operation(summary = "Authenticate a user", description = "Logs in a user with an email and password.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login successful", content = @Content(schema = @Schema(implementation = AuthResponseDto.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid credentials")
     })
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginDto loginDto, HttpServletResponse httpServletResponse) {
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Attempting to login user with email: {}", requesterId, loginDto.getEmail());
-
+        log.info("Requester [GUEST]: Attempting to login user with email: {}", loginDto.getEmail());
         AuthServiceImpl.AuthDetails authDetails = authService.loginUser(loginDto.getEmail(), loginDto.getPassword(), httpServletResponse);
         AuthResponseDto authResponseDto = new AuthResponseDto(authDetails.getAccessToken(), "Bearer", accessTokenExpirationMs, authDetails.getUser().getEmail(), authDetails.getRoleNames());
-
-        log.info("Requester [{}]: Successfully authenticated user: {}", requesterId, authDetails.getUser().getEmail());
+        log.info("Requester [GUEST]: Successfully authenticated user: {}", authDetails.getUser().getEmail());
         return ResponseEntity.ok(authResponseDto);
     }
 
-    /**
-     * Refreshes an access token using a valid refresh token from an HTTP-only cookie.
-     * A new refresh token is also issued and set as a new cookie (token rotation).
-     *
-     * @param refreshTokenFromCookie The refresh token string retrieved from the cookie.
-     * @param httpServletResponse    The response object used to set the new refresh token cookie.
-     * @return A ResponseEntity containing a DTO with the new access token.
-     */
-    @Operation(summary = "Refresh an access token", description = "Generates a new JWT access token using the refresh token from the HTTP-only cookie.")
+    @Operation(summary = "Initiate password reset", description = "Sends a password reset link to the user's email address if the account exists.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Password reset email sent (if the user exists). Always returns OK to prevent email enumeration.")
+    })
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.initiatePasswordReset(request.email());
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Finalize password reset", description = "Sets a new password for a user using a valid reset token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Password has been successfully reset."),
+            @ApiResponse(responseCode = "400", description = "Bad Request: The token is invalid, expired, or the new password is weak.")
+    })
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.finalizePasswordReset(request.token(), request.newPassword());
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Refresh an access token", description = "Generates a new JWT access token using the refresh token from an HTTP-only cookie.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Access token refreshed successfully", content = @Content(schema = @Schema(implementation = TokenRefreshResponseDto.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized: Refresh token is missing, invalid, or expired")
@@ -129,26 +114,14 @@ public class AuthController {
             @Parameter(description = "The refresh token cookie, sent automatically by the browser.", in = ParameterIn.COOKIE, name = "${app.security.refresh-cookie.name}")
             @CookieValue(name = "${app.security.refresh-cookie.name}", required = false) String refreshTokenFromCookie,
             HttpServletResponse httpServletResponse) {
-        String requesterId = SecurityUtils.getRequesterIdentifier();
-        log.info("Requester [{}]: Attempting to refresh access token.", requesterId);
-
         if (refreshTokenFromCookie == null || refreshTokenFromCookie.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
         AuthServiceImpl.RefreshedTokenDetails refreshedTokenDetails = authService.refreshAccessToken(refreshTokenFromCookie, httpServletResponse);
         TokenRefreshResponseDto responseDto = new TokenRefreshResponseDto(refreshedTokenDetails.getNewAccessToken(), "Bearer", accessTokenExpirationMs);
-
-        log.info("Requester [{}]: Successfully refreshed access token.", requesterId);
         return ResponseEntity.ok(responseDto);
     }
 
-    /**
-     * Logs out the currently authenticated user by invalidating their session and clearing authentication cookies.
-     *
-     * @param httpServletResponse The response object used to send cookie clearing headers.
-     * @return A ResponseEntity containing a success message.
-     */
     @Operation(summary = "Log out the current user", description = "Invalidates the user's session and clears authentication cookies.", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Logout successful"))
     @PostMapping("/logout")
@@ -157,21 +130,24 @@ public class AuthController {
         log.info("Requester [{}]: Attempting to logout.", requesterId);
         String logoutMessage;
 
-        if ("GUEST".equals(requesterId) || !SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof User user) {
+            authService.logoutUser(user.getId(), httpServletResponse);
+            logoutMessage = "Logout successful.";
+        } else {
             authService.clearAuthCookies(httpServletResponse);
             logoutMessage = "No active user session found. Cookies cleared if any.";
-        } else {
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (principal instanceof User) {
-                int userIdToLogout = ((User) principal).getId();
-                authService.logoutUser(userIdToLogout, httpServletResponse);
-                logoutMessage = "Logout successful.";
-            } else {
-                authService.clearAuthCookies(httpServletResponse);
-                SecurityContextHolder.clearContext();
-                logoutMessage = "Authenticated session cleared. Cookies cleared.";
-            }
         }
         return ResponseEntity.ok(new ApiResponseWrapper<>(logoutMessage));
+    }
+
+    // --- DTO Records for Password Reset ---
+    public record ForgotPasswordRequest(
+            @Schema(description = "The email address of the user who forgot their password.", example = "user@example.com") String email) {
+    }
+
+    public record ResetPasswordRequest(
+            @Schema(description = "The password reset token received via email.", example = "a1b2c3d4-e5f6-7890-g1h2-i3j4k5l6m7n8") String token,
+            @Schema(description = "The new password for the user account.", example = "newStrongPassword123!") String newPassword) {
     }
 }

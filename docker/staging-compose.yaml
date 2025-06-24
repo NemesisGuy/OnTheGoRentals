@@ -18,13 +18,13 @@ services:
     ports:
       - "3307:3306" # Host port 3307 to container port 3306
     volumes:
-     # - mysql_data_volume:/var/lib/mysql # Persist MySQL data
+      # - mysql_data_volume:/var/lib/mysql # Persist MySQL data
       - mysql-data:/var/lib/mysql # <--- USE YOUR ORIGINAL/CORRECT VOLUME NAME HERE
 
     networks:
       - on_the_go_rentals_app_network # Connect to the shared application network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--password=my_secret_password"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "--password=my_secret_password" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -46,7 +46,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: [ "CMD", "mc", "ready", "local" ]
       interval: 30s
       timeout: 20s
       retries: 3
@@ -83,7 +83,7 @@ services:
       # If your backend handles the code exchange (like /login/oauth2/code/google), this is a backend URI.
       GOOGLE_REDIRECT_URI: http://localhost:8087/login/oauth2/code/google # Assuming backend is exposed on host 8087
 
-            # MinIO Connection (uses service name 'minio')
+      # MinIO Connection (uses service name 'minio')
       MINIO_URL=http://localhost:9012
       MINIO_ACCESS_KEY=minioadmin
       MINIO_SECRET_KEY=minioadmin
@@ -110,13 +110,13 @@ services:
       # This VUE_APP_API_URL is read by entrypoint.sh inside the frontend container
       # to generate config.js for your Vue app.
       # It should be the URL through which the user's BROWSER can reach the backend.
-     - BACKEND_API_BASE_URL=https://otgrapi.nemesisnet.co.za # Backend exposed on host port 8087
+      - BACKEND_API_BASE_URL=https://otgrapi.nemesisnet.co.za # Backend exposed on host port 8087
     networks:
       - on_the_go_rentals_app_network # Not strictly necessary if it only talks to backend via public URL, but good practice
     depends_on:
       - on-the-go-rentals-backend # Optional: Frontend might start before backend is fully ready,
-                    # but Nginx will serve static files. API calls will fail until backend is up.
-                    # Usually, this is fine as user interaction triggers API calls.
+        # but Nginx will serve static files. API calls will fail until backend is up.
+      # Usually, this is fine as user interaction triggers API calls.
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -135,7 +135,7 @@ services:
 
 # Define the named volume for MySQL data persistence
 volumes:
-  mysql-data: {} # <--- USE YOUR ORIGINAL/CORRECT VOLUME NAME HERE
+  mysql-data: { } # <--- USE YOUR ORIGINAL/CORRECT VOLUME NAME HERE
 
 # Define the shared network for all services
 networks:

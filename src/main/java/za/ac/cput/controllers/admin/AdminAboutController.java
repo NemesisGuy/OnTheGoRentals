@@ -31,8 +31,6 @@ import java.util.UUID;
  *
  * @author Cwenga Dlova (214310671)
  * @version 2.0
- * @since 2023-09-24
- * {@code @updated} by Peter Buckingham
  * @updated 2025-05-29
  * * This controller provides endpoints for:
  * * - Creating new "About Us" entries
@@ -43,8 +41,8 @@ import java.util.UUID;
  * * It uses the IAboutUsService to interact with the underlying data layer.
  * * Security is enforced to ensure only administrators can access these endpoints.
  * * Note: This controller is intended for administrative use only and should not be exposed to public users.
- *
- *
+ * @since 2023-09-24
+ * {@code @updated} by Peter Buckingham
  */
 @RestController
 @RequestMapping("/api/v1/admin/about-us")

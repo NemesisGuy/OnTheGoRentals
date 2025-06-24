@@ -23,6 +23,7 @@ public interface IDamageReportRepository extends JpaRepository<DamageReport, Int
      * @return A list of all non-deleted {@link DamageReport} entities.
      */
     List<DamageReport> findByDeletedFalse();
+
     /**
      * Finds a damage report by its internal integer ID, ensuring it is not deleted.
      *
@@ -31,6 +32,7 @@ public interface IDamageReportRepository extends JpaRepository<DamageReport, Int
      * otherwise an empty Optional.
      */
     Optional<DamageReport> findByIdAndDeletedFalse(Integer integer);
+
     /**
      * Finds a damage report by its UUID, ensuring it is not deleted.
      *

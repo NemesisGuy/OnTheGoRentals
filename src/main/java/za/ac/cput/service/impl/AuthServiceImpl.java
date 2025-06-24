@@ -21,16 +21,20 @@ import za.ac.cput.domain.entity.security.RefreshToken;
 import za.ac.cput.domain.entity.security.Role;
 import za.ac.cput.domain.entity.security.RoleName;
 import za.ac.cput.domain.entity.security.User;
+import za.ac.cput.exception.BadRequestException;
 import za.ac.cput.exception.EmailAlreadyExistsException;
+import za.ac.cput.exception.InvalidTokenException;
 import za.ac.cput.exception.TokenRefreshException;
 import za.ac.cput.repository.IRoleRepository;
+import za.ac.cput.repository.UserRepository;
 import za.ac.cput.security.JwtUtilities;
 import za.ac.cput.service.IAuthService;
+import za.ac.cput.service.IEmailService;
 import za.ac.cput.service.IRefreshTokenService;
 import za.ac.cput.service.IUserService;
 
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -54,11 +58,14 @@ public class AuthServiceImpl implements IAuthService {
     private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     private final IUserService userService;
+    private final UserRepository userRepository;
     private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtilities jwtUtilities;
     private final IRefreshTokenService refreshTokenService;
+    private final IEmailService emailService; // <-- INJECT THE EMAIL SERVICE
+
 
     @Value("${jwt.refresh-token.expiration-ms}")
     private Long refreshTokenDurationMs;
@@ -69,8 +76,11 @@ public class AuthServiceImpl implements IAuthService {
     @Value("${app.security.refresh-cookie.path}")
     private String refreshTokenCookiePath;
 
-    @Value("${app.security.cookie.secure:true}") // Default to true, configurable
+    @Value("${app.security.cookie.secure:true}")
     private boolean secureCookie;
+
+    @Value("${app.frontend.url}") // URL of the Vue.js frontend
+    private String frontendUrl;
 
     /**
      * Constructs the AuthServiceImpl with necessary dependencies.
@@ -84,17 +94,22 @@ public class AuthServiceImpl implements IAuthService {
      */
     @Autowired
     public AuthServiceImpl(IUserService userService,
+                           UserRepository userRepository,
                            IRoleRepository roleRepository,
                            PasswordEncoder passwordEncoder,
                            AuthenticationManager authenticationManager,
                            JwtUtilities jwtUtilities,
-                           IRefreshTokenService refreshTokenService) {
+                           IRefreshTokenService refreshTokenService,
+                           IEmailService emailService
+    ) {
         this.userService = userService;
+        this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtilities = jwtUtilities;
         this.refreshTokenService = refreshTokenService;
+        this.emailService = emailService;
         log.info("AuthServiceImpl initialized. Secure cookie flag: {}, Refresh token cookie name: '{}', Path: '{}', Duration: {}ms",
                 secureCookie, refreshTokenCookieName, refreshTokenCookiePath, refreshTokenDurationMs);
     }
@@ -128,7 +143,7 @@ public class AuthServiceImpl implements IAuthService {
      * {@inheritDoc}
      */
     // In AuthServiceImpl.java
-    @Override
+    /*@Override
     public User registerUser(String firstName, String lastName, String email, String plainPassword, RoleName defaultRoleName) {
         log.info("AuthService: Attempting to register new user with email: {}", email);
         if (userService.existsByEmail(email)) { // Check via IUserService.read()
@@ -158,6 +173,54 @@ public class AuthServiceImpl implements IAuthService {
 
         log.info("AuthService: Successfully registered user. ID: {}, UUID: '{}', Email: '{}'",
                 savedUser.getId(), savedUser.getUuid(), savedUser.getEmail());
+        return savedUser;
+    }*/
+    @Override
+    public User registerUser(String firstName, String lastName, String email, String plainPassword, RoleName defaultRoleName) {
+        log.info("AuthService: Attempting to register new user with email: {}", email);
+        if (userService.existsByEmail(email)) {
+            log.warn("AuthService: Registration failed. Email '{}' already exists.", email);
+            throw new EmailAlreadyExistsException("Email " + email + " is already taken!");
+        }
+
+        Role userRoleEntity = roleRepository.findByRoleName(defaultRoleName);
+        if (userRoleEntity == null) {
+            log.error("AuthService: Default role '{}' not found. This is a critical configuration error.", defaultRoleName);
+            throw new IllegalStateException("Default role " + defaultRoleName + " not found.");
+        }
+
+        User userToCreateDetails = User.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .password(plainPassword)
+                .build();
+
+        // The user service is now responsible ONLY for creating the user record.
+        User savedUser = userService.createUser(userToCreateDetails, Collections.singletonList(userRoleEntity));
+
+        log.info("AuthService: Successfully registered user. ID: {}, Email: '{}'", savedUser.getId(), savedUser.getEmail());
+
+        // --- START: WELCOME EMAIL LOGIC ---
+        // This is the correct place for it. Part of the registration business process.
+        try {
+            Map<String, Object> templateVariables = new HashMap<>();
+            templateVariables.put("name", savedUser.getFirstName());
+
+            emailService.sendHtmlMessage(
+                    savedUser.getEmail(),
+                    "Welcome to On The Go Rentals!",
+                    "email/welcome", // Path to 'src/main/resources/templates/email/welcome.html'
+                    templateVariables
+            );
+            log.info("Welcome email queued for user: {}", savedUser.getEmail());
+        } catch (Exception e) {
+            // Log the error but do not throw it. User registration should not fail
+            // if the email service is down.
+            log.error("Could not send welcome email to user {}: {}", savedUser.getEmail(), e.getMessage());
+        }
+        // --- END: WELCOME EMAIL LOGIC ---
+
         return savedUser;
     }
 
@@ -297,6 +360,92 @@ public class AuthServiceImpl implements IAuthService {
         log.debug("AuthService: Headers added to HTTP response to instruct client to clear refresh token cookie.");
     }
 
+    /**
+     * Initiates a password reset process by generating a token and sending it to the user's email.
+     *
+     * @param email The email address of the user requesting the password reset.
+     */
+    @Override
+    public void initiatePasswordReset(String email) {
+        log.info("AuthService: Password reset initiated for email: {}", email);
+        userRepository.findByEmail(email).ifPresent(user -> {
+            String token = UUID.randomUUID().toString();
+            user.setPasswordResetToken(token);
+            user.setPasswordResetTokenExpiry(LocalDateTime.now().plusHours(1)); // Token is valid for 1 hour
+            userRepository.save(user);
+
+            // Construct the reset URL pointing to the frontend application
+            String resetUrl = frontendUrl + "/reset-password?token=" + token;
+
+            Map<String, Object> emailContext = new HashMap<>();
+            emailContext.put("name", user.getFirstName());
+            emailContext.put("resetUrl", resetUrl);
+
+            emailService.sendHtmlMessage(
+                    user.getEmail(),
+                    "Your Password Reset Request",
+                    "email/password-reset-request",
+                    emailContext
+            );
+            log.info("Password reset email queued for user ID: {}", user.getId());
+        });
+        // Note: We deliberately do not throw an error if the user is not found
+        // to prevent attackers from discovering registered email addresses.
+        log.debug("AuthService: Password reset process finished for attempt on email: {}", email);
+    }
+
+    /**
+     * Finalizes the password reset process by validating the token and updating the user's password.
+     *
+     * @param token       The password reset token sent to the user's email.
+     * @param newPassword The new password to set for the user.
+     * @throws InvalidTokenException if the token is invalid or expired.
+     */
+
+    @Override
+    public void finalizePasswordReset(String token, String newPassword) {
+        log.info("AuthService: Attempting to finalize password reset with provided token.");
+        User user = userRepository.findByPasswordResetToken(token)
+                .orElseThrow(() -> new BadRequestException("Invalid or non-existent password reset token."));
+
+        if (user.getPasswordResetTokenExpiry().isBefore(LocalDateTime.now())) {
+            // Invalidate the expired token before throwing an error
+            user.setPasswordResetToken(null);
+            user.setPasswordResetTokenExpiry(null);
+            userRepository.save(user);
+            throw new BadRequestException("Password reset token has expired.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        // Clear the token so it cannot be used again
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiry(null);
+
+        userRepository.save(user);
+        log.info("Successfully reset password for user ID: {}", user.getId());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AuthDetails loginUserWithOAuth(User user, HttpServletResponse httpServletResponse) {
+        log.info("AuthService: Performing OAuth login for user '{}'", user.getEmail());
+
+        List<String> roleNames = user.getRoles().stream()
+                .map(Role::getRoleName).collect(Collectors.toList());
+
+        String accessToken = jwtUtilities.generateToken(user, roleNames);
+        RefreshToken refreshTokenEntity = refreshTokenService.createRefreshToken(user.getId());
+
+        ResponseCookie refreshTokenCookie = generateHttpOnlyRefreshTokenCookie(refreshTokenEntity.getToken());
+        httpServletResponse.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
+        log.info("AuthService: Successfully logged in OAuth user: '{}'.", user.getEmail());
+        return new AuthDetails(user, accessToken, roleNames);
+    }
+
+
     // --- Helper classes for returning structured data (internal to this service) ---
     // These are not web DTOs but internal data carriers.
     // The controller layer is responsible for mapping data from these into web DTOs.
@@ -346,4 +495,6 @@ public class AuthServiceImpl implements IAuthService {
             return newAccessToken;
         }
     }
+
+
 }

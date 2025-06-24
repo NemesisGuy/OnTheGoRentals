@@ -138,7 +138,7 @@ public class AdminBookingController {
             @Parameter(description = "UUID of the booking to retrieve", required = true) @PathVariable UUID bookingUuid) {
         log.info("Admin request to get booking by UUID: {}", bookingUuid);
         Booking bookingEntity = bookingService.read(bookingUuid);
-        return ResponseEntity.ok(BookingMapper.toDto(bookingEntity, fileStorageService , publicApiUrl));
+        return ResponseEntity.ok(BookingMapper.toDto(bookingEntity, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -193,7 +193,7 @@ public class AdminBookingController {
         log.info("Admin [{}]: Successfully updated booking with UUID: {}", requesterId, persistedBooking.getUuid());
 
         // 5. Map the final entity back to a DTO for the response.
-        return ResponseEntity.ok(BookingMapper.toDto(persistedBooking, fileStorageService , publicApiUrl));
+        return ResponseEntity.ok(BookingMapper.toDto(persistedBooking, fileStorageService, publicApiUrl));
     }
 
     /**
@@ -234,6 +234,6 @@ public class AdminBookingController {
         if (bookings.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(BookingMapper.toDtoList(bookings, fileStorageService , publicApiUrl));
+        return ResponseEntity.ok(BookingMapper.toDtoList(bookings, fileStorageService, publicApiUrl));
     }
 }

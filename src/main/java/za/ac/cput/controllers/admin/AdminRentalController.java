@@ -93,7 +93,7 @@ public class AdminRentalController {
 
         Rental rentalToCreate = RentalMapper.toEntity(createDto, userEntity, carEntity, driverEntity);
         Rental createdEntity = rentalService.create(rentalToCreate);
-        return new ResponseEntity<>(RentalMapper.toDto(createdEntity, fileStorageService , publicApiUrl), HttpStatus.CREATED);
+        return new ResponseEntity<>(RentalMapper.toDto(createdEntity, fileStorageService, publicApiUrl), HttpStatus.CREATED);
     }
 
     /**
@@ -213,7 +213,7 @@ public class AdminRentalController {
         Rental rentalWithUpdates = RentalMapper.applyUpdateDtoToEntity(updateDto, existingRental, userEntity, carEntity, driverEntity);
         Rental persistedRental = rentalService.update(rentalWithUpdates);
 
-        return ResponseEntity.ok(RentalMapper.toDto(persistedRental, fileStorageService, publicApiUrl   ));
+        return ResponseEntity.ok(RentalMapper.toDto(persistedRental, fileStorageService, publicApiUrl));
     }
 
     /**

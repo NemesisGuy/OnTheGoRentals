@@ -122,4 +122,17 @@ public interface IUserService {
      * @return {@code true} if a user with the given email exists, {@code false} otherwise.
      */
     boolean existsByEmail(String email);
+
+    /**
+     * Processes the OAuth2 post-login logic.
+     * This method is called after a successful OAuth2 authentication.
+     * It should find an existing user or create a new one based on the provided details.
+     *
+     * @param email     The email address of the authenticated user.
+     * @param firstName The first name of the authenticated user.
+     * @param lastName  The last name of the authenticated user.
+     * @return The {@link User} entity representing the authenticated user.
+     */
+    User processOAuthPostLogin(String email, String firstName, String lastName);
+
 }

@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 /**
  * User.java
  * Represents a user in the system, implementing Spring Security's UserDetails.
- * Now includes fields for managing a user's profile image.
+ * Now includes fields for managing a user's profile image and password resets.
  * <p>
  * Author: Peter Buckingham (220165289)
- * Updated: 2024-06-07
+ * Updated: 2025-06-23
  */
 @Entity
 @Getter
@@ -64,10 +64,26 @@ public class User implements Serializable, UserDetails {
     @Column(length = 20)
     AuthProvider authProvider;
 
-    // New fields for profile image tracking
-    String profileImageFileName;    // e.g., "user_selfie_abc.jpg"
-    String profileImageType;        // e.g., "selfies" from ImageType enum
+    // --- Profile Image Tracking ---
+    String profileImageFileName;
+    String profileImageType;
     LocalDateTime profileImageUploadedAt;
+
+    // --- Password Reset Fields ---
+    /**
+     * A unique, secure token generated for a password reset request.
+     * This token is sent to the user via email. It is temporary and single-use.
+     */
+    @Column(name = "password_reset_token", unique = true)
+    String passwordResetToken;
+
+    /**
+     * The timestamp indicating when the passwordResetToken expires.
+     * After this time, the token is considered invalid.
+     */
+    @Column(name = "password_reset_token_expiry")
+    LocalDateTime passwordResetTokenExpiry;
+
 
     @Column(nullable = false)
     boolean deleted = false;
@@ -111,7 +127,6 @@ public class User implements Serializable, UserDetails {
     // --- UserDetails Implementation ---
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Implementation remains the same
         return this.roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
                 .collect(Collectors.toList());

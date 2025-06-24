@@ -1,0 +1,157 @@
+version: '3.8'
+
+# This Docker Compose file sets up a complete staging environment.
+# All configuration is passed directly via environment variables,
+# suitable for deployment in Portainer without an .env file.
+
+services:
+  # 1. MySQL Database Service (unchanged)
+  mysql:
+    image: mysql:8.0
+    container_name: staging-mysql-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: OnTheGoRentalsDatabase
+      MYSQL_ROOT_PASSWORD: my_secret_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - staging-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "--password=my_secret_password" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # 2. MinIO S3-Compatible Object Storage Service (unchanged)
+  minio:
+    image: minio/minio:latest
+    container_name: staging-minio-server
+    command: server /data --console-address ":9001"
+    ports:
+      - "9012:9000"
+      - "9013:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_SERVER_URL: "https://minio-api.nemesisnet.co.za"
+      MINIO_BROWSER_REDIRECT_URL: "https://minio-console.nemesisnet.co.za"
+    volumes:
+      - minio-data:/data
+    networks:
+      - staging-network
+    healthcheck:
+      test: [ "CMD", "mc", "ready", "local" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
+  # 3. Spring Boot Backend Service (unchanged)
+  backend:
+    image: nemesisguy/on-the-go-rentals-backend:latest
+    container_name: staging-backend-app
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=staging,storage-minio
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/OnTheGoRentalsDatabase?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=my_secret_password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - MINIO_URL=http://minio:9000
+      - MINIO_PUBLIC_URL=https://minio-api.nemesisnet.co.za
+      - APP_PUBLIC_API_URL=https://otgrapi.nemesisnet.co.za
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET_NAME=car-rental-app
+      - JWT_SECRET=2b44b0b00fd822d8ce753e54dac3dc4e06c2725f7db930f3b9924468b53194dbccdbe23d7baa5ef5fbc414ca4b2e64700bad60c5a7c45eaba56880985582fba4
+      - JWT_EXPIRATION=36000000
+      - JWT_REFRESH_TOKEN_EXPIRATION_MS=604800000
+      - GOOGLE_CLIENT_ID=your_actual_google_client_id
+      - GOOGLE_CLIENT_SECRET=your_actual_google_client_secret
+      - GOOGLE_REDIRECT_URI=https://otgrapi.nemesisnet.co.za/login/oauth2/code/google
+    ports:
+      - "8087:8080"
+    networks:
+      - staging-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  # 4. Vue.js Frontend Service (unchanged)
+  frontend:
+    image: nemesisguy/on-the-go-rentals-frontend:latest
+    container_name: staging-frontend-app
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      - BACKEND_API_BASE_URL=https://otgrapi.nemesisnet.co.za
+    networks:
+      - staging-network
+    depends_on:
+      - backend
+
+  # 5. phpMyAdmin Database Management Tool (unchanged)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: staging-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: my_secret_password
+    ports:
+      - "8085:80"
+    networks:
+      - staging-network
+    depends_on:
+      - mysql
+
+  # 6. Prometheus Monitoring Service --- CORRECTED ---
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: staging-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      # FIX: Mount the entire directory instead of the single file.
+      # - ./prometheus:/etc/prometheus
+      - /etc/docker/on-the-go-rentals/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+    networks:
+      - staging-network
+    depends_on:
+      - backend
+
+  # 7. Grafana Visualization Service --- CORRECTED ---
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: staging-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    volumes:
+      # FIX: Mount the parent directory that contains the provisioning structure.
+      # - ./grafana/provisioning:/etc/grafana/provisioning
+      - /etc/docker/on-the-go-rentals/grafana/provisioning:/etc/grafana/provisioning
+
+    networks:
+      - staging-network
+    depends_on:
+      - prometheus
+
+# Define the persistent volumes
+volumes:
+  mysql-data: { }
+  minio-data: { }
+
+# Define the shared network for all services
+networks:
+  staging-network:
+    driver: bridge

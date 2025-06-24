@@ -2,7 +2,8 @@
 
 ## System Purpose
 
-**OnTheGoRentals** is a car rental management application built using Spring Boot. It manages the entire rental lifecycle from bookings to active rentals, damage reporting, and administrative functions.
+**OnTheGoRentals** is a car rental management application built using Spring Boot. It manages the entire rental
+lifecycle from bookings to active rentals, damage reporting, and administrative functions.
 
 ## I. Core Technologies
 
@@ -152,4 +153,6 @@
 
 ---
 
-This document serves as the current architecture baseline of the **OnTheGoRentals** system before the upcoming architectural revisions and feature enhancements (e.g., incident reports outside customer custody, driver clarification, and refined rental status handling).
+This document serves as the current architecture baseline of the **OnTheGoRentals** system before the upcoming
+architectural revisions and feature enhancements (e.g., incident reports outside customer custody, driver clarification,
+and refined rental status handling).

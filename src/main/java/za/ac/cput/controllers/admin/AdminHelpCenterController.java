@@ -30,11 +30,10 @@ import java.util.UUID;
  * Allows admins to perform full CRUD operations on help topics.
  *
  * @author Aqeel Hanslo (219374422)
- * @version 1.0
- * @since 2023-10-01
- * This controller provides endpoints for creating, reading, updating, and deleting help topics.
  * @author Peter Buckingham (220165289)
  * @version 2.0
+ * @since 2023-10-01
+ * This controller provides endpoints for creating, reading, updating, and deleting help topics.
  */
 @RestController
 @RequestMapping("/api/v1/admin/help-topics")

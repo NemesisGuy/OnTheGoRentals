@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Welcome to On The Go Rentals!</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+        }
+
+        .header {
+            font-size: 24px;
+            color: #e83e8c;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="header">Welcome, <span th:text="${name}">User</span>!</h1>
+    <p>Thank you for signing up for On The Go Rentals. We're excited to have you on board.</p>
+    <p>You can now log in to your account and start browsing our fleet of available vehicles.</p>
+    <p>Happy renting!</p>
+    <p>— The On The Go Rentals Team</p>
+</div>
+</body>
+</html>

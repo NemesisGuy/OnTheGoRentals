@@ -114,7 +114,7 @@ public class LocalFileStorageService implements IFileStorageService {
      *
      * @param key The key (relative path) of the file to load (e.g., "cars/uuid.jpg").
      * @return An {@link Optional} containing the {@link Resource} if the file exists and is readable,
-     *         or an empty Optional otherwise.
+     * or an empty Optional otherwise.
      */
     @Override
     public Optional<Resource> loadAsResource(String key) {

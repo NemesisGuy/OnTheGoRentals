@@ -107,7 +107,7 @@ public class BookingController {
             throw new CarNotAvailableException("Car with UUID: " + carToBook.getUuid() + " is not available for booking.");
         }
 
-        Booking bookingToCreate = BookingMapper.toEntity(bookingRequestDTO, currentUser, carToBook,null);
+        Booking bookingToCreate = BookingMapper.toEntity(bookingRequestDTO, currentUser, carToBook, null);
         Booking createdBookingEntity = bookingService.create(bookingToCreate);
 
         log.info("Requester [{}]: Successfully created booking with UUID: {}", requesterId, createdBookingEntity.getUuid());

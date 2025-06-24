@@ -9,17 +9,18 @@ This file contains tracked bugs, planned improvements, and technical notes for i
 - [ ] Dashboard: formatting glitch on mobile view
 
 # 🐛 Bugs to Fix
-- [ ] Backend bookings sends whole user object including password in json response - switch to DTO
-- [ ] Booking(admin create booking) form dates: date not getting to DB could be date picker not working 
-- [x] user profile update and read returning ful user object, switch to DTO (UserResponseDTO is used in UserController and AdminUserController for profile read/update responses)
 
+- [ ] Backend bookings sends whole user object including password in json response - switch to DTO
+- [ ] Booking(admin create booking) form dates: date not getting to DB could be date picker not working
+- [x] user profile update and read returning ful user object, switch to DTO (UserResponseDTO is used in UserController
+  and AdminUserController for profile read/update responses)
 
 # ✅ Done
+
 - [x] Fixed loading modal timing in booking form
 - [x] Booking modal not hiding loader on cancel
 - [x] Dashboard chart icon missing
 - [x] Role null pointer error when fetching users
-
 
 ---
 
@@ -47,7 +48,8 @@ This file contains tracked bugs, planned improvements, and technical notes for i
 - [x] Loading modal shows correctly on API call start
 - [x] Added confirmation modal before creating booking
 - [x] [Refactor] `/api/admin/users/list/all` fetch into separate method
-- [x] [Refactor] Centralize Axios auth headers using interceptor - Refactor all manual Axios Authorization headers to use global interceptor
+- [x] [Refactor] Centralize Axios auth headers using interceptor - Refactor all manual Axios Authorization headers to
+  use global interceptor
 
 ---
 
@@ -59,12 +61,11 @@ This file contains tracked bugs, planned improvements, and technical notes for i
 
 ---
 
-
-
 ## 🛠️ Refactoring Summary
-### Admin Controllers and Vue.js Components Refactor
-(2025-05-27)
 
+### Admin Controllers and Vue.js Components Refactor
+
+(2025-05-27)
 
 Completed a comprehensive refactoring of all administrative controllers
 (AboutUs, Car, ContactUs, Driver, Faq, HelpCenter, Rental, User)
@@ -73,6 +74,7 @@ and their corresponding Vue.js management components.
 This effort establishes consistent patterns across the admin interface:
 
 Backend (Admin Controllers):
+
 - Standardized base API paths to `/api/v1/admin/{resource_plural}`.
 - Implemented RESTful CRUD operations using standard HTTP methods.
 - External resource identification now consistently uses UUIDs in path
@@ -90,6 +92,7 @@ Backend (Admin Controllers):
 - Removed direct factory usage from controllers.
 
 Frontend (Admin Vue Components - e.g., RentalManagement, UsersManagement):
+
 - Updated to consume the `ApiResponse` wrapper for all API calls.
 - Adapted to use UUIDs when interacting with specific resources via API.
 - Data fetching, inline editing, creation, and deletion logic now use

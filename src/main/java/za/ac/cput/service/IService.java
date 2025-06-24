@@ -51,6 +51,7 @@ public interface IService<T, ID> {
      * (e.g., if the entity was not found).
      */
     boolean delete(ID id);
+
     /**
      * Retrieves all entities.
      *

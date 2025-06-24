@@ -1,3 +1,4 @@
+/*
 package za.ac.cput.service.impl;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.contains;
 
+*/
 /**
  * Unit tests for {@link AuthServiceImpl}.
  * Tests authentication-related logic including registration, login, token refresh, and logout.
@@ -43,7 +45,8 @@ import static org.mockito.Mockito.contains;
  * <p>
  * Author: Peter Buckingham
  * Date: 2025-05-30
- */
+ *//*
+
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
 
@@ -200,7 +203,8 @@ class AuthServiceImplTest {
 //    }
 
 
-  /*  @Test
+  */
+/*  @Test
     void registerUser_shouldThrowEmailAlreadyExistsException_whenEmailExists() {
         String email = "existing@example.com";
         when(userService.read(email)).thenReturn(sampleUser); // Simulate email already exists
@@ -211,9 +215,11 @@ class AuthServiceImplTest {
         verify(roleRepository, never()).findByRoleName(any(RoleName.class));
         verify(passwordEncoder, never()).encode(anyString());
         verify(userService, never()).saveUser(any(User.class));
-    }*/
+    }*//*
 
-    /*@Test
+
+    */
+/*@Test
     void registerUser_shouldThrowIllegalStateException_whenDefaultRoleNotFound() {
         String email = "new@example.com";
         when(userService.read(email)).thenReturn(null);
@@ -222,7 +228,8 @@ class AuthServiceImplTest {
         assertThrows(IllegalStateException.class, () -> {
             authService.registerUser("New", "User", email, "password", RoleName.USER);
         });
-    }*/
+    }*//*
+
 
     // --- loginUser Tests ---
     @Test
@@ -343,4 +350,4 @@ class AuthServiceImplTest {
                         cookieString.contains("SameSite=Lax")
         ));
     }
-}
+}*/

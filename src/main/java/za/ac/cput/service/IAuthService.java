@@ -68,4 +68,33 @@ public interface IAuthService {
      * @param httpServletResponse The response object.
      */
     void clearAuthCookies(HttpServletResponse httpServletResponse);
+
+    /**
+     * Initiates a password reset process by generating a token and sending it to the user's email.
+     *
+     * @param email The email address of the user requesting the password reset.
+     */
+    void initiatePasswordReset(String email);
+
+
+    /**
+     * Finalizes the password reset process by validating the token and updating the user's password.
+     *
+     * @param token       The password reset token sent to the user's email.
+     * @param newPassword The new password to set for the user.
+     * @throws za.ac.cput.exception.InvalidTokenException if the token is invalid or expired.
+     */
+    void finalizePasswordReset(String token, String newPassword);
+
+    /**
+     * Logs in a user using OAuth2 authentication, typically after validating an ID token from a third-party provider.
+     *
+     * @param user                The user entity containing information from the OAuth2 provider.
+     * @param httpServletResponse The response object to add the refresh token cookie to.
+     * @return An {@link AuthServiceImpl.AuthDetails} object containing the authenticated {@link User},
+     * the access token string, and their role names.
+     */
+
+    AuthServiceImpl.AuthDetails loginUserWithOAuth(User user, HttpServletResponse httpServletResponse);
+
 }
