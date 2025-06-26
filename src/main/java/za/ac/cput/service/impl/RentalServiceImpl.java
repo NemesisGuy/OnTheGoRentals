@@ -82,6 +82,7 @@ public class RentalServiceImpl implements IRentalService {
 
         // Use the builder to modify the managed car entity
         new Car.Builder().copy(car).setAvailable(false).applyTo(car);
+        carRepository.save(car);
         log.info("Car UUID {} marked as unavailable for new rental.", car.getUuid());
 
         // Construct the final rental object using the builder, NOT setters
@@ -209,6 +210,8 @@ public class RentalServiceImpl implements IRentalService {
                 .setUuid(existingRental.getUuid())
                 .applyTo(existingRental);
 
+
+
         log.info("Rental ID {} successfully updated. New status: {}", rentalId, existingRental.getStatus());
         return existingRental;
     }
@@ -219,6 +222,8 @@ public class RentalServiceImpl implements IRentalService {
         // This is now safe because the main update method will fetch the managed entity
         // based on the ID set here.
         new Rental.Builder().copy(rental).setId(id).applyTo(rental);
+        log.info("Updating rental with ID: {}", id);
+
         return update(rental);
     }
 
@@ -230,12 +235,12 @@ public class RentalServiceImpl implements IRentalService {
     public boolean delete(Integer id) {
         log.info("Attempting to soft-delete rental ID: {}", id);
         return rentalRepository.findByIdAndDeletedFalse(id).map(rental -> {
-            Car car = rental.getCar();
-            if (car != null && !car.isAvailable() && rental.getStatus() == RentalStatus.ACTIVE) {
-                new Car.Builder().copy(car).setAvailable(true).applyTo(car);
-                log.info("Car UUID {} marked as available due to deletion of active rental ID {}", car.getUuid(), id);
-            }
+            // --- THE FIX IS HERE ---
+            // Use the helper method to handle the logic and the save call.
+            updateCarAvailabilityOnStatusChange(rental.getCar(), rental.getStatus(), RentalStatus.CANCELLED);
+
             new Rental.Builder().copy(rental).setDeleted(true).setStatus(RentalStatus.CANCELLED).applyTo(rental);
+            rentalRepository.save(rental);
             log.info("Rental ID {} successfully marked as deleted.", id);
             return true;
         }).orElse(false);
@@ -252,17 +257,20 @@ public class RentalServiceImpl implements IRentalService {
         if (rental.getStatus() != RentalStatus.ACTIVE)
             throw new IllegalStateException("Only an ACTIVE rental can be completed.");
 
-        Car car = rental.getCar();
+/*        Car car = rental.getCar();
         if (car != null) {
             new Car.Builder().copy(car).setAvailable(true).applyTo(car);
+            carRepository.save(car);
             log.info("Car UUID {} marked as available upon rental completion.", car.getUuid());
-        }
+        }*/
+        updateCarAvailabilityOnStatusChange(rental.getCar(), rental.getStatus(), RentalStatus.COMPLETED);
 
         new Rental.Builder().copy(rental)
                 .setStatus(RentalStatus.COMPLETED)
                 .setReturnedDate(LocalDateTime.now())
                 .setFine((int) fineAmount)
                 .applyTo(rental);
+        rentalRepository.save(rental);
 
         log.info("Rental UUID {} completed successfully.", rentalUuid);
         return rental;
@@ -280,13 +288,16 @@ public class RentalServiceImpl implements IRentalService {
             throw new IllegalStateException("Cannot cancel a completed rental.");
         if (rental.getStatus() == RentalStatus.CANCELLED) return rental;
 
-        Car car = rental.getCar();
+       /* Car car = rental.getCar();
         if (car != null && !car.isAvailable()) {
             new Car.Builder().copy(car).setAvailable(true).applyTo(car);
+            carRepository.save(car);
             log.info("Car UUID {} marked as available upon rental cancellation.", car.getUuid());
-        }
+        }*/
+        updateCarAvailabilityOnStatusChange(rental.getCar(), rental.getStatus(), RentalStatus.CANCELLED);
 
         new Rental.Builder().copy(rental).setStatus(RentalStatus.CANCELLED).applyTo(rental);
+        rentalRepository.save(rental);
         log.info("Rental UUID {} cancelled successfully.", rentalUuid);
         return rental;
     }
@@ -301,13 +312,16 @@ public class RentalServiceImpl implements IRentalService {
         if (rental == null) throw new ResourceNotFoundException("Rental not found: " + rentalUuid);
         if (rental.getStatus() == RentalStatus.ACTIVE) return rental;
 
-        Car car = rental.getCar();
+        /*Car car = rental.getCar();
         if (car != null && car.isAvailable()) {
             new Car.Builder().copy(car).setAvailable(false).applyTo(car);
+            carRepository.save(car);
             log.info("Car UUID {} marked as unavailable upon rental confirmation.", car.getUuid());
-        }
+        }*/
+        updateCarAvailabilityOnStatusChange(rental.getCar(), rental.getStatus(), RentalStatus.ACTIVE);
 
         new Rental.Builder().copy(rental).setStatus(RentalStatus.ACTIVE).applyTo(rental);
+        rentalRepository.save(rental);
         log.info("Rental UUID {} confirmed successfully.", rentalUuid);
         return rental;
     }
@@ -380,7 +394,7 @@ public class RentalServiceImpl implements IRentalService {
     public List<Rental> findByUserIdAndReturnedDateIsNullAndDeletedFalse(Integer userId) {
         return rentalRepository.findByUserIdAndReturnedDateIsNullAndDeletedFalse(userId);
     }
-
+/*
     private void updateCarAvailabilityOnStatusChange(Car car, RentalStatus oldStatus, RentalStatus newStatus) {
         if (car == null) return;
         boolean wasActive = oldStatus == RentalStatus.ACTIVE;
@@ -390,6 +404,24 @@ public class RentalServiceImpl implements IRentalService {
             new Car.Builder().copy(car).setAvailable(true).applyTo(car);
         } else if (!wasActive && newStatus == RentalStatus.ACTIVE && car.isAvailable()) {
             new Car.Builder().copy(car).setAvailable(false).applyTo(car);
+        }
+    }*/
+    private void updateCarAvailabilityOnStatusChange(Car car, RentalStatus oldStatus, RentalStatus newStatus) {
+        if (car == null) return;
+        boolean wasActive = oldStatus == RentalStatus.ACTIVE;
+        boolean isNowTerminal = newStatus == RentalStatus.COMPLETED || newStatus == RentalStatus.CANCELLED;
+
+        // If the car was active and is now being completed/cancelled, make it available again.
+        if (wasActive && isNowTerminal && !car.isAvailable()) {
+            new Car.Builder().copy(car).setAvailable(true).applyTo(car);
+            carRepository.save(car); // --- EXPLICIT SAVE ---
+            log.info("Car {} made available.", car.getUuid());
+        }
+        // If the car was NOT active and is now becoming active, make it unavailable.
+        else if (!wasActive && newStatus == RentalStatus.ACTIVE && car.isAvailable()) {
+            new Car.Builder().copy(car).setAvailable(false).applyTo(car);
+            carRepository.save(car); // --- EXPLICIT SAVE ---
+            log.info("Car {} made unavailable.", car.getUuid());
         }
     }
 }

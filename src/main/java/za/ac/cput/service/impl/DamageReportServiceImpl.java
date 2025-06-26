@@ -3,6 +3,7 @@ package za.ac.cput.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.ac.cput.domain.entity.DamageReport;
@@ -42,9 +43,9 @@ public class DamageReportServiceImpl implements IDamageReportService { // Correc
      * @param rentalService          The service for rental-related operations (e.g., validating rental existence).
      */
     @Autowired
-    public DamageReportServiceImpl(IDamageReportRepository damageReportRepository, IRentalService rentalService) {
+    public DamageReportServiceImpl(IDamageReportRepository damageReportRepository, @Lazy IRentalService rentalService) {
         this.damageReportRepository = damageReportRepository;
-        this.rentalService = rentalService; // Injected for potential validation
+        this.rentalService = rentalService;
         log.info("DamageReportServiceImpl initialized.");
     }
 
@@ -171,20 +172,30 @@ public class DamageReportServiceImpl implements IDamageReportService { // Correc
                 });
 
         // Business rule: Rental associated with a damage report typically should not change.
-        if (damageReportWithUpdates.getRental() == null ||
-                !damageReportWithUpdates.getRental().getUuid().equals(existingReport.getRental().getUuid())) {
-            log.error("Update failed for damage report ID {}: Attempt to change associated Rental is not allowed.", reportId);
+        // New, more robust validation logic.
+
+        // 1. The existing report MUST have a rental.
+        if (existingReport.getRental() == null || existingReport.getRental().getUuid() == null) {
+            log.error("Update failed for report ID {}: The existing report in the database has a missing or invalid rental link.", reportId);
+            throw new IllegalStateException("Data integrity error: Existing damage report has no associated rental.");
+        }
+
+        // 2. The incoming update MUST specify the same rental.
+        if (damageReportWithUpdates.getRental() == null || damageReportWithUpdates.getRental().getUuid() == null) {
+            log.error("Update failed for report ID {}: The update request is missing the rental information.", reportId);
+            throw new IllegalArgumentException("The associated Rental cannot be removed from a DamageReport during an update.");
+        }
+
+        // 3. Compare the UUIDs.
+        if (!damageReportWithUpdates.getRental().getUuid().equals(existingReport.getRental().getUuid())) {
+            log.error("Update failed for report ID {}: Attempt to change associated Rental is not allowed.", reportId);
             throw new IllegalArgumentException("The associated Rental of a DamageReport cannot be changed post-creation.");
         }
 
-        log.debug("Updating damage report ID: {}. New Description: '{}'",
-                reportId, damageReportWithUpdates.getDescription());
-        // 'damageReportWithUpdates' IS the new state, built by the controller (ensuring Rental is not changed).
-
+        // 'damageReportWithUpdates' is now safe to save.
         DamageReport savedReport = damageReportRepository.save(damageReportWithUpdates);
-        log.info("Successfully updated damage report. ID: {}, UUID: '{}'",
-                savedReport.getId(), savedReport.getUuid());
-        return savedReport; // Original code returned null, corrected to return saved entity
+        log.info("Successfully updated damage report. ID: {}, UUID: '{}'", savedReport.getId(), savedReport.getUuid());
+        return savedReport;
     }
 
     /**

@@ -129,4 +129,17 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
      * * @return A list of {@link Booking} entities that match the criteria and are not soft-deleted.
      */
     List<Booking> findByStatusAndStartDateBetweenAndDeletedFalse(BookingStatus bookingStatus, LocalDateTime startOfDay, LocalDateTime endOfDay);
+
+    /**
+     * Finds the IDs of all cars that are booked and confirmed within a given date range.
+     * This query identifies cars that are definitively unavailable for a new booking.
+     * The overlap logic is: (booking starts before range ends) AND (booking ends after range starts).
+     *
+     * @param startDate The start of the desired booking period.
+     * @param endDate   The end of the desired booking period.
+     * @return A list of integer IDs for the cars that are booked.
+     */
+    @Query("SELECT b.car.id FROM Booking b WHERE b.status = 'CONFIRMED' AND (b.startDate < :endDate AND b.endDate > :startDate)")
+    List<Integer> findBookedCarIdsByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
 }

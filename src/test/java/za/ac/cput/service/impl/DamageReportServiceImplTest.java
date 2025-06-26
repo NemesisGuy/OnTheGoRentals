@@ -1,21 +1,21 @@
-/*
 package za.ac.cput.service.impl;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.entity.DamageReport;
 import za.ac.cput.domain.entity.Rental;
+import za.ac.cput.domain.entity.security.User;
 import za.ac.cput.exception.ResourceNotFoundException;
 import za.ac.cput.repository.IDamageReportRepository;
 import za.ac.cput.service.IRentalService;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,385 +23,199 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-*/
 /**
- * Unit tests for {@link DamageReportServiceImpl}.
- * Tests CRUD operations and business logic for DamageReport entities.
- *//*
-
+ * Unit tests for the DamageReportServiceImpl class.
+ * Uses Mockito to isolate the service logic and verify its interactions with dependencies.
+ */
 @ExtendWith(MockitoExtension.class)
 class DamageReportServiceImplTest {
 
     @Mock
     private IDamageReportRepository damageReportRepository;
-
     @Mock
     private IRentalService rentalService;
 
     @InjectMocks
     private DamageReportServiceImpl damageReportService;
 
-    private DamageReport sampleDamageReport;
-    private Rental sampleRental;
-    private UUID commonReportUuid;
-    private UUID commonRentalUuid;
-    private LocalDateTime fixedTime;
+    private Rental rental;
+    private DamageReport damageReport;
 
+    // Set up common test objects before each test runs
     @BeforeEach
     void setUp() {
-        commonRentalUuid = UUID.randomUUID();
-        commonReportUuid = UUID.randomUUID();
-        fixedTime = LocalDateTime.now();
+        UUID rentalUuid = UUID.randomUUID();
+        UUID carUuid = UUID.randomUUID();
+        UUID userUuid = UUID.randomUUID();
 
-        sampleRental = Rental.builder()
-                .setUuid(commonRentalUuid)
-                .setId(1)
-                .build();
+        User user = User.builder().uuid(userUuid).email("test@example.com").build();
+        Car car = new Car.Builder().setUuid(carUuid).setMake("Toyota").build();
+        rental = new Rental.Builder().setUuid(rentalUuid).setUser(user).setCar(car) .build();
 
-        sampleDamageReport = new DamageReport.Builder()
-                .setId(1)
-                .setUuid(commonReportUuid)
-                .setRental(sampleRental)
-                .setDescription("Scratch on the left door.")
-                .setDateAndTime(fixedTime.minusDays(1))
-                .setLocation("Parking Lot A")
-                .setRepairCost(150.00)
-                .setCreatedAt(fixedTime.minusDays(1))
-                .setUpdatedAt(fixedTime.minusHours(2))
-                .setDeleted(false)
+        damageReport = new DamageReport.Builder()
+                .setDescription("Scratch on the left door")
+                .setRental(rental)
                 .build();
     }
 
-    // --- Create Tests ---
     @Test
-    void create_shouldSaveAndReturnReport_whenRentalExists() {
-        DamageReport reportToCreate = new DamageReport.Builder()
-                .setRental(sampleRental)
-                .setDescription("New dent on bumper.")
-                .setLocation("Highway Exit 5")
-                .build();
+    @DisplayName("Should create a damage report when a valid rental exists")
+    void create_WithValidRental_ShouldSucceed() {
+        // --- Arrange ---
+        // Mock the rentalService to confirm that the rental exists
+        when(rentalService.read(rental.getUuid())).thenReturn(rental);
+        // Mock the repository's save method to return the object it was given
+        when(damageReportRepository.save(any(DamageReport.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        DamageReport savedReport = new DamageReport.Builder()
-                .copy(reportToCreate)
-                .setUuid(UUID.randomUUID())
-                .setDateAndTime(LocalDateTime.now())
-                .setCreatedAt(LocalDateTime.now())
-                .setDeleted(false)
-                .setId(2)
-                .build();
-        savedReport = new DamageReport.Builder().copy(savedReport).setUpdatedAt(savedReport.getCreatedAt()).build();
+        // --- Act ---
+        DamageReport createdReport = damageReportService.create(damageReport);
 
+        // --- Assert ---
+        assertNotNull(createdReport);
+        assertNotNull(createdReport.getUuid()); // Should be set by the service if null
+        assertNotNull(createdReport.getDateAndTime()); // Should be set if null
+        assertFalse(createdReport.isDeleted());
+        assertEquals("Scratch on the left door", createdReport.getDescription());
 
-        when(rentalService.read(sampleRental.getUuid())).thenReturn(sampleRental);
-        when(damageReportRepository.save(any(DamageReport.class))).thenReturn(savedReport);
-
-        DamageReport created = damageReportService.create(reportToCreate);
-
-        assertNotNull(created);
-        assertEquals(savedReport.getDescription(), created.getDescription());
-        assertNotNull(created.getId());
-        assertNotNull(created.getUuid());
-        assertNotNull(created.getDateAndTime());
-        assertNotNull(created.getCreatedAt());
-        assertFalse(created.isDeleted());
-        assertEquals(sampleRental, created.getRental());
-        verify(rentalService).read(sampleRental.getUuid());
-        verify(damageReportRepository).save(any(DamageReport.class));
+        // Verify that the dependencies were called
+        verify(rentalService, times(1)).read(rental.getUuid());
+        verify(damageReportRepository, times(1)).save(any(DamageReport.class));
     }
 
     @Test
-    void create_shouldThrowIllegalArgumentException_whenRentalIsNull() {
-        DamageReport reportWithNullRental = new DamageReport.Builder()
-                .setRental(null)
-                .setDescription("Test")
-                .build();
+    @DisplayName("Should throw ResourceNotFoundException when creating a report for a non-existent rental")
+    void create_WithNonExistentRental_ShouldThrowException() {
+        // --- Arrange ---
+        // Mock the rentalService to return null, simulating a non-existent rental
+        when(rentalService.read(rental.getUuid())).thenReturn(null);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            damageReportService.create(reportWithNullRental);
+        // --- Act & Assert ---
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
+            damageReportService.create(damageReport);
         });
+
+        assertEquals("Associated Rental not found with UUID: " + rental.getUuid(), exception.getMessage());
+
+        // Verify that the save method was never called
+        verify(damageReportRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when creating a report without a rental")
+    void create_WithNullRental_ShouldThrowException() {
+        // --- Arrange ---
+        damageReport = new DamageReport.Builder().setRental(null).build(); // Make the rental object null
+
+        // --- Act & Assert ---
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            damageReportService.create(damageReport);
+        });
+
         assertEquals("Rental and Rental UUID must be provided for a damage report.", exception.getMessage());
-        verify(rentalService, never()).read(any(UUID.class));
-        verify(damageReportRepository, never()).save(any(DamageReport.class));
+        verify(damageReportRepository, never()).save(any());
     }
 
     @Test
-    void create_shouldThrowIllegalArgumentException_whenRentalUuidIsNull() {
-        // Create a Rental mock that returns null for getUuid()
-        Rental rentalWithNullUuidSpy = spy(Rental.builder().setId(1).build()); // Spy on a real object or use a mock
-        doReturn(null).when(rentalWithNullUuidSpy).getUuid();
+    @DisplayName("Should successfully update a damage report")
+    void update_WithValidData_ShouldSucceed() {
+        // --- Arrange ---
+        UUID reportUuid = UUID.randomUUID();
+        damageReport = new DamageReport.Builder().copy(damageReport)
+                        .setId(1)
+                        .setUuid(reportUuid)
+                        .setDescription("Deep scratch and dent").build();
 
 
-        DamageReport reportWithNullRentalUuid = new DamageReport.Builder()
-                .setRental(rentalWithNullUuidSpy) // Use the spy/mock
-                .setDescription("Test where rental object exists but its UUID is null")
+        DamageReport updatedState = new DamageReport.Builder()
+                .setId(1)
+                .setUuid(reportUuid)
+                .setDescription("Updated: Deep scratch and dent")
+                .setRental(rental) // The rental must remain the same
                 .build();
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            damageReportService.create(reportWithNullRentalUuid);
+        // Mock finding the existing report
+        when(damageReportRepository.findByIdAndDeletedFalse(1)).thenReturn(Optional.of(damageReport));
+        // Mock the save operation
+        when(damageReportRepository.save(any(DamageReport.class))).thenReturn(updatedState);
+
+        // --- Act ---
+        DamageReport result = damageReportService.update(updatedState);
+
+        // --- Assert ---
+        assertNotNull(result);
+        assertEquals("Updated: Deep scratch and dent", result.getDescription());
+        verify(damageReportRepository, times(1)).findByIdAndDeletedFalse(1);
+        verify(damageReportRepository, times(1)).save(updatedState);
+    }
+
+    // ... inside DamageReportServiceImplTest.java ...
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when trying to update the rental on a report")
+    void update_WhenChangingRental_ShouldThrowException() {
+        // --- Arrange ---
+        // THE FIX IS HERE: We must provide a valid 'existingReport' that HAS a rental,
+        // because we want to test the logic that PREVENTS that rental from being changed.
+
+        // 1. Create a valid "existing" report that we'll pretend is in the database.
+        // It has our original `rental` object associated with it.
+        DamageReport existingReport = new DamageReport.Builder()
+                .setId(1)
+                .setRental(this.rental) // Use the rental created in setUp()
+                .build();
+
+        // 2. Create a different rental object for the update attempt.
+        Rental newRental = new Rental.Builder().setUuid(UUID.randomUUID()).build();
+
+        // 3. Create the incoming DTO/payload that attempts the illegal change.
+        DamageReport updatedStateWithDifferentRental = new DamageReport.Builder()
+                .setId(1)
+                .setRental(newRental) // Attempting to change the rental
+                .build();
+
+        // 4. Mock the repository to return our valid "existing" report.
+        when(damageReportRepository.findByIdAndDeletedFalse(1)).thenReturn(Optional.of(existingReport));
+
+        // --- Act & Assert ---
+        // Now, the test will correctly check the part of the code that compares the two different rental UUIDs.
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            damageReportService.update(updatedStateWithDifferentRental);
         });
-        assertEquals("Rental and Rental UUID must be provided for a damage report.", exception.getMessage());
-        verify(rentalService, never()).read(any(UUID.class)); // Should not proceed to read if UUID is null
-        verify(damageReportRepository, never()).save(any(DamageReport.class));
-    }
 
-
-    @Test
-    void create_shouldThrowResourceNotFoundException_whenRentalDoesNotExist() {
-        UUID nonExistentRentalUuid = UUID.randomUUID();
-        Rental rentalForReport = Rental.builder().setUuid(nonExistentRentalUuid).setId(99).build();
-        DamageReport reportToCreate = new DamageReport.Builder()
-                .setRental(rentalForReport)
-                .setDescription("Test")
-                .build();
-
-        when(rentalService.read(nonExistentRentalUuid)).thenReturn(null);
-
-        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-            damageReportService.create(reportToCreate);
-        });
-        assertEquals("Associated Rental not found with UUID: " + nonExistentRentalUuid, exception.getMessage());
-        verify(rentalService).read(nonExistentRentalUuid);
-        verify(damageReportRepository, never()).save(any(DamageReport.class));
-    }
-
-    // --- Read by UUID Tests ---
-    @Test
-    void readByUuid_shouldReturnReport_whenFoundAndNotDeleted() {
-        when(damageReportRepository.findByUuidAndDeletedFalse(commonReportUuid)).thenReturn(Optional.of(sampleDamageReport));
-        DamageReport found = damageReportService.read(commonReportUuid);
-        assertNotNull(found);
-        assertEquals(sampleDamageReport.getId(), found.getId());
-        verify(damageReportRepository).findByUuidAndDeletedFalse(commonReportUuid);
-    }
-
-    @Test
-    void readByUuid_shouldReturnNull_whenNotFound() {
-        UUID nonExistentUuid = UUID.randomUUID();
-        when(damageReportRepository.findByUuidAndDeletedFalse(nonExistentUuid)).thenReturn(Optional.empty());
-        DamageReport found = damageReportService.read(nonExistentUuid);
-        assertNull(found);
-        verify(damageReportRepository).findByUuidAndDeletedFalse(nonExistentUuid);
-    }
-
-    // --- Read by Integer ID Tests (Interface method) ---
-    @Test
-    void readByIntegerId_shouldReturnReport_whenFoundAndNotDeleted() {
-        when(damageReportRepository.findByIdAndDeletedFalse(1)).thenReturn(Optional.of(sampleDamageReport));
-        DamageReport found = damageReportService.read(Integer.valueOf(1)); // Use Integer object
-        assertNotNull(found);
-        assertEquals(sampleDamageReport.getUuid(), found.getUuid());
-        verify(damageReportRepository).findByIdAndDeletedFalse(1);
-    }
-
-    @Test
-    void readByIntegerId_shouldReturnNull_whenNotFound() {
-        when(damageReportRepository.findByIdAndDeletedFalse(99)).thenReturn(Optional.empty());
-        DamageReport found = damageReportService.read(Integer.valueOf(99)); // Use Integer object
-        assertNull(found);
-        verify(damageReportRepository).findByIdAndDeletedFalse(99);
-    }
-
-    // --- Read by int ID (Deprecated) Tests ---
-    @Test
-    @SuppressWarnings("deprecation")
-    void readByIntIdDeprecated_shouldReturnOptionalReport_whenFound() {
-        when(damageReportRepository.findByIdAndDeletedFalse(1)).thenReturn(Optional.of(sampleDamageReport));
-        Optional<DamageReport> foundOpt = damageReportService.read(1); // Calls deprecated read(int id)
-        assertTrue(foundOpt.isPresent());
-        assertEquals(sampleDamageReport.getUuid(), foundOpt.get().getUuid());
-        verify(damageReportRepository).findByIdAndDeletedFalse(1);
-    }
-
-    @Test
-    @SuppressWarnings("deprecation")
-    void readByIntIdDeprecated_shouldReturnEmptyOptional_whenNotFound() {
-        when(damageReportRepository.findByIdAndDeletedFalse(99)).thenReturn(Optional.empty());
-        Optional<DamageReport> foundOpt = damageReportService.read(99); // Calls deprecated read(int id)
-        assertFalse(foundOpt.isPresent());
-        verify(damageReportRepository).findByIdAndDeletedFalse(99);
-    }
-
-
-    // --- Update Tests ---
-    @Test
-    void update_shouldUpdateAndReturnReport_whenValid() {
-        DamageReport updatesToApply = new DamageReport.Builder()
-                .copy(sampleDamageReport)
-                .setDescription("Updated description: Severe dent and paint chip.")
-                .setRepairCost(250.00)
-                .build();
-
-        DamageReport updatedAndSavedReport = new DamageReport.Builder()
-                .copy(updatesToApply)
-                .setUpdatedAt(LocalDateTime.now())
-                .build();
-
-        when(damageReportRepository.findByIdAndDeletedFalse(sampleDamageReport.getId())).thenReturn(Optional.of(sampleDamageReport));
-        when(damageReportRepository.save(any(DamageReport.class))).thenReturn(updatedAndSavedReport);
-
-        DamageReport updated = damageReportService.update(updatesToApply);
-
-        assertNotNull(updated);
-        assertEquals(updatesToApply.getDescription(), updated.getDescription());
-        assertEquals(updatesToApply.getRepairCost(), updated.getRepairCost());
-        assertEquals(sampleDamageReport.getRental().getUuid(), updated.getRental().getUuid());
-        verify(damageReportRepository).findByIdAndDeletedFalse(sampleDamageReport.getId());
-        verify(damageReportRepository).save(updatesToApply);
-    }
-
-    @Test
-    void update_shouldThrowResourceNotFoundException_whenIdIsZeroAndNotExists() {
-        DamageReport reportWithDefaultId = new DamageReport.Builder()
-                .setRental(sampleRental).setDescription("ID is 0").build(); // ID will be 0
-
-        when(damageReportRepository.findByIdAndDeletedFalse(0)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-            damageReportService.update(reportWithDefaultId);
-        });
-        assertTrue(exception.getMessage().contains("DamageReport not found with ID: 0 for update."));
-        verify(damageReportRepository).findByIdAndDeletedFalse(0);
-        verify(damageReportRepository, never()).save(any(DamageReport.class));
-    }
-
-*/
-/*
-    // IF DamageReport.id were Integer
-    @Test
-    void update_shouldThrowIllegalArgumentException_whenIdObjectIsNull() {
-        DamageReport reportWithNullId = new DamageReport.Builder()
-                // Explicitly set the Integer ID to null, or don't set it if builder defaults to null
-                .setId(0) // Assuming builder.setId(Integer id)
-                .setRental(sampleRental)
-                .setDescription("ID is a null Integer")
-                .build();
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            damageReportService.update(reportWithNullId);
-        });
-        assertEquals("DamageReport ID cannot be null for update.", exception.getMessage());
-        verify(damageReportRepository, never()).findByIdAndDeletedFalse(any());
-        verify(damageReportRepository, never()).save(any(DamageReport.class));
-    }
-*//*
-
-
-
-    @Test
-    void update_shouldThrowResourceNotFoundException_whenReportNotFound() {
-        DamageReport nonExistentReport = new DamageReport.Builder()
-                .setId(99)
-                .setUuid(UUID.randomUUID())
-                .setRental(sampleRental)
-                .setDescription("Non Existent")
-                .build();
-        when(damageReportRepository.findByIdAndDeletedFalse(99)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-            damageReportService.update(nonExistentReport);
-        });
-        assertEquals("DamageReport not found with ID: 99 for update.", exception.getMessage());
-        verify(damageReportRepository).findByIdAndDeletedFalse(99);
-        verify(damageReportRepository, never()).save(any(DamageReport.class));
-    }
-
-    @Test
-    void update_shouldThrowIllegalArgumentException_whenRentalIsChanged() {
-        Rental differentRental = Rental.builder().setUuid(UUID.randomUUID()).setId(2).build();
-        DamageReport updatesWithDifferentRental = new DamageReport.Builder()
-                .copy(sampleDamageReport)
-                .setRental(differentRental)
-                .build();
-
-        when(damageReportRepository.findByIdAndDeletedFalse(sampleDamageReport.getId())).thenReturn(Optional.of(sampleDamageReport));
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            damageReportService.update(updatesWithDifferentRental);
-        });
+        // Assert the correct error message is thrown.
         assertEquals("The associated Rental of a DamageReport cannot be changed post-creation.", exception.getMessage());
-        verify(damageReportRepository).findByIdAndDeletedFalse(sampleDamageReport.getId());
-        verify(damageReportRepository, never()).save(any(DamageReport.class));
+
+        // Verify that the save method was never called because the validation failed.
+        verify(damageReportRepository, never()).save(any());
     }
 
     @Test
-    void update_shouldThrowIllegalArgumentException_whenUpdatedRentalIsNull() {
-        DamageReport updatesWithNullRental = new DamageReport.Builder()
-                .copy(sampleDamageReport)
-                .setRental(null)
-                .build();
+    @DisplayName("Should soft-delete a damage report by ID")
+    void deleteById_WhenReportExists_ShouldReturnTrue() {
+        // --- Arrange ---
+        damageReport=  new DamageReport.Builder().setId(1).build();
+        when(damageReportRepository.findByIdAndDeletedFalse(1)).thenReturn(Optional.of(damageReport));
 
-        when(damageReportRepository.findByIdAndDeletedFalse(sampleDamageReport.getId())).thenReturn(Optional.of(sampleDamageReport));
+        // --- Act ---
+        boolean result = damageReportService.deleteById(1);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            damageReportService.update(updatesWithNullRental);
-        });
-        assertEquals("The associated Rental of a DamageReport cannot be changed post-creation.", exception.getMessage());
-        verify(damageReportRepository).findByIdAndDeletedFalse(sampleDamageReport.getId());
-        verify(damageReportRepository, never()).save(any(DamageReport.class));
-    }
-
-
-    // --- Delete by Integer ID Tests (delete and deleteById) ---
-    @Test
-    void deleteByIntegerId_shouldSoftDeleteAndReturnTrue_whenFound() {
-        when(damageReportRepository.findByIdAndDeletedFalse(sampleDamageReport.getId())).thenReturn(Optional.of(sampleDamageReport));
-        doAnswer(invocation -> {
-            DamageReport arg = invocation.getArgument(0);
-            assertTrue(arg.isDeleted()); return arg;
-        }).when(damageReportRepository).save(any(DamageReport.class));
-
-        boolean result = damageReportService.delete(Integer.valueOf(sampleDamageReport.getId()));
-
+        // --- Assert ---
         assertTrue(result);
-        verify(damageReportRepository).findByIdAndDeletedFalse(sampleDamageReport.getId());
-        verify(damageReportRepository).save(argThat(dr -> dr.isDeleted() && dr.getId() == sampleDamageReport.getId()));
+        // Verify that the save method was called on an entity that is marked as deleted
+        verify(damageReportRepository, times(1)).save(argThat(report -> report.isDeleted()));
     }
 
     @Test
-    void deleteByIntegerId_shouldReturnFalse_whenNotFound() {
+    @DisplayName("Should return false when trying to delete a non-existent report")
+    void deleteById_WhenReportDoesNotExist_ShouldReturnFalse() {
+        // --- Arrange ---
         when(damageReportRepository.findByIdAndDeletedFalse(99)).thenReturn(Optional.empty());
-        boolean result = damageReportService.delete(Integer.valueOf(99));
+
+        // --- Act ---
+        boolean result = damageReportService.deleteById(99);
+
+        // --- Assert ---
         assertFalse(result);
-        verify(damageReportRepository).findByIdAndDeletedFalse(99);
-        verify(damageReportRepository, never()).save(any(DamageReport.class));
+        verify(damageReportRepository, never()).save(any());
     }
-
-    @Test
-    void deleteByIdPrimitive_shouldSoftDeleteAndReturnTrue_whenFound() {
-        when(damageReportRepository.findByIdAndDeletedFalse(sampleDamageReport.getId())).thenReturn(Optional.of(sampleDamageReport));
-        doAnswer(invocation -> {
-            DamageReport arg = invocation.getArgument(0);
-            assertTrue(arg.isDeleted()); return arg;
-        }).when(damageReportRepository).save(any(DamageReport.class));
-
-        boolean result = damageReportService.deleteById(sampleDamageReport.getId());
-
-        assertTrue(result);
-        verify(damageReportRepository).findByIdAndDeletedFalse(sampleDamageReport.getId());
-        verify(damageReportRepository).save(argThat(dr -> dr.isDeleted() && dr.getId() == sampleDamageReport.getId()));
-    }
-
-
-    // --- GetAll Tests ---
-    @Test
-    void getAll_shouldReturnListOfNonDeletedReports() {
-        DamageReport anotherReport = new DamageReport.Builder().setId(2).setUuid(UUID.randomUUID()).setRental(sampleRental).setDescription("Another report").build();
-        List<DamageReport> list = List.of(sampleDamageReport, anotherReport);
-        when(damageReportRepository.findByDeletedFalse()).thenReturn(list);
-
-        List<DamageReport> result = damageReportService.getAll();
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        verify(damageReportRepository).findByDeletedFalse();
-    }
-
-    @Test
-    void getAll_shouldReturnEmptyList_whenNoNonDeletedEntriesExist() {
-        when(damageReportRepository.findByDeletedFalse()).thenReturn(Collections.emptyList());
-        List<DamageReport> result = damageReportService.getAll();
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-        verify(damageReportRepository).findByDeletedFalse();
-    }
-}*/
+}

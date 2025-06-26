@@ -10,11 +10,16 @@ import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.entity.CarImage;
 import za.ac.cput.domain.enums.ImageType;
 import za.ac.cput.domain.enums.PriceGroup;
+import za.ac.cput.exception.BadRequestException;
 import za.ac.cput.exception.ResourceNotFoundException;
+import za.ac.cput.repository.BookingRepository;
 import za.ac.cput.repository.CarRepository;
 import za.ac.cput.service.ICarService;
 import za.ac.cput.service.IFileStorageService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +39,8 @@ public class CarServiceImpl implements ICarService {
     private static final Logger log = LoggerFactory.getLogger(CarServiceImpl.class);
     private final CarRepository carRepository;
     private final IFileStorageService fileStorageService;
+    private final BookingRepository bookingRepository;
+
 
     /**
      * Constructs the CarServiceImpl with its required dependencies.
@@ -42,9 +49,12 @@ public class CarServiceImpl implements ICarService {
      * @param fileStorageService The service for handling physical file storage operations (e.g., saving images).
      */
     @Autowired
-    public CarServiceImpl(CarRepository carRepository, IFileStorageService fileStorageService) {
+    public CarServiceImpl(CarRepository carRepository, IFileStorageService fileStorageService,
+                          BookingRepository bookingRepository) {
         this.carRepository = carRepository;
         this.fileStorageService = fileStorageService;
+        this.bookingRepository = bookingRepository;
+
         log.info("CarServiceImpl initialized.");
     }
 
@@ -253,5 +263,74 @@ public class CarServiceImpl implements ICarService {
         }
 
         return carRepository.save(existingCar);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Car> findAvailableCarsByDateRange(LocalDate startDate, LocalDate endDate) {
+        log.debug("Fetching available cars for date range: {} to {}", startDate, endDate);
+        if (startDate.isAfter(endDate)) {
+            throw new BadRequestException("Start date cannot be after end date.");
+        }
+
+        // Convert LocalDate to LocalDateTime for the query
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        // Step 1: Find all car IDs that are busy during this period.
+        List<Integer> busyCarIds = bookingRepository.findBookedCarIdsByDateRange(startDateTime, endDateTime);
+
+        // Handle the case where no cars are booked.
+        // The `NotIn` clause fails with an empty list in some JPA providers.
+        if (busyCarIds.isEmpty()) {
+            // If no cars are busy, then all available cars are returned.
+            return carRepository.findAllByAvailableTrueAndDeletedFalse();
+        }
+
+        // Step 2: Find all available cars whose IDs are NOT in the busy list.
+        return carRepository.findByAvailableTrueAndDeletedFalseAndIdNotIn(busyCarIds);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Car> getAvailableCarsByPrice(PriceGroup priceGroup, LocalDate startDate, LocalDate endDate) {
+        log.debug("Fetching available cars by price group: {} for date range: {} to {}", priceGroup, startDate, endDate);
+        List<Integer> busyCarIds = getBusyCarIds(startDate, endDate);
+
+        if (busyCarIds.isEmpty()) {
+            return carRepository.findAllByAvailableTrueAndDeletedFalseAndPriceGroup(priceGroup);
+        }
+        return carRepository.findByAvailableTrueAndDeletedFalseAndPriceGroupAndIdNotIn(priceGroup, busyCarIds);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Car> findAllAvailableByCategory(String category, LocalDate startDate, LocalDate endDate) {
+        log.debug("Fetching available cars by category: '{}' for date range: {} to {}", category, startDate, endDate);
+        List<Integer> busyCarIds = getBusyCarIds(startDate, endDate);
+
+        if (busyCarIds.isEmpty()) {
+            return carRepository.findAllByAvailableTrueAndDeletedFalseAndCategory(category);
+        }
+        return carRepository.findByAvailableTrueAndDeletedFalseAndCategoryAndIdNotIn(category, busyCarIds);
+    }
+
+    // This is the main availability method, it remains largely the same
+
+
+    /**
+     * Private helper method to encapsulate the logic for finding busy car IDs.
+     * This avoids code duplication across the public service methods.
+     */
+    private List<Integer> getBusyCarIds(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            throw new BadRequestException("Start date and end date are required for availability checks.");
+        }
+        if (startDate.isAfter(endDate)) {
+            throw new BadRequestException("Start date cannot be after end date.");
+        }
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        return bookingRepository.findBookedCarIdsByDateRange(startDateTime, endDateTime);
     }
 }

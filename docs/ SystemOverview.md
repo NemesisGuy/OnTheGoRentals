@@ -2,157 +2,147 @@
 
 ## System Purpose
 
-**OnTheGoRentals** is a car rental management application built using Spring Boot. It manages the entire rental
-lifecycle from bookings to active rentals, damage reporting, and administrative functions.
+**OnTheGoRentals** is a car rental management application built using Spring Boot. It manages the entire rental lifecycle from user authentication and booking to active rentals, damage reporting, and comprehensive administrative functions.
 
-## I. Core Technologies
+## I. High-Level Features
 
-* **Backend:** Java, Spring Boot, Spring MVC, Spring Security, Spring Data JPA
-* **Database:** Relational DB (H2 in development; PostgreSQL/MySQL in production)
-* **Build Tool:** Maven or Gradle
-* **Utilities:** Lombok
+*   **Multi-Faceted Authentication:** Standard email/password registration, secure password reset, and one-click Google OAuth2 login.
+*   **Full Rental Lifecycle Management:** Users can book cars; administrators can manage the fleet, confirm bookings, handle rentals, and log damage reports.
+*   **Comprehensive Admin Dashboard:** A central hub for managing all aspects of the application, including users, cars, content, and system health.
+*   **Transactional Email Notifications:** Automated, templated HTML emails for user registration and password resets.
+*   **Full Observability Stack:** Integrated suite for metrics (Prometheus), logging (Loki), and visualization (Grafana).
 
-## II. User Roles and Flow
+## II. Core Technologies
+
+*   **Backend:** Java, Spring Boot, Spring MVC, Spring Security (JWT & OAuth2), Spring Data JPA, Thymeleaf
+*   **Database:** Relational DB (H2 in development; MySQL in production)
+*   **Build Tool:** Maven
+*   **Observability:** Prometheus, Grafana, Loki
+*   **Utilities:** Lombok
+
+## III. User Roles and Flow
 
 ### Public User:
 
-* Browse available cars
-* View About Us, FAQs, Help Center
+*   Browse available cars.
+*   View About Us, FAQs, Help Center.
+*   Register via email/password or Google account.
+*   Request a password reset.
 
 ### Authenticated User:
 
-* Book cars
-* Manage bookings (confirm, cancel)
-* View rental history
-* Edit profile
+*   Book cars.
+*   Manage personal bookings (confirm, cancel).
+*   View rental history.
+*   Edit profile information.
 
 ### Admin/Staff:
 
-* Manage Users, Cars, Bookings, Rentals, Drivers, Damage Reports
-* Manage site content (About Us, Contact Us, FAQs, Help Center, Settings)
+*   Manage Users, Cars, Bookings, Rentals, Drivers, Damage Reports.
+*   Manage site content (About Us, Contact Us, FAQs, Help Center, Settings).
 
 ### Booking to Rental Flow:
 
-1. User makes a **Booking**
-2. Staff confirms the booking and turns it into a **Rental**
-3. User returns the car; staff marks **Rental** as returned
+1.  User makes a **Booking**.
+2.  Staff confirms the booking and converts it into a **Rental**.
+3.  User returns the car; staff marks the **Rental** as returned.
 
-## III. Key Entities
+## IV. Key Entities
 
 ### User
 
-* UUID, internal ID, firstName, lastName, email, encodedPassword, roles
-* Optional Google auth, profileImageUrl
-* Associations: Roles (many-to-many), Rentals (one-to-many)
+*   UUID, internal ID, firstName, lastName, email, encodedPassword, roles.
+*   Optional Google auth, profileImageUrl.
+*   **Password Reset Fields:** `passwordResetToken`, `passwordResetTokenExpiry`.
+*   Associations: Roles (many-to-many), Rentals (one-to-many).
 
 ### Role
 
-* Internal ID, RoleName enum (USER, ADMIN, SUPERADMIN)
+*   Internal ID, RoleName enum (USER, ADMIN, SUPERADMIN).
 
 ### Car
 
-* UUID, ID, make, model, year, category, PriceGroup enum, licensePlate, availability
+*   UUID, ID, make, model, year, category, PriceGroup enum, licensePlate, availability.
 
-### Booking
+### Booking / Rental
 
-* UUID, ID, user, car, booking dates, booking status
+*   Manages the reservation and active rental states with associations to User and Car, tracking relevant dates and statuses.
 
-### Rental
+### Other Core Entities
 
-* UUID, ID, user, car, (optional) driver, issueDate, expectedReturnDate, actualReturnDate, status, issuerId, receiverId
+*   **Driver:** Optional driver details for a rental.
+*   **DamageReport:** Details any damage associated with a rental.
+*   **RefreshToken:** Securely manages JWT refresh capabilities for a user.
+*   **Content Entities:** AboutUs, Faq, HelpCenter, etc., for managing site content.
 
-### Driver
-
-* UUID, ID, personal/license details, availability
-* Currently optional; could represent external driver assigned by admin
-
-### DamageReport
-
-* UUID, ID, description, time, location, repairCost, associated Rental
-* Can occur under staff or customer care
-
-### ContactUs
-
-* UUID, ID, name, email, subject, message, submissionDate
-
-### AboutUs / Faq / HelpCenter / Feedback / Settings
-
-* Static informational content and app-wide config settings
-
-### RefreshToken
-
-* Associated with User, for JWT refresh
-
-## IV. API Structure
+## V. API Structure
 
 ### Base Path: `/api/v1/`
 
 #### Public Endpoints:
 
-* `/cars`, `/faqs`, `/contact-us`, `/about-us`, `/help-topics`
+*   `/cars/**`, `/faqs/**`, `/contact-us`, `/about-us/**`, `/help-center/**`
 
 #### Auth Endpoints:
 
-* `/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`
+*   `/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`
+*   `/auth/forgot-password`, `/auth/reset-password`
+*   `/oauth2/authorization/google` (Handled by Spring Security)
 
 #### User Profile:
 
-* `/users/me/profile`, `/users/me/rental-history`
+*   `/users/me/profile`, `/users/me/rental-history`
 
-#### Bookings:
+#### Bookings & Rentals:
 
-* `/bookings` (create, view, update, confirm, cancel)
-
-#### Rentals:
-
-* `/rentals` (view own, confirm, cancel, complete)
+*   `/bookings/**`, `/rentals/**`
 
 #### Admin Panel:
 
-* `/admin/...` for managing all entities (CRUD with UUIDs)
+*   `/admin/...` for managing all entities (CRUD with UUIDs).
 
-## V. Services
+## VI. Services
 
-* Services follow the `I...Service` interface and `...ServiceImpl` implementation pattern
-* Pure logic, no DTOs or ResponseEntity
-* Uses Builder pattern for updates
+*   Services follow the `I...Service` interface and `...ServiceImpl` implementation pattern.
+*   Encapsulate business logic; do not interact with DTOs or `ResponseEntity`.
+*   Use the Builder pattern for immutable updates.
 
-## VI. Security
+## VII. Security
 
-* **JWT Authentication**
+*   **JWT Authentication:**
+  *   Access Token: Short-lived, returned in the response body.
+  *   Refresh Token: Long-lived, stored in a secure, HttpOnly cookie.
+*   **Google OAuth2:** Integrated into the Spring Security filter chain, with custom success handlers to provision users and issue application-specific JWTs.
+*   **JwtAuthenticationFilter:** The primary filter that parses JWTs from incoming requests to authenticate users.
 
-    * Access Token: Short-lived, in response body
-    * Refresh Token: Long-lived, in secure HTTP-only cookies
+## VIII. DTOs and Mappers
 
-* **JwtUtilities:** Token creation, validation, and cookie logic
+*   **DTO Types:** RequestDTOs (for input, using `@Valid`) and ResponseDTOs (for output).
+*   **Mapper Layer:** Stateless utility classes responsible for Entity <-> DTO transformations.
 
-* **Spring Security:** Role-based authorization (USER, ADMIN, SUPERADMIN)
+## IX. Error Handling
 
-* **JwtAuthenticationFilter:** Parses token from requests
+*   **Custom Exceptions:** A suite of specific exceptions like `ResourceNotFoundException`, `TokenRefreshException`, `BadRequestException`.
+*   **GlobalExceptionHandler:** A `@RestControllerAdvice` component that catches exceptions and maps them to a standard `ApiResponseWrapper`, ensuring consistent error responses.
+*   **Response Wrapper:** A custom advice that wraps all successful API responses in the same standard envelope for consistency.
 
-## VII. DTOs and Mappers
+## X. Data Seeding
 
-* **DTO Types:** RequestDTOs (with @Valid), ResponseDTOs
-* **Mapper Layer:** Entity <-> DTO transformations
+*   A `CommandLineRunner` seeds the database with default `USER`/`ADMIN` roles and test user accounts on startup if they do not already exist.
 
-## VIII. Error Handling
+## XI. Transactional Emails
 
-* **Custom Exceptions:** ResourceNotFound, TokenRefresh, etc.
-* **GlobalExceptionHandler:** Maps errors into `ApiResponse<T>`
-* **Response Wrapper:** Wraps success responses into standard format
+*   **IEmailService:** An abstraction for sending emails.
+*   **EmailServiceImpl:** An `@Async` (non-blocking) implementation that sends emails via an external SMTP relay service (e.g., Brevo).
+*   **Thymeleaf:** Used to create dynamic, reusable HTML templates for professional-looking emails (e.g., welcome messages, password reset instructions).
 
-## IX. Data Seeding
+## XII. Observability & Monitoring
 
-* CommandLineRunner seeds USER/ADMIN roles and test users if missing or soft-deleted
-
-## X. Logging
-
-* Uses SLF4J (Logback) with user context awareness
-* Logs requester identity (email or GUEST)
-* Logging levels: INFO, DEBUG, WARN, ERROR
+*   **Metrics:** Spring Boot Actuator exposes application metrics via a `/actuator/prometheus` endpoint.
+*   **Prometheus:** A time-series database configured to periodically scrape and store these metrics.
+*   **Logging:** Centralized log aggregation is handled by **Loki**, with **Promtail** acting as the agent to collect logs from all Docker containers.
+*   **Visualization:** **Grafana** serves as the unified dashboard for visualizing both Prometheus metrics and Loki logs, enabling powerful correlation between performance spikes and application log events.
 
 ---
 
-This document serves as the current architecture baseline of the **OnTheGoRentals** system before the upcoming
-architectural revisions and feature enhancements (e.g., incident reports outside customer custody, driver clarification,
-and refined rental status handling).
+This document serves as the current architecture baseline of the **OnTheGoRentals** system.

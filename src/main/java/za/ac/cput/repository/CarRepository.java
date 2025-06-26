@@ -101,4 +101,27 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
      * * otherwise an empty Optional.
      */
     Optional<Car> findByIdAndDeletedFalse(Integer id);
+
+    /**
+     * Finds all cars that are available and NOT in the provided list of IDs.
+     * This is used to filter out cars that are already booked for a specific period.
+     *
+     * @param excludedCarIds A list of car IDs to exclude from the result.
+     * @return A list of available cars.
+     */
+
+    // Keep this one for the date-only search
+    List<Car> findByAvailableTrueAndDeletedFalseAndIdNotIn(List<Integer> excludedCarIds);
+
+    // --- NEW METHODS FOR COMBINED FILTERS ---
+
+    /**
+     * Finds available cars of a specific category, excluding those with conflicting bookings.
+     */
+    List<Car> findByAvailableTrueAndDeletedFalseAndCategoryAndIdNotIn(String category, List<Integer> excludedCarIds);
+
+    /**
+     * Finds available cars of a specific price group, excluding those with conflicting bookings.
+     */
+    List<Car> findByAvailableTrueAndDeletedFalseAndPriceGroupAndIdNotIn(PriceGroup priceGroup, List<Integer> excludedCarIds);
 }

@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.enums.PriceGroup;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -132,4 +133,12 @@ public interface ICarService extends IService<Car, Integer> {
      */
     Car addImagesToCar(UUID carUuid, List<MultipartFile> files);
 
+    @Transactional(readOnly = true)
+    List<Car> getAvailableCarsByPrice(PriceGroup priceGroup, LocalDate startDate, LocalDate endDate);
+
+    @Transactional(readOnly = true)
+    List<Car> findAllAvailableByCategory(String category, LocalDate startDate, LocalDate endDate);
+
+    @Transactional(readOnly = true)
+    List<Car> findAvailableCarsByDateRange(LocalDate startDate, LocalDate endDate);
 }

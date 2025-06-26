@@ -9,11 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.dto.response.CarResponseDTO;
 import za.ac.cput.domain.entity.Car;
 import za.ac.cput.domain.enums.PriceGroup;
@@ -23,9 +21,11 @@ import za.ac.cput.service.ICarService;
 import za.ac.cput.service.IFileStorageService;
 import za.ac.cput.utils.SecurityUtils;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * CarController.java
@@ -90,13 +90,13 @@ public class CarController {
      *
      * @return A ResponseEntity containing a list of available car DTOs.
      */
-    @Operation(summary = "Get available cars", description = "Retrieves a list of all cars currently marked as available.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved available cars"),
-            @ApiResponse(responseCode = "204", description = "No cars are currently available")
-    })
-    @GetMapping("/available")
-    public ResponseEntity<List<CarResponseDTO>> getAvailableCars() {
+//    @Operation(summary = "Get available cars", description = "Retrieves a list of all cars currently marked as available.")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Successfully retrieved available cars"),
+//            @ApiResponse(responseCode = "204", description = "No cars are currently available")
+//    })
+//    @GetMapping("/available")
+   /* public ResponseEntity<List<CarResponseDTO>> getAvailableCars() {
         String requesterId = SecurityUtils.getRequesterIdentifier();
         log.info("Requester [{}]: Request to get all available cars.", requesterId);
 
@@ -105,7 +105,7 @@ public class CarController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(CarMapper.toDtoList(availableCars, fileStorageService, publicApiUrl));
-    }
+    }*/
 
     /**
      * Retrieves a list of available cars filtered by a specific price group.
@@ -169,5 +169,77 @@ public class CarController {
             log.warn("Requester [{}]: Invalid price group string provided: '{}'.", requesterId, groupString);
             throw new BadRequestException("Invalid price group value: '" + groupString + "'.");
         }
+    }
+   /*
+    @Operation(summary = "Get available cars for a date range", description = "Finds cars that are genuinely available for the given start and end dates.")
+    @GetMapping("/available")
+    public ResponseEntity<List<CarResponseDTO>> getAvailableCarsByDateRange(
+            @Parameter(description = "Optional start date for availability search (YYYY-MM-DD)")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+
+            @Parameter(description = "Optional end date for availability search (YYYY-MM-DD)")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+
+            @Parameter(description = "Optional category to filter by")
+            @RequestParam(required = false) String category,
+
+            @Parameter(description = "Optional price group to filter by")
+            @RequestParam(required = false) PriceGroup priceGroup
+    ) {
+        log.info("Request to find available cars for range: {} to {}", startDate, endDate);
+        List<Car> availableCars;
+
+        if (category != null) {
+            log.debug("Filtering by category: {}", category);
+            availableCars = carService.findAllAvailableByCategory(category, startDate, endDate);
+        } else if (priceGroup != null) {
+            log.debug("Filtering by price group: {}", priceGroup);
+            availableCars = carService.getAvailableCarsByPrice(priceGroup, startDate, endDate);
+        } else {
+            availableCars = carService.findAvailableCarsByDateRange(startDate, endDate);
+        }
+
+        return ResponseEntity.ok(CarMapper.toDtoList(availableCars, fileStorageService, publicApiUrl));
+    }
+    */
+
+    @Operation(summary = "Get available cars, with optional filters", description = "Finds cars that are available. If dates are provided, it checks for booking conflicts. Can be further filtered.")
+    @GetMapping("/available")
+    public ResponseEntity<List<CarResponseDTO>> getAvailableCars(
+            @Parameter(description = "Optional start date for availability search (YYYY-MM-DD)")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+
+            @Parameter(description = "Optional end date for availability search (YYYY-MM-DD)")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+
+            @Parameter(description = "Optional category to filter by")
+            @RequestParam(required = false) String category,
+
+            @Parameter(description = "Optional price group to filter by")
+            @RequestParam(required = false) PriceGroup priceGroup
+    ) {
+        String requesterId = SecurityUtils.getRequesterIdentifier();
+        log.info("Requester [{}]: Request to find available cars.", requesterId);
+
+        List<Car> availableCars;
+
+        // --- NEW LOGIC: Check if dates were provided ---
+        if (startDate != null && endDate != null) {
+            log.debug("Date range provided. Searching with date-based availability for range: {} to {}", startDate, endDate);
+            // This is the advanced search logic
+            if (category != null && !category.isEmpty()) {
+                availableCars = carService.findAllAvailableByCategory(category, startDate, endDate);
+            } else if (priceGroup != null) {
+                availableCars = carService.getAvailableCarsByPrice(priceGroup, startDate, endDate);
+            } else {
+                availableCars = carService.findAvailableCarsByDateRange(startDate, endDate);
+            }
+        } else {
+            // Fallback for when no dates are provided
+            log.debug("No date range provided. Getting all generally available cars.");
+            availableCars = carService.getAllAvailableCars();
+        }
+
+        return ResponseEntity.ok(CarMapper.toDtoList(availableCars, fileStorageService, publicApiUrl));
     }
 }
